@@ -148,6 +148,30 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 	if (btnSiguiente2) {
 		btnSiguiente2.addEventListener('click', function() {
+			const dniInput = document.getElementById('dni');
+			const dniValue = dniInput.value.trim();
+			let dniErrorMsg = '';
+			if (!dniValue) {
+				dniErrorMsg = 'El campo DNI es obligatorio.';
+			} else if (!/^\d{7,8}$/.test(dniValue)) {
+				dniErrorMsg = 'El DNI debe tener entre 7 y 8 números.';
+			}
+			let dniErrorDiv = document.getElementById('dni-error');
+			if (!dniErrorDiv) {
+				dniErrorDiv = document.createElement('div');
+				dniErrorDiv.id = 'dni-error';
+				dniErrorDiv.className = 'text-danger mt-1';
+				dniInput.parentNode.appendChild(dniErrorDiv);
+			}
+			if (dniErrorMsg) {
+				dniErrorDiv.textContent = dniErrorMsg;
+				dniInput.classList.add('is-invalid');
+				dniInput.focus();
+				return;
+			} else {
+				dniErrorDiv.textContent = '';
+				dniInput.classList.remove('is-invalid');
+			}
 			paso2.classList.add('d-none');
 			paso3.classList.remove('d-none');
 			setTimeout(function() {
@@ -161,6 +185,13 @@ document.addEventListener('DOMContentLoaded', function() {
 				}
 			}, 200); // Espera a que el modal renderice
 		});
+		// Solo permitir números y máximo 8 caracteres en el input DNI
+		const dniInput = document.getElementById('dni');
+		if (dniInput) {
+			dniInput.addEventListener('input', function() {
+				this.value = this.value.replace(/\D/g, '').slice(0, 8);
+			});
+		}
 	}
 	// ...existing code...
 	if (btnAnterior3) {
