@@ -72,9 +72,73 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	if (btnSiguiente1) {
 		btnSiguiente1.addEventListener('click', function() {
+			const cuitInput = document.getElementById('cuit');
+			const razonInput = document.getElementById('razonSocial');
+			const cuitValue = cuitInput.value.trim();
+			const razonValue = razonInput.value.trim();
+			let errorMsg = '';
+			// Validar CUIT obligatorio y formato
+			if (!cuitValue) {
+				errorMsg = 'El campo CUIT es obligatorio.';
+			} else if (!(/^\d{11}$/.test(cuitValue))) {
+				errorMsg = 'El CUIT debe tener exactamente 11 números.';
+			}
+			// Validar Razón Social obligatorio
+			let razonErrorMsg = '';
+			if (!razonValue) {
+				razonErrorMsg = 'El campo Razón Social es obligatorio.';
+			}
+			// Mostrar error CUIT
+			let errorDiv = document.getElementById('cuit-error');
+			if (!errorDiv) {
+				errorDiv = document.createElement('div');
+				errorDiv.id = 'cuit-error';
+				errorDiv.className = 'text-danger mt-1';
+				cuitInput.parentNode.appendChild(errorDiv);
+			}
+			if (errorMsg) {
+				errorDiv.textContent = errorMsg;
+				cuitInput.classList.add('is-invalid');
+				cuitInput.focus();
+			} else {
+				errorDiv.textContent = '';
+				cuitInput.classList.remove('is-invalid');
+			}
+			// Mostrar error Razón Social
+			let razonErrorDiv = document.getElementById('razonSocial-error');
+			if (!razonErrorDiv) {
+				razonErrorDiv = document.createElement('div');
+				razonErrorDiv.id = 'razonSocial-error';
+				razonErrorDiv.className = 'text-danger mt-1';
+				razonInput.parentNode.appendChild(razonErrorDiv);
+			}
+			if (razonErrorMsg) {
+				razonErrorDiv.textContent = razonErrorMsg;
+				razonInput.classList.add('is-invalid');
+				if (!errorMsg) razonInput.focus();
+			} else {
+				razonErrorDiv.textContent = '';
+				razonInput.classList.remove('is-invalid');
+			}
+			// Si hay algún error, no avanzar
+			if (errorMsg || razonErrorMsg) return;
 			paso1.classList.add('d-none');
 			paso2.classList.remove('d-none');
 		});
+		// Solo permitir números y máximo 11 caracteres en el input CUIT
+		const cuitInput = document.getElementById('cuit');
+		if (cuitInput) {
+			cuitInput.addEventListener('input', function() {
+				this.value = this.value.replace(/\D/g, '').slice(0, 11);
+			});
+		}
+		// Forzar mayúsculas en Razón Social
+		const razonInput = document.getElementById('razonSocial');
+		if (razonInput) {
+			razonInput.addEventListener('input', function() {
+				this.value = this.value.toUpperCase();
+			});
+		}
 	}
 	if (btnAnterior2) {
 		btnAnterior2.addEventListener('click', function() {
