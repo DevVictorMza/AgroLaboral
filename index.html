@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cepas Laborales - Mendoza</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm fixed-top">
+        <div class="container-fluid">
+            <!-- Logo y texto eliminados de la navbar -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Ofertas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#servicios">Nuestros servicios</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <button class="btn btn-outline-light me-2">Login</button>
+                    <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#modalRegistroEmpleador">Registro Empleador</button>
+                </div>
+                    <!-- Modal se moverá fuera del nav -->
+                    </div>
+                </div>
+            </div>
+        </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- Banner -->
+    <!-- Modal Registro Empleador (Wizard) -->
+    <div class="modal fade" id="modalRegistroEmpleador" tabindex="-1" aria-labelledby="modalRegistroEmpleadorLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h4 class="modal-title w-100 text-center fw-bold" id="modalRegistroEmpleadorLabel">Registro de Empleador</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body pt-0">
+                    <!-- Wizard Steps -->
+                    <div class="wizard-progress mb-4">
+                        <div class="progress wizard-progress-bar">
+                            <div class="progress-bar bg-primary wizard-progress-bar-inner" role="progressbar"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2 wizard-steps-labels">
+                            <div class="wizard-step-label active"><span>1.</span> <span>Datos<br>de Empresa</span></div>
+                            <div class="wizard-step-label active"><span>2.</span> <span>Administrador</span></div>
+                            <div class="wizard-step-label active"><span>3.</span> <span>Establecimiento</span></div>
+                            <div class="wizard-step-label"><span>4.</span> <span>Admin.<br>Establec.</span></div>
+                            <div class="wizard-step-label"><span>5.</span> <span>Confirmación</span></div>
+                        </div>
+                    </div>
+                    <!-- Paso 1: Datos de empresa -->
+                    <form id="form-registro-empleador-paso1">
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3">Datos de Empresa</h5>
+                            <div class="mb-3">
+                                <label for="cuit" class="form-label">CUIT</label>
+                                <input type="text" class="form-control" id="cuit" name="cuit" placeholder="Ej: 20-12345678-9">
+                            </div>
+                            <div class="mb-3">
+                                <label for="razonSocial" class="form-label">Razón Social</label>
+                                <input type="text" class="form-control" id="razonSocial" name="razonSocial" placeholder="Ej: Finca Los Olivos">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="button" class="btn btn-primary" id="btn-siguiente-paso1">Siguiente</button>
+                        </div>
+                    </form>
+                    <!-- Paso 2: Administrador de Empresa (oculto por ahora) -->
+                    <form id="form-registro-empleador-paso2" class="d-none">
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3">Administrador de Empresa</h5>
+                            <div class="mb-3">
+                                <label for="dni" class="form-label">DNI</label>
+                                <input type="text" class="form-control" id="dni" name="dni" placeholder="Ej: 12345678">
+                            </div>
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ej: Juan">
+                            </div>
+                            <div class="mb-3">
+                                <label for="apellido" class="form-label">Apellido</label>
+                                <input type="text" class="form-control" id="apellido" name="apellido" placeholder="Ej: Pérez">
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="Ej: juan@email.com">
+                            </div>
+                            <div class="mb-3">
+                                <label for="telefono" class="form-label">Teléfono</label>
+                                <input type="text" class="form-control" id="telefono" name="telefono" placeholder="Ej: 2611234567">
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Contraseña</label>
+                                <input type="password" class="form-control" id="password" name="password">
+                            </div>
+                            <div class="mb-3">
+                                <label for="password2" class="form-label">Repetir Contraseña</label>
+                                <input type="password" class="form-control" id="password2" name="password2">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-secondary" id="btn-anterior-paso2">Anterior</button>
+                            <button type="button" class="btn btn-primary" id="btn-siguiente-paso2">Siguiente</button>
+                        </div>
+                    </form>
+                    <!-- Paso 3: Establecimiento (oculto por ahora) -->
+                    <form id="form-registro-empleador-paso3" class="d-none">
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3">Establecimiento</h5>
+                            <div class="mb-3">
+                                <label for="nombreEstablecimiento" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="nombreEstablecimiento" name="nombreEstablecimiento" placeholder="Ej: Finca Los Olivos">
+                            </div>
+                            <div class="mb-3">
+                                <label for="renspa" class="form-label">Número de RENSPA</label>
+                                <input type="text" class="form-control" id="renspa" name="renspa" placeholder="Ej: 1234567890">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Especies</label>
+                                <div class="dropdown">
+                                    <button class="form-control text-start dropdown-toggle" type="button" id="dropdownEspecies" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Seleccionar especies
+                                    </button>
+                                    <ul class="dropdown-menu w-100" aria-labelledby="dropdownEspecies" id="especies-list">
+                                        <li class="px-3 py-2 text-muted">Cargando especies...</li>
+                                    </ul>
+                                    <input type="hidden" id="especies" name="especies">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="departamento" class="form-label">Departamento</label>
+                                <select class="form-select" id="departamento" name="departamento">
+                                    <option value="">Cargando departamentos...</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="distrito" class="form-label">Distrito</label>
+                                <select class="form-select" id="distrito" name="distrito">
+                                    <option value="">Seleccionar distrito</option>
+                                    <option>Palmira</option>
+                                    <option>Alto Verde</option>
+                                    <option>Chapanay</option>
+                                    <option>El Central</option>
+                                    <option>El Divisadero</option>
+                                    <option>El Espino</option>
+                                    <option>El Ramblón</option>
+                                    <option>Ingeniero Giagnoni</option>
+                                    <option>Montecaseros</option>
+                                    <option>Chivilcoy</option>
+                                    <option>Algarrobo Grande</option>
+                                    <option>Alto Salvador</option>
+                                    <option>Colonia Las Rosas</option>
+                                    <option>Colonia Segovia</option>
+                                    <option>Colonia Italia</option>
+                                    <option>El Ñango</option>
+                                    <option>El Ramblón</option>
+                                    <option>El Central</option>
+                                    <option>El Divisadero</option>
+                                    <option>El Espino</option>
+                                    <option>Ingeniero Giagnoni</option>
+                                    <option>Montecaseros</option>
+                                    <option>Chivilcoy</option>
+                                    <option>Algarrobo Grande</option>
+                                    <option>Alto Salvador</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="calle" class="form-label">Calle</label>
+                                <input type="text" class="form-control" id="calle" name="calle" placeholder="Ej: Ruta 50">
+                            </div>
+                            <div class="mb-3">
+                                <label for="numeracion" class="form-label">Numeración</label>
+                                <input type="text" class="form-control" id="numeracion" name="numeracion" placeholder="Ej: 1234">
+                            </div>
+                            <div class="mb-3">
+                                <label for="codigoPostal" class="form-label">Código Postal</label>
+                                <input type="text" class="form-control" id="codigoPostal" name="codigoPostal" placeholder="Ej: 5584">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Mapa de Geolocalización</label>
+                                <div id="establecimiento-map" style="height: 250px; border-radius: 8px;"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="latitud" class="form-label">Latitud</label>
+                                    <input type="text" class="form-control" id="latitud" name="latitud" readonly>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="longitud" class="form-label">Longitud</label>
+                                    <input type="text" class="form-control" id="longitud" name="longitud" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-secondary" id="btn-anterior-paso3">Anterior</button>
+                            <button type="button" class="btn btn-primary" id="btn-siguiente-paso3">Siguiente</button>
+                        </div>
+                    </form>
+                    <!-- Paso 5: Confirmación (oculto por ahora) -->
+                    <form id="form-registro-empleador-paso5" class="d-none">
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3">Confirmación de Registro</h5>
+                            <ul class="list-group mb-3" id="confirmacion-lista">
+                                <!-- Los datos se llenarán por JS -->
+                            </ul>
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-outline-secondary" id="btn-anterior-paso5">Anterior</button>
+                                <button type="submit" class="btn btn-success" id="btn-confirmar-registro">Confirmar Registro</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="banner-container text-white d-flex align-items-center justify-content-center">
+        <div class="text-center banner-text-content">
+            <!-- Ícono de uva eliminado -->
+            <h1 class="display-4 fw-bold">Bienvenidos a Cepas Laborales</h1>
+            <p class="lead">La plataforma para conectar Al Empresario y Al trabajador.</p>
+        </div>
+    </div>
+    <!-- Servicios -->
+    <section id="servicios" class="container py-5">
+        <h2 class="text-center fw-bold mb-2">Nuestros Servicios</h2>
+        <p class="text-center mb-5">Conectamos el talento agrícola con las mejores oportunidades laborales</p>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-ubicacion">
+                    <div class="card-body">
+                        <div class="mb-3 servicio-icon servicio-icon-ubicacion"><i class="fas fa-map-marker-alt"></i></div>
+                        <h5 class="fw-bold">Ubicación Precisa</h5>
+                        <p class="mb-0">Encuentra trabajos cerca de tu ubicación o personal en tu zona específica</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-perfiles">
+                    <div class="card-body">
+                        <div class="mb-3 servicio-icon servicio-icon-perfiles"><i class="fas fa-user-check"></i></div>
+                        <h5 class="fw-bold">Perfiles Verificados</h5>
+                        <p class="mb-0">Todos los usuarios pasan por un proceso de verificación para garantizar confiabilidad</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-trabajo">
+                    <div class="card-body">
+                        <div class="mb-3 servicio-icon servicio-icon-trabajo"><i class="fas fa-clock"></i></div>
+                        <h5 class="fw-bold">Trabajo Temporal y Fijo</h5>
+                        <p class="mb-0">Desde trabajos de temporada hasta empleos permanentes en el sector agrícola</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-comunicacion">
+                    <div class="card-body">
+                        <div class="mb-3 servicio-icon servicio-icon-comunicacion"><i class="fas fa-comments"></i></div>
+                        <h5 class="fw-bold">Comunicación Directa</h5>
+                        <p class="mb-0">Chatea directamente con empleadores o trabajadores sin intermediarios</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-pagos">
+                    <div class="card-body">
+                        <div class="mb-3 servicio-icon servicio-icon-pagos"><i class="fas fa-shield-alt"></i></div>
+                        <h5 class="fw-bold">Pagos Seguros</h5>
+                        <p class="mb-0">Sistema de pagos protegido que garantiza la seguridad de ambas partes</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-horarios">
+                    <div class="card-body">
+                        <div class="mb-3 servicio-icon servicio-icon-horarios"><i class="fas fa-calendar-alt"></i></div>
+                        <h5 class="fw-bold">Horarios Flexibles</h5>
+                        <p class="mb-0">Adapta tus horarios de trabajo según tus necesidades y disponibilidad</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cómo Funciona -->
+    <section id="como-funciona" class="container py-5">
+        <h2 class="text-center fw-bold mb-2">¿Cómo Funciona?</h2>
+        <p class="text-center mb-5">Simple, rápido y efectivo</p>
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <h4 class="fw-bold text-success text-center mb-4">Para Trabajadores</h4>
+                <ul class="list-unstyled">
+                    <li class="d-flex mb-4 align-items-start">
+                        <span class="funciona-num funciona-num-trabajador me-3">1</span>
+                        <div>
+                            <span class="fw-bold">Regístrate y Crea tu Perfil</span><br>
+                            <span class="text-muted">Completa tu información personal, experiencia y habilidades</span>
+                        </div>
+                    </li>
+                    <li class="d-flex mb-4 align-items-start">
+                        <span class="funciona-num funciona-num-trabajador me-3">2</span>
+                        <div>
+                            <span class="fw-bold">Busca Ofertas de Trabajo</span><br>
+                            <span class="text-muted">Explora trabajos disponibles en tu área geográfica</span>
+                        </div>
+                    </li>
+                    <li class="d-flex mb-4 align-items-start">
+                        <span class="funciona-num funciona-num-trabajador me-3">3</span>
+                        <div>
+                            <span class="fw-bold">Aplica y Conecta</span><br>
+                            <span class="text-muted">Envía tu solicitud y conecta directamente con empleadores</span>
+                        </div>
+                    </li>
+                    <li class="d-flex mb-4 align-items-start">
+                        <span class="funciona-num funciona-num-trabajador me-3">4</span>
+                        <div>
+                            <span class="fw-bold">Trabaja y Recibe Pago</span><br>
+                            <span class="text-muted">Completa el trabajo y recibe tu pago de forma segura</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-5">
+                <h4 class="fw-bold text-primary text-center mb-4">Para Empleadores</h4>
+                <ul class="list-unstyled">
+                    <li class="d-flex mb-4 align-items-start">
+                        <span class="funciona-num funciona-num-empleador me-3">1</span>
+                        <div>
+                            <span class="fw-bold">Crea tu Cuenta Empresarial</span><br>
+                            <span class="text-muted">Registra tu empresa y verifica tu información</span>
+                        </div>
+                    </li>
+                    <li class="d-flex mb-4 align-items-start">
+                        <span class="funciona-num funciona-num-empleador me-3">2</span>
+                        <div>
+                            <span class="fw-bold">Publica Ofertas de Trabajo</span><br>
+                            <span class="text-muted">Describe el trabajo, ubicación y requisitos necesarios</span>
+                        </div>
+                    </li>
+                    <li class="d-flex mb-4 align-items-start">
+                        <span class="funciona-num funciona-num-empleador me-3">3</span>
+                        <div>
+                            <span class="fw-bold">Revisa Candidatos</span><br>
+                            <span class="text-muted">Examina perfiles y selecciona a los mejores candidatos</span>
+                        </div>
+                    </li>
+                    <li class="d-flex mb-4 align-items-start">
+                        <span class="funciona-num funciona-num-empleador me-3">4</span>
+                        <div>
+                            <span class="fw-bold">Contrata y Supervisa</span><br>
+                            <span class="text-muted">Contrata trabajadores y supervisa el progreso del trabajo</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    <!-- Main Content -->
+    <main class="container py-5">
+        <div class="row justify-content-center mb-4">
+            <div class="col-md-5 mb-3 mb-md-0">
+                <div class="card stat-card text-center shadow-sm">
+                    <div class="card-body">
+                        <i class="fas fa-tractor fa-2x mb-2 stat-icon"></i>
+                        <h5 class="card-title">Fincas Registradas</h5>
+                        <div class="display-6 fw-bold">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="card stat-card text-center shadow-sm">
+                    <div class="card-body">
+                        <i class="fas fa-handshake fa-2x mb-2 stat-icon"></i>
+                        <h5 class="card-title">Ofertas Disponibles</h5>
+                        <div class="display-6 fw-bold">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <h2 class="text-center mb-4">Mapa Interactivo de Fincas</h2>
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div id="map" class="my-3"></div>
+            </div>
+        </div>
+    </main>
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center p-3 mt-auto">
+        <div class="container">
+            <p>&copy; 2025 Cepas Laborales. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- App JS -->
+    <script src="js/app.js"></script>
+</body>
+</html>

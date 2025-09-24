@@ -1,0 +1,122 @@
+/* Cómo Funciona */
+.funciona-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 1.3rem;
+    color: #fff;
+    margin-top: 2px;
+}
+.funciona-num-trabajador {
+    background: #19c37d;
+}
+.funciona-num-empleador {
+    background: #2979ff;
+}
+/* Servicios */
+.servicio-card-ubicacion { background: #e9fbe9; }
+.servicio-card-perfiles { background: #e9f2fe; }
+.servicio-card-trabajo { background: #fff3ed; }
+.servicio-card-comunicacion { background: #f3e9fe; }
+.servicio-card-pagos { background: #fffbe9; }
+.servicio-card-horarios { background: #e9fafe; }
+
+.servicio-icon { font-size: 2.2rem; }
+.servicio-icon-ubicacion { color: #3ec97c; }
+.servicio-icon-perfiles { color: #3a7bd5; }
+.servicio-icon-trabajo { color: #ff8800; }
+.servicio-icon-comunicacion { color: #a259e6; }
+.servicio-icon-pagos { color: #ffd600; }
+.servicio-icon-horarios { color: #1bc9c9; }
+
+/* Stat cards íconos */
+.stat-icon { color: #7E57C2; }
+:root {
+    --primary-color: #7E57C2;
+    --secondary-color: #8D6E63;
+    --light-bg: #F1F8E9;
+    --dark-text: #333;
+    --navbar-height: 60px;
+
+:root {
+    --primary-color: #7E57C2; /* Grape Violet */
+    --secondary-color: #8D6E63; /* Brown */
+    --light-bg: #F1F8E9;
+    --dark-text: #333;
+    --navbar-height: 60px;
+}
+
+
+body {
+    background-color: #f6fbe9;
+    color: var(--dark-text);
+}
+
+
+.stat-card {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 20px 0 10px 0;
+    transition: box-shadow 0.2s;
+}
+.stat-card:hover {
+    box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+}
+.stat-card i {
+    color: #7E57C2;
+}
+
+.btn-primary:hover, .btn-outline-light:hover {
+    background-color: #704db0;
+    border-color: #704db0;
+}
+
+.nav-link.active {
+    font-weight: bold;
+}
+
+/* Banner */
+.banner-container {
+    position: relative;
+    height: 50vh;
+    min-height: 300px;
+    background: url('../pexels-nc-farm-bureau-mark-8658558.jpg') center center/cover no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.banner-text-content {
+    position: relative;
+    z-index: 1;
+    background: rgba(60,60,60,0.45);
+    border-radius: 12px;
+    padding: 1.5rem 2.5rem;
+    color: #fff;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+}
+
+.banner-icon {
+    max-width: 120px;
+    height: auto;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+}
+
+/* Map */
+#map, #farm-map-selector {
+    height: 400px;
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin-bottom: 32px;
+}
+/* Fix Bootstrap modal z-index to always be above backdrop */
+.modal, .modal.show {
+    z-index: 1060 !important;
+}
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
