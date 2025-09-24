@@ -52,6 +52,86 @@
 
 // Inicializar el mapa principal de la página (no el del wizard)
 document.addEventListener('DOMContentLoaded', function() {
+	// --- Función de ojo para mostrar/ocultar contraseña (siempre activa) ---
+	function addPasswordToggle(inputId) {
+		const input = document.getElementById(inputId);
+		if (!input) return;
+		let wrapper = input.parentNode;
+		// Evitar duplicar el icono
+		if (wrapper.querySelector('.password-toggle')) return;
+		const toggle = document.createElement('span');
+		toggle.className = 'password-toggle';
+		toggle.style.cursor = 'pointer';
+		toggle.style.position = 'absolute';
+		toggle.style.right = '12px';
+		toggle.style.top = '50%';
+		toggle.style.transform = 'translateY(-50%)';
+		toggle.innerHTML = '<i class="bi bi-eye-slash" style="font-size:1.2em;"></i>';
+		// Crear contenedor relativo si no existe
+		if (getComputedStyle(wrapper).position === 'static') {
+			wrapper.style.position = 'relative';
+		}
+		wrapper.appendChild(toggle);
+		toggle.addEventListener('click', function() {
+			if (input.type === 'password') {
+				input.type = 'text';
+				toggle.innerHTML = '<i class="bi bi-eye" style="font-size:1.2em;"></i>';
+			} else {
+				input.type = 'password';
+				toggle.innerHTML = '<i class="bi bi-eye-slash" style="font-size:1.2em;"></i>';
+			}
+		});
+	}
+	addPasswordToggle('password');
+	addPasswordToggle('password2');
+
+	// Coincidencia visual de contraseñas (siempre activa)
+	const passwordInput = document.getElementById('password');
+	const password2Input = document.getElementById('password2');
+	if (password2Input && passwordInput) {
+		// Mensaje de éxito
+		let successMsg = document.getElementById('password-success-msg');
+		if (!successMsg) {
+			successMsg = document.createElement('div');
+			successMsg.id = 'password-success-msg';
+			successMsg.className = 'text-success mt-1';
+			password2Input.parentNode.appendChild(successMsg);
+		}
+		function updatePasswordMatch() {
+			const passwordValue = passwordInput.value;
+			const password2Value = password2Input.value;
+			let password2Icon = document.getElementById('password2-icon');
+			if (!password2Icon) {
+				password2Icon = document.createElement('span');
+				password2Icon.id = 'password2-icon';
+				password2Icon.style.marginLeft = '8px';
+				password2Input.parentNode.appendChild(password2Icon);
+			}
+			// Validación de mínimo 4 caracteres
+			if (passwordValue.length < 4 || password2Value.length < 4) {
+				password2Icon.innerHTML = '';
+				successMsg.textContent = '';
+				return;
+			}
+			if (!password2Value) {
+				password2Icon.innerHTML = '';
+				successMsg.textContent = '';
+			} else if (passwordValue !== password2Value) {
+				password2Icon.innerHTML = '<i class="bi bi-x-circle-fill" style="color:#dc3545;font-size:1.2em;vertical-align:middle;"></i>';
+				successMsg.textContent = '';
+			} else {
+				password2Icon.innerHTML = '<i class="bi bi-check-circle-fill" style="color:#198754;font-size:1.2em;vertical-align:middle;"></i>';
+				successMsg.textContent = '¡Sus contraseñas coinciden!';
+			}
+		}
+		password2Input.addEventListener('input', function() {
+			this.value = this.value.replace(/\s/g, '');
+			updatePasswordMatch();
+		});
+		passwordInput.addEventListener('input', function() {
+			updatePasswordMatch();
+		});
+	}
 	var map = L.map('map').setView([-32.89, -68.83], 8); // Mendoza
 	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 		maxZoom: 18,
@@ -148,14 +228,46 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 	if (btnSiguiente2) {
 		btnSiguiente2.addEventListener('click', function() {
-			const dniInput = document.getElementById('dni');
-			const dniValue = dniInput.value.trim();
-			let dniErrorMsg = '';
+		const dniInput = document.getElementById('dni');
+		const nombreInput = document.getElementById('nombre');
+		const apellidoInput = document.getElementById('apellido');
+	const emailInput = document.getElementById('email');
+	const telefonoInput = document.getElementById('telefono');
+	const passwordInput = document.getElementById('password');
+	const password2Input = document.getElementById('password2');
+	const dniValue = dniInput.value.trim();
+	const nombreValue = nombreInput.value.trim();
+	const apellidoValue = apellidoInput.value.trim();
+	const emailValue = emailInput.value.trim();
+	const telefonoValue = telefonoInput.value.trim();
+	const passwordValue = passwordInput ? passwordInput.value : '';
+	const password2Value = password2Input ? password2Input.value : '';
+	let dniErrorMsg = '';
+	let nombreErrorMsg = '';
+	let apellidoErrorMsg = '';
+	let emailErrorMsg = '';
+	let telefonoErrorMsg = '';
+	let passwordErrorMsg = '';
+	let password2ErrorMsg = '';
+			// Validación DNI
 			if (!dniValue) {
 				dniErrorMsg = 'El campo DNI es obligatorio.';
 			} else if (!/^\d{7,8}$/.test(dniValue)) {
 				dniErrorMsg = 'El DNI debe tener entre 7 y 8 números.';
 			}
+			// Validación Nombre
+			if (!nombreValue) {
+				nombreErrorMsg = 'El campo Nombre es obligatorio.';
+			} else if (!/^[A-ZÁÉÍÓÚÑ ]+$/.test(nombreValue)) {
+				nombreErrorMsg = 'El nombre solo debe contener letras y espacios.';
+			}
+			// Validación Apellido
+			if (!apellidoValue) {
+				apellidoErrorMsg = 'El campo Apellido es obligatorio.';
+			} else if (!/^[A-ZÁÉÍÓÚÑ ]+$/.test(apellidoValue)) {
+				apellidoErrorMsg = 'El apellido solo debe contener letras y espacios.';
+			}
+			// Error DNI
 			let dniErrorDiv = document.getElementById('dni-error');
 			if (!dniErrorDiv) {
 				dniErrorDiv = document.createElement('div');
@@ -167,11 +279,146 @@ document.addEventListener('DOMContentLoaded', function() {
 				dniErrorDiv.textContent = dniErrorMsg;
 				dniInput.classList.add('is-invalid');
 				dniInput.focus();
-				return;
 			} else {
 				dniErrorDiv.textContent = '';
 				dniInput.classList.remove('is-invalid');
 			}
+			// Error Nombre
+			let nombreErrorDiv = document.getElementById('nombre-error');
+			if (!nombreErrorDiv) {
+				nombreErrorDiv = document.createElement('div');
+				nombreErrorDiv.id = 'nombre-error';
+				nombreErrorDiv.className = 'text-danger mt-1';
+				nombreInput.parentNode.appendChild(nombreErrorDiv);
+			}
+			if (nombreErrorMsg) {
+				nombreErrorDiv.textContent = nombreErrorMsg;
+				nombreInput.classList.add('is-invalid');
+				if (!dniErrorMsg) nombreInput.focus();
+			} else {
+				nombreErrorDiv.textContent = '';
+				nombreInput.classList.remove('is-invalid');
+			}
+			// Error Apellido
+			let apellidoErrorDiv = document.getElementById('apellido-error');
+			if (!apellidoErrorDiv) {
+				apellidoErrorDiv = document.createElement('div');
+				apellidoErrorDiv.id = 'apellido-error';
+				apellidoErrorDiv.className = 'text-danger mt-1';
+				apellidoInput.parentNode.appendChild(apellidoErrorDiv);
+			}
+			if (apellidoErrorMsg) {
+				apellidoErrorDiv.textContent = apellidoErrorMsg;
+				apellidoInput.classList.add('is-invalid');
+				if (!dniErrorMsg && !nombreErrorMsg) apellidoInput.focus();
+			} else {
+				apellidoErrorDiv.textContent = '';
+				apellidoInput.classList.remove('is-invalid');
+			}
+			// Error Email
+			let emailErrorDiv = document.getElementById('email-error');
+			if (!emailErrorDiv) {
+				emailErrorDiv = document.createElement('div');
+				emailErrorDiv.id = 'email-error';
+				emailErrorDiv.className = 'text-danger mt-1';
+				emailInput.parentNode.appendChild(emailErrorDiv);
+			}
+			// Validación Email
+			if (!emailValue) {
+				emailErrorMsg = 'El campo Email es obligatorio.';
+			} else if (!/^([a-zA-Z0-9_\.-]+)@([a-zA-Z0-9\.-]+)\.([a-zA-Z]{2,})$/.test(emailValue)) {
+				emailErrorMsg = 'Ingrese un email válido.';
+			}
+			if (emailErrorMsg) {
+				emailErrorDiv.textContent = emailErrorMsg;
+				emailInput.classList.add('is-invalid');
+				if (!dniErrorMsg && !nombreErrorMsg && !apellidoErrorMsg) emailInput.focus();
+			} else {
+				emailErrorDiv.textContent = '';
+				emailInput.classList.remove('is-invalid');
+			}
+			// Error Teléfono
+			let telefonoErrorDiv = document.getElementById('telefono-error');
+			if (!telefonoErrorDiv) {
+				telefonoErrorDiv = document.createElement('div');
+				telefonoErrorDiv.id = 'telefono-error';
+				telefonoErrorDiv.className = 'text-danger mt-1';
+				telefonoInput.parentNode.appendChild(telefonoErrorDiv);
+			}
+			// Validación Teléfono
+			if (!telefonoValue) {
+				telefonoErrorMsg = 'El campo Teléfono es obligatorio.';
+			} else if (!/^\d+$/.test(telefonoValue)) {
+				telefonoErrorMsg = 'El teléfono solo debe contener números.';
+			}
+			if (telefonoErrorMsg) {
+				telefonoErrorDiv.textContent = telefonoErrorMsg;
+				telefonoInput.classList.add('is-invalid');
+				if (!dniErrorMsg && !nombreErrorMsg && !apellidoErrorMsg && !emailErrorMsg) telefonoInput.focus();
+			} else {
+				telefonoErrorDiv.textContent = '';
+				telefonoInput.classList.remove('is-invalid');
+			}
+			// Error Password
+			let passwordErrorDiv = document.getElementById('password-error');
+			if (!passwordErrorDiv) {
+				passwordErrorDiv = document.createElement('div');
+				passwordErrorDiv.id = 'password-error';
+				passwordErrorDiv.className = 'text-danger mt-1';
+				passwordInput.parentNode.appendChild(passwordErrorDiv);
+			}
+			if (!passwordValue) {
+				passwordErrorMsg = 'El campo Contraseña es obligatorio.';
+			} else if (/\s/.test(passwordValue)) {
+				passwordErrorMsg = 'La contraseña no debe contener espacios.';
+			} else if (passwordValue.length < 4) {
+				passwordErrorMsg = 'La contraseña debe tener al menos 4 caracteres.';
+			}
+			if (passwordErrorMsg) {
+				passwordErrorDiv.textContent = passwordErrorMsg;
+				passwordInput.classList.add('is-invalid');
+				if (!dniErrorMsg && !nombreErrorMsg && !apellidoErrorMsg && !emailErrorMsg && !telefonoErrorMsg) passwordInput.focus();
+			} else {
+				passwordErrorDiv.textContent = '';
+				passwordInput.classList.remove('is-invalid');
+			}
+			// Error Password2 y coincidencia
+			let password2ErrorDiv = document.getElementById('password2-error');
+			let password2Icon = document.getElementById('password2-icon');
+			if (password2Input) {
+				if (!password2ErrorDiv) {
+					password2ErrorDiv = document.createElement('div');
+					password2ErrorDiv.id = 'password2-error';
+					password2ErrorDiv.className = 'text-danger mt-1';
+					password2Input.parentNode.appendChild(password2ErrorDiv);
+				}
+				if (!password2Icon) {
+					password2Icon = document.createElement('span');
+					password2Icon.id = 'password2-icon';
+					password2Icon.style.marginLeft = '8px';
+					password2Input.parentNode.appendChild(password2Icon);
+				}
+				if (!password2Value) {
+					password2ErrorMsg = 'Repita la contraseña.';
+					password2Icon.innerHTML = '';
+				} else if (passwordValue !== password2Value) {
+					password2ErrorMsg = 'La contraseña no coincide.';
+					password2Icon.innerHTML = '<i class="bi bi-x-circle-fill" style="color:#dc3545;font-size:1.2em;vertical-align:middle;"></i>';
+				} else {
+					password2ErrorMsg = '';
+					password2Icon.innerHTML = '<i class="bi bi-check-circle-fill" style="color:#198754;font-size:1.2em;vertical-align:middle;"></i>';
+				}
+				if (password2ErrorMsg) {
+					password2ErrorDiv.textContent = password2ErrorMsg;
+					password2Input.classList.add('is-invalid');
+					if (!dniErrorMsg && !nombreErrorMsg && !apellidoErrorMsg && !emailErrorMsg && !telefonoErrorMsg && !passwordErrorMsg) password2Input.focus();
+				} else {
+					password2ErrorDiv.textContent = '';
+					password2Input.classList.remove('is-invalid');
+				}
+			}
+			// Si hay algún error, no avanzar
+			if (dniErrorMsg || nombreErrorMsg || apellidoErrorMsg || emailErrorMsg || telefonoErrorMsg || passwordErrorMsg || password2ErrorMsg) return;
 			paso2.classList.add('d-none');
 			paso3.classList.remove('d-none');
 			setTimeout(function() {
@@ -183,6 +430,68 @@ document.addEventListener('DOMContentLoaded', function() {
 				if (distritoSelect) {
 					distritoSelect.innerHTML = '<option value="">Seleccionar distrito</option>';
 				}
+				// No permitir espacios en contraseña
+				const passwordInput = document.getElementById('password');
+				if (passwordInput) {
+					passwordInput.addEventListener('input', function() {
+						this.value = this.value.replace(/\s/g, '');
+					});
+				}
+				// No permitir espacios en repetir contraseña
+				const password2Input = document.getElementById('password2');
+				if (password2Input) {
+					password2Input.addEventListener('input', function() {
+						this.value = this.value.replace(/\s/g, '');
+						const passwordValue = passwordInput.value;
+						const password2Value = this.value;
+						let password2Icon = document.getElementById('password2-icon');
+						if (!password2Icon) {
+							password2Icon = document.createElement('span');
+							password2Icon.id = 'password2-icon';
+							password2Icon.style.marginLeft = '8px';
+							this.parentNode.appendChild(password2Icon);
+						}
+						if (!password2Value) {
+							password2Icon.innerHTML = '';
+						} else if (passwordValue !== password2Value) {
+							password2Icon.innerHTML = '<i class="bi bi-x-circle-fill" style="color:#dc3545;font-size:1.2em;vertical-align:middle;"></i>';
+						} else {
+							password2Icon.innerHTML = '<i class="bi bi-check-circle-fill" style="color:#198754;font-size:1.2em;vertical-align:middle;"></i>';
+						}
+					});
+				}
+				// Función de ojo para mostrar/ocultar contraseña
+				function addPasswordToggle(inputId) {
+					const input = document.getElementById(inputId);
+					if (!input) return;
+					let wrapper = input.parentNode;
+					// Evitar duplicar el icono
+					if (wrapper.querySelector('.password-toggle')) return;
+					const toggle = document.createElement('span');
+					toggle.className = 'password-toggle';
+					toggle.style.cursor = 'pointer';
+					toggle.style.position = 'absolute';
+					toggle.style.right = '12px';
+					toggle.style.top = '50%';
+					toggle.style.transform = 'translateY(-50%)';
+					toggle.innerHTML = '<i class="bi bi-eye-slash" style="font-size:1.2em;"></i>';
+					// Crear contenedor relativo si no existe
+					if (getComputedStyle(wrapper).position === 'static') {
+						wrapper.style.position = 'relative';
+					}
+					wrapper.appendChild(toggle);
+					toggle.addEventListener('click', function() {
+						if (input.type === 'password') {
+							input.type = 'text';
+							toggle.innerHTML = '<i class="bi bi-eye" style="font-size:1.2em;"></i>';
+						} else {
+							input.type = 'password';
+							toggle.innerHTML = '<i class="bi bi-eye-slash" style="font-size:1.2em;"></i>';
+						}
+					});
+				}
+				addPasswordToggle('password');
+				addPasswordToggle('password2');
 			}, 200); // Espera a que el modal renderice
 		});
 		// Solo permitir números y máximo 8 caracteres en el input DNI
@@ -190,6 +499,27 @@ document.addEventListener('DOMContentLoaded', function() {
 		if (dniInput) {
 			dniInput.addEventListener('input', function() {
 				this.value = this.value.replace(/\D/g, '').slice(0, 8);
+			});
+		}
+		// Forzar mayúsculas y solo letras en Nombre
+		const nombreInput = document.getElementById('nombre');
+		if (nombreInput) {
+			nombreInput.addEventListener('input', function() {
+				this.value = this.value.toUpperCase().replace(/[^A-ZÁÉÍÓÚÑ ]/g, '');
+			});
+		}
+		// Forzar mayúsculas y solo letras en Apellido
+		const apellidoInput = document.getElementById('apellido');
+		if (apellidoInput) {
+			apellidoInput.addEventListener('input', function() {
+				this.value = this.value.toUpperCase().replace(/[^A-ZÁÉÍÓÚÑ ]/g, '');
+			});
+		}
+		// Solo permitir números en Teléfono
+		const telefonoInput = document.getElementById('telefono');
+		if (telefonoInput) {
+			telefonoInput.addEventListener('input', function() {
+				this.value = this.value.replace(/\D/g, '');
 			});
 		}
 	}
