@@ -532,10 +532,218 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 	if (btnSiguiente3) {
 		btnSiguiente3.addEventListener('click', function() {
+			// --- Validación Nombre Establecimiento ---
+			const nombreEstInput = document.getElementById('nombreEstablecimiento');
+			const nombreEstValue = nombreEstInput.value.trim();
+			let nombreEstErrorMsg = '';
+			if (!nombreEstValue) {
+				nombreEstErrorMsg = 'El campo Nombre de Establecimiento es obligatorio.';
+			} else if (!/^[A-Z0-9 ]+$/.test(nombreEstValue)) {
+				nombreEstErrorMsg = 'Solo se permiten letras mayúsculas, números y espacios.';
+			}
+			let nombreEstErrorDiv = document.getElementById('nombreEstablecimiento-error');
+			if (!nombreEstErrorDiv) {
+				nombreEstErrorDiv = document.createElement('div');
+				nombreEstErrorDiv.id = 'nombreEstablecimiento-error';
+				nombreEstErrorDiv.className = 'text-danger mt-1';
+				nombreEstInput.parentNode.appendChild(nombreEstErrorDiv);
+			}
+			if (nombreEstErrorMsg) {
+				nombreEstErrorDiv.textContent = nombreEstErrorMsg;
+				nombreEstInput.classList.add('is-invalid');
+				nombreEstInput.focus();
+				return;
+			} else {
+				nombreEstErrorDiv.textContent = '';
+				nombreEstInput.classList.remove('is-invalid');
+			}
+
+			// --- Validación RENSPA ---
+			const renspaInput = document.getElementById('renspa');
+			const renspaValue = renspaInput.value.trim();
+			let renspaErrorMsg = '';
+			if (!renspaValue) {
+				renspaErrorMsg = 'El campo Número de RENSPA es obligatorio.';
+			} else if (!/^\d{17}$/.test(renspaValue)) {
+				renspaErrorMsg = 'El RENSPA debe tener exactamente 17 números.';
+			}
+			let renspaErrorDiv = document.getElementById('renspa-error');
+			if (!renspaErrorDiv) {
+				renspaErrorDiv = document.createElement('div');
+				renspaErrorDiv.id = 'renspa-error';
+				renspaErrorDiv.className = 'text-danger mt-1';
+				renspaInput.parentNode.appendChild(renspaErrorDiv);
+			}
+			if (renspaErrorMsg) {
+				renspaErrorDiv.textContent = renspaErrorMsg;
+				renspaInput.classList.add('is-invalid');
+				renspaInput.focus();
+				return;
+			} else {
+				renspaErrorDiv.textContent = '';
+				renspaInput.classList.remove('is-invalid');
+			}
+
+			// --- Validación Especies ---
+			const especiesInput = document.getElementById('especies');
+			const especiesErrorId = 'especies-error';
+			let especiesErrorDiv = document.getElementById(especiesErrorId);
+			if (!especiesErrorDiv) {
+				especiesErrorDiv = document.createElement('div');
+				especiesErrorDiv.id = especiesErrorId;
+				especiesErrorDiv.className = 'text-danger mt-1';
+				especiesInput.parentNode.appendChild(especiesErrorDiv);
+			}
+			let especiesSeleccionadas = [];
+			if (especiesInput.value) {
+				especiesSeleccionadas = especiesInput.value.split(',').filter(v => v.trim() !== '');
+			}
+			let especiesErrorMsg = '';
+			if (especiesSeleccionadas.length === 0) {
+				especiesErrorMsg = 'Debe seleccionar al menos una especie.';
+			} else if (especiesSeleccionadas.length > 5) {
+				especiesErrorMsg = 'Solo puede seleccionar hasta 5 especies.';
+			}
+			if (especiesSeleccionadas.some(v => !/^[0-9]+$/.test(v))) {
+				especiesErrorMsg = 'Selección inválida de especies.';
+			}
+			if (especiesErrorMsg) {
+				especiesErrorDiv.textContent = especiesErrorMsg;
+				especiesInput.classList.add('is-invalid');
+				especiesInput.focus();
+				return;
+			} else {
+				especiesErrorDiv.textContent = '';
+				especiesInput.classList.remove('is-invalid');
+			}
+
+			// --- Validación Departamento ---
+			const departamentoInput = document.getElementById('departamento');
+			let departamentoErrorDiv = document.getElementById('departamento-error');
+			if (!departamentoErrorDiv) {
+				departamentoErrorDiv = document.createElement('div');
+				departamentoErrorDiv.id = 'departamento-error';
+				departamentoErrorDiv.className = 'text-danger mt-1';
+				departamentoInput.parentNode.appendChild(departamentoErrorDiv);
+			}
+			let departamentoErrorMsg = '';
+			if (!departamentoInput.value) {
+				departamentoErrorMsg = 'Debe seleccionar un departamento.';
+			}
+			if (departamentoErrorMsg) {
+				departamentoErrorDiv.textContent = departamentoErrorMsg;
+				departamentoInput.classList.add('is-invalid');
+				departamentoInput.focus();
+				return;
+			} else {
+				departamentoErrorDiv.textContent = '';
+				departamentoInput.classList.remove('is-invalid');
+			}
+
+			// --- Validación CALLE ---
+			const calleInput = document.getElementById('calle');
+			function validarCalle() {
+				const value = calleInput.value.trim();
+				const regex = /^[A-Z0-9 ]+$/;
+				let valid = true;
+				let msg = '';
+				if (value === '') {
+					valid = false;
+					msg = 'El campo Calle es obligatorio.';
+				} else if (!regex.test(value)) {
+					valid = false;
+					msg = 'Solo letras mayúsculas y números, sin caracteres especiales.';
+				}
+				calleInput.classList.remove('is-invalid', 'is-valid');
+				let error = document.getElementById('calle-error');
+				if (!valid) {
+					calleInput.classList.add('is-invalid');
+					if (!error) {
+						error = document.createElement('div');
+						error.id = 'calle-error';
+						error.className = 'invalid-feedback';
+						calleInput.parentNode.appendChild(error);
+					}
+					error.textContent = msg;
+				} else {
+					calleInput.classList.add('is-valid');
+					if (error) error.remove();
+				}
+				return valid;
+			}
+			if (!validarCalle()) {
+				calleInput.focus();
+				return;
+			}
+
+			// --- Validación NUMERACION ---
+			const numeracionInput = document.getElementById('numeracion');
+			function validarNumeracion() {
+				const value = numeracionInput.value;
+				const regex = /^\d+$/;
+				let valid = true;
+				let msg = '';
+				if (value === '') {
+					valid = false;
+					msg = 'El campo Numeración es obligatorio.';
+				} else if (!regex.test(value)) {
+					valid = false;
+					msg = 'Solo se permiten números, sin espacios ni caracteres especiales.';
+				}
+				numeracionInput.classList.remove('is-invalid', 'is-valid');
+				let error = document.getElementById('numeracion-error');
+				if (!valid) {
+					numeracionInput.classList.add('is-invalid');
+					if (!error) {
+						error = document.createElement('div');
+						error.id = 'numeracion-error';
+						error.className = 'invalid-feedback';
+						numeracionInput.parentNode.appendChild(error);
+					}
+					error.textContent = msg;
+				} else {
+					numeracionInput.classList.add('is-valid');
+					if (error) error.remove();
+				}
+				return valid;
+			}
+			if (!validarNumeracion()) {
+				numeracionInput.focus();
+				return;
+			}
+
 			paso3.classList.add('d-none');
 			paso5.classList.remove('d-none');
 			llenarConfirmacion();
 		});
+		// Forzar mayúsculas y solo números/letras en input Nombre Establecimiento
+		const nombreEstInput = document.getElementById('nombreEstablecimiento');
+		if (nombreEstInput) {
+			nombreEstInput.addEventListener('input', function() {
+				this.value = this.value.toUpperCase().replace(/[^A-Z0-9 ]/g, '');
+			});
+		}
+		// Solo permitir mayúsculas y números en CALLE
+		const calleInput2 = document.getElementById('calle');
+		if (calleInput2) {
+			calleInput2.addEventListener('input', function() {
+				this.value = this.value.toUpperCase().replace(/[^A-Z0-9 ]/g, '');
+			});
+		}
+		// Solo permitir números en NUMERACION
+		const numeracionInput2 = document.getElementById('numeracion');
+		if (numeracionInput2) {
+			numeracionInput2.addEventListener('input', function() {
+				this.value = this.value.replace(/\D/g, '');
+			});
+		}
+		// Solo permitir números y máximo 17 caracteres en RENSPA
+		const renspaInput = document.getElementById('renspa');
+		if (renspaInput) {
+			renspaInput.addEventListener('input', function() {
+				this.value = this.value.replace(/\D/g, '').slice(0, 17);
+			});
+		}
 	}
 	if (btnAnterior5) {
 		btnAnterior5.addEventListener('click', function() {
