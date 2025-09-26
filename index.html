@@ -220,8 +220,55 @@
                             <button type="button" class="btn btn-primary" id="btn-siguiente-paso3">Siguiente</button>
                         </div>
                     </form>
+                    <!-- Paso 4: Administrador de Establecimiento (opcional) -->
+                    <form id="form-registro-empleador-paso4" class="d-none">
+                                            <div class="mb-4">
+                                                <h5 class="fw-bold mb-3">Administrador de Establecimiento <span class="text-muted">(opcional)</span></h5>
+                                                <div class="form-check mb-3">
+                                                    <input class="form-check-input" type="checkbox" id="sinAdminEstablecimiento">
+                                                    <label class="form-check-label" for="sinAdminEstablecimiento">
+                                                        No agregar administrador de establecimiento
+                                                    </label>
+                                                </div>
+                        <div class="mb-3">
+                          <label for="adminEstNombre" class="form-label">Nombre</label>
+                          <input type="text" class="form-control" id="adminEstNombre" name="adminEstNombre" placeholder="Nombre">
+                        </div>
+                        <div class="mb-3">
+                          <label for="adminEstApellido" class="form-label">Apellido</label>
+                          <input type="text" class="form-control" id="adminEstApellido" name="adminEstApellido" placeholder="Apellido">
+                        </div>
+                        <div class="mb-3">
+                          <label for="adminEstDni" class="form-label">DNI</label>
+                          <input type="text" class="form-control" id="adminEstDni" name="adminEstDni" placeholder="DNI">
+                        </div>
+                        <div class="mb-3">
+                          <label for="adminEstEmail" class="form-label">Email</label>
+                          <input type="email" class="form-control" id="adminEstEmail" name="adminEstEmail" placeholder="Email">
+                        </div>
+                        <div class="mb-3">
+                          <label for="adminEstTelefono" class="form-label">Teléfono</label>
+                          <input type="text" class="form-control" id="adminEstTelefono" name="adminEstTelefono" placeholder="Teléfono">
+                        </div>
+                        <div class="mb-3">
+                          <label for="adminEstPassword" class="form-label">Contraseña</label>
+                          <input type="password" class="form-control" id="adminEstPassword" name="adminEstPassword" placeholder="Contraseña">
+                        </div>
+                        <div class="mb-3">
+                          <label for="adminEstPassword2" class="form-label">Repetir Contraseña</label>
+                          <input type="password" class="form-control" id="adminEstPassword2" name="adminEstPassword2" placeholder="Repetir Contraseña">
+                        </div>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary" id="btn-anterior-paso4">Anterior</button>
+                        <button type="button" class="btn btn-primary" id="btn-siguiente-paso4">Siguiente</button>
+                      </div>
+                    </form>
                     <!-- Paso 5: Confirmación (oculto por ahora) -->
                     <form id="form-registro-empleador-paso5" class="d-none">
+                        <div id="mensaje-error-confirmacion" class="alert alert-danger d-none" role="alert">
+                            Faltan datos obligatorios en el resumen. Por favor, revise los pasos anteriores.
+                        </div>
                         <div class="mb-4">
                             <h5 class="fw-bold mb-3">Confirmación de Registro</h5>
                             <ul class="list-group mb-3" id="confirmacion-lista">
@@ -230,6 +277,9 @@
                             <div class="d-flex justify-content-between">
                                 <button type="button" class="btn btn-outline-secondary" id="btn-anterior-paso5">Anterior</button>
                                 <button type="submit" class="btn btn-success" id="btn-confirmar-registro">Confirmar Registro</button>
+                            </div>
+                            <div id="mensaje-exito" class="alert alert-success mt-4 d-none" role="alert">
+                                ¡Su cuenta ha sido creada con éxito!
                             </div>
                         </div>
                     </form>

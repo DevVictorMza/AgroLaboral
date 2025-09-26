@@ -1,3 +1,265 @@
+// Mostrar mensaje de éxito al confirmar registro
+document.addEventListener('DOMContentLoaded', function() {
+	// Actualizar lista de confirmación cada vez que se muestre el modal y el paso 5 esté visible
+	const modalRegistro = document.getElementById('modalRegistroEmpleador');
+	if (modalRegistro) {
+		modalRegistro.addEventListener('shown.bs.modal', function() {
+			const paso5 = document.getElementById('form-registro-empleador-paso5');
+			if (paso5 && !paso5.classList.contains('d-none')) {
+				llenarConfirmacion();
+			}
+		});
+	}
+	const formPaso5 = document.getElementById('form-registro-empleador-paso5');
+	if (formPaso5) {
+		formPaso5.addEventListener('submit', function(e) {
+			e.preventDefault();
+			const mensaje = document.getElementById('mensaje-exito');
+			if (mensaje) {
+				mensaje.classList.remove('d-none');
+				mensaje.scrollIntoView({behavior: 'smooth'});
+			}
+		});
+	}
+});
+	// Bloquear/desbloquear campos si se marca el checkbox 'sinAdminEstablecimiento'
+	const sinAdmin = document.getElementById('sinAdminEstablecimiento');
+	if (sinAdmin) {
+		const camposPaso4 = [
+			document.getElementById('adminEstNombre'),
+			document.getElementById('adminEstApellido'),
+			document.getElementById('adminEstDni'),
+			document.getElementById('adminEstEmail'),
+			document.getElementById('adminEstTelefono'),
+			document.getElementById('adminEstPassword'),
+			document.getElementById('adminEstPassword2')
+		];
+		sinAdmin.addEventListener('change', function() {
+			if (this.checked) {
+				camposPaso4.forEach(campo => {
+					campo.disabled = true;
+					campo.value = '';
+					campo.classList.remove('is-invalid', 'is-valid');
+				});
+			} else {
+				camposPaso4.forEach(campo => {
+					campo.disabled = false;
+				});
+			}
+		});
+	}
+	// --- Paso 4: Validación Administrador de Establecimiento (opcional) ---
+	const paso4 = document.getElementById('form-registro-empleador-paso4');
+	const btnAnterior4 = document.getElementById('btn-anterior-paso4');
+	const btnSiguiente4 = document.getElementById('btn-siguiente-paso4');
+	if (btnAnterior4) {
+		btnAnterior4.addEventListener('click', function() {
+			paso4.classList.add('d-none');
+			paso3.classList.remove('d-none');
+		});
+	}
+	if (btnSiguiente4) {
+		btnSiguiente4.addEventListener('click', function() {
+			// Ocultar todos los pasos y mostrar solo el paso 5
+			const pasos = [
+				document.getElementById('form-registro-empleador-paso1'),
+				document.getElementById('form-registro-empleador-paso2'),
+				document.getElementById('form-registro-empleador-paso3'),
+				document.getElementById('form-registro-empleador-paso4'),
+				document.getElementById('form-registro-empleador-paso5')
+			];
+			pasos.forEach((p, idx) => {
+				if (p) p.classList.add('d-none');
+			});
+			const paso5 = document.getElementById('form-registro-empleador-paso5');
+			if (paso5) paso5.classList.remove('d-none');
+			// Actualizar barra de progreso y labels de pasos
+			const wizardLabels = document.querySelectorAll('.wizard-step-label');
+			wizardLabels.forEach((el, idx) => {
+				if (idx === 4) {
+					el.classList.add('active');
+				} else {
+					el.classList.remove('active');
+				}
+			});
+			const progressBar = document.querySelector('.wizard-progress-bar-inner');
+			if (progressBar) progressBar.style.width = '100%';
+			const sinAdmin = document.getElementById('sinAdminEstablecimiento');
+			if (sinAdmin && sinAdmin.checked) {
+				paso4.classList.add('d-none');
+				paso5.classList.remove('d-none');
+				llenarConfirmacion();
+				return;
+			}
+			// Obtener valores
+			const nombre = document.getElementById('adminEstNombre');
+			const apellido = document.getElementById('adminEstApellido');
+			const dni = document.getElementById('adminEstDni');
+			const email = document.getElementById('adminEstEmail');
+			const telefono = document.getElementById('adminEstTelefono');
+			const password = document.getElementById('adminEstPassword');
+			const password2 = document.getElementById('adminEstPassword2');
+			const campos = [nombre, apellido, dni, email, telefono, password, password2];
+			const values = campos.map(c => c.value.trim());
+			// Si todos los campos están vacíos, permitir avanzar
+			if (values.every(v => v === '')) {
+				paso4.classList.add('d-none');
+				paso5.classList.remove('d-none');
+				llenarConfirmacion();
+				return;
+			}
+			// Validaciones
+			let errores = false;
+			// Nombre
+			let nombreError = document.getElementById('adminEstNombre-error');
+			if (!nombreError) {
+				nombreError = document.createElement('div');
+				nombreError.id = 'adminEstNombre-error';
+				nombreError.className = 'text-danger mt-1';
+				nombre.parentNode.appendChild(nombreError);
+			}
+			if (!values[0]) {
+				nombreError.textContent = 'El nombre es obligatorio.';
+				nombre.classList.add('is-invalid');
+				errores = true;
+			} else if (!/^[A-ZÁÉÍÓÚÑ ]+$/.test(values[0])) {
+				nombreError.textContent = 'Solo letras mayúsculas y espacios.';
+				nombre.classList.add('is-invalid');
+				errores = true;
+			} else {
+				nombreError.textContent = '';
+				nombre.classList.remove('is-invalid');
+			}
+			// Apellido
+			let apellidoError = document.getElementById('adminEstApellido-error');
+			if (!apellidoError) {
+				apellidoError = document.createElement('div');
+				apellidoError.id = 'adminEstApellido-error';
+				apellidoError.className = 'text-danger mt-1';
+				apellido.parentNode.appendChild(apellidoError);
+			}
+			if (!values[1]) {
+				apellidoError.textContent = 'El apellido es obligatorio.';
+				apellido.classList.add('is-invalid');
+				errores = true;
+			} else if (!/^[A-ZÁÉÍÓÚÑ ]+$/.test(values[1])) {
+				apellidoError.textContent = 'Solo letras mayúsculas y espacios.';
+				apellido.classList.add('is-invalid');
+				errores = true;
+			} else {
+				apellidoError.textContent = '';
+				apellido.classList.remove('is-invalid');
+			}
+			// DNI
+			let dniError = document.getElementById('adminEstDni-error');
+			if (!dniError) {
+				dniError = document.createElement('div');
+				dniError.id = 'adminEstDni-error';
+				dniError.className = 'text-danger mt-1';
+				dni.parentNode.appendChild(dniError);
+			}
+			if (!values[2]) {
+				dniError.textContent = 'El DNI es obligatorio.';
+				dni.classList.add('is-invalid');
+				errores = true;
+			} else if (!/^\d{7,8}$/.test(values[2])) {
+				dniError.textContent = 'El DNI debe tener entre 7 y 8 números.';
+				dni.classList.add('is-invalid');
+				errores = true;
+			} else {
+				dniError.textContent = '';
+				dni.classList.remove('is-invalid');
+			}
+			// Email
+			let emailError = document.getElementById('adminEstEmail-error');
+			if (!emailError) {
+				emailError = document.createElement('div');
+				emailError.id = 'adminEstEmail-error';
+				emailError.className = 'text-danger mt-1';
+				email.parentNode.appendChild(emailError);
+			}
+			if (!values[3]) {
+				emailError.textContent = 'El email es obligatorio.';
+				email.classList.add('is-invalid');
+				errores = true;
+			} else if (!/^([a-zA-Z0-9_\.-]+)@([a-zA-Z0-9\.-]+)\.([a-zA-Z]{2,})$/.test(values[3])) {
+				emailError.textContent = 'Ingrese un email válido.';
+				email.classList.add('is-invalid');
+				errores = true;
+			} else {
+				emailError.textContent = '';
+				email.classList.remove('is-invalid');
+			}
+			// Teléfono
+			let telError = document.getElementById('adminEstTelefono-error');
+			if (!telError) {
+				telError = document.createElement('div');
+				telError.id = 'adminEstTelefono-error';
+				telError.className = 'text-danger mt-1';
+				telefono.parentNode.appendChild(telError);
+			}
+			if (!values[4]) {
+				telError.textContent = 'El teléfono es obligatorio.';
+				telefono.classList.add('is-invalid');
+				errores = true;
+			} else if (!/^\d+$/.test(values[4])) {
+				telError.textContent = 'El teléfono solo debe contener números.';
+				telefono.classList.add('is-invalid');
+				errores = true;
+			} else {
+				telError.textContent = '';
+				telefono.classList.remove('is-invalid');
+			}
+			// Contraseña
+			let passError = document.getElementById('adminEstPassword-error');
+			if (!passError) {
+				passError = document.createElement('div');
+				passError.id = 'adminEstPassword-error';
+				passError.className = 'text-danger mt-1';
+				password.parentNode.appendChild(passError);
+			}
+			if (!values[5]) {
+				passError.textContent = 'La contraseña es obligatoria.';
+				password.classList.add('is-invalid');
+				errores = true;
+			} else if (/\s/.test(values[5])) {
+				passError.textContent = 'La contraseña no debe contener espacios.';
+				password.classList.add('is-invalid');
+				errores = true;
+			} else if (values[5].length < 4) {
+				passError.textContent = 'La contraseña debe tener al menos 4 caracteres.';
+				password.classList.add('is-invalid');
+				errores = true;
+			} else {
+				passError.textContent = '';
+				password.classList.remove('is-invalid');
+			}
+			// Repetir Contraseña
+			let pass2Error = document.getElementById('adminEstPassword2-error');
+			if (!pass2Error) {
+				pass2Error = document.createElement('div');
+				pass2Error.id = 'adminEstPassword2-error';
+				pass2Error.className = 'text-danger mt-1';
+				password2.parentNode.appendChild(pass2Error);
+			}
+			if (!values[6]) {
+				pass2Error.textContent = 'Repita la contraseña.';
+				password2.classList.add('is-invalid');
+				errores = true;
+			} else if (values[5] !== values[6]) {
+				pass2Error.textContent = 'Las contraseñas no coinciden.';
+				password2.classList.add('is-invalid');
+				errores = true;
+			} else {
+				pass2Error.textContent = '';
+				password2.classList.remove('is-invalid');
+			}
+			if (errores) return;
+			paso4.classList.add('d-none');
+			paso5.classList.remove('d-none');
+			llenarConfirmacion();
+		});
+	}
 	// Cargar distritos según el departamento seleccionado
 	function cargarDistritosPorDepartamento(idDepartamento) {
 		const select = document.getElementById('distrito');
@@ -713,8 +975,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 
 			paso3.classList.add('d-none');
-			paso5.classList.remove('d-none');
-			llenarConfirmacion();
+			paso4.classList.remove('d-none');
 		});
 		// Forzar mayúsculas y solo números/letras en input Nombre Establecimiento
 		const nombreEstInput = document.getElementById('nombreEstablecimiento');
@@ -750,6 +1011,19 @@ document.addEventListener('DOMContentLoaded', function() {
 			paso5.classList.add('d-none');
 			paso3.classList.remove('d-none');
 		});
+	}
+
+	// Refuerzo: cada vez que el paso 5 se haga visible, actualizar la lista
+	const paso5ObserverTarget = document.getElementById('form-registro-empleador-paso5');
+	if (paso5ObserverTarget) {
+		const observer = new MutationObserver(function(mutations) {
+			mutations.forEach(function(mutation) {
+				if (!paso5ObserverTarget.classList.contains('d-none')) {
+					llenarConfirmacion();
+				}
+			});
+		});
+		observer.observe(paso5ObserverTarget, { attributes: true, attributeFilter: ['class'] });
 	}
 
 	// Inicialización del mapa de geolocalización para el paso 3 del wizard
@@ -826,26 +1100,96 @@ document.addEventListener('DOMContentLoaded', function() {
 	function llenarConfirmacion() {
 		const lista = document.getElementById('confirmacion-lista');
 		if (!lista) return;
-		lista.innerHTML = '';
-		// Paso 1
-		lista.innerHTML += `<li class='list-group-item'><b>CUIT:</b> ${document.getElementById('cuit').value}</li>`;
-		lista.innerHTML += `<li class='list-group-item'><b>Razón Social:</b> ${document.getElementById('razonSocial').value}</li>`;
-		// Paso 2
-		lista.innerHTML += `<li class='list-group-item'><b>DNI:</b> ${document.getElementById('dni').value}</li>`;
-		lista.innerHTML += `<li class='list-group-item'><b>Nombre:</b> ${document.getElementById('nombre').value}</li>`;
-		lista.innerHTML += `<li class='list-group-item'><b>Apellido:</b> ${document.getElementById('apellido').value}</li>`;
-		lista.innerHTML += `<li class='list-group-item'><b>Email:</b> ${document.getElementById('email').value}</li>`;
-		lista.innerHTML += `<li class='list-group-item'><b>Teléfono:</b> ${document.getElementById('telefono').value}</li>`;
-		// Paso 3
-		lista.innerHTML += `<li class='list-group-item'><b>Nombre Establecimiento:</b> ${document.getElementById('nombreEstablecimiento').value}</li>`;
-		lista.innerHTML += `<li class='list-group-item'><b>Número de RENSPA:</b> ${document.getElementById('renspa').value}</li>`;
-		lista.innerHTML += `<li class='list-group-item'><b>Especies:</b> ${document.getElementById('especies').selectedOptions[0]?.textContent || ''}</li>`;
-		lista.innerHTML += `<li class='list-group-item'><b>Departamento:</b> ${document.getElementById('departamento').value}</li>`;
-		lista.innerHTML += `<li class='list-group-item'><b>Distrito:</b> ${document.getElementById('distrito').value}</li>`;
-		lista.innerHTML += `<li class='list-group-item'><b>Calle:</b> ${document.getElementById('calle').value}</li>`;
-		lista.innerHTML += `<li class='list-group-item'><b>Numeración:</b> ${document.getElementById('numeracion').value}</li>`;
-		lista.innerHTML += `<li class='list-group-item'><b>Código Postal:</b> ${document.getElementById('codigoPostal').value}</li>`;
-		lista.innerHTML += `<li class='list-group-item'><b>Latitud:</b> ${document.getElementById('latitud').value}</li>`;
-		lista.innerHTML += `<li class='list-group-item'><b>Longitud:</b> ${document.getElementById('longitud').value}</li>`;
+	lista.innerHTML = '';
+	const mensajeError = document.getElementById('mensaje-error-confirmacion');
+	let camposFaltantes = [];
+	// --- Empresa ---
+	lista.innerHTML += `<li class='list-group-item active bg-secondary text-white'>Datos de Empresa</li>`;
+	const cuit = document.getElementById('cuit').value;
+	const razon = document.getElementById('razonSocial').value;
+	if (!cuit) camposFaltantes.push('CUIT');
+	if (!razon) camposFaltantes.push('Razón Social');
+	lista.innerHTML += `<li class='list-group-item'><b>CUIT:</b> ${cuit}</li>`;
+	lista.innerHTML += `<li class='list-group-item'><b>Razón Social:</b> ${razon}</li>`;
+	// --- Administrador Empresa ---
+	lista.innerHTML += `<li class='list-group-item active bg-secondary text-white mt-2'>Administrador</li>`;
+	const dniEmp = document.getElementById('dni').value;
+	const nombreEmp = document.getElementById('nombre').value;
+	const apellidoEmp = document.getElementById('apellido').value;
+	const emailEmp = document.getElementById('email').value;
+	const telEmp = document.getElementById('telefono').value;
+	if (!dniEmp) camposFaltantes.push('DNI (Administrador Empresa)');
+	if (!nombreEmp) camposFaltantes.push('Nombre (Administrador Empresa)');
+	if (!apellidoEmp) camposFaltantes.push('Apellido (Administrador Empresa)');
+	if (!emailEmp) camposFaltantes.push('Email (Administrador Empresa)');
+	if (!telEmp) camposFaltantes.push('Teléfono (Administrador Empresa)');
+	lista.innerHTML += `<li class='list-group-item'><b>DNI:</b> ${dniEmp}</li>`;
+	lista.innerHTML += `<li class='list-group-item'><b>Nombre:</b> ${nombreEmp}</li>`;
+	lista.innerHTML += `<li class='list-group-item'><b>Apellido:</b> ${apellidoEmp}</li>`;
+	lista.innerHTML += `<li class='list-group-item'><b>Email:</b> ${emailEmp}</li>`;
+	lista.innerHTML += `<li class='list-group-item'><b>Teléfono:</b> ${telEmp}</li>`;
+	// --- Establecimiento ---
+	lista.innerHTML += `<li class='list-group-item active bg-secondary text-white mt-2'>Establecimiento</li>`;
+	const nombreEst = document.getElementById('nombreEstablecimiento').value;
+	const renspa = document.getElementById('renspa').value;
+	if (!nombreEst) camposFaltantes.push('Nombre Establecimiento');
+	if (!renspa) camposFaltantes.push('Número de RENSPA');
+	lista.innerHTML += `<li class='list-group-item'><b>Nombre:</b> ${nombreEst}</li>`;
+	lista.innerHTML += `<li class='list-group-item'><b>Número de RENSPA:</b> ${renspa}</li>`;
+	const especies = Array.from(document.getElementById('especies').selectedOptions).map(opt => opt.textContent).join(', ');
+	if (!especies) camposFaltantes.push('Especies');
+	lista.innerHTML += `<li class='list-group-item'><b>Especies:</b> ${especies}</li>`;
+	const departamento = document.getElementById('departamento').selectedOptions[0]?.textContent || '';
+	const distrito = document.getElementById('distrito').selectedOptions[0]?.textContent || '';
+	if (!departamento) camposFaltantes.push('Departamento');
+	if (!distrito) camposFaltantes.push('Distrito');
+	lista.innerHTML += `<li class='list-group-item'><b>Departamento:</b> ${departamento}</li>`;
+	lista.innerHTML += `<li class='list-group-item'><b>Distrito:</b> ${distrito}</li>`;
+	const calle = document.getElementById('calle').value;
+	const numeracion = document.getElementById('numeracion').value;
+	const codPostal = document.getElementById('codigoPostal').value;
+	const lat = document.getElementById('latitud').value;
+	const lng = document.getElementById('longitud').value;
+	if (!calle) camposFaltantes.push('Calle');
+	if (!numeracion) camposFaltantes.push('Numeración');
+	if (!codPostal) camposFaltantes.push('Código Postal');
+	if (!lat) camposFaltantes.push('Latitud');
+	if (!lng) camposFaltantes.push('Longitud');
+	lista.innerHTML += `<li class='list-group-item'><b>Calle:</b> ${calle}</li>`;
+	lista.innerHTML += `<li class='list-group-item'><b>Numeración:</b> ${numeracion}</li>`;
+	lista.innerHTML += `<li class='list-group-item'><b>Código Postal:</b> ${codPostal}</li>`;
+	lista.innerHTML += `<li class='list-group-item'><b>Latitud:</b> ${lat}</li>`;
+	lista.innerHTML += `<li class='list-group-item'><b>Longitud:</b> ${lng}</li>`;
+	// --- Admin. Establecimiento ---
+	lista.innerHTML += `<li class='list-group-item active bg-secondary text-white mt-2'>Admin. Establecimiento</li>`;
+	const sinAdmin = document.getElementById('sinAdminEstablecimiento');
+	if (sinAdmin && sinAdmin.checked) {
+		lista.innerHTML += `<li class='list-group-item'>No posee administrador de establecimiento.</li>`;
+	} else {
+		const nombreAdminEst = document.getElementById('adminEstNombre').value;
+		const apellidoAdminEst = document.getElementById('adminEstApellido').value;
+		const dniAdminEst = document.getElementById('adminEstDni').value;
+		const emailAdminEst = document.getElementById('adminEstEmail').value;
+		const telAdminEst = document.getElementById('adminEstTelefono').value;
+		if (!nombreAdminEst) camposFaltantes.push('Nombre (Admin Establecimiento)');
+		if (!apellidoAdminEst) camposFaltantes.push('Apellido (Admin Establecimiento)');
+		if (!dniAdminEst) camposFaltantes.push('DNI (Admin Establecimiento)');
+		if (!emailAdminEst) camposFaltantes.push('Email (Admin Establecimiento)');
+		if (!telAdminEst) camposFaltantes.push('Teléfono (Admin Establecimiento)');
+		lista.innerHTML += `<li class='list-group-item'><b>Nombre:</b> ${nombreAdminEst}</li>`;
+		lista.innerHTML += `<li class='list-group-item'><b>Apellido:</b> ${apellidoAdminEst}</li>`;
+		lista.innerHTML += `<li class='list-group-item'><b>DNI:</b> ${dniAdminEst}</li>`;
+		lista.innerHTML += `<li class='list-group-item'><b>Email:</b> ${emailAdminEst}</li>`;
+		lista.innerHTML += `<li class='list-group-item'><b>Teléfono:</b> ${telAdminEst}</li>`;
+	}
+		// Mostrar/ocultar mensaje de error
+		if (mensajeError) {
+			if (camposFaltantes.length > 0) {
+				mensajeError.textContent = 'Faltan datos obligatorios en el resumen: ' + camposFaltantes.join(', ');
+				mensajeError.classList.remove('d-none');
+			} else {
+				mensajeError.classList.add('d-none');
+			}
+		}
 	}
 });
