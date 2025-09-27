@@ -1,5 +1,248 @@
+// Validación: adminEstPassword y adminEstPassword2 en tiempo real, feedback visual
+const adminEstPassword = document.getElementById('adminEstPassword');
+const adminEstPassword2 = document.getElementById('adminEstPassword2');
+if (adminEstPassword) {
+	adminEstPassword.addEventListener('input', function() {
+		let errorDiv = document.getElementById('adminEstPassword-error');
+		if (!errorDiv) {
+			errorDiv = document.createElement('div');
+			errorDiv.id = 'adminEstPassword-error';
+			errorDiv.className = 'text-danger mt-1';
+			this.parentNode.appendChild(errorDiv);
+		}
+		if (!this.value) {
+			errorDiv.textContent = 'La contraseña es obligatoria.';
+			this.classList.add('is-invalid');
+			this.classList.remove('is-valid');
+		} else if (/\s/.test(this.value)) {
+			errorDiv.textContent = 'La contraseña no debe contener espacios.';
+			this.classList.add('is-invalid');
+			this.classList.remove('is-valid');
+		} else if (this.value.length < 4) {
+			errorDiv.textContent = 'La contraseña debe tener al menos 4 caracteres.';
+			this.classList.add('is-invalid');
+			this.classList.remove('is-valid');
+		} else {
+			errorDiv.textContent = '';
+			this.classList.remove('is-invalid');
+			this.classList.add('is-valid');
+		}
+	});
+}
+if (adminEstPassword2 && adminEstPassword) {
+	adminEstPassword2.addEventListener('input', function() {
+		let errorDiv = document.getElementById('adminEstPassword2-error');
+		if (!errorDiv) {
+			errorDiv = document.createElement('div');
+			errorDiv.id = 'adminEstPassword2-error';
+			errorDiv.className = 'text-danger mt-1';
+			this.parentNode.appendChild(errorDiv);
+		}
+		if (!this.value) {
+			errorDiv.textContent = 'Repita la contraseña.';
+			this.classList.add('is-invalid');
+			this.classList.remove('is-valid');
+		} else if (this.value !== adminEstPassword.value) {
+			errorDiv.textContent = 'Su contraseña no coincide, por favor verifique de vuelta!';
+			this.classList.add('is-invalid');
+			this.classList.remove('is-valid');
+		} else {
+			errorDiv.textContent = 'Su contraseña coincide!';
+			errorDiv.classList.remove('text-danger');
+			errorDiv.classList.add('text-success');
+			this.classList.remove('is-invalid');
+			this.classList.add('is-valid');
+		}
+	});
+}
+// Validación: adminEstTelefono solo números, obligatorio, máximo 15 dígitos, feedback visual
+const adminEstTelefono = document.getElementById('adminEstTelefono');
+if (adminEstTelefono) {
+	adminEstTelefono.addEventListener('input', function() {
+		// Solo permitir números y máximo 15 caracteres
+		this.value = this.value.replace(/\D/g, '').slice(0, 15);
+		let errorDiv = document.getElementById('adminEstTelefono-error');
+		if (!errorDiv) {
+			errorDiv = document.createElement('div');
+			errorDiv.id = 'adminEstTelefono-error';
+			errorDiv.className = 'text-danger mt-1';
+			this.parentNode.appendChild(errorDiv);
+		}
+		if (!this.value) {
+			errorDiv.textContent = 'El teléfono es obligatorio.';
+			this.classList.add('is-invalid');
+			this.classList.remove('is-valid');
+		} else if (!/^\d{1,15}$/.test(this.value)) {
+			errorDiv.textContent = 'El teléfono debe tener hasta 15 dígitos.';
+			this.classList.add('is-invalid');
+			this.classList.remove('is-valid');
+		} else {
+			errorDiv.textContent = '';
+			this.classList.remove('is-invalid');
+			this.classList.add('is-valid');
+		}
+	});
+	adminEstTelefono.addEventListener('blur', function() {
+		let errorDiv = document.getElementById('adminEstTelefono-error');
+		if (!errorDiv) {
+			errorDiv = document.createElement('div');
+			errorDiv.id = 'adminEstTelefono-error';
+			errorDiv.className = 'text-danger mt-1';
+			this.parentNode.appendChild(errorDiv);
+		}
+		if (!this.value) {
+			errorDiv.textContent = 'El teléfono es obligatorio.';
+			this.classList.add('is-invalid');
+			this.classList.remove('is-valid');
+		} else if (!/^\d{1,15}$/.test(this.value)) {
+			errorDiv.textContent = 'El teléfono debe tener hasta 15 dígitos.';
+			this.classList.add('is-invalid');
+			this.classList.remove('is-valid');
+		} else {
+			errorDiv.textContent = '';
+			this.classList.remove('is-invalid');
+			this.classList.add('is-valid');
+		}
+	});
+}
 // Mostrar mensaje de éxito al confirmar registro
 document.addEventListener('DOMContentLoaded', function() {
+	// Validación: adminEstEmail formato email, obligatorio, sin espacios
+	const adminEstEmail = document.getElementById('adminEstEmail');
+	if (adminEstEmail) {
+		adminEstEmail.addEventListener('input', function() {
+			let value = this.value.replace(/\s/g, ''); // Eliminar espacios
+			this.value = value;
+			// Validar formato email
+			const emailRegex = /^([a-zA-Z0-9_\.-]+)@([a-zA-Z0-9\.-]+)\.([a-zA-Z]{2,})$/;
+			if (!emailRegex.test(value)) {
+				this.classList.add('is-invalid');
+				this.classList.remove('is-valid');
+			} else {
+				this.classList.remove('is-invalid');
+				this.classList.add('is-valid');
+			}
+		});
+		adminEstEmail.addEventListener('blur', function() {
+			let value = this.value.replace(/\s/g, '');
+			this.value = value;
+			const emailRegex = /^([a-zA-Z0-9_\.-]+)@([a-zA-Z0-9\.-]+)\.([a-zA-Z]{2,})$/;
+			if (!value || !emailRegex.test(value)) {
+				this.classList.add('is-invalid');
+				if (!document.getElementById('adminEstEmail-error')) {
+					const error = document.createElement('div');
+					error.id = 'adminEstEmail-error';
+					error.className = 'text-danger mt-1';
+					error.textContent = 'Ingrese un email válido y obligatorio.';
+					this.parentNode.appendChild(error);
+				}
+			} else {
+				this.classList.remove('is-invalid');
+				const error = document.getElementById('adminEstEmail-error');
+				if (error) error.remove();
+			}
+		});
+	}
+	// Validación: adminEstDni solo números, obligatorio, 7-8 dígitos, sin espacios ni caracteres especiales
+	const adminEstDni = document.getElementById('adminEstDni');
+	if (adminEstDni) {
+		adminEstDni.addEventListener('input', function() {
+			let value = this.value.replace(/[^0-9]/g, ''); // Solo números
+			if (value.length > 8) value = value.slice(0, 8); // Limitar a 8 dígitos
+			this.value = value;
+			// Validar longitud
+			if (value.length < 7 || value.length > 8) {
+				this.classList.add('is-invalid');
+				this.classList.remove('is-valid');
+			} else {
+				this.classList.remove('is-invalid');
+				this.classList.add('is-valid');
+			}
+		});
+		adminEstDni.addEventListener('blur', function() {
+			let value = this.value.replace(/[^0-9]/g, '');
+			if (value.length < 7 || value.length > 8) {
+				this.classList.add('is-invalid');
+				if (!document.getElementById('adminEstDni-error')) {
+					const error = document.createElement('div');
+					error.id = 'adminEstDni-error';
+					error.className = 'text-danger mt-1';
+					error.textContent = 'El DNI debe tener entre 7 y 8 números.';
+					this.parentNode.appendChild(error);
+				}
+			} else {
+				this.classList.remove('is-invalid');
+				const error = document.getElementById('adminEstDni-error');
+				if (error) error.remove();
+			}
+		});
+	}
+	// Validación: adminEstApellido solo letras mayúsculas, sin números, caracteres especiales, espacios ni en blanco
+	const adminEstApellido = document.getElementById('adminEstApellido');
+	if (adminEstApellido) {
+		adminEstApellido.addEventListener('input', function() {
+			let value = this.value.toUpperCase();
+			value = value.replace(/[^A-Z]/g, ''); // Solo letras mayúsculas
+			this.value = value;
+			// Validar que no esté vacío
+			if (value === '') {
+				this.classList.add('is-invalid');
+				this.classList.remove('is-valid');
+			} else {
+				this.classList.remove('is-invalid');
+				this.classList.add('is-valid');
+			}
+		});
+		adminEstApellido.addEventListener('blur', function() {
+			if (!this.value.trim()) {
+				this.classList.add('is-invalid');
+				if (!document.getElementById('adminEstApellido-error')) {
+					const error = document.createElement('div');
+					error.id = 'adminEstApellido-error';
+					error.className = 'text-danger mt-1';
+					error.textContent = 'El apellido es obligatorio.';
+					this.parentNode.appendChild(error);
+				}
+			} else {
+				this.classList.remove('is-invalid');
+				const error = document.getElementById('adminEstApellido-error');
+				if (error) error.remove();
+			}
+		});
+	}
+	// Validación: adminEstNombre solo letras mayúsculas, sin números, caracteres especiales, espacios ni en blanco
+	const adminEstNombre = document.getElementById('adminEstNombre');
+	if (adminEstNombre) {
+		adminEstNombre.addEventListener('input', function() {
+			let value = this.value.toUpperCase();
+			value = value.replace(/[^A-Z]/g, ''); // Solo letras mayúsculas
+			this.value = value;
+			// Validar que no esté vacío
+			if (value === '') {
+				this.classList.add('is-invalid');
+				this.classList.remove('is-valid');
+			} else {
+				this.classList.remove('is-invalid');
+				this.classList.add('is-valid');
+			}
+		});
+		adminEstNombre.addEventListener('blur', function() {
+			if (!this.value.trim()) {
+				this.classList.add('is-invalid');
+				if (!document.getElementById('adminEstNombre-error')) {
+					const error = document.createElement('div');
+					error.id = 'adminEstNombre-error';
+					error.className = 'text-danger mt-1';
+					error.textContent = 'El nombre es obligatorio.';
+					this.parentNode.appendChild(error);
+				}
+			} else {
+				this.classList.remove('is-invalid');
+				const error = document.getElementById('adminEstNombre-error');
+				if (error) error.remove();
+			}
+		});
+	}
 	// Actualizar lista de confirmación cada vez que se muestre el modal y el paso 5 esté visible
 	const modalRegistro = document.getElementById('modalRegistroEmpleador');
 	if (modalRegistro) {
@@ -202,8 +445,12 @@ document.addEventListener('DOMContentLoaded', function() {
 				telError.textContent = 'El teléfono es obligatorio.';
 				telefono.classList.add('is-invalid');
 				errores = true;
-			} else if (!/^\d+$/.test(values[4])) {
-				telError.textContent = 'El teléfono solo debe contener números.';
+			} else if (!/^\d{1,15}$/.test(values[4])) {
+				if (!/^\d+$/.test(values[4])) {
+					telError.textContent = 'El teléfono solo debe contener números.';
+				} else {
+					telError.textContent = 'El teléfono debe tener hasta 15 dígitos.';
+				}
 				telefono.classList.add('is-invalid');
 				errores = true;
 			} else {
@@ -470,8 +717,51 @@ document.addEventListener('DOMContentLoaded', function() {
 		// Solo permitir números y máximo 11 caracteres en el input CUIT
 		const cuitInput = document.getElementById('cuit');
 		if (cuitInput) {
+			let debounceTimeout;
 			cuitInput.addEventListener('input', function() {
 				this.value = this.value.replace(/\D/g, '').slice(0, 11);
+				clearTimeout(debounceTimeout);
+				const cuitValue = this.value.trim();
+				let errorDiv = document.getElementById('cuit-error');
+				if (!errorDiv) {
+					errorDiv = document.createElement('div');
+					errorDiv.id = 'cuit-error';
+					errorDiv.className = 'text-danger mt-1';
+					this.parentNode.appendChild(errorDiv);
+				}
+				if (!cuitValue) {
+					errorDiv.textContent = 'El campo CUIT es obligatorio.';
+					this.classList.add('is-invalid');
+					this.classList.remove('is-valid');
+					return;
+				} else if (!(/^\d{11}$/.test(cuitValue))) {
+					errorDiv.textContent = 'El CUIT debe tener exactamente 11 números.';
+					this.classList.add('is-invalid');
+					this.classList.remove('is-valid');
+					return;
+				}
+				// Validación en backend con debounce
+				errorDiv.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Validando CUIT...';
+				debounceTimeout = setTimeout(() => {
+					fetch(`http://localhost:9090/empresas/validar-cuit?cuit=${encodeURIComponent(cuitValue)}`)
+						.then(response => response.json())
+						.then(data => {
+							if (data && data.disponible) {
+								errorDiv.innerHTML = '<span style="color:green;">&#10004;</span> CUIT disponible';
+								cuitInput.classList.remove('is-invalid');
+								cuitInput.classList.add('is-valid');
+							} else {
+								errorDiv.innerHTML = '<span style="color:red;">&#10008;</span> El CUIT ya está registrado.';
+								cuitInput.classList.remove('is-valid');
+								cuitInput.classList.add('is-invalid');
+							}
+						})
+						.catch(() => {
+							errorDiv.innerHTML = '<span style="color:red;">&#10008;</span> Error al validar CUIT en el servidor.';
+							cuitInput.classList.remove('is-valid');
+							cuitInput.classList.add('is-invalid');
+						});
+				}, 400);
 			});
 		}
 		// Forzar mayúsculas en Razón Social
