@@ -1,3 +1,72 @@
+/* Panel de usuario profesional */
+.card.shadow-lg.rounded {
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(60,60,100,0.12);
+    border: 1px solid #e0e0e0;
+    background: #fff;
+}
+.card-header.bg-primary {
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+    box-shadow: 0 2px 8px rgba(13,110,253,0.08);
+    padding: 1.2rem 1.5rem;
+}
+.card-body {
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
+}
+.fw-bold {
+    font-weight: 600 !important;
+}
+.panel-section-title {
+    font-size: 1.15rem;
+    color: #7E57C2;
+    margin-bottom: 0.7rem;
+    font-weight: 700;
+}
+.panel-divider {
+    border: none;
+    border-top: 1.5px solid #e0e0e0;
+    margin: 1.2rem 0;
+}
+.btn-outline-primary, .btn-success, .btn-outline-secondary {
+    font-size: 1.05rem;
+    border-radius: 8px;
+    transition: box-shadow 0.2s, background 0.2s;
+}
+.btn-outline-primary:hover, .btn-success:hover, .btn-outline-secondary:hover {
+    box-shadow: 0 2px 8px rgba(60,60,100,0.10);
+}
+.btn-success.w-100 {
+    font-size: 1.08rem;
+    padding: 0.7rem;
+}
+.list-group-item {
+    border-radius: 7px;
+    margin-bottom: 0.3rem;
+    border: 1px solid #f0f0f0;
+}
+.mb-4 {
+    margin-bottom: 2rem!important;
+}
+.mb-2 {
+    margin-bottom: 1.2rem!important;
+}
+.mt-4 {
+    margin-top: 2rem!important;
+}
+.text-center {
+    text-align: center!important;
+}
+.panel-form-label {
+    font-weight: 500;
+    color: #333;
+}
+/* Mapa de geolocalización en el wizard de establecimiento */
+.map-panel {
+    height: 300px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
 /* Cómo Funciona */
 .funciona-num {
     display: flex;

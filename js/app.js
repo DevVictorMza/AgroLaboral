@@ -107,6 +107,195 @@ if (adminEstTelefono) {
 }
 // Mostrar mensaje de éxito al confirmar registro
 document.addEventListener('DOMContentLoaded', function() {
+	// --- PERFIL USUARIO: DATOS Y PANEL ---
+	// Datos de usuario reales tras registro
+	let userData = {
+		nombre: '',
+		empresa: '',
+		cuit: '',
+		email: '',
+		telefono: '',
+		avatar: 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+		role: 'Empleador',
+		fincas: [],
+		ofertas: []
+	};
+	// Referencias globales
+	const btnMiPerfilTab = document.getElementById('btn-mi-perfil-tab');
+	const panelControl = document.getElementById('panel-control');
+	const mainContent = document.querySelector('main');
+	const banner = document.querySelector('.banner-container');
+	const servicios = document.getElementById('servicios');
+	const comoFunciona = document.getElementById('como-funciona');
+	const btnSalirPanel = document.getElementById('btn-salir-panel');
+	const btnVolverInicio = document.getElementById('btn-volver-inicio');
+	const btnEditarDatos = document.getElementById('btn-editar-datos');
+	const btnGuardarDatos = document.getElementById('btn-guardar-datos');
+	const btnCancelarDatos = document.getElementById('btn-cancelar-datos');
+	const formMisDatos = document.getElementById('form-mis-datos');
+	// Sincronizar datos del wizard al panel tras registro
+	function syncUserDataFromWizard() {
+		userData.empresa = document.getElementById('razonSocial')?.value || '';
+		userData.cuit = document.getElementById('cuit')?.value || '';
+		userData.nombre = document.getElementById('nombre')?.value || '';
+		userData.email = document.getElementById('email')?.value || '';
+		userData.telefono = document.getElementById('telefono')?.value || '';
+		// Registrar establecimiento del wizard en el panel
+		const estNombre = document.getElementById('nombreEstablecimiento')?.value || '';
+		const departamento = document.getElementById('departamento');
+		const distrito = document.getElementById('distrito');
+		const calle = document.getElementById('calle')?.value || '';
+		const numeracion = document.getElementById('numeracion')?.value || '';
+		const codigoPostal = document.getElementById('codigoPostal')?.value || '';
+		let estUbicacion = '';
+		if (departamento && departamento.selectedOptions.length > 0) {
+			estUbicacion += departamento.selectedOptions[0].textContent + ', ';
+		}
+		if (distrito && distrito.selectedOptions.length > 0) {
+			estUbicacion += distrito.selectedOptions[0].textContent + ', ';
+		}
+		estUbicacion += calle ? calle + ' ' : '';
+		estUbicacion += numeracion ? numeracion + ', ' : '';
+		estUbicacion += codigoPostal ? 'CP ' + codigoPostal : '';
+		estUbicacion = estUbicacion.trim();
+		if (estNombre && estUbicacion) {
+			// Evitar duplicados si ya existe
+			if (!userData.fincas.some(e => e.nombre === estNombre && e.ubicacion === estUbicacion)) {
+				userData.fincas.push({ nombre: estNombre, ubicacion: estUbicacion });
+			}
+		}
+	}
+	function cargarPanelDatos() {
+		// ...no avatar...
+		document.getElementById('user-name').textContent = userData.nombre;
+		document.getElementById('user-role').textContent = userData.role;
+		document.getElementById('panel-empresa').value = userData.empresa;
+		document.getElementById('panel-cuit').value = userData.cuit;
+		document.getElementById('panel-email').value = userData.email;
+		document.getElementById('panel-telefono').value = userData.telefono;
+	}
+	function renderFincas() {
+		const list = document.getElementById('panel-fincas-list');
+		list.innerHTML = '';
+		if (userData.fincas.length === 0) {
+			list.innerHTML = '<div class="list-group-item text-muted">No hay fincas registradas.</div>';
+			return;
+		}
+		userData.fincas.forEach((finca, idx) => {
+			list.innerHTML += `<div class="list-group-item d-flex justify-content-between align-items-center">
+				<div>
+					<span class="fw-bold">${finca.nombre}</span> <span class="text-muted">${finca.ubicacion}</span>
+				</div>
+				<div>
+					<button class="btn btn-sm btn-outline-primary me-1" data-edit-finca="${idx}"><i class="fas fa-edit"></i></button>
+					<button class="btn btn-sm btn-outline-danger" data-delete-finca="${idx}"><i class="fas fa-trash"></i></button>
+				</div>
+			</div>`;
+		});
+	}
+	function renderOfertas() {
+		const list = document.getElementById('panel-ofertas-list');
+		list.innerHTML = '';
+		if (userData.ofertas.length === 0) {
+			list.innerHTML = '<div class="list-group-item text-muted">No hay ofertas registradas.</div>';
+			return;
+		}
+		userData.ofertas.forEach((oferta, idx) => {
+			list.innerHTML += `<div class="list-group-item d-flex justify-content-between align-items-center">
+				<div>
+					<span class="fw-bold">${oferta.titulo}</span> <span class="text-muted">${oferta.estado}</span>
+				</div>
+				<div>
+					<button class="btn btn-sm btn-outline-primary me-1" data-edit-oferta="${idx}"><i class="fas fa-edit"></i></button>
+					<button class="btn btn-sm btn-outline-danger" data-delete-oferta="${idx}"><i class="fas fa-trash"></i></button>
+				</div>
+			</div>`;
+		});
+	}
+	// Mostrar panel al hacer click en Mi Perfil
+	if (btnMiPerfilTab && panelControl) {
+		btnMiPerfilTab.addEventListener('click', function(e) {
+			e.preventDefault();
+			// Sincronizar datos del wizard antes de mostrar el panel
+			syncUserDataFromWizard();
+			cargarPanelDatos();
+			renderFincas();
+			renderOfertas();
+			// Mostrar panel y ocultar el resto
+			panelControl.classList.remove('d-none');
+			if (mainContent) mainContent.classList.add('d-none');
+			if (banner) banner.classList.add('d-none');
+			if (servicios) servicios.classList.add('d-none');
+			if (comoFunciona) comoFunciona.classList.add('d-none');
+		});
+	}
+	// Salir del panel y restaurar vista inicial
+	if (btnSalirPanel) {
+		btnSalirPanel.addEventListener('click', function() {
+			panelControl.classList.add('d-none');
+			if (mainContent) mainContent.classList.remove('d-none');
+			if (banner) banner.classList.remove('d-none');
+			if (servicios) servicios.classList.remove('d-none');
+			if (comoFunciona) comoFunciona.classList.remove('d-none');
+		});
+	}
+	// Volver al inicio desde el panel
+	if (btnVolverInicio) {
+		btnVolverInicio.addEventListener('click', function() {
+			panelControl.classList.add('d-none');
+			if (mainContent) mainContent.classList.remove('d-none');
+			if (banner) banner.classList.remove('d-none');
+			if (servicios) servicios.classList.remove('d-none');
+			if (comoFunciona) comoFunciona.classList.remove('d-none');
+		});
+	}
+	// Edición de datos
+	if (btnEditarDatos && btnGuardarDatos && btnCancelarDatos && formMisDatos) {
+		btnEditarDatos.addEventListener('click', function() {
+			formMisDatos.querySelectorAll('input').forEach(inp => inp.removeAttribute('readonly'));
+			btnEditarDatos.classList.add('d-none');
+			btnGuardarDatos.classList.remove('d-none');
+			btnCancelarDatos.classList.remove('d-none');
+		});
+		btnCancelarDatos.addEventListener('click', function() {
+			cargarPanelDatos();
+			formMisDatos.querySelectorAll('input').forEach(inp => inp.setAttribute('readonly', true));
+			btnEditarDatos.classList.remove('d-none');
+			btnGuardarDatos.classList.add('d-none');
+			btnCancelarDatos.classList.add('d-none');
+		});
+		formMisDatos.addEventListener('submit', function(e) {
+			e.preventDefault();
+			// Guardar cambios en userData
+			userData.empresa = document.getElementById('panel-empresa').value;
+			userData.cuit = document.getElementById('panel-cuit').value;
+			userData.email = document.getElementById('panel-email').value;
+			userData.telefono = document.getElementById('panel-telefono').value;
+			cargarPanelDatos();
+			formMisDatos.querySelectorAll('input').forEach(inp => inp.setAttribute('readonly', true));
+			btnEditarDatos.classList.remove('d-none');
+			btnGuardarDatos.classList.add('d-none');
+			btnCancelarDatos.classList.add('d-none');
+		});
+	}
+	// Añadir finca
+	const btnAbrirModalFinca = document.getElementById('btn-abrir-modal-finca');
+	const modalFinca = new bootstrap.Modal(document.getElementById('modalFinca'));
+	const formFinca = document.getElementById('form-finca');
+	if (btnAbrirModalFinca && modalFinca && formFinca) {
+		btnAbrirModalFinca.addEventListener('click', function() {
+			formFinca.reset();
+			modalFinca.show();
+		});
+		formFinca.addEventListener('submit', function(e) {
+			e.preventDefault();
+			const nombre = document.getElementById('finca-nombre').value;
+			const ubicacion = document.getElementById('finca-ubicacion').value;
+			userData.fincas.push({ nombre, ubicacion });
+			renderFincas();
+			modalFinca.hide();
+		});
+	}
 	// Validación: adminEstEmail formato email, obligatorio, sin espacios
 	const adminEstEmail = document.getElementById('adminEstEmail');
 	if (adminEstEmail) {
@@ -257,11 +446,23 @@ document.addEventListener('DOMContentLoaded', function() {
 	if (formPaso5) {
 		formPaso5.addEventListener('submit', function(e) {
 			e.preventDefault();
+			// Sincronizar datos del wizard al panel
+			syncUserDataFromWizard();
 			const mensaje = document.getElementById('mensaje-exito');
 			if (mensaje) {
 				mensaje.classList.remove('d-none');
 				mensaje.scrollIntoView({behavior: 'smooth'});
 			}
+			// Mostrar botón Mi Perfil, ocultar login/registro
+			const btnLogin = document.getElementById('btn-login');
+			const btnRegistro = document.getElementById('btn-registro');
+			if (btnLogin) btnLogin.classList.add('d-none');
+			if (btnRegistro) btnRegistro.classList.add('d-none');
+			if (btnMiPerfilTab) btnMiPerfilTab.classList.remove('d-none');
+			// Abrir automáticamente el panel de perfil
+			setTimeout(function() {
+				btnMiPerfilTab.click();
+			}, 300);
 		});
 	}
 });
@@ -1419,37 +1620,47 @@ document.addEventListener('DOMContentLoaded', function() {
 	lista.innerHTML += `<li class='list-group-item'><b>Email:</b> ${emailEmp}</li>`;
 	lista.innerHTML += `<li class='list-group-item'><b>Teléfono:</b> ${telEmp}</li>`;
 	// --- Establecimiento ---
-	lista.innerHTML += `<li class='list-group-item active bg-secondary text-white mt-2'>Establecimiento</li>`;
-	const nombreEst = document.getElementById('nombreEstablecimiento').value;
-	const renspa = document.getElementById('renspa').value;
-	if (!nombreEst) camposFaltantes.push('Nombre Establecimiento');
-	if (!renspa) camposFaltantes.push('Número de RENSPA');
-	lista.innerHTML += `<li class='list-group-item'><b>Nombre:</b> ${nombreEst}</li>`;
-	lista.innerHTML += `<li class='list-group-item'><b>Número de RENSPA:</b> ${renspa}</li>`;
-	const especies = Array.from(document.getElementById('especies').selectedOptions).map(opt => opt.textContent).join(', ');
-	if (!especies) camposFaltantes.push('Especies');
-	lista.innerHTML += `<li class='list-group-item'><b>Especies:</b> ${especies}</li>`;
-	const departamento = document.getElementById('departamento').selectedOptions[0]?.textContent || '';
-	const distrito = document.getElementById('distrito').selectedOptions[0]?.textContent || '';
-	if (!departamento) camposFaltantes.push('Departamento');
-	if (!distrito) camposFaltantes.push('Distrito');
-	lista.innerHTML += `<li class='list-group-item'><b>Departamento:</b> ${departamento}</li>`;
-	lista.innerHTML += `<li class='list-group-item'><b>Distrito:</b> ${distrito}</li>`;
-	const calle = document.getElementById('calle').value;
-	const numeracion = document.getElementById('numeracion').value;
-	const codPostal = document.getElementById('codigoPostal').value;
-	const lat = document.getElementById('latitud').value;
-	const lng = document.getElementById('longitud').value;
-	if (!calle) camposFaltantes.push('Calle');
-	if (!numeracion) camposFaltantes.push('Numeración');
-	if (!codPostal) camposFaltantes.push('Código Postal');
-	if (!lat) camposFaltantes.push('Latitud');
-	if (!lng) camposFaltantes.push('Longitud');
-	lista.innerHTML += `<li class='list-group-item'><b>Calle:</b> ${calle}</li>`;
-	lista.innerHTML += `<li class='list-group-item'><b>Numeración:</b> ${numeracion}</li>`;
-	lista.innerHTML += `<li class='list-group-item'><b>Código Postal:</b> ${codPostal}</li>`;
-	lista.innerHTML += `<li class='list-group-item'><b>Latitud:</b> ${lat}</li>`;
-	lista.innerHTML += `<li class='list-group-item'><b>Longitud:</b> ${lng}</li>`;
+lista.innerHTML += `<li class='list-group-item active bg-secondary text-white mt-2'>Establecimiento</li>`;
+const nombreEst = document.getElementById('nombreEstablecimiento').value;
+const renspa = document.getElementById('renspa').value;
+const especiesInput = document.getElementById('especies');
+let especies = '';
+if (especiesInput) {
+	if (especiesInput.tagName === 'SELECT') {
+		especies = Array.from(especiesInput.selectedOptions).map(opt => opt.textContent).join(', ');
+	} else {
+		// Si es input hidden, obtener texto del botón dropdown
+		const dropdownBtn = document.getElementById('dropdownEspecies');
+		especies = dropdownBtn ? dropdownBtn.textContent : '';
+	}
+}
+const departamento = document.getElementById('departamento').selectedOptions[0]?.textContent || '';
+const distrito = document.getElementById('distrito').selectedOptions[0]?.textContent || '';
+const calle = document.getElementById('calle').value;
+const numeracion = document.getElementById('numeracion').value;
+const codPostal = document.getElementById('codigoPostal').value;
+const lat = document.getElementById('latitud').value;
+const lng = document.getElementById('longitud').value;
+if (!nombreEst) camposFaltantes.push('Nombre Establecimiento');
+if (!renspa) camposFaltantes.push('Número de RENSPA');
+if (!especies) camposFaltantes.push('Especies');
+if (!departamento) camposFaltantes.push('Departamento');
+if (!distrito) camposFaltantes.push('Distrito');
+if (!calle) camposFaltantes.push('Calle');
+if (!numeracion) camposFaltantes.push('Numeración');
+if (!codPostal) camposFaltantes.push('Código Postal');
+if (!lat) camposFaltantes.push('Latitud');
+if (!lng) camposFaltantes.push('Longitud');
+lista.innerHTML += `<li class='list-group-item'><b>Nombre:</b> ${nombreEst}</li>`;
+lista.innerHTML += `<li class='list-group-item'><b>Número de RENSPA:</b> ${renspa}</li>`;
+lista.innerHTML += `<li class='list-group-item'><b>Especies:</b> ${especies}</li>`;
+lista.innerHTML += `<li class='list-group-item'><b>Departamento:</b> ${departamento}</li>`;
+lista.innerHTML += `<li class='list-group-item'><b>Distrito:</b> ${distrito}</li>`;
+lista.innerHTML += `<li class='list-group-item'><b>Calle:</b> ${calle}</li>`;
+lista.innerHTML += `<li class='list-group-item'><b>Numeración:</b> ${numeracion}</li>`;
+lista.innerHTML += `<li class='list-group-item'><b>Código Postal:</b> ${codPostal}</li>`;
+lista.innerHTML += `<li class='list-group-item'><b>Latitud:</b> ${lat}</li>`;
+lista.innerHTML += `<li class='list-group-item'><b>Longitud:</b> ${lng}</li>`;
 	// --- Admin. Establecimiento ---
 	lista.innerHTML += `<li class='list-group-item active bg-secondary text-white mt-2'>Admin. Establecimiento</li>`;
 	const sinAdmin = document.getElementById('sinAdminEstablecimiento');
