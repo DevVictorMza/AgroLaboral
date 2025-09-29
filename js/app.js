@@ -122,19 +122,37 @@ document.addEventListener('DOMContentLoaded', function() {
 	};
 	// Referencias globales
 	const btnMiPerfilTab = document.getElementById('btn-mi-perfil-tab');
-	const panelControl = document.getElementById('panel-control');
+	const dashboardPanel = document.getElementById('dashboard-panel');
 	const mainContent = document.querySelector('main');
 	const banner = document.querySelector('.banner-container');
 	const servicios = document.getElementById('servicios');
 	const comoFunciona = document.getElementById('como-funciona');
-	const btnSalirPanel = document.getElementById('btn-salir-panel');
-	const btnVolverInicio = document.getElementById('btn-volver-inicio');
-	const btnEditarDatos = document.getElementById('btn-editar-datos');
-	const btnGuardarDatos = document.getElementById('btn-guardar-datos');
-	const btnCancelarDatos = document.getElementById('btn-cancelar-datos');
-	const formMisDatos = document.getElementById('form-mis-datos');
 	// Sincronizar datos del wizard al panel tras registro
 	function syncUserDataFromWizard() {
+		// También sincronizar datos para el dashboard-panel
+		if (dashboardPanel) {
+			const nombre = document.getElementById('nombre')?.value || '';
+			const empresa = document.getElementById('razonSocial')?.value || '';
+			const cuit = document.getElementById('cuit')?.value || '';
+			const email = document.getElementById('email')?.value || '';
+			const telefono = document.getElementById('telefono')?.value || '';
+			const direccion = `${document.getElementById('calle')?.value || ''} ${document.getElementById('numeracion')?.value || ''}`.trim();
+			document.getElementById('dashboard-nombre').textContent = nombre;
+			document.getElementById('dashboard-nombre-input').value = nombre;
+			document.getElementById('dashboard-empresa').textContent = empresa;
+			document.getElementById('dashboard-empresa-input').value = empresa;
+			document.getElementById('dashboard-cuit-input').value = cuit;
+			document.getElementById('dashboard-email-input').value = email;
+			document.getElementById('dashboard-telefono-input').value = telefono;
+			document.getElementById('dashboard-direccion-input').value = direccion;
+			document.getElementById('dashboard-rol').textContent = 'Empleador Agrícola';
+			// Fincas y stats
+			const fincasCount = userData.fincas.length;
+			document.getElementById('dashboard-fincas-count').textContent = fincasCount;
+			document.getElementById('dashboard-ofertas-count').textContent = userData.ofertas.length;
+			document.getElementById('dashboard-candidatos-count').textContent = '0';
+			document.getElementById('dashboard-contratados-count').textContent = '0';
+		}
 		userData.empresa = document.getElementById('razonSocial')?.value || '';
 		userData.cuit = document.getElementById('cuit')?.value || '';
 		userData.nombre = document.getElementById('nombre')?.value || '';
@@ -213,20 +231,33 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	}
 	// Mostrar panel al hacer click en Mi Perfil
-	if (btnMiPerfilTab && panelControl) {
+	if (btnMiPerfilTab && dashboardPanel) {
 		btnMiPerfilTab.addEventListener('click', function(e) {
 			e.preventDefault();
 			// Sincronizar datos del wizard antes de mostrar el panel
 			syncUserDataFromWizard();
-			cargarPanelDatos();
-			renderFincas();
-			renderOfertas();
-			// Mostrar panel y ocultar el resto
-			panelControl.classList.remove('d-none');
+			// Mostrar dashboard-panel y ocultar el resto
+			dashboardPanel.classList.remove('d-none');
 			if (mainContent) mainContent.classList.add('d-none');
 			if (banner) banner.classList.add('d-none');
 			if (servicios) servicios.classList.add('d-none');
 			if (comoFunciona) comoFunciona.classList.add('d-none');
+		});
+	}
+	// Mostrar panel al confirmar registro
+	const btnConfirmarRegistro = document.getElementById('btn-confirmar-registro');
+	if (btnConfirmarRegistro && btnMiPerfilTab && dashboardPanel) {
+		btnConfirmarRegistro.addEventListener('click', function(e) {
+			e.preventDefault(); // Evita el submit y recarga
+			setTimeout(function() {
+				syncUserDataFromWizard();
+				dashboardPanel.classList.remove('d-none');
+				if (mainContent) mainContent.classList.add('d-none');
+				if (banner) banner.classList.add('d-none');
+				if (servicios) servicios.classList.add('d-none');
+				if (comoFunciona) comoFunciona.classList.add('d-none');
+				btnMiPerfilTab.classList.remove('d-none');
+			}, 100);
 		});
 	}
 	// Salir del panel y restaurar vista inicial
@@ -446,7 +477,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	if (formPaso5) {
 		formPaso5.addEventListener('submit', function(e) {
 			e.preventDefault();
-			// Sincronizar datos del wizard al panel
+			// Sincronizar datos del wizard al panel y dashboard
 			syncUserDataFromWizard();
 			const mensaje = document.getElementById('mensaje-exito');
 			if (mensaje) {
@@ -458,11 +489,27 @@ document.addEventListener('DOMContentLoaded', function() {
 			const btnRegistro = document.getElementById('btn-registro');
 			if (btnLogin) btnLogin.classList.add('d-none');
 			if (btnRegistro) btnRegistro.classList.add('d-none');
-			if (btnMiPerfilTab) btnMiPerfilTab.classList.remove('d-none');
-			// Abrir automáticamente el panel de perfil
-			setTimeout(function() {
-				btnMiPerfilTab.click();
-			}, 300);
+			let perfilBtn = document.getElementById('btn-mi-perfil-tab');
+			if (!perfilBtn) {
+				// Crear el botón dinámicamente si no existe
+				const navDiv = document.querySelector('.d-flex');
+				perfilBtn = document.createElement('button');
+				perfilBtn.id = 'btn-mi-perfil-tab';
+				perfilBtn.className = 'btn btn-success ms-2';
+				perfilBtn.innerHTML = '<i class="fas fa-user-circle fa-lg me-2"></i> Mi Perfil';
+				navDiv.appendChild(perfilBtn);
+				perfilBtn.addEventListener('click', function(e) {
+					e.preventDefault();
+					syncUserDataFromWizard();
+					dashboardPanel.classList.remove('d-none');
+					if (mainContent) mainContent.classList.add('d-none');
+					if (banner) banner.classList.add('d-none');
+					if (servicios) servicios.classList.add('d-none');
+					if (comoFunciona) comoFunciona.classList.add('d-none');
+				});
+			}
+			perfilBtn.classList.remove('d-none');
+			perfilBtn.click(); // Simula el click para mostrar el dashboard-panel
 		});
 	}
 });
@@ -1276,7 +1323,6 @@ document.addEventListener('DOMContentLoaded', function() {
 			});
 		}
 	}
-	// ...existing code...
 	if (btnAnterior3) {
 		btnAnterior3.addEventListener('click', function() {
 			paso3.classList.add('d-none');

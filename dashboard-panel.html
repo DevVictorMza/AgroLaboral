@@ -1,0 +1,105 @@
+<div id="dashboard-panel" class="d-none dashboard-dark-bg">
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-header">
+      <i class="fas fa-seedling fa-2x sidebar-logo"></i>
+      <span class="sidebar-title">AgroPanel</span>
+      <span class="sidebar-subtitle">Panel de Control</span>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li><a href="#" class="sidebar-link active" id="sidebar-resumen"><i class="fas fa-home me-2"></i>Resumen</a></li>
+        <li><a href="#" class="sidebar-link" id="sidebar-fincas"><i class="fas fa-tractor me-2"></i>Fincas</a></li>
+        <li><a href="#" class="sidebar-link" id="sidebar-ofertas"><i class="fas fa-briefcase me-2"></i>Ofertas de Trabajo</a></li>
+        <li><a href="#" class="sidebar-link" id="sidebar-analisis"><i class="fas fa-chart-bar me-2"></i>Análisis</a></li>
+        <li><a href="#" class="sidebar-link" id="sidebar-perfil"><i class="fas fa-user me-2"></i>Perfil</a></li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="#" class="sidebar-link" id="sidebar-config"><i class="fas fa-cog me-2"></i>Configuración</a>
+    </div>
+  </aside>
+  <main class="dashboard-main">
+    <header class="dashboard-header d-flex justify-content-between align-items-center">
+      <h2 class="dashboard-title">Mi Perfil</h2>
+      <button class="btn btn-primary" id="btn-editar-dashboard-perfil"><i class="fas fa-edit me-1"></i>Editar Perfil</button>
+    </header>
+    <section class="dashboard-profile-section">
+      <div class="row g-4">
+        <div class="col-lg-4 col-md-5">
+          <div class="dashboard-profile-card text-center">
+            <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Avatar" class="dashboard-avatar mb-3">
+            <h4 class="fw-bold" id="dashboard-nombre">Juan Pérez</h4>
+            <div class="dashboard-empresa" id="dashboard-empresa">AGROPECUARIA LOS ANDES S.A.</div>
+            <div class="dashboard-rol" id="dashboard-rol">Empleador Agrícola</div>
+          </div>
+        </div>
+        <div class="col-lg-8 col-md-7">
+          <div class="dashboard-info-card mb-4">
+            <h5 class="fw-bold mb-3"><i class="fas fa-user me-2"></i>Información Personal</h5>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="dashboard-label">Nombre Completo</label>
+                  <input type="text" class="form-control" id="dashboard-nombre-input" readonly placeholder="Nombre completo" title="Nombre completo">
+              </div>
+              <div class="col-md-6">
+                <label class="dashboard-label">Email</label>
+                  <input type="email" class="form-control" id="dashboard-email-input" readonly placeholder="Email" title="Email">
+              </div>
+              <div class="col-md-6">
+                <label class="dashboard-label">Teléfono</label>
+                  <input type="text" class="form-control" id="dashboard-telefono-input" readonly placeholder="Teléfono" title="Teléfono">
+              </div>
+              <div class="col-md-6">
+                <label class="dashboard-label">Dirección</label>
+                  <input type="text" class="form-control" id="dashboard-direccion-input" readonly placeholder="Dirección" title="Dirección">
+              </div>
+            </div>
+          </div>
+          <div class="dashboard-info-card mb-4">
+            <h5 class="fw-bold mb-3"><i class="fas fa-building me-2"></i>Información de Empresa</h5>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="dashboard-label">Razón Social</label>
+                  <input type="text" class="form-control" id="dashboard-empresa-input" readonly placeholder="Razón Social" title="Razón Social">
+              </div>
+              <div class="col-md-6">
+                <label class="dashboard-label">CUIT</label>
+                  <input type="text" class="form-control" id="dashboard-cuit-input" readonly placeholder="CUIT" title="CUIT">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row g-4 mt-3">
+        <div class="col-md-3">
+          <div class="dashboard-stat-card">
+            <i class="fas fa-tractor fa-2x mb-2"></i>
+            <div class="stat-label">Fincas</div>
+            <div class="stat-value" id="dashboard-fincas-count">0</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="dashboard-stat-card">
+            <i class="fas fa-briefcase fa-2x mb-2"></i>
+            <div class="stat-label">Ofertas</div>
+            <div class="stat-value" id="dashboard-ofertas-count">0</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="dashboard-stat-card">
+            <i class="fas fa-user fa-2x mb-2"></i>
+            <div class="stat-label">Candidatos</div>
+            <div class="stat-value" id="dashboard-candidatos-count">0</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="dashboard-stat-card">
+            <i class="fas fa-envelope fa-2x mb-2"></i>
+            <div class="stat-label">Contratados</div>
+            <div class="stat-value" id="dashboard-contratados-count">0</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
