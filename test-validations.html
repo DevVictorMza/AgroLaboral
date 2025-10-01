@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Validaciones Wizard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="mb-0">🧪 Test de Validaciones - Wizard de Registro</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <strong>ℹ️ Instrucciones:</strong>
+                            <ol class="mb-0 mt-2">
+                                <li>Abre las herramientas de desarrollador (F12)</li>
+                                <li>Ve a la pestaña "Console"</li>
+                                <li>Haz clic en "Abrir Modal de Registro"</li>
+                                <li>Prueba las validaciones en cada paso</li>
+                                <li>Verifica que los mensajes aparezcan en la consola</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <button class="btn btn-primary btn-lg w-100" data-bs-toggle="modal" data-bs-target="#modalRegistroEmpleador">
+                                🚀 Abrir Modal de Registro
+                            </button>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>✅ Validaciones que deberían funcionar:</h6>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">CUIT (11 dígitos + backend)</li>
+                                    <li class="list-group-item">Razón Social (obligatorio)</li>
+                                    <li class="list-group-item">DNI (7-8 dígitos)</li>
+                                    <li class="list-group-item">Nombres y apellidos (mayúsculas)</li>
+                                    <li class="list-group-item">Email (formato válido)</li>
+                                    <li class="list-group-item">Teléfono (solo números)</li>
+                                    <li class="list-group-item">Contraseñas (coincidencia)</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>🔍 Backend Status:</h6>
+                                <div id="backend-status" class="alert alert-secondary">
+                                    Verificando conexión...
+                                </div>
+                                <h6>📊 Test Results:</h6>
+                                <div id="test-results">
+                                    <small class="text-muted">Los resultados aparecerán aquí</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include the modal from index.html -->
+    <div class="modal fade" id="modalRegistroEmpleador" tabindex="-1" aria-labelledby="modalRegistroEmpleadorLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h4 class="modal-title w-100 text-center fw-bold" id="modalRegistroEmpleadorLabel">Registro de Empleador</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body pt-0">
+                    <!-- Wizard Steps -->
+                    <div class="wizard-progress mb-4">
+                        <div class="progress wizard-progress-bar">
+                            <div class="progress-bar bg-primary wizard-progress-bar-inner" role="progressbar"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2 wizard-steps-labels">
+                            <div class="wizard-step-label active"><span>1.</span> <span>Datos<br>de Empresa</span></div>
+                            <div class="wizard-step-label"><span>2.</span> <span>Administrador</span></div>
+                            <div class="wizard-step-label"><span>3.</span> <span>Establecimiento</span></div>
+                            <div class="wizard-step-label"><span>4.</span> <span>Admin.<br>Establec.</span></div>
+                            <div class="wizard-step-label"><span>5.</span> <span>Confirmación</span></div>
+                        </div>
+                    </div>
+                    <!-- Paso 1: Datos de empresa -->
+                    <form id="form-registro-empleador-paso1">
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3">Datos de Empresa</h5>
+                            <div class="mb-3">
+                                <label for="cuit" class="form-label">CUIT</label>
+                                <input type="text" class="form-control" id="cuit" name="cuit" placeholder="Ej: 20123456789">
+                            </div>
+                            <div class="mb-3">
+                                <label for="razonSocial" class="form-label">Razón Social</label>
+                                <input type="text" class="form-control" id="razonSocial" name="razonSocial" placeholder="Ej: Finca Los Olivos">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="button" class="btn btn-primary" id="btn-siguiente-paso1">Siguiente</button>
+                        </div>
+                    </form>
+                    <!-- Paso 2: Administrador de Empresa (oculto por ahora) -->
+                    <form id="form-registro-empleador-paso2" class="d-none">
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3">Administrador de Empresa</h5>
+                            <div class="mb-3">
+                                <label for="dni" class="form-label">DNI</label>
+                                <input type="text" class="form-control" id="dni" name="dni" placeholder="Ej: 12345678">
+                            </div>
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ej: JUAN">
+                            </div>
+                            <div class="mb-3">
+                                <label for="apellido" class="form-label">Apellido</label>
+                                <input type="text" class="form-control" id="apellido" name="apellido" placeholder="Ej: PÉREZ">
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="Ej: juan@email.com">
+                            </div>
+                            <div class="mb-3">
+                                <label for="telefono" class="form-label">Teléfono</label>
+                                <input type="text" class="form-control" id="telefono" name="telefono" placeholder="Ej: 2611234567">
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Contraseña</label>
+                                <input type="password" class="form-control" id="password" name="password">
+                            </div>
+                            <div class="mb-3">
+                                <label for="password2" class="form-label">Repetir Contraseña</label>
+                                <input type="password" class="form-control" id="password2" name="password2">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-secondary" id="btn-anterior-paso2">Anterior</button>
+                            <button type="button" class="btn btn-primary" id="btn-siguiente-paso2">Siguiente</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/app.js"></script>
+    
+    <script>
+        // Test script específico para validaciones
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🧪 Test de Validaciones iniciado');
+            
+            // Verificar backend al cargar la página
+            const statusDiv = document.getElementById('backend-status');
+            const resultsDiv = document.getElementById('test-results');
+            
+            function updateBackendStatus(status, message) {
+                statusDiv.className = `alert alert-${status}`;
+                statusDiv.innerHTML = message;
+            }
+            
+            function addTestResult(test, result) {
+                const resultItem = document.createElement('div');
+                resultItem.className = `alert alert-${result ? 'success' : 'danger'} alert-sm py-1 mb-1`;
+                resultItem.innerHTML = `<small>${result ? '✅' : '❌'} ${test}</small>`;
+                resultsDiv.appendChild(resultItem);
+            }
+            
+            // Test conectividad backend
+            fetch('http://localhost:9090/empresas/health')
+                .then(response => {
+                    if (response.ok) {
+                        updateBackendStatus('success', '✅ Backend disponible');
+                        addTestResult('Backend conectado', true);
+                    } else {
+                        updateBackendStatus('warning', '⚠️ Backend responde con errores');
+                        addTestResult('Backend conectado', false);
+                    }
+                })
+                .catch(error => {
+                    updateBackendStatus('danger', '❌ Backend no disponible');
+                    addTestResult('Backend conectado', false);
+                });
+            
+            // Agregar listeners para tests automáticos
+            setTimeout(() => {
+                // Test de validación CUIT
+                const cuitInput = document.getElementById('cuit');
+                if (cuitInput) {
+                    addTestResult('Campo CUIT encontrado', true);
+                } else {
+                    addTestResult('Campo CUIT encontrado', false);
+                }
+                
+                // Test de botones de navegación
+                const btnSiguiente1 = document.getElementById('btn-siguiente-paso1');
+                if (btnSiguiente1) {
+                    addTestResult('Botón Siguiente Paso 1 encontrado', true);
+                } else {
+                    addTestResult('Botón Siguiente Paso 1 encontrado', false);
+                }
+                
+                console.log('✅ Tests básicos completados');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

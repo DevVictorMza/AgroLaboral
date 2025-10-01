@@ -107,224 +107,49 @@ if (adminEstTelefono) {
 }
 // Mostrar mensaje de éxito al confirmar registro
 document.addEventListener('DOMContentLoaded', function() {
-	// --- PERFIL USUARIO: DATOS Y PANEL ---
-	// Datos de usuario reales tras registro
-	let userData = {
+	// --- FUNCIONALIDAD DE REGISTRO COMPLETADO ---
+	// Solo mostrar mensaje de éxito tras completar el registro
+	const userData = {
 		nombre: '',
 		empresa: '',
 		cuit: '',
 		email: '',
-		telefono: '',
-		avatar: 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
-		role: 'Empleador',
-		fincas: [],
-		ofertas: []
+		telefono: ''
 	};
-	// Referencias globales
-	const btnMiPerfilTab = document.getElementById('btn-mi-perfil-tab');
-	const dashboardPanel = document.getElementById('dashboard-panel');
-	const mainContent = document.querySelector('main');
-	const banner = document.querySelector('.banner-container');
-	const servicios = document.getElementById('servicios');
-	const comoFunciona = document.getElementById('como-funciona');
-	// Sincronizar datos del wizard al panel tras registro
+	// Función para sincronizar datos del wizard tras registro
 	function syncUserDataFromWizard() {
-		// También sincronizar datos para el dashboard-panel
-		if (dashboardPanel) {
-			const nombre = document.getElementById('nombre')?.value || '';
-			const empresa = document.getElementById('razonSocial')?.value || '';
-			const cuit = document.getElementById('cuit')?.value || '';
-			const email = document.getElementById('email')?.value || '';
-			const telefono = document.getElementById('telefono')?.value || '';
-			const direccion = `${document.getElementById('calle')?.value || ''} ${document.getElementById('numeracion')?.value || ''}`.trim();
-			document.getElementById('dashboard-nombre').textContent = nombre;
-			document.getElementById('dashboard-nombre-input').value = nombre;
-			document.getElementById('dashboard-empresa').textContent = empresa;
-			document.getElementById('dashboard-empresa-input').value = empresa;
-			document.getElementById('dashboard-cuit-input').value = cuit;
-			document.getElementById('dashboard-email-input').value = email;
-			document.getElementById('dashboard-telefono-input').value = telefono;
-			document.getElementById('dashboard-direccion-input').value = direccion;
-			document.getElementById('dashboard-rol').textContent = 'Empleador Agrícola';
-			// Fincas y stats
-			const fincasCount = userData.fincas.length;
-			document.getElementById('dashboard-fincas-count').textContent = fincasCount;
-			document.getElementById('dashboard-ofertas-count').textContent = userData.ofertas.length;
-			document.getElementById('dashboard-candidatos-count').textContent = '0';
-			document.getElementById('dashboard-contratados-count').textContent = '0';
-		}
+		// Datos de empresa (Paso 1)
 		userData.empresa = document.getElementById('razonSocial')?.value || '';
 		userData.cuit = document.getElementById('cuit')?.value || '';
+		
+		// Datos de administrador de empresa (Paso 2)
 		userData.nombre = document.getElementById('nombre')?.value || '';
 		userData.email = document.getElementById('email')?.value || '';
 		userData.telefono = document.getElementById('telefono')?.value || '';
-		// Registrar establecimiento del wizard en el panel
-		const estNombre = document.getElementById('nombreEstablecimiento')?.value || '';
-		const departamento = document.getElementById('departamento');
-		const distrito = document.getElementById('distrito');
-		const calle = document.getElementById('calle')?.value || '';
-		const numeracion = document.getElementById('numeracion')?.value || '';
-		const codigoPostal = document.getElementById('codigoPostal')?.value || '';
-		let estUbicacion = '';
-		if (departamento && departamento.selectedOptions.length > 0) {
-			estUbicacion += departamento.selectedOptions[0].textContent + ', ';
-		}
-		if (distrito && distrito.selectedOptions.length > 0) {
-			estUbicacion += distrito.selectedOptions[0].textContent + ', ';
-		}
-		estUbicacion += calle ? calle + ' ' : '';
-		estUbicacion += numeracion ? numeracion + ', ' : '';
-		estUbicacion += codigoPostal ? 'CP ' + codigoPostal : '';
-		estUbicacion = estUbicacion.trim();
-		if (estNombre && estUbicacion) {
-			// Evitar duplicados si ya existe
-			if (!userData.fincas.some(e => e.nombre === estNombre && e.ubicacion === estUbicacion)) {
-				userData.fincas.push({ nombre: estNombre, ubicacion: estUbicacion });
-			}
-		}
 	}
-	function cargarPanelDatos() {
-		// ...no avatar...
-		document.getElementById('user-name').textContent = userData.nombre;
-		document.getElementById('user-role').textContent = userData.role;
-		document.getElementById('panel-empresa').value = userData.empresa;
-		document.getElementById('panel-cuit').value = userData.cuit;
-		document.getElementById('panel-email').value = userData.email;
-		document.getElementById('panel-telefono').value = userData.telefono;
-	}
-	function renderFincas() {
-		const list = document.getElementById('panel-fincas-list');
-		list.innerHTML = '';
-		if (userData.fincas.length === 0) {
-			list.innerHTML = '<div class="list-group-item text-muted">No hay fincas registradas.</div>';
-			return;
-		}
-		userData.fincas.forEach((finca, idx) => {
-			list.innerHTML += `<div class="list-group-item d-flex justify-content-between align-items-center">
-				<div>
-					<span class="fw-bold">${finca.nombre}</span> <span class="text-muted">${finca.ubicacion}</span>
-				</div>
-				<div>
-					<button class="btn btn-sm btn-outline-primary me-1" data-edit-finca="${idx}"><i class="fas fa-edit"></i></button>
-					<button class="btn btn-sm btn-outline-danger" data-delete-finca="${idx}"><i class="fas fa-trash"></i></button>
-				</div>
-			</div>`;
-		});
-	}
-	function renderOfertas() {
-		const list = document.getElementById('panel-ofertas-list');
-		list.innerHTML = '';
-		if (userData.ofertas.length === 0) {
-			list.innerHTML = '<div class="list-group-item text-muted">No hay ofertas registradas.</div>';
-			return;
-		}
-		userData.ofertas.forEach((oferta, idx) => {
-			list.innerHTML += `<div class="list-group-item d-flex justify-content-between align-items-center">
-				<div>
-					<span class="fw-bold">${oferta.titulo}</span> <span class="text-muted">${oferta.estado}</span>
-				</div>
-				<div>
-					<button class="btn btn-sm btn-outline-primary me-1" data-edit-oferta="${idx}"><i class="fas fa-edit"></i></button>
-					<button class="btn btn-sm btn-outline-danger" data-delete-oferta="${idx}"><i class="fas fa-trash"></i></button>
-				</div>
-			</div>`;
-		});
-	}
-	// Mostrar panel al hacer click en Mi Perfil
-	if (btnMiPerfilTab && dashboardPanel) {
-		btnMiPerfilTab.addEventListener('click', function(e) {
-			e.preventDefault();
-			// Sincronizar datos del wizard antes de mostrar el panel
-			syncUserDataFromWizard();
-			// Mostrar dashboard-panel y ocultar el resto
-			dashboardPanel.classList.remove('d-none');
-			if (mainContent) mainContent.classList.add('d-none');
-			if (banner) banner.classList.add('d-none');
-			if (servicios) servicios.classList.add('d-none');
-			if (comoFunciona) comoFunciona.classList.add('d-none');
-		});
-	}
-	// Mostrar panel al confirmar registro
+	// Guardar datos y redirigir al dashboard tras completar registro
 	const btnConfirmarRegistro = document.getElementById('btn-confirmar-registro');
-	if (btnConfirmarRegistro && btnMiPerfilTab && dashboardPanel) {
+	if (btnConfirmarRegistro) {
 		btnConfirmarRegistro.addEventListener('click', function(e) {
-			e.preventDefault(); // Evita el submit y recarga
+			e.preventDefault();
 			setTimeout(function() {
 				syncUserDataFromWizard();
-				dashboardPanel.classList.remove('d-none');
-				if (mainContent) mainContent.classList.add('d-none');
-				if (banner) banner.classList.add('d-none');
-				if (servicios) servicios.classList.add('d-none');
-				if (comoFunciona) comoFunciona.classList.add('d-none');
-				btnMiPerfilTab.classList.remove('d-none');
+				
+				// Guardar datos del usuario en localStorage para el dashboard
+				localStorage.setItem('userData', JSON.stringify(userData));
+				
+				// Cerrar modal de registro
+				const modalRegistro = document.getElementById('modalRegistroEmpleador');
+				if (modalRegistro) {
+					const modalInstance = bootstrap.Modal.getInstance(modalRegistro);
+					if (modalInstance) modalInstance.hide();
+				}
+				
+				// Redirigir al dashboard
+				setTimeout(function() {
+					window.location.href = 'dashboard.html';
+				}, 500);
 			}, 100);
-		});
-	}
-	// Salir del panel y restaurar vista inicial
-	if (btnSalirPanel) {
-		btnSalirPanel.addEventListener('click', function() {
-			panelControl.classList.add('d-none');
-			if (mainContent) mainContent.classList.remove('d-none');
-			if (banner) banner.classList.remove('d-none');
-			if (servicios) servicios.classList.remove('d-none');
-			if (comoFunciona) comoFunciona.classList.remove('d-none');
-		});
-	}
-	// Volver al inicio desde el panel
-	if (btnVolverInicio) {
-		btnVolverInicio.addEventListener('click', function() {
-			panelControl.classList.add('d-none');
-			if (mainContent) mainContent.classList.remove('d-none');
-			if (banner) banner.classList.remove('d-none');
-			if (servicios) servicios.classList.remove('d-none');
-			if (comoFunciona) comoFunciona.classList.remove('d-none');
-		});
-	}
-	// Edición de datos
-	if (btnEditarDatos && btnGuardarDatos && btnCancelarDatos && formMisDatos) {
-		btnEditarDatos.addEventListener('click', function() {
-			formMisDatos.querySelectorAll('input').forEach(inp => inp.removeAttribute('readonly'));
-			btnEditarDatos.classList.add('d-none');
-			btnGuardarDatos.classList.remove('d-none');
-			btnCancelarDatos.classList.remove('d-none');
-		});
-		btnCancelarDatos.addEventListener('click', function() {
-			cargarPanelDatos();
-			formMisDatos.querySelectorAll('input').forEach(inp => inp.setAttribute('readonly', true));
-			btnEditarDatos.classList.remove('d-none');
-			btnGuardarDatos.classList.add('d-none');
-			btnCancelarDatos.classList.add('d-none');
-		});
-		formMisDatos.addEventListener('submit', function(e) {
-			e.preventDefault();
-			// Guardar cambios en userData
-			userData.empresa = document.getElementById('panel-empresa').value;
-			userData.cuit = document.getElementById('panel-cuit').value;
-			userData.email = document.getElementById('panel-email').value;
-			userData.telefono = document.getElementById('panel-telefono').value;
-			cargarPanelDatos();
-			formMisDatos.querySelectorAll('input').forEach(inp => inp.setAttribute('readonly', true));
-			btnEditarDatos.classList.remove('d-none');
-			btnGuardarDatos.classList.add('d-none');
-			btnCancelarDatos.classList.add('d-none');
-		});
-	}
-	// Añadir finca
-	const btnAbrirModalFinca = document.getElementById('btn-abrir-modal-finca');
-	const modalFinca = new bootstrap.Modal(document.getElementById('modalFinca'));
-	const formFinca = document.getElementById('form-finca');
-	if (btnAbrirModalFinca && modalFinca && formFinca) {
-		btnAbrirModalFinca.addEventListener('click', function() {
-			formFinca.reset();
-			modalFinca.show();
-		});
-		formFinca.addEventListener('submit', function(e) {
-			e.preventDefault();
-			const nombre = document.getElementById('finca-nombre').value;
-			const ubicacion = document.getElementById('finca-ubicacion').value;
-			userData.fincas.push({ nombre, ubicacion });
-			renderFincas();
-			modalFinca.hide();
 		});
 	}
 	// Validación: adminEstEmail formato email, obligatorio, sin espacios
@@ -473,43 +298,20 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 		});
 	}
+	// Finalizar registro en el paso 5
 	const formPaso5 = document.getElementById('form-registro-empleador-paso5');
 	if (formPaso5) {
 		formPaso5.addEventListener('submit', function(e) {
 			e.preventDefault();
-			// Sincronizar datos del wizard al panel y dashboard
+			// Sincronizar datos del wizard
 			syncUserDataFromWizard();
+			
+			// Mostrar mensaje de éxito
 			const mensaje = document.getElementById('mensaje-exito');
 			if (mensaje) {
 				mensaje.classList.remove('d-none');
 				mensaje.scrollIntoView({behavior: 'smooth'});
 			}
-			// Mostrar botón Mi Perfil, ocultar login/registro
-			const btnLogin = document.getElementById('btn-login');
-			const btnRegistro = document.getElementById('btn-registro');
-			if (btnLogin) btnLogin.classList.add('d-none');
-			if (btnRegistro) btnRegistro.classList.add('d-none');
-			let perfilBtn = document.getElementById('btn-mi-perfil-tab');
-			if (!perfilBtn) {
-				// Crear el botón dinámicamente si no existe
-				const navDiv = document.querySelector('.d-flex');
-				perfilBtn = document.createElement('button');
-				perfilBtn.id = 'btn-mi-perfil-tab';
-				perfilBtn.className = 'btn btn-success ms-2';
-				perfilBtn.innerHTML = '<i class="fas fa-user-circle fa-lg me-2"></i> Mi Perfil';
-				navDiv.appendChild(perfilBtn);
-				perfilBtn.addEventListener('click', function(e) {
-					e.preventDefault();
-					syncUserDataFromWizard();
-					dashboardPanel.classList.remove('d-none');
-					if (mainContent) mainContent.classList.add('d-none');
-					if (banner) banner.classList.add('d-none');
-					if (servicios) servicios.classList.add('d-none');
-					if (comoFunciona) comoFunciona.classList.add('d-none');
-				});
-			}
-			perfilBtn.classList.remove('d-none');
-			perfilBtn.click(); // Simula el click para mostrar el dashboard-panel
 		});
 	}
 });
@@ -1739,4 +1541,17 @@ lista.innerHTML += `<li class='list-group-item'><b>Longitud:</b> ${lng}</li>`;
 			}
 		}
 	}
+});
+
+// --- EFECTO SCROLL PARA NAVBAR TRANSPARENTE ---
+document.addEventListener('DOMContentLoaded', function() {
+	const navbar = document.getElementById('transparent-navbar');
+	
+	window.addEventListener('scroll', function() {
+		if (window.scrollY > 50) {
+			navbar.classList.add('scrolled');
+		} else {
+			navbar.classList.remove('scrolled');
+		}
+	});
 });

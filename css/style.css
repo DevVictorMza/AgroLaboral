@@ -2,8 +2,8 @@
 .card.shadow-lg.rounded {
     border-radius: 18px;
     box-shadow: 0 8px 32px rgba(60,60,100,0.12);
-    border: 1px solid #e0e0e0;
-    background: #fff;
+    border: 1px solid #fcfcfc;
+    background: #000000;
 }
 .card-header.bg-primary {
     border-top-left-radius: 18px;
@@ -153,16 +153,19 @@ body {
 .banner-container {
     position: relative;
     height: 50vh;
-    min-height: 300px;
+    min-height: 500px;
     background: url('../pexels-nc-farm-bureau-mark-8658558.jpg') center center/cover no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 1;
+    margin-top: -80px;
+    padding-top: 80px;
 }
 
 .banner-text-content {
     position: relative;
-    z-index: 1;
+    z-index: 10;
     background: rgba(60,60,60,0.45);
     border-radius: 12px;
     padding: 1.5rem 2.5rem;
@@ -187,5 +190,167 @@ body {
 /* Fix Bootstrap modal z-index to always be above backdrop */
 .modal, .modal.show {
     z-index: 1060 !important;
+}
+
+/* Navbar completamente transparente sobre imagen de bienvenida */
+#transparent-navbar {
+    background: transparent !important;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: none;
+    z-index: 1050 !important;
+}
+
+/* Estilo para los enlaces del navbar transparente */
+#transparent-navbar .navbar-nav .nav-link {
+    color: #fff !important;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    padding: 0.5rem 1rem;
+}
+
+#transparent-navbar .navbar-nav .nav-link:hover {
+    color: #ffeb3b !important;
+    transform: translateY(-2px);
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.9);
+    transition: all 0.3s ease;
+}
+
+#transparent-navbar .navbar-nav .nav-link.active {
+    color: #ffeb3b !important;
+    font-weight: 700;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+/* Botón del toggler para dispositivos móviles */
+#transparent-navbar .navbar-toggler {
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.5rem;
+    border-radius: 6px;
+}
+
+#transparent-navbar .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.9%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* Mantener navbar siempre transparente */
+#transparent-navbar.scrolled {
+    background: transparent !important;
+    box-shadow: none;
+}
+
+/* ===== EFECTOS PARA EL TÍTULO PRINCIPAL ===== */
+
+/* Título con gradiente animado y efectos 3D */
+.title-gradient {
+    background: linear-gradient(45deg, #4CAF50, #8BC34A, #CDDC39, #FFF176, #4CAF50);
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 4s ease-in-out infinite;
+    text-shadow: 
+        2px 2px 0px rgba(0, 0, 0, 0.8),
+        4px 4px 0px rgba(0, 0, 0, 0.6),
+        6px 6px 0px rgba(0, 0, 0, 0.4),
+        8px 8px 0px rgba(0, 0, 0, 0.2);
+    letter-spacing: 2px;
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1.5rem;
+}
+
+/* Animación de entrada del título */
+.animated-title {
+    animation: titleEntrance 1.5s ease-out;
+    transform-origin: center;
+}
+
+/* Efecto de resplandor al hacer hover */
+.title-gradient:hover {
+    animation: glowPulse 1.5s ease-in-out infinite;
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+}
+
+/* Subtítulo mejorado */
+.subtitle-enhanced {
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+    font-size: 1.3rem;
+    font-weight: 400;
+    letter-spacing: 1px;
+    animation: fadeInUp 1.8s ease-out;
+    margin-bottom: 0;
+}
+
+/* ===== ANIMACIONES ===== */
+
+/* Gradiente animado */
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Entrada dramática del título */
+@keyframes titleEntrance {
+    0% {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.8);
+        filter: blur(10px);
+    }
+    50% {
+        opacity: 0.7;
+        transform: translateY(-10px) scale(0.95);
+        filter: blur(2px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+/* Efecto de resplandor pulsante */
+@keyframes glowPulse {
+    0%, 100% {
+        filter: drop-shadow(0 0 10px rgba(255, 235, 59, 0.6));
+    }
+    50% {
+        filter: drop-shadow(0 0 25px rgba(255, 235, 59, 0.9)) 
+                drop-shadow(0 0 40px rgba(255, 235, 59, 0.6));
+    }
+}
+
+/* Aparición suave del subtítulo */
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .title-gradient {
+        font-size: 2.5rem;
+        letter-spacing: 1px;
+        text-shadow: 
+            1px 1px 0px rgba(0, 0, 0, 0.8),
+            2px 2px 0px rgba(0, 0, 0, 0.6),
+            3px 3px 0px rgba(0, 0, 0, 0.4);
+    }
+    
+    .subtitle-enhanced {
+        font-size: 1.1rem;
+        letter-spacing: 0.5px;
+    }
 }
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);

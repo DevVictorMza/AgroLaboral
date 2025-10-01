@@ -1,0 +1,62 @@
+/* Estilos adicionales para el dashboard - Paleta Agrícola */
+
+/* Cards con gradientes específicos inspirados en la agricultura */
+.stat-card-earth {
+    background: linear-gradient(135deg, #5D4037, #8D6E63) !important;
+}
+
+.stat-card-harvest {
+    background: linear-gradient(135deg, #FF8F00, #FFB300) !important;
+}
+
+.stat-card-sky {
+    background: linear-gradient(135deg, #01579B, #0277BD) !important;
+}
+
+/* Compatibilidad con Safari para backdrop-filter */
+.dashboard-card {
+    -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(15px);
+}
+
+/* Mejoras de accesibilidad con colores agrícolas */
+.btn-edit-profile:focus,
+.btn-save-profile:focus,
+.btn-cancel-edit:focus {
+    outline: 2px solid #4CAF50;
+    outline-offset: 2px;
+}
+
+/* Efectos adicionales para temática agrícola */
+.dashboard-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 30% 70%, rgba(76, 175, 80, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+/* Responsive improvements con temática natural */
+@media (max-width: 576px) {
+    .user-header {
+        padding: 1rem;
+        background: linear-gradient(135deg, #2E7D32 0%, #4CAF50 50%, #FF8F00 100%);
+    }
+    
+    .user-avatar {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+    
+    .main-content {
+        padding: 1rem;
+    }
+
+    .brand h4 {
+        font-size: 1.1rem;
+    }
+}
