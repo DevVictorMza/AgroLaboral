@@ -1,3 +1,61 @@
+// FUNCIONES DE FEEDBACK VISUAL
+
+// Mostrar feedback de campo
+function showFieldFeedback(input, isValid, message) {
+	// Limpiar estados previos
+	input.classList.remove('is-valid', 'is-invalid', 'shake');
+	
+	// Buscar o crear div de feedback
+	let feedbackDiv = input.parentNode.querySelector('.field-feedback');
+	if (!feedbackDiv) {
+		feedbackDiv = document.createElement('div');
+		feedbackDiv.className = 'field-feedback';
+		input.parentNode.appendChild(feedbackDiv);
+	}
+	
+	if (isValid) {
+		input.classList.add('is-valid');
+		feedbackDiv.className = 'field-feedback text-success';
+		feedbackDiv.innerHTML = `<i class="fas fa-check-circle me-1"></i>${message}`;
+	} else {
+		input.classList.add('is-invalid');
+		feedbackDiv.className = 'field-feedback text-danger';
+		feedbackDiv.innerHTML = `<i class="fas fa-exclamation-circle me-1"></i>${message}`;
+		input.classList.add('shake');
+		setTimeout(() => input.classList.remove('shake'), 500);
+	}
+}
+
+// Agregar estado de carga a botón o contenedor
+function addLoadingState(element, message = 'Procesando...') {
+	// Si es un botón
+	if (element.tagName === 'BUTTON' || element.tagName === 'INPUT') {
+		const originalText = element.textContent;
+		const originalDisabled = element.disabled;
+		
+		element.disabled = true;
+		element.innerHTML = `<i class="fas fa-spinner fa-spin me-2"></i>${message}`;
+		element.classList.add('loading');
+		
+		return function removeLoading() {
+			element.disabled = originalDisabled;
+			element.textContent = originalText;
+			element.classList.remove('loading');
+		};
+	} else {
+		// Si es un contenedor, crear un div de loading
+		const loadingDiv = document.createElement('div');
+		loadingDiv.className = 'mb-3 loading-state';
+		loadingDiv.innerHTML = `<i class="fas fa-spinner fa-spin me-2"></i>${message}`;
+		element.appendChild(loadingDiv);
+		
+		return function removeLoading() {
+			const loadingDiv = element.querySelector('.loading-state');
+			if (loadingDiv) loadingDiv.remove();
+		};
+	}
+}
+
 // Inicialización del mapa principal de la página (no el del wizard)
 document.addEventListener('DOMContentLoaded', function() {
 	// --- Función de ojo para mostrar/ocultar contraseña ---
@@ -181,8 +239,43 @@ document.addEventListener('DOMContentLoaded', function() {
 		// Solo permitir números y máximo 11 caracteres en el input CUIT
 		const cuitInput = document.getElementById('cuit');
 		if (cuitInput) {
+			let debounceTimeout;
 			cuitInput.addEventListener('input', function() {
 				this.value = this.value.replace(/\D/g, '').slice(0, 11);
+				clearTimeout(debounceTimeout);
+				
+				const cuitValue = this.value.trim();
+				
+				if (!cuitValue) {
+					showFieldFeedback(this, false, 'El campo CUIT es obligatorio.');
+					return;
+				} 
+				
+				if (!/^\d{11}$/.test(cuitValue)) {
+					showFieldFeedback(this, false, 'El CUIT debe tener exactamente 11 números.');
+					return;
+				}
+				
+				// Validación en backend con debounce
+				const tempDiv = this.parentNode.querySelector('.field-feedback');
+				if (tempDiv) {
+					tempDiv.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Validando CUIT...';
+				}
+				
+				debounceTimeout = setTimeout(() => {
+					fetch(`http://localhost:9090/empresas/validar-cuit?cuit=${encodeURIComponent(cuitValue)}`)
+						.then(response => response.json())
+						.then(data => {
+							if (data && data.disponible) {
+								showFieldFeedback(this, true, '¡CUIT disponible!');
+							} else {
+								showFieldFeedback(this, false, 'El CUIT ya está registrado.');
+							}
+						})
+						.catch(() => {
+							showFieldFeedback(this, false, 'Error al validar CUIT en el servidor.');
+						});
+				}, 400);
 			});
 		}
 		
@@ -370,7 +463,154 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 
 	// Resto de pasos del wizard...
-	// [El código continuaría con los pasos 3, 4, 5 pero lo resumo por espacio]
+	
+	// Paso 3: Ubicación del Establecimiento
+	if (btnAnterior3) {
+		btnAnterior3.addEventListener('click', function() {
+			paso3.classList.add('d-none');
+			paso2.classList.remove('d-none');
+			
+			// Actualizar barra de progreso
+			const progressBar = document.querySelector('.wizard-progress-bar-inner');
+			if (progressBar) progressBar.style.width = '40%';
+			
+			// Actualizar labels de pasos
+			const wizardLabels = document.querySelectorAll('.wizard-step-label');
+			wizardLabels.forEach((el, idx) => {
+				if (idx === 2) {
+					el.classList.remove('active');
+				}
+			});
+		});
+	}
+
+	if (btnSiguiente3) {
+		btnSiguiente3.addEventListener('click', function() {
+			const departamentoSelect = document.getElementById('departamento');
+			const distritoSelect = document.getElementById('distrito');
+			const latitudInput = document.getElementById('latitud');
+			const longitudInput = document.getElementById('longitud');
+			
+			const departamentoValue = departamentoSelect ? departamentoSelect.value : '';
+			const distritoValue = distritoSelect ? distritoSelect.value : '';
+			const latitudValue = latitudInput ? latitudInput.value : '';
+			const longitudValue = longitudInput ? longitudInput.value : '';
+			
+			let hasErrors = false;
+			
+			// Validar departamento
+			if (!departamentoValue) {
+				showFieldFeedback(departamentoSelect, false, 'Debe seleccionar un departamento.');
+				hasErrors = true;
+			} else {
+				showFieldFeedback(departamentoSelect, true, '');
+			}
+			
+			// Validar distrito
+			if (!distritoValue) {
+				showFieldFeedback(distritoSelect, false, 'Debe seleccionar un distrito.');
+				hasErrors = true;
+			} else {
+				showFieldFeedback(distritoSelect, true, '');
+			}
+			
+			// Validar coordenadas
+			if (!latitudValue || !longitudValue) {
+				const mapContainer = document.getElementById('establecimiento-map');
+				showFieldFeedback(mapContainer, false, 'Debe marcar la ubicación en el mapa.');
+				hasErrors = true;
+			} else {
+				const mapContainer = document.getElementById('establecimiento-map');
+				showFieldFeedback(mapContainer, true, 'Ubicación seleccionada correctamente.');
+			}
+			
+			if (hasErrors) return;
+			
+			paso3.classList.add('d-none');
+			paso4.classList.remove('d-none');
+			
+			// Actualizar barra de progreso
+			const progressBar = document.querySelector('.wizard-progress-bar-inner');
+			if (progressBar) progressBar.style.width = '80%';
+			
+			// Actualizar labels de pasos
+			const wizardLabels = document.querySelectorAll('.wizard-step-label');
+			wizardLabels.forEach((el, idx) => {
+				if (idx === 3) {
+					el.classList.add('active');
+				}
+			});
+		});
+	}
+
+	// Paso 4: Especies
+	if (btnAnterior4) {
+		btnAnterior4.addEventListener('click', function() {
+			paso4.classList.add('d-none');
+			paso3.classList.remove('d-none');
+			
+			// Actualizar barra de progreso
+			const progressBar = document.querySelector('.wizard-progress-bar-inner');
+			if (progressBar) progressBar.style.width = '60%';
+			
+			// Actualizar labels de pasos
+			const wizardLabels = document.querySelectorAll('.wizard-step-label');
+			wizardLabels.forEach((el, idx) => {
+				if (idx === 3) {
+					el.classList.remove('active');
+				}
+			});
+		});
+	}
+
+	if (btnSiguiente4) {
+		btnSiguiente4.addEventListener('click', function() {
+			const especiesList = document.getElementById('especies-list');
+			const especiesSeleccionadas = especiesList ? especiesList.querySelectorAll('input[type="checkbox"]:checked') : [];
+			
+			if (especiesSeleccionadas.length === 0) {
+				showFieldFeedback(especiesList, false, 'Debe seleccionar al menos una especie.');
+				return;
+			} else {
+				showFieldFeedback(especiesList, true, `${especiesSeleccionadas.length} especie(s) seleccionada(s).`);
+			}
+			
+			paso4.classList.add('d-none');
+			paso5.classList.remove('d-none');
+			
+			// Actualizar barra de progreso
+			const progressBar = document.querySelector('.wizard-progress-bar-inner');
+			if (progressBar) progressBar.style.width = '100%';
+			
+			// Actualizar labels de pasos
+			const wizardLabels = document.querySelectorAll('.wizard-step-label');
+			wizardLabels.forEach((el, idx) => {
+				if (idx === 4) {
+					el.classList.add('active');
+				}
+			});
+		});
+	}
+
+	// Paso 5: Confirmación
+	if (btnAnterior5) {
+		btnAnterior5.addEventListener('click', function() {
+			paso5.classList.add('d-none');
+			paso4.classList.remove('d-none');
+			
+			// Actualizar barra de progreso
+			const progressBar = document.querySelector('.wizard-progress-bar-inner');
+			if (progressBar) progressBar.style.width = '80%';
+			
+			// Actualizar labels de pasos
+			const wizardLabels = document.querySelectorAll('.wizard-step-label');
+			wizardLabels.forEach((el, idx) => {
+				if (idx === 4) {
+					el.classList.remove('active');
+				}
+			});
+		});
+	}
 	
 	// Inicialización del mapa de geolocalización para el paso 3 del wizard
 	let establecimientoMap = null;
@@ -400,44 +640,217 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// Cargar especies desde endpoint
 	function cargarEspecies() {
-		// Función simplificada - en producción conectaría con API
 		const especiesList = document.getElementById('especies-list');
-		if (especiesList) {
-			especiesList.innerHTML = `
-				<li class="px-3 py-1">
-					<div class="form-check">
-						<input class="form-check-input" type="checkbox" value="1" id="chk-especie-1">
-						<label class="form-check-label" for="chk-especie-1">Vid</label>
-					</div>
-				</li>
-				<li class="px-3 py-1">
-					<div class="form-check">
-						<input class="form-check-input" type="checkbox" value="2" id="chk-especie-2">
-						<label class="form-check-label" for="chk-especie-2">Olivo</label>
-					</div>
-				</li>
-				<li class="px-3 py-1">
-					<div class="form-check">
-						<input class="form-check-input" type="checkbox" value="3" id="chk-especie-3">
-						<label class="form-check-label" for="chk-especie-3">Cerezo</label>
-					</div>
-				</li>
-			`;
+		if (!especiesList) return;
+		
+		addLoadingState(especiesList, 'Cargando especies...');
+		
+		fetch('http://localhost:9090/especies')
+			.then(response => response.json())
+			.then(especies => {
+				let html = '';
+				especies.forEach(especie => {
+					html += `
+						<li class="px-3 py-1">
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" value="${especie.idEspecie}" id="chk-especie-${especie.idEspecie}">
+								<label class="form-check-label" for="chk-especie-${especie.idEspecie}">
+									${especie.nombreEspecie}
+								</label>
+							</div>
+						</li>
+					`;
+				});
+				especiesList.innerHTML = html;
+				
+				// Event listeners para actualizar dropdown y campo oculto
+				especiesList.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+					checkbox.addEventListener('change', function() {
+						actualizarEspeciesSeleccionadas();
+					});
+				});
+			})
+			.catch(error => {
+				console.error('Error cargando especies:', error);
+				especiesList.innerHTML = `
+					<li class="px-3 py-1">
+						<div class="form-check">
+							<input class="form-check-input" type="checkbox" value="1" id="chk-especie-1">
+							<label class="form-check-label" for="chk-especie-1">VID</label>
+						</div>
+					</li>
+					<li class="px-3 py-1">
+						<div class="form-check">
+							<input class="form-check-input" type="checkbox" value="2" id="chk-especie-2">
+							<label class="form-check-label" for="chk-especie-2">OLIVO</label>
+						</div>
+					</li>
+					<li class="px-3 py-1">
+						<div class="form-check">
+							<input class="form-check-input" type="checkbox" value="3" id="chk-especie-3">
+							<label class="form-check-label" for="chk-especie-3">CEREZO</label>
+						</div>
+					</li>
+				`;
+				
+				// Event listeners para datos por defecto
+				especiesList.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+					checkbox.addEventListener('change', function() {
+						actualizarEspeciesSeleccionadas();
+					});
+				});
+			});
+	}
+	
+	// Actualizar especies seleccionadas en el dropdown y campo oculto
+	function actualizarEspeciesSeleccionadas() {
+		const especiesList = document.getElementById('especies-list');
+		const dropdownButton = document.getElementById('dropdownEspecies');
+		const hiddenInput = document.getElementById('especies');
+		
+		if (!especiesList || !dropdownButton || !hiddenInput) return;
+		
+		const especiesSeleccionadas = especiesList.querySelectorAll('input[type="checkbox"]:checked');
+		const especiesTexto = Array.from(especiesSeleccionadas).map(checkbox => {
+			const label = especiesList.querySelector(`label[for="${checkbox.id}"]`);
+			return label ? label.textContent.trim() : '';
+		}).filter(texto => texto !== '');
+		
+		const especiesIds = Array.from(especiesSeleccionadas).map(checkbox => checkbox.value);
+		
+		if (especiesTexto.length > 0) {
+			dropdownButton.textContent = especiesTexto.length === 1 ? 
+				especiesTexto[0] : 
+				`${especiesTexto.length} especies seleccionadas`;
+			hiddenInput.value = especiesIds.join(',');
+		} else {
+			dropdownButton.textContent = 'Seleccionar especies';
+			hiddenInput.value = '';
 		}
 	}
 
 	// Cargar departamentos
 	function cargarDepartamentos() {
 		const select = document.getElementById('departamento');
-		if (select) {
-			select.innerHTML = `
-				<option value="">Seleccionar departamento</option>
-				<option value="1">Capital</option>
-				<option value="2">Godoy Cruz</option>
-				<option value="3">Maipú</option>
-				<option value="4">Las Heras</option>
-			`;
+		if (!select) return;
+		
+		addLoadingState(select.parentNode, 'Cargando departamentos...');
+		
+		fetch('http://localhost:9090/departamentos')
+			.then(response => {
+				if (!response.ok) {
+					throw new Error(`HTTP error! status: ${response.status}`);
+				}
+				return response.json();
+			})
+			.then(departamentos => {
+				let html = '<option value="">Seleccionar departamento</option>';
+				departamentos.forEach(dep => {
+					html += `<option value="${dep.idDepartamento}">${dep.nombreDepartamento}</option>`;
+				});
+				select.innerHTML = html;
+				
+				// Event listener para cargar distritos
+				select.addEventListener('change', function() {
+					cargarDistritos(this.value);
+				});
+				
+				// Limpiar loading state
+				const loadingDiv = select.parentNode.querySelector('.loading-state');
+				if (loadingDiv) loadingDiv.remove();
+			})
+			.catch(error => {
+				console.error('Error cargando departamentos:', error);
+				select.innerHTML = `
+					<option value="">Seleccionar departamento</option>
+					<option value="1">Capital</option>
+					<option value="2">Godoy Cruz</option>
+					<option value="3">Maipú</option>
+					<option value="4">Las Heras</option>
+				`;
+				
+				// Event listener para datos por defecto
+				select.addEventListener('change', function() {
+					cargarDistritos(this.value);
+				});
+				
+				// Limpiar loading state
+				const loadingDiv = select.parentNode.querySelector('.loading-state');
+				if (loadingDiv) loadingDiv.remove();
+			})
+			.catch(error => {
+				console.error('Error cargando departamentos:', error);
+				select.innerHTML = `
+					<option value="">Seleccionar departamento</option>
+					<option value="1">Capital</option>
+					<option value="2">Godoy Cruz</option>
+					<option value="3">Maipú</option>
+					<option value="4">Las Heras</option>
+				`;
+				
+				// Event listener para datos por defecto
+				select.addEventListener('change', function() {
+					cargarDistritos(this.value);
+				});
+				
+				// Limpiar loading state
+				const loadingDiv = select.parentNode.querySelector('.loading-state');
+				if (loadingDiv) loadingDiv.remove();
+			});
+	}
+	
+	// Cargar distritos basado en departamento seleccionado
+	function cargarDistritos(departamentoId) {
+		const select = document.getElementById('distrito');
+		if (!select || !departamentoId) {
+			if (select) select.innerHTML = '<option value="">Primero seleccione un departamento</option>';
+			return;
 		}
+		
+		addLoadingState(select.parentNode, 'Cargando distritos...');
+		
+		fetch(`http://localhost:9090/distritos/departamento/${departamentoId}`)
+			.then(response => {
+				if (!response.ok) {
+					throw new Error(`HTTP error! status: ${response.status}`);
+				}
+				return response.json();
+			})
+			.then(distritos => {
+				let html = '<option value="">Seleccionar distrito</option>';
+				distritos.forEach(distrito => {
+					html += `<option value="${distrito.idDistrito}">${distrito.nombreDistrito}</option>`;
+				});
+				select.innerHTML = html;
+				
+				// Limpiar loading state
+				const loadingDiv = select.parentNode.querySelector('.loading-state');
+				if (loadingDiv) loadingDiv.remove();
+			})
+			.catch(error => {
+				console.error('Error cargando distritos desde backend:', error);
+				// Fallback a datos estáticos solo en caso de error
+				const distritosData = {
+					'1': [{idDistrito: 1, nombreDistrito: 'JUNÍN CENTRO'}, {idDistrito: 2, nombreDistrito: 'JUNÍN NORTE'}],
+					'2': [{idDistrito: 3, nombreDistrito: 'LA PAZ CENTRO'}, {idDistrito: 4, nombreDistrito: 'LA PAZ SUR'}],
+					'3': [{idDistrito: 5, nombreDistrito: 'RIVADAVIA CENTRO'}, {idDistrito: 6, nombreDistrito: 'RIVADAVIA OESTE'}],
+					'4': [{idDistrito: 7, nombreDistrito: 'GUAYMALLÉN NORTE'}, {idDistrito: 8, nombreDistrito: 'GUAYMALLÉN SUR'}]
+				};
+				
+				const distritos = distritosData[departamentoId] || [];
+				let html = '<option value="">Seleccionar distrito</option>';
+				distritos.forEach(distrito => {
+					html += `<option value="${distrito.idDistrito}">${distrito.nombreDistrito}</option>`;
+				});
+				select.innerHTML = html;
+				
+				// Limpiar loading state
+				const loadingDiv = select.parentNode.querySelector('.loading-state');
+				if (loadingDiv) {
+					loadingDiv.remove();
+					console.log('Loading state de distritos eliminado después del error');
+				}
+			});
 	}
 });
 
@@ -465,19 +878,203 @@ document.addEventListener('DOMContentLoaded', function() {
 	if (btnConfirmarRegistro) {
 		btnConfirmarRegistro.addEventListener('click', function(e) {
 			e.preventDefault();
-			setTimeout(function() {
-				// Cerrar modal de registro
-				const modalRegistro = document.getElementById('modalRegistroEmpleador');
-				if (modalRegistro) {
-					const modalInstance = bootstrap.Modal.getInstance(modalRegistro);
-					if (modalInstance) modalInstance.hide();
-				}
+			
+			// Recopilar todos los datos del wizard
+			const datosRegistro = recopilarDatosWizard();
+			
+			if (datosRegistro) {
+				// Deshabilitar botón y mostrar estado de carga
+				const removeLoading = addLoadingState(btnConfirmarRegistro, 'Registrando...');
 				
-				// Redirigir al dashboard
-				setTimeout(function() {
-					window.location.href = 'dashboard.html';
-				}, 500);
-			}, 100);
+				// Enviar datos al backend
+				enviarRegistroAlBackend(datosRegistro)
+					.then(response => {
+						// Registro exitoso
+						removeLoading();
+						mostrarMensajeExito();
+						
+						setTimeout(function() {
+							// Cerrar modal de registro
+							const modalRegistro = document.getElementById('modalRegistroEmpleador');
+							if (modalRegistro) {
+								const modalInstance = bootstrap.Modal.getInstance(modalRegistro);
+								if (modalInstance) modalInstance.hide();
+							}
+							
+							// Redirigir al dashboard
+							setTimeout(function() {
+								window.location.href = 'dashboard.html';
+							}, 500);
+						}, 1500);
+					})
+					.catch(error => {
+						// Error en el registro
+						removeLoading();
+						mostrarMensajeError(error.message);
+					});
+			}
 		});
 	}
 });
+
+// Función para recopilar todos los datos del wizard
+function recopilarDatosWizard() {
+	try {
+		// Paso 1: Datos de empresa
+		const cuit = document.getElementById('cuit')?.value?.trim();
+		const razonSocial = document.getElementById('razonSocial')?.value?.trim();
+		
+		// Paso 2: Administrador de empresa
+		const dni = document.getElementById('dni')?.value?.trim();
+		const nombre = document.getElementById('nombre')?.value?.trim();
+		const apellido = document.getElementById('apellido')?.value?.trim();
+		const email = document.getElementById('email')?.value?.trim();
+		const telefono = document.getElementById('telefono')?.value?.trim();
+		const password = document.getElementById('password')?.value;
+		
+		// Paso 3: Datos de establecimiento
+		const nombreEstablecimiento = document.getElementById('nombreEstablecimiento')?.value?.trim();
+		const renspa = document.getElementById('renspa')?.value?.trim();
+		const calle = document.getElementById('calle')?.value?.trim();
+		const numeracion = document.getElementById('numeracion')?.value?.trim();
+		const codigoPostal = document.getElementById('codigoPostal')?.value?.trim();
+		const distrito = document.getElementById('distrito')?.value;
+		const latitud = document.getElementById('latitud')?.value;
+		const longitud = document.getElementById('longitud')?.value;
+		
+		// Paso 4: Especies seleccionadas
+		const especiesInput = document.getElementById('especies')?.value;
+		const especiesIds = especiesInput ? especiesInput.split(',').filter(id => id.trim()).map(id => parseInt(id)) : [];
+		
+		// Paso 4: Administrador de establecimiento (opcional)
+		const sinAdminEst = document.getElementById('sinAdminEstablecimiento')?.checked;
+		const adminEstNombre = document.getElementById('adminEstNombre')?.value?.trim();
+		const adminEstApellido = document.getElementById('adminEstApellido')?.value?.trim();
+		const adminEstDni = document.getElementById('adminEstDni')?.value?.trim();
+		const adminEstEmail = document.getElementById('adminEstEmail')?.value?.trim();
+		const adminEstTelefono = document.getElementById('adminEstTelefono')?.value?.trim();
+		const adminEstPassword = document.getElementById('adminEstPassword')?.value;
+		
+		// Validaciones básicas
+		if (!cuit || !razonSocial || !dni || !nombre || !apellido || !email || !telefono || !password) {
+			throw new Error('Faltan datos obligatorios en los pasos 1 y 2');
+		}
+		
+		if (!nombreEstablecimiento || !renspa || !calle || !numeracion || !codigoPostal || !distrito || !latitud || !longitud) {
+			throw new Error('Faltan datos obligatorios del establecimiento en el paso 3');
+		}
+		
+		if (especiesIds.length === 0) {
+			throw new Error('Debe seleccionar al menos una especie');
+		}
+		
+		// Estructurar JSON según el formato esperado por el backend
+		const datosRegistro = {
+			dtoEmpresaRegistro: {
+				cuit: cuit,
+				razonSocial: razonSocial
+			},
+			dtoEstablecimientoRegistro: {
+				numeroRenspa: renspa,
+				nombreEstablecimiento: nombreEstablecimiento,
+				calle: calle,
+				numeracion: numeracion,
+				codigoPostal: codigoPostal,
+				localizacion: {
+					latitud: parseFloat(latitud),
+					longitud: parseFloat(longitud)
+				},
+				idDistrito: parseInt(distrito),
+				idEspecies: especiesIds
+			},
+			dtoPersonaEmpresaRegistro: {
+				dni: dni,
+				apellido: apellido,
+				nombrePersona: nombre,
+				telefono: telefono,
+				email: email,
+				contrasenia: password
+			}
+		};
+		
+		// Agregar administrador de establecimiento solo si no está marcado como "sin administrador"
+		if (!sinAdminEst && adminEstNombre && adminEstApellido && adminEstDni && adminEstEmail && adminEstTelefono && adminEstPassword) {
+			datosRegistro.dtoPersonaEstablecimientoRegistro = {
+				dni: adminEstDni,
+				apellido: adminEstApellido,
+				nombrePersona: adminEstNombre,
+				telefono: adminEstTelefono,
+				email: adminEstEmail,
+				contrasenia: adminEstPassword
+			};
+		}
+		
+		return datosRegistro;
+		
+	} catch (error) {
+		console.error('Error recopilando datos del wizard:', error);
+		mostrarMensajeError(error.message);
+		return null;
+	}
+}
+
+// Función para enviar registro al backend
+async function enviarRegistroAlBackend(datos) {
+	try {
+		const response = await fetch('http://localhost:9090/registro', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(datos)
+		});
+		
+		if (!response.ok) {
+			const errorData = await response.json().catch(() => ({}));
+			throw new Error(errorData.message || `Error HTTP: ${response.status}`);
+		}
+		
+		const resultado = await response.json();
+		console.log('Registro exitoso:', resultado);
+		return resultado;
+		
+	} catch (error) {
+		console.error('Error enviando registro al backend:', error);
+		throw error;
+	}
+}
+
+// Función para mostrar mensaje de éxito
+function mostrarMensajeExito() {
+	// Buscar el container del paso 5 para mostrar el mensaje
+	const paso5 = document.getElementById('form-registro-empleador-paso5');
+	if (paso5) {
+		const mensajeExito = document.createElement('div');
+		mensajeExito.className = 'alert alert-success mt-3';
+		mensajeExito.innerHTML = `
+			<i class="fas fa-check-circle me-2"></i>
+			<strong>¡Registro exitoso!</strong> Su empresa ha sido registrada correctamente.
+			Será redirigido al dashboard en unos segundos...
+		`;
+		paso5.appendChild(mensajeExito);
+	}
+}
+
+// Función para mostrar mensaje de error
+function mostrarMensajeError(mensaje) {
+	// Buscar el container del paso 5 para mostrar el mensaje
+	const paso5 = document.getElementById('form-registro-empleador-paso5');
+	if (paso5) {
+		// Eliminar mensajes anteriores
+		const mensajesAnteriores = paso5.querySelectorAll('.alert');
+		mensajesAnteriores.forEach(alert => alert.remove());
+		
+		const mensajeError = document.createElement('div');
+		mensajeError.className = 'alert alert-danger mt-3';
+		mensajeError.innerHTML = `
+			<i class="fas fa-exclamation-triangle me-2"></i>
+			<strong>Error en el registro:</strong> ${mensaje}
+		`;
+		paso5.appendChild(mensajeError);
+	}
+}
