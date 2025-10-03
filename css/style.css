@@ -1,3 +1,37 @@
+/* Variables del Dashboard */
+:root {
+    --sidebar-width: 250px;
+    --primary-blue: #4A90E2;
+    --secondary-blue: #357ABD;
+    --accent-blue: #5BA0F2;
+    --success-green: #27AE60;
+    --light-green: #2ECC71;
+    --warning-orange: #F39C12;
+    --light-orange: #E67E22;
+    --purple-accent: #9B59B6;
+    --light-purple: #8E44AD;
+    --dark-bg: #000000;
+    --card-bg: #2A2A2A;
+    --sidebar-bg: #000000;
+    --text-light: #FFFFFF;
+    --text-muted: #CCCCCC;
+    --shadow-blue: rgba(74, 144, 226, 0.3);
+    --shadow-dark: rgba(0, 0, 0, 0.8);
+}
+
+/* Asegurar cobertura completa del tema oscuro */
+html {
+    background: #000000 !important;
+    min-height: 100%;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+}
+
 /* Panel de usuario profesional */
 .card.shadow-lg.rounded {
     border-radius: 18px;
@@ -28,10 +62,24 @@
     border-top: 1.5px solid #e0e0e0;
     margin: 1.2rem 0;
 }
-.btn-outline-primary, .btn-success, .btn-outline-secondary {
-    font-size: 1.05rem;
-    border-radius: 8px;
-    transition: box-shadow 0.2s, background 0.2s;
+/* Estilos globales de texto para tema oscuro */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-light) !important;
+}
+
+p, span, div {
+    color: var(--text-light);
+}
+
+/* Contenedores y secciones */
+.container, section {
+    position: relative;
+    z-index: 1;
+}
+
+/* Asegurar que todos los containers tengan el tema oscuro */
+.py-5, .container {
+    background: transparent !important;
 }
 .btn-outline-primary:hover, .btn-success:hover, .btn-outline-secondary:hover {
     box-shadow: 0 2px 8px rgba(60,60,100,0.10);
@@ -68,39 +116,150 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 /* Cómo Funciona */
+/* Números grandes y modernos para pasos */
 .funciona-num {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 38px;
-    height: 38px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     font-weight: bold;
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     color: #fff;
     margin-top: 2px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    border: 3px solid rgba(255,255,255,0.12);
+    transition: transform 0.2s;
 }
 .funciona-num-trabajador {
-    background: #19c37d;
+    background: linear-gradient(135deg, var(--success-green), var(--light-green));
+    box-shadow: 0 4px 15px rgba(39, 174, 96, 0.25);
 }
 .funciona-num-empleador {
-    background: #2979ff;
+    background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.25);
 }
-/* Servicios */
-.servicio-card-ubicacion { background: #e9fbe9; }
-.servicio-card-perfiles { background: #e9f2fe; }
-.servicio-card-trabajo { background: #fff3ed; }
-.servicio-card-comunicacion { background: #f3e9fe; }
-.servicio-card-pagos { background: #fffbe9; }
-.servicio-card-horarios { background: #e9fafe; }
+.funciona-num:hover {
+    transform: scale(1.08) rotate(-6deg);
+}
 
-.servicio-icon { font-size: 2.2rem; }
-.servicio-icon-ubicacion { color: #3ec97c; }
-.servicio-icon-perfiles { color: #3a7bd5; }
-.servicio-icon-trabajo { color: #ff8800; }
-.servicio-icon-comunicacion { color: #a259e6; }
-.servicio-icon-pagos { color: #ffd600; }
-.servicio-icon-horarios { color: #1bc9c9; }
+/* Tarjeta moderna para sección cómo funciona */
+.funciona-card {
+    background: var(--card-bg) !important;
+    border-radius: 16px;
+    border: 1.5px solid #333;
+    box-shadow: 0 6px 32px rgba(0,0,0,0.18);
+    padding: 2.5rem 2rem 2rem 2rem;
+    margin-bottom: 2rem;
+    min-height: 420px;
+}
+.funciona-card h4 {
+    margin-bottom: 2rem;
+}
+.funciona-card ul {
+    margin-bottom: 0;
+}
+.funciona-card li {
+    background: rgba(255,255,255,0.01);
+    border-radius: 10px;
+    padding: 0.7rem 1rem;
+    margin-bottom: 1.2rem;
+    transition: background 0.2s;
+}
+.funciona-card li:hover {
+    background: rgba(255,255,255,0.04);
+}
+.funciona-card span.fw-bold {
+    color: var(--text-light);
+    font-size: 1.08rem;
+}
+.funciona-card .text-muted {
+    color: var(--text-muted) !important;
+    font-size: 0.98rem;
+}
+/* Servicios - Estilo Dashboard Moderno */
+.servicio-card {
+    background: var(--card-bg) !important;
+    border: 1px solid #444444;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.servicio-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border-color: var(--primary-blue);
+}
+
+.servicio-card .card-body {
+    padding: 2rem;
+    color: var(--text-light);
+}
+
+.servicio-card h5 {
+    color: var(--text-light) !important;
+    margin-bottom: 1rem;
+}
+
+.servicio-card p {
+    color: var(--text-muted) !important;
+    line-height: 1.6;
+}
+
+/* Íconos con colores del dashboard */
+.servicio-icon {
+    font-size: 2.5rem;
+    padding: 1rem;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.servicio-icon-ubicacion {
+    background: linear-gradient(135deg, var(--success-green), var(--light-green));
+    color: white;
+    box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+}
+
+.servicio-icon-perfiles {
+    background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+    color: white;
+    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+}
+
+.servicio-icon-trabajo {
+    background: linear-gradient(135deg, var(--warning-orange), var(--light-orange));
+    color: white;
+    box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+}
+
+.servicio-icon-comunicacion {
+    background: linear-gradient(135deg, var(--purple-accent), var(--light-purple));
+    color: white;
+    box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3);
+}
+
+.servicio-icon-pagos {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #333;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+}
+
+.servicio-icon-horarios {
+    background: linear-gradient(135deg, #00BFFF, #1E90FF);
+    color: white;
+    box-shadow: 0 4px 15px rgba(30, 144, 255, 0.3);
+}
+
+.servicio-card:hover .servicio-icon {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
 
 /* Stat cards íconos */
 .stat-icon { color: #7E57C2; }
@@ -120,9 +279,27 @@
 }
 
 
+/* Tema oscuro global */
 body {
-    background-color: #f6fbe9;
-    color: var(--dark-text);
+    background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%) !important;
+    color: var(--text-light) !important;
+    min-height: 100vh;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 10% 20%, rgba(74, 144, 226, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 90% 80%, rgba(39, 174, 96, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(155, 89, 182, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
 }
 
 
@@ -149,18 +326,40 @@ body {
     font-weight: bold;
 }
 
-/* Banner */
+/* Banner con Video */
 .banner-container {
     position: relative;
     height: 50vh;
     min-height: 500px;
-    background: url('../pexels-nc-farm-bureau-mark-8658558.jpg') center center/cover no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1;
     margin-top: -80px;
     padding-top: 80px;
+    overflow: hidden;
+}
+
+/* Video de fondo */
+.video-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+/* Overlay para mejorar legibilidad */
+.video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 2;
 }
 
 .banner-text-content {
@@ -179,26 +378,149 @@ body {
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
 }
 
-/* Map */
+/* Preservar funcionalidad del mapa y elementos críticos */
+/* Preservar funcionalidad del mapa y elementos críticos */
 #map, #farm-map-selector {
     height: 400px;
     width: 100%;
     border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     margin-bottom: 32px;
+    background: white !important;
+    color: #333 !important;
+}
+
+#map *, #farm-map-selector * {
+    color: inherit !important;
+}
+
+/* Preservar modales y formularios */
+.modal-content {
+    background: var(--card-bg) !important;
+    color: var(--text-light) !important;
+    border: 1px solid #444444;
+}
+
+.modal-header {
+    border-bottom: 1px solid #444444;
+}
+
+.modal-body {
+    background: transparent;
+}
+
+.form-control {
+    background: #333333 !important;
+    border: 1px solid #555555 !important;
+    color: var(--text-light) !important;
+}
+
+.form-control:focus {
+    background: #404040 !important;
+    border-color: var(--primary-blue) !important;
+    color: var(--text-light) !important;
+}
+
+.form-label {
+    color: var(--text-light) !important;
+}
+
+/* Botones consistentes */
+.btn-primary {
+    background: var(--primary-blue) !important;
+    border-color: var(--primary-blue) !important;
+}
+
+.btn-primary:hover {
+    background: var(--secondary-blue) !important;
+    border-color: var(--secondary-blue) !important;
+}
+
+/* Sección "Cómo Funciona" con tema oscuro */
+#como-funciona {
+    padding: 4rem 0;
+    background: transparent;
+}
+
+#como-funciona h2, #como-funciona h4 {
+    color: var(--text-light) !important;
+}
+
+#como-funciona p {
+    color: var(--text-muted) !important;
+}
+
+#como-funciona .fw-bold {
+    color: var(--text-light) !important;
+}
+
+#como-funciona .text-muted {
+    color: var(--text-muted) !important;
+}
+
+#como-funciona .text-success {
+    color: var(--success-green) !important;
+}
+
+#como-funciona .text-primary {
+    color: var(--primary-blue) !important;
+}
+
+/* Stats cards con tema oscuro */
+.stat-card {
+    background: var(--card-bg) !important;
+    border: 1px solid #444444 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border-color: var(--primary-blue);
+}
+
+.stat-card .card-body {
+    color: var(--text-light) !important;
+}
+
+.stat-card .card-title {
+    color: var(--text-light) !important;
+}
+
+.stat-card .display-6 {
+    color: var(--primary-blue) !important;
+}
+
+.stat-icon {
+    color: var(--primary-blue) !important;
+}
+
+/* Main content con tema oscuro */
+main {
+    background: transparent;
+}
+
+main h2 {
+    color: var(--text-light) !important;
+    margin-bottom: 2rem;
 }
 /* Fix Bootstrap modal z-index to always be above backdrop */
 .modal, .modal.show {
     z-index: 1060 !important;
 }
 
-/* Navbar completamente transparente sobre imagen de bienvenida */
+/* Navbar visible solo en la sección del video */
 #transparent-navbar {
     background: transparent !important;
     border: none;
     transition: all 0.3s ease;
     box-shadow: none;
     z-index: 1050 !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
 }
 
 /* Estilo para los enlaces del navbar transparente */
@@ -235,31 +557,28 @@ body {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.9%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
-/* Mantener navbar siempre transparente */
+/* Ocultar navbar cuando se sale de la sección del video */
 #transparent-navbar.scrolled {
-    background: transparent !important;
-    box-shadow: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-100%);
+    transition: all 0.3s ease;
 }
 
 /* ===== EFECTOS PARA EL TÍTULO PRINCIPAL ===== */
 
-/* Título con gradiente animado y efectos 3D */
+/* Título blanco limpio y elegante */
 .title-gradient {
-    background: linear-gradient(45deg, #4CAF50, #8BC34A, #CDDC39, #FFF176, #4CAF50);
-    background-size: 400% 400%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: gradientShift 4s ease-in-out infinite;
+    color: #FFFFFF;
     text-shadow: 
-        2px 2px 0px rgba(0, 0, 0, 0.8),
-        4px 4px 0px rgba(0, 0, 0, 0.6),
-        6px 6px 0px rgba(0, 0, 0, 0.4),
-        8px 8px 0px rgba(0, 0, 0, 0.2);
+        2px 2px 4px rgba(0, 0, 0, 0.8),
+        4px 4px 8px rgba(0, 0, 0, 0.6),
+        0 0 20px rgba(255, 255, 255, 0.3);
     letter-spacing: 2px;
     position: relative;
     display: inline-block;
     margin-bottom: 1.5rem;
+    font-weight: 700;
 }
 
 /* Animación de entrada del título */
@@ -268,11 +587,14 @@ body {
     transform-origin: center;
 }
 
-/* Efecto de resplandor al hacer hover */
+/* Efecto elegante al hacer hover */
 .title-gradient:hover {
-    animation: glowPulse 1.5s ease-in-out infinite;
-    transform: scale(1.05);
-    transition: transform 0.3s ease;
+    transform: scale(1.03);
+    transition: all 0.3s ease;
+    text-shadow: 
+        2px 2px 4px rgba(0, 0, 0, 0.9),
+        4px 4px 8px rgba(0, 0, 0, 0.7),
+        0 0 25px rgba(255, 255, 255, 0.5);
 }
 
 /* Subtítulo mejorado */
@@ -353,4 +675,58 @@ body {
         letter-spacing: 0.5px;
     }
 }
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+
+/* ===== ANIMACIONES DORADAS ===== */
+
+/* Animación de resplandor verde neón */
+@keyframes glowPulse {
+    0%, 100% {
+        filter: drop-shadow(0 0 15px rgba(0, 255, 65, 0.8)) drop-shadow(0 0 25px rgba(57, 255, 20, 0.6));
+    }
+    50% {
+        filter: drop-shadow(0 0 30px rgba(0, 255, 65, 1)) drop-shadow(0 0 40px rgba(57, 255, 20, 0.8)) drop-shadow(0 0 50px rgba(0, 255, 127, 0.6));
+    }
+}
+
+/* Animación de gradiente dorado mejorada */
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    25% {
+        background-position: 100% 50%;
+    }
+    50% {
+        background-position: 100% 100%;
+    }
+    75% {
+        background-position: 0% 100%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Animación de entrada suave */
+@keyframes titleEntrance {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Animación de fade in para el subtítulo */
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

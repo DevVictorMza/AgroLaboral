@@ -15,7 +15,7 @@
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="transparent-navbar">
+    <nav class="navbar navbar-expand-lg navbar-light" id="transparent-navbar">
         <div class="container-fluid">
             <!-- Logo y texto eliminados de la navbar -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,18 +45,10 @@
                         <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#modalRegistroEmpleador" id="btn-registro" onclick="return false;">Registro Empleador</a>
                     </li>
                 </ul>
-                <div class="d-flex">
-                </div>
-                    <!-- Modal se moverá fuera del nav -->
-                    </div>
-                </div>
-            </div>
-        </div>
-                </div>
             </div>
         </div>
     </nav>
-            <!-- Banner -->
+
     <!-- Modal Registro Empleador (Wizard) -->
     <div class="modal fade" id="modalRegistroEmpleador" tabindex="-1" aria-labelledby="modalRegistroEmpleadorLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -298,6 +290,17 @@
         </div>
     </div>
     <div class="banner-container text-white d-flex align-items-center justify-content-center">
+        <!-- Video de fondo -->
+        <video autoplay muted loop id="background-video" class="video-background">
+            <source src="video-agricultura.mp4" type="video/mp4">
+            <!-- Fallback para navegadores que no soportan video -->
+            Tu navegador no soporta videos HTML5.
+        </video>
+        
+        <!-- Overlay para mejorar legibilidad del texto -->
+        <div class="video-overlay"></div>
+        
+        <!-- Contenido del banner -->
         <div class="text-center banner-text-content">
             <!-- Ícono de uva eliminado -->
             <h1 class="display-4 fw-bold title-gradient animated-title">Bienvenidos a Agro Laboral</h1>
@@ -373,8 +376,8 @@
     <section id="como-funciona" class="container py-5">
         <h2 class="text-center fw-bold mb-2">¿Cómo Funciona?</h2>
         <p class="text-center mb-5">Simple, rápido y efectivo</p>
-        <div class="row justify-content-center">
-            <div class="col-md-5">
+        <div class="row justify-content-center gap-4">
+            <div class="col-md-5 funciona-card shadow servicio-card mb-4">
                 <h4 class="fw-bold text-success text-center mb-4">Para Trabajadores</h4>
                 <ul class="list-unstyled">
                     <li class="d-flex mb-4 align-items-start">
@@ -407,7 +410,7 @@
                     </li>
                 </ul>
             </div>
-            <div class="col-md-5">
+            <div class="col-md-5 funciona-card shadow servicio-card mb-4">
                 <h4 class="fw-bold text-primary text-center mb-4">Para Empleadores</h4>
                 <ul class="list-unstyled">
                     <li class="d-flex mb-4 align-items-start">
@@ -464,7 +467,7 @@
                 </div>
             </div>
         </div>
-        <h2 class="text-center mb-4">Mapa Interactivo de Fincas</h2>
+        <h2 class="text-center mb-4">Mapa Interactivo de Establecimientos/Fincas</h2>
         <div class="row justify-content-center">
             <div class="col-lg-10">
                 <div id="map" class="my-3"></div>
