@@ -90,6 +90,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 	addPasswordToggle('password');
 	addPasswordToggle('password2');
+	addPasswordToggle('adminEstPassword');
+	addPasswordToggle('adminEstPassword2');
 
 	// Coincidencia visual de contraseñas
 	const passwordInput = document.getElementById('password');
@@ -113,8 +115,8 @@ document.addEventListener('DOMContentLoaded', function() {
 				password2Icon.style.marginLeft = '8px';
 				password2Input.parentNode.appendChild(password2Icon);
 			}
-			// Validación de mínimo 4 caracteres
-			if (passwordValue.length < 4 || password2Value.length < 4) {
+			// Validación de exactamente 6 caracteres
+			if (passwordValue.length !== 6 || password2Value.length !== 6) {
 				password2Icon.innerHTML = '';
 				successMsg.textContent = '';
 				return;
@@ -131,11 +133,61 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 		}
 		password2Input.addEventListener('input', function() {
-			this.value = this.value.replace(/\s/g, '');
+			this.value = this.value.replace(/\s/g, '').slice(0, 6);
 			updatePasswordMatch();
 		});
 		passwordInput.addEventListener('input', function() {
+			this.value = this.value.replace(/\s/g, '').slice(0, 6);
 			updatePasswordMatch();
+		});
+	}
+
+	// Validación de contraseñas del administrador de establecimiento
+	const adminPasswordInput = document.getElementById('adminEstPassword');
+	const adminPassword2Input = document.getElementById('adminEstPassword2');
+	if (adminPassword2Input && adminPasswordInput) {
+		// Mensaje de éxito
+		let adminSuccessMsg = document.getElementById('adminEst-password-success-msg');
+		if (!adminSuccessMsg) {
+			adminSuccessMsg = document.createElement('div');
+			adminSuccessMsg.id = 'adminEst-password-success-msg';
+			adminSuccessMsg.className = 'text-success mt-1';
+			adminPassword2Input.parentNode.appendChild(adminSuccessMsg);
+		}
+		function updateAdminPasswordMatch() {
+			const adminPasswordValue = adminPasswordInput.value;
+			const adminPassword2Value = adminPassword2Input.value;
+			let adminPassword2Icon = document.getElementById('adminEstPassword2-icon');
+			if (!adminPassword2Icon) {
+				adminPassword2Icon = document.createElement('span');
+				adminPassword2Icon.id = 'adminEstPassword2-icon';
+				adminPassword2Icon.style.marginLeft = '8px';
+				adminPassword2Input.parentNode.appendChild(adminPassword2Icon);
+			}
+			// Validación de exactamente 6 caracteres
+			if (adminPasswordValue.length !== 6 || adminPassword2Value.length !== 6) {
+				adminPassword2Icon.innerHTML = '';
+				adminSuccessMsg.textContent = '';
+				return;
+			}
+			if (!adminPassword2Value) {
+				adminPassword2Icon.innerHTML = '';
+				adminSuccessMsg.textContent = '';
+			} else if (adminPasswordValue !== adminPassword2Value) {
+				adminPassword2Icon.innerHTML = '<i class="bi bi-x-circle-fill" style="color:#dc3545;font-size:1.2em;vertical-align:middle;"></i>';
+				adminSuccessMsg.textContent = '';
+			} else {
+				adminPassword2Icon.innerHTML = '<i class="bi bi-check-circle-fill" style="color:#198754;font-size:1.2em;vertical-align:middle;"></i>';
+				adminSuccessMsg.textContent = '¡Sus contraseñas coinciden!';
+			}
+		}
+		adminPassword2Input.addEventListener('input', function() {
+			this.value = this.value.replace(/\s/g, '').slice(0, 6);
+			updateAdminPasswordMatch();
+		});
+		adminPasswordInput.addEventListener('input', function() {
+			this.value = this.value.replace(/\s/g, '').slice(0, 6);
+			updateAdminPasswordMatch();
 		});
 	}
 
@@ -334,7 +386,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				{input: nombreInput, value: nombreValue, regex: /^[A-ZÁÉÍÓÚÑ ]+$/, message: 'El nombre solo debe contener letras y espacios.', required: true},
 				{input: apellidoInput, value: apellidoValue, regex: /^[A-ZÁÉÍÓÚÑ ]+$/, message: 'El apellido solo debe contener letras y espacios.', required: true},
 				{input: emailInput, value: emailValue, regex: /^([a-zA-Z0-9_\.-]+)@([a-zA-Z0-9\.-]+)\.([a-zA-Z]{2,})$/, message: 'Ingrese un email válido.', required: true},
-				{input: telefonoInput, value: telefonoValue, regex: /^\d+$/, message: 'El teléfono solo debe contener números.', required: true}
+				{input: telefonoInput, value: telefonoValue, regex: /^\d{1,13}$/, message: 'El teléfono debe contener entre 1 y 13 números.', required: true}
 			];
 			
 			validations.forEach(validation => {
@@ -374,8 +426,8 @@ document.addEventListener('DOMContentLoaded', function() {
 					passwordErrorDiv.textContent = 'La contraseña es obligatoria.';
 					passwordInput.classList.add('is-invalid');
 					hasErrors = true;
-				} else if (passwordValue.length < 4) {
-					passwordErrorDiv.textContent = 'La contraseña debe tener al menos 4 caracteres.';
+				} else if (passwordValue.length !== 6) {
+					passwordErrorDiv.textContent = 'La contraseña debe tener 6 caracteres.';
 					passwordInput.classList.add('is-invalid');
 					hasErrors = true;
 				} else {
@@ -457,7 +509,21 @@ document.addEventListener('DOMContentLoaded', function() {
 		const telefonoInput = document.getElementById('telefono');
 		if (telefonoInput) {
 			telefonoInput.addEventListener('input', function() {
-				this.value = this.value.replace(/\D/g, '');
+				this.value = this.value.replace(/\D/g, '').slice(0, 13);
+			});
+		}
+		
+		const adminEstTelefonoInput = document.getElementById('adminEstTelefono');
+		if (adminEstTelefonoInput) {
+			adminEstTelefonoInput.addEventListener('input', function() {
+				this.value = this.value.replace(/\D/g, '').slice(0, 13);
+			});
+		}
+		
+		const renspaInput = document.getElementById('renspa');
+		if (renspaInput) {
+			renspaInput.addEventListener('input', function() {
+				this.value = this.value.replace(/\D/g, '').slice(0, 11);
 			});
 		}
 	}
@@ -486,17 +552,40 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	if (btnSiguiente3) {
 		btnSiguiente3.addEventListener('click', function() {
+			const nombreEstablecimientoInput = document.getElementById('nombreEstablecimiento');
+			const renspaInput = document.getElementById('renspa');
 			const departamentoSelect = document.getElementById('departamento');
 			const distritoSelect = document.getElementById('distrito');
 			const latitudInput = document.getElementById('latitud');
 			const longitudInput = document.getElementById('longitud');
 			
+			const nombreEstablecimientoValue = nombreEstablecimientoInput ? nombreEstablecimientoInput.value.trim() : '';
+			const renspaValue = renspaInput ? renspaInput.value.trim() : '';
 			const departamentoValue = departamentoSelect ? departamentoSelect.value : '';
 			const distritoValue = distritoSelect ? distritoSelect.value : '';
 			const latitudValue = latitudInput ? latitudInput.value : '';
 			const longitudValue = longitudInput ? longitudInput.value : '';
 			
 			let hasErrors = false;
+			
+			// Validar nombre del establecimiento
+			if (!nombreEstablecimientoValue) {
+				showFieldFeedback(nombreEstablecimientoInput, false, 'El nombre del establecimiento es obligatorio.');
+				hasErrors = true;
+			} else {
+				showFieldFeedback(nombreEstablecimientoInput, true, '');
+			}
+			
+			// Validar RENSPA
+			if (!renspaValue) {
+				showFieldFeedback(renspaInput, false, 'El número de RENSPA es obligatorio.');
+				hasErrors = true;
+			} else if (!/^\d{1,11}$/.test(renspaValue)) {
+				showFieldFeedback(renspaInput, false, 'El RENSPA debe contener entre 1 y 11 números.');
+				hasErrors = true;
+			} else {
+				showFieldFeedback(renspaInput, true, '');
+			}
 			
 			// Validar departamento
 			if (!departamentoValue) {
@@ -960,6 +1049,11 @@ function recopilarDatosWizard() {
 			throw new Error('Faltan datos obligatorios en los pasos 1 y 2');
 		}
 		
+		// Validación específica de longitud de contraseña
+		if (password.length > 6) {
+			throw new Error('La contraseña no puede exceder los 6 caracteres');
+		}
+		
 		if (!nombreEstablecimiento || !renspa || !calle || !numeracion || !codigoPostal || !distrito || !latitud || !longitud) {
 			throw new Error('Faltan datos obligatorios del establecimiento en el paso 3');
 		}
@@ -993,19 +1087,24 @@ function recopilarDatosWizard() {
 				nombrePersona: nombre,
 				telefono: telefono,
 				email: email,
-				contrasenia: password
+				contrasenia: password.substring(0, 6) // Asegurar máximo 6 caracteres
 			}
 		};
 		
 		// Agregar administrador de establecimiento solo si no está marcado como "sin administrador"
 		if (!sinAdminEst && adminEstNombre && adminEstApellido && adminEstDni && adminEstEmail && adminEstTelefono && adminEstPassword) {
+			// Validación específica de longitud de contraseña del admin
+			if (adminEstPassword.length > 6) {
+				throw new Error('La contraseña del administrador no puede exceder los 6 caracteres');
+			}
+			
 			datosRegistro.dtoPersonaEstablecimientoRegistro = {
 				dni: adminEstDni,
 				apellido: adminEstApellido,
 				nombrePersona: adminEstNombre,
 				telefono: adminEstTelefono,
 				email: adminEstEmail,
-				contrasenia: adminEstPassword
+				contrasenia: adminEstPassword.substring(0, 6) // Asegurar máximo 6 caracteres
 			};
 		}
 		
