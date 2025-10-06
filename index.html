@@ -39,7 +39,7 @@
                 <!-- Botones públicos (antes del registro) - Estilo nav-link -->
                 <ul class="navbar-nav" id="public-buttons">
                     <li class="nav-item">
-                        <a class="nav-link" href="#" id="btn-login" onclick="return false;">Login</a>
+                        <a class="nav-link" href="#" id="btn-login" data-bs-toggle="modal" data-bs-target="#modalLogin" onclick="return false;">Login</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#modalRegistroEmpleador" id="btn-registro" onclick="return false;">Registro Empleador</a>
@@ -291,6 +291,37 @@
                             <div id="mensaje-exito" class="alert alert-success mt-4 d-none" role="alert">
                                 ¡Su cuenta ha sido creada con éxito!
                             </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Login -->
+    <div class="modal fade" id="modalLogin" tabindex="-1" aria-labelledby="modalLoginLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h4 class="modal-title w-100 text-center fw-bold" id="modalLoginLabel">Iniciar Sesión</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body pt-0">
+                    <form id="form-login">
+                        <div class="mb-4">
+                            <div class="mb-3">
+                                <label for="dni-login" class="form-label">DNI</label>
+                                <input type="text" class="form-control" id="dni-login" name="dni-login" placeholder="Ej: 12345678">
+                            </div>
+                            <div class="mb-3" style="position: relative;">
+                                <label for="password-login" class="form-label">Contraseña</label>
+                                <input type="password" class="form-control" id="password-login" name="password-login" placeholder="Ingresa tu contraseña">
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-primary btn-lg" id="btn-iniciar-sesion">
+                                <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+                            </button>
                         </div>
                     </form>
                 </div>
