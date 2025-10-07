@@ -93,7 +93,319 @@ document.addEventListener('DOMContentLoaded', function() {
 	addPasswordToggle('adminEstPassword');
 	addPasswordToggle('adminEstPassword2');
 
-	// Coincidencia visual de contraseñas
+	// Inicializar autocompletado por DNI - NOTA: Los event listeners ya están configurados arriba
+	console.log('🔧 Sistema de autocompletado DNI inicializado correctamente');
+	console.log('📝 Event listeners agregados a campos DNI para autocompletado automático');
+	
+	// Función de prueba para autocompletado (temporal para debugging)
+	window.testAutocompletado = async function(dni) {
+		console.log('🧪 Probando autocompletado con DNI:', dni);
+		const resultado = await consultarPersonaPorDni(dni);
+		console.log('🧪 Resultado:', resultado);
+		return resultado;
+	};
+	
+	// Función de prueba para simular blur event
+	window.testBlur = function() {
+		const dniField = document.getElementById('dni');
+		if (dniField) {
+			console.log('🧪 Simulando blur en campo DNI con valor:', dniField.value);
+			dniField.dispatchEvent(new Event('blur'));
+		} else {
+			console.log('❌ Campo DNI no encontrado');
+		}
+	};
+	
+	// Función para verificar el estado completo del autocompletado
+	window.debugAutocompletado = function() {
+		console.log('🔍 === DIAGNÓSTICO DE AUTOCOMPLETADO ===');
+		
+		// Verificar campos existentes
+		const campos = {
+			dni: document.getElementById('dni'),
+			nombre: document.getElementById('nombre'),
+			apellido: document.getElementById('apellido'),
+			email: document.getElementById('email'),
+			telefono: document.getElementById('telefono')
+		};
+		
+		console.log('📋 Campos encontrados:', {
+			dni: !!campos.dni,
+			nombre: !!campos.nombre,
+			apellido: !!campos.apellido,
+			email: !!campos.email,
+			telefono: !!campos.telefono
+		});
+		
+		// Verificar event listeners
+		if (campos.dni) {
+			console.log('📝 Valor actual del DNI:', campos.dni.value);
+			console.log('🎯 Clases del campo DNI:', campos.dni.className);
+			
+			// Verificar si tiene event listeners
+			const clonedNode = campos.dni.cloneNode(true);
+			console.log('👂 ¿Tiene event listeners?', campos.dni !== clonedNode);
+		}
+		
+		// Probar conectividad con backend
+		console.log('🌐 Probando conectividad con backend...');
+		fetch('http://localhost:9090/api/persona/12345678')
+			.then(response => {
+				console.log('📡 Respuesta del servidor:', {
+					status: response.status,
+					statusText: response.statusText,
+					url: response.url
+				});
+				return response.text();
+			})
+			.then(text => {
+				console.log('📄 Cuerpo de respuesta:', text);
+			})
+			.catch(error => {
+				console.error('❌ Error de conectividad:', error);
+			});
+		
+		return campos;
+	};
+
+	// Función de test completa para autocompletado
+	window.testAutocompletadoCompleto = async function(dniTest = '35876866') {
+		console.log('🧪 === INICIANDO TEST COMPLETO DE AUTOCOMPLETADO ===');
+		console.log('🧪 DNI de prueba:', dniTest);
+		
+		// 1. Verificar que los campos existen
+		const campos = {
+			dni: document.getElementById('dni'),
+			nombre: document.getElementById('nombre'),
+			apellido: document.getElementById('apellido'),
+			email: document.getElementById('email'),
+			telefono: document.getElementById('telefono')
+		};
+		
+		console.log('🧪 1. Verificando campos...');
+		let camposFaltantes = [];
+		Object.keys(campos).forEach(key => {
+			if (!campos[key]) {
+				camposFaltantes.push(key);
+			}
+		});
+		
+		if (camposFaltantes.length > 0) {
+			console.error('❌ Campos faltantes:', camposFaltantes);
+			return false;
+		}
+		console.log('✅ Todos los campos están presentes');
+		
+		// 2. Simular ingreso de DNI
+		console.log('🧪 2. Simulando ingreso de DNI...');
+		campos.dni.value = dniTest;
+		campos.dni.focus();
+		
+		// 3. Probar consulta directa al backend
+		console.log('🧪 3. Probando consulta al backend...');
+		try {
+			const resultado = await consultarPersonaPorDni(dniTest);
+			console.log('✅ Resultado de consulta:', resultado);
+			
+			if (resultado) {
+				console.log('✅ Persona encontrada en backend');
+				console.log('📄 Datos:', {
+					nombre: resultado.nombrePersona,
+					apellido: resultado.apellido,
+					email: resultado.email,
+					telefono: resultado.telefono
+				});
+			} else {
+				console.log('⚠️ Persona no encontrada en backend (DNI no existe)');
+			}
+		} catch (error) {
+			console.error('❌ Error al consultar backend:', error);
+			return false;
+		}
+		
+		// 4. Probar autocompletado completo
+		console.log('🧪 4. Probando autocompletado completo...');
+		try {
+			await autocompletarPersona('dni', 'nombre', 'apellido', 'email', 'telefono');
+			console.log('✅ Autocompletado ejecutado sin errores');
+			
+			// Verificar si los campos se llenaron
+			console.log('📋 Valores después del autocompletado:', {
+				nombre: campos.nombre.value,
+				apellido: campos.apellido.value,
+				email: campos.email.value,
+				telefono: campos.telefono.value
+			});
+			
+			console.log('📋 Estados de campos:', {
+				nombre: { readOnly: campos.nombre.readOnly, classes: campos.nombre.className },
+				apellido: { readOnly: campos.apellido.readOnly, classes: campos.apellido.className },
+				email: { readOnly: campos.email.readOnly, classes: campos.email.className },
+				telefono: { readOnly: campos.telefono.readOnly, classes: campos.telefono.className }
+			});
+			
+		} catch (error) {
+			console.error('❌ Error en autocompletado:', error);
+			return false;
+		}
+		
+		// 5. Simular evento blur para probar event listeners
+		console.log('🧪 5. Simulando evento blur...');
+		campos.dni.dispatchEvent(new Event('blur'));
+		
+		console.log('🧪 === TEST COMPLETO FINALIZADO ===');
+		return true;
+	};
+
+	// Función para analizar específicamente qué datos llegan con un DNI
+	window.analizarDatosDNI = async function(dni = '35668877') {
+		console.log('📊 === ANÁLISIS ESPECÍFICO DE DATOS PARA DNI ===');
+		console.log('📊 DNI a analizar:', dni);
+		
+		try {
+			// 1. Hacer la consulta directa
+			const url = `http://localhost:9090/personas/persona/${dni}`;
+			console.log('📊 URL consultada:', url);
+			
+			const response = await fetch(url, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'Accept': 'application/json'
+				},
+				mode: 'cors'
+			});
+			
+			console.log('📊 Status de respuesta:', response.status);
+			console.log('📊 Headers de respuesta:', Object.fromEntries(response.headers.entries()));
+			
+			if (response.ok) {
+				const rawData = await response.text();
+				console.log('📊 Datos RAW (texto):', rawData);
+				
+				const jsonData = JSON.parse(rawData);
+				console.log('📊 Datos parseados (JSON):', jsonData);
+				
+				// Analizar estructura detalladamente
+				console.log('📊 === ESTRUCTURA DETALLADA ===');
+				console.log('📊 Tipo:', typeof jsonData);
+				console.log('📊 Constructor:', jsonData.constructor.name);
+				console.log('📊 Propiedades:', Object.getOwnPropertyNames(jsonData));
+				console.log('📊 Valores:');
+				
+				Object.entries(jsonData).forEach(([key, value]) => {
+					console.log(`📊   ${key}: "${value}" (${typeof value})`);
+					if (value === null) console.log(`📊     ⚠️ VALOR NULL`);
+					if (value === undefined) console.log(`📊     ⚠️ VALOR UNDEFINED`);
+					if (value === '') console.log(`📊     ⚠️ STRING VACÍO`);
+				});
+				
+				// Probar el autocompletado con estos datos
+				console.log('📊 === SIMULANDO AUTOCOMPLETADO ===');
+				const camposPrueba = {
+					nombrePersona: jsonData.nombrePersona || jsonData.nombre || '',
+					apellido: jsonData.apellido || '',
+					email: jsonData.email || jsonData.correo || '',
+					telefono: jsonData.telefono || jsonData.tel || jsonData.celular || ''
+				};
+				console.log('📊 Campos que se autocompletarían:', camposPrueba);
+				
+				return jsonData;
+			} else {
+				console.log('📊 ❌ No se encontró persona con DNI:', dni);
+				console.log('📊 Status:', response.status);
+				const errorText = await response.text();
+				console.log('📊 Error texto:', errorText);
+				return null;
+			}
+			
+		} catch (error) {
+			console.error('📊 ❌ Error al analizar DNI:', error);
+		return null;
+	}
+};
+
+// Función para abrir el endpoint directamente en el navegador
+window.abrirEndpointEnNavegador = function(dni = '35876866') {
+	const url = `http://localhost:9090/personas/persona/${dni}`;
+	console.log('🌐 Abriendo en navegador:', url);
+	console.log('🌐 Copia esta URL y ábrela en una nueva pestaña:', url);
+	// Si el navegador lo permite, abrir automáticamente
+	try {
+		window.open(url, '_blank');
+		console.log('✅ URL abierta en nueva pestaña');
+	} catch (error) {
+		console.log('⚠️ No se pudo abrir automáticamente. Copia la URL manualmente.');
+	}
+	return url;
+};
+
+// Función completa de depuración del sistema de autocompletado
+window.depurarAutocompletado = async function(dni = '35876866') {
+	console.log('🔧 === DEPURACIÓN COMPLETA DEL AUTOCOMPLETADO ===');
+	console.log('🔧 DNI de prueba:', dni);
+	
+	// 1. Verificar conexión al backend
+	console.log('🔧 1. Verificando conexión al backend...');
+	try {
+		const testResponse = await fetch('http://localhost:9090/');
+		console.log('✅ Backend disponible en puerto 9090');
+	} catch (error) {
+		console.error('❌ Backend no disponible en puerto 9090:', error);
+		return false;
+	}
+	
+	// 2. Probar endpoint específico
+	console.log('🔧 2. Probando endpoint personas/persona...');
+	const resultado = await window.probarEndpointPersonas(dni);
+	
+	// 3. Verificar campos del DOM
+	console.log('🔧 3. Verificando campos del formulario...');
+	const campos = {
+		dni: document.getElementById('dni'),
+		nombre: document.getElementById('nombre'),
+		apellido: document.getElementById('apellido'),
+		email: document.getElementById('email'),
+		telefono: document.getElementById('telefono')
+	};
+	
+	let camposFaltantes = [];
+	Object.keys(campos).forEach(key => {
+		if (!campos[key]) {
+			camposFaltantes.push(key);
+		}
+	});
+	
+	if (camposFaltantes.length > 0) {
+		console.error('❌ Campos faltantes en el DOM:', camposFaltantes);
+		return false;
+	} else {
+		console.log('✅ Todos los campos están presentes en el DOM');
+	}
+	
+	// 4. Probar autocompletado completo
+	console.log('🔧 4. Probando autocompletado completo...');
+	if (resultado) {
+		console.log('✅ Persona encontrada, probando autocompletado...');
+		campos.dni.value = dni;
+		await ejecutarAutocompletado('dni');
+		console.log('✅ Autocompletado ejecutado');
+	} else {
+		console.log('⚠️ Persona no encontrada, probando comportamiento de DNI no existente...');
+		campos.dni.value = dni;
+		await ejecutarAutocompletado('dni');
+		console.log('✅ Comportamiento de DNI no existente probado');
+	}
+	
+	// 5. Resumen
+	console.log('🔧 === RESUMEN DE DEPURACIÓN ===');
+	console.log('✅ Backend: Disponible');
+	console.log('✅ Endpoint: personas/persona/{dni}');
+	console.log('✅ Campos DOM: Presentes');
+	console.log(resultado ? '✅ Autocompletado: Funcional' : '⚠️ Autocompletado: DNI no existe (normal)');
+	
+	return true;
+};	// Coincidencia visual de contraseñas
 	const passwordInput = document.getElementById('password');
 	const password2Input = document.getElementById('password2');
 	if (password2Input && passwordInput) {
@@ -487,8 +799,28 @@ document.addEventListener('DOMContentLoaded', function() {
 		// Formateo de inputs en tiempo real
 		const dniInput = document.getElementById('dni');
 		if (dniInput) {
+			// Event listener para formateo y validación en tiempo real
 			dniInput.addEventListener('input', function() {
+				// Formatear: solo números, máximo 8 dígitos
 				this.value = this.value.replace(/\D/g, '').slice(0, 8);
+			});
+			
+			// Event listener para autocompletado cuando se sale del campo
+			dniInput.addEventListener('blur', async function() {
+				const dniValue = this.value.trim();
+				if (dniValue && dniValue.length >= 7) {
+					console.log('🔥 Activando autocompletado desde blur del DNI:', dniValue);
+					await ejecutarAutocompletado('dni');
+				}
+			});
+			
+			// Event listener adicional para el evento change
+			dniInput.addEventListener('change', async function() {
+				const dniValue = this.value.trim();
+				if (dniValue && dniValue.length >= 7) {
+					console.log('🔥 Activando autocompletado desde change del DNI:', dniValue);
+					await ejecutarAutocompletado('dni');
+				}
 			});
 		}
 		
@@ -524,6 +856,34 @@ document.addEventListener('DOMContentLoaded', function() {
 		if (renspaInput) {
 			renspaInput.addEventListener('input', function() {
 				this.value = this.value.replace(/\D/g, '').slice(0, 11);
+			});
+		}
+		
+		// Formateo y autocompletado para DNI del administrador de establecimiento
+		const adminEstDniInput = document.getElementById('adminEstDni');
+		if (adminEstDniInput) {
+			// Event listener para formateo en tiempo real
+			adminEstDniInput.addEventListener('input', function() {
+				// Formatear: solo números, máximo 8 dígitos
+				this.value = this.value.replace(/\D/g, '').slice(0, 8);
+			});
+			
+			// Event listener para autocompletado cuando se sale del campo
+			adminEstDniInput.addEventListener('blur', async function() {
+				const dniValue = this.value.trim();
+				if (dniValue && dniValue.length >= 7) {
+					console.log('🔥 Activando autocompletado desde blur del adminEstDni:', dniValue);
+					await ejecutarAutocompletadoAdmin('adminEstDni');
+				}
+			});
+			
+			// Event listener adicional para el evento change
+			adminEstDniInput.addEventListener('change', async function() {
+				const dniValue = this.value.trim();
+				if (dniValue && dniValue.length >= 7) {
+					console.log('🔥 Activando autocompletado desde change del adminEstDni:', dniValue);
+					await ejecutarAutocompletadoAdmin('adminEstDni');
+				}
 			});
 		}
 	}
@@ -1091,7 +1451,7 @@ function recopilarDatosWizard() {
 			}
 		};
 		
-		// Agregar administrador de establecimiento solo si no está marcado como "sin administrador"
+		// Administrador de establecimiento: Solo incluir la clave si hay datos válidos
 		if (!sinAdminEst && adminEstNombre && adminEstApellido && adminEstDni && adminEstEmail && adminEstTelefono && adminEstPassword) {
 			// Validación específica de longitud de contraseña del admin
 			if (adminEstPassword.length > 6) {
@@ -1107,6 +1467,7 @@ function recopilarDatosWizard() {
 				contrasenia: adminEstPassword.substring(0, 6) // Asegurar máximo 6 caracteres
 			};
 		}
+		// NOTA: Si no hay administrador, simplemente no se incluye la clave dtoPersonaEstablecimientoRegistro
 		
 		return datosRegistro;
 		
@@ -1177,3 +1538,444 @@ function mostrarMensajeError(mensaje) {
 		paso5.appendChild(mensajeError);
 	}
 }
+
+// ========================================================================================
+// FUNCIONALIDAD DE AUTOCOMPLETADO POR DNI
+// ========================================================================================
+
+/**
+ * Consulta los datos de una persona por DNI
+ * @param {string} dni - DNI a consultar
+ * @returns {Promise<Object|null>} - Datos de la persona o null si no existe
+ */
+async function consultarPersonaPorDni(dni) {
+	console.log('🔍 Consultando DNI:', dni);
+	
+	// Validar que el DNI tenga al menos 7 dígitos
+	if (!dni || dni.trim().length < 7) {
+		console.log('❌ DNI inválido o muy corto:', dni);
+		return null;
+	}
+
+	try {
+		const url = `http://localhost:9090/personas/persona/${dni.trim()}`;
+		console.log('🌐 Haciendo fetch a:', url);
+		
+		// Agregar headers para CORS si es necesario
+		const response = await fetch(url, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'Accept': 'application/json'
+			},
+			mode: 'cors' // Asegurarse de que permita CORS
+		});
+		
+		console.log('📡 Response recibida:', {
+			status: response.status,
+			statusText: response.statusText,
+			ok: response.ok,
+			headers: Object.fromEntries(response.headers.entries())
+		});
+		
+		if (response.ok) {
+			const persona = await response.json();
+			console.log('✅ Persona encontrada:', persona);
+			
+			// ⭐ ANÁLISIS DETALLADO DE LOS DATOS RECIBIDOS ⭐
+			console.log('📊 === ANÁLISIS COMPLETO DEL OBJETO PERSONA ===');
+			console.log('🔍 Tipo de dato:', typeof persona);
+			console.log('🔍 Es array?:', Array.isArray(persona));
+			console.log('🔍 Propiedades del objeto:', Object.keys(persona));
+			console.log('🔍 Valores de cada propiedad:');
+			
+			// Analizar cada propiedad individualmente
+			for (const [key, value] of Object.entries(persona)) {
+				console.log(`   📌 ${key}: ${value} (tipo: ${typeof value})`);
+			}
+			
+			// Verificar propiedades específicas que usamos en el autocompletado
+			console.log('🎯 === MAPEO DE CAMPOS PARA AUTOCOMPLETADO ===');
+			console.log('🎯 nombrePersona:', persona.nombrePersona);
+			console.log('🎯 apellido:', persona.apellido);
+			console.log('🎯 email:', persona.email);
+			console.log('🎯 telefono:', persona.telefono);
+			
+			// Verificar si hay propiedades adicionales útiles
+			console.log('🔍 === PROPIEDADES ADICIONALES DISPONIBLES ===');
+			const propsUsadas = ['nombrePersona', 'apellido', 'email', 'telefono'];
+			const propsAdicionales = Object.keys(persona).filter(key => !propsUsadas.includes(key));
+			console.log('🔍 Propiedades no utilizadas:', propsAdicionales);
+			propsAdicionales.forEach(prop => {
+				console.log(`   📌 ${prop}: ${persona[prop]} (disponible pero no usado)`);
+			});
+			
+			return persona;
+		} else if (response.status === 404) {
+			console.log('⚠️ Persona no encontrada (404) - Esto es normal');
+			return null;
+		} else {
+			console.error('❌ Error del servidor:', response.status, response.statusText);
+			// Intentar leer el cuerpo del error
+			try {
+				const errorText = await response.text();
+				console.error('❌ Detalle del error:', errorText);
+			} catch (e) {
+				console.error('❌ No se pudo leer el detalle del error');
+			}
+			return null;
+		}
+	} catch (error) {
+		console.error('❌ Error de red/conexión:', error);
+		console.error('❌ Tipo de error:', error.name);
+		console.error('❌ Mensaje:', error.message);
+		
+		// Verificar si es un problema de CORS
+		if (error.name === 'TypeError' && error.message.includes('fetch')) {
+			console.error('🚫 Posible problema de CORS o servidor no disponible');
+		}
+		
+		return null;
+	}
+}
+
+/**
+ * Autocompleta los campos de una persona basado en el DNI
+ * @param {string} dniFieldId - ID del campo DNI
+ * @param {string} nombreFieldId - ID del campo nombre
+ * @param {string} apellidoFieldId - ID del campo apellido  
+ * @param {string} emailFieldId - ID del campo email
+ * @param {string} telefonoFieldId - ID del campo teléfono
+ */
+async function autocompletarPersona(dniFieldId, nombreFieldId, apellidoFieldId, emailFieldId, telefonoFieldId) {
+	console.log('🚀 Iniciando autocompletado para:', dniFieldId); // DEBUG
+	
+	const dniField = document.getElementById(dniFieldId);
+	const nombreField = document.getElementById(nombreFieldId);
+	const apellidoField = document.getElementById(apellidoFieldId);
+	const emailField = document.getElementById(emailFieldId);
+	const telefonoField = document.getElementById(telefonoFieldId);
+
+	if (!dniField || !nombreField || !apellidoField || !emailField || !telefonoField) {
+		console.error('❌ No se encontraron todos los campos necesarios para autocompletado');
+		console.log('Campos encontrados:', {
+			dni: !!dniField,
+			nombre: !!nombreField, 
+			apellido: !!apellidoField,
+			email: !!emailField,
+			telefono: !!telefonoField
+		}); // DEBUG
+		return;
+	}
+
+	const dni = dniField.value.trim();
+	console.log('📝 DNI ingresado:', dni); // DEBUG
+	
+	if (!dni) {
+		console.log('⚠️ DNI vacío, limpiando campos'); // DEBUG
+		// Si no hay DNI, limpiar y habilitar campos (EXCEPTO contraseñas)
+		limpiarYHabilitarCampos(nombreField, apellidoField, emailField, telefonoField);
+		return;
+	}
+
+	// Mostrar indicador de carga con feedback visual
+	dniField.classList.add('is-loading');
+	dniField.setAttribute('title', 'Consultando datos...');
+	
+	// Agregar mensaje de carga temporal
+	let loadingMsg = document.getElementById('dni-loading-msg');
+	if (!loadingMsg) {
+		loadingMsg = document.createElement('div');
+		loadingMsg.id = 'dni-loading-msg';
+		loadingMsg.className = 'text-info mt-1';
+		dniField.parentNode.appendChild(loadingMsg);
+	}
+	loadingMsg.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Consultando datos en el sistema...';
+	console.log('⏳ Agregando indicador de carga'); // DEBUG
+
+	try {
+		const persona = await consultarPersonaPorDni(dni);
+		console.log('🔄 Resultado de consultarPersonaPorDni:', persona); // DEBUG
+		
+		if (persona) {
+			console.log('✅ Autocompletando con datos de persona existente'); // DEBUG
+			console.log('🎯 === MAPEO DE DATOS AL FORMULARIO ===');
+			
+			// Mostrar datos originales y como se mapean
+			const datosOriginales = {
+				nombrePersona: persona.nombrePersona,
+				apellido: persona.apellido,
+				email: persona.email,
+				telefono: persona.telefono
+			};
+			console.log('🎯 Datos originales del backend:', datosOriginales);
+			
+			// Persona encontrada: autocompletar SOLO datos básicos (NO contraseñas)
+			const nombreValor = persona.nombrePersona || '';
+			const apellidoValor = persona.apellido || '';
+			const emailValor = persona.email || '';
+			const telefonoValor = persona.telefono || '';
+			
+			console.log('🎯 Valores que se asignarán:');
+			console.log('🎯   nombre: "' + nombreValor + '"');
+			console.log('🎯   apellido: "' + apellidoValor + '"');
+			console.log('🎯   email: "' + emailValor + '"');
+			console.log('🎯   telefono: "' + telefonoValor + '"');
+			
+			// Asignar valores
+			nombreField.value = nombreValor;
+			apellidoField.value = apellidoValor;
+			emailField.value = emailValor;
+			telefonoField.value = telefonoValor;
+			
+			console.log('🎯 Valores asignados en el DOM:');
+			console.log('🎯   ' + nombreField.id + '.value = "' + nombreField.value + '"');
+			console.log('🎯   ' + apellidoField.id + '.value = "' + apellidoField.value + '"');
+			console.log('🎯   ' + emailField.id + '.value = "' + emailField.value + '"');
+			console.log('🎯   ' + telefonoField.id + '.value = "' + telefonoField.value + '"');
+			
+			// Deshabilitar SOLO campos de datos básicos (NO contraseñas)
+			deshabilitarCampos(nombreField, apellidoField, emailField, telefonoField);
+			
+			// Agregar clase visual para indicar campos autocompletados
+			agregarClaseAutocompletado(nombreField, apellidoField, emailField, telefonoField);
+			
+			console.log('🔒 Campos bloqueados para edición'); // DEBUG
+			
+			// Mostrar mensaje de éxito
+			const loadingMsg = document.getElementById('dni-loading-msg');
+			if (loadingMsg) {
+				loadingMsg.className = 'text-success mt-1';
+				loadingMsg.innerHTML = '<i class="fas fa-check-circle me-1"></i>Datos encontrados y autocompletados';
+				setTimeout(() => loadingMsg.remove(), 3000);
+			}
+		} else {
+			console.log('📝 Persona no encontrada, habilitando edición manual'); // DEBUG
+			// Persona no encontrada: limpiar y habilitar campos para edición manual
+			// IMPORTANTE: Solo limpiamos datos básicos, NO las contraseñas
+			limpiarYHabilitarCampos(nombreField, apellidoField, emailField, telefonoField);
+			
+			// Mostrar mensaje informativo
+			const loadingMsg = document.getElementById('dni-loading-msg');
+			if (loadingMsg) {
+				loadingMsg.className = 'text-warning mt-1';
+				loadingMsg.innerHTML = '<i class="fas fa-info-circle me-1"></i>DNI no encontrado. Complete los datos manualmente';
+				setTimeout(() => loadingMsg.remove(), 5000);
+			}
+		}
+	} catch (error) {
+		console.error('❌ Error en autocompletado:', error);
+		// En caso de error, permitir edición manual (EXCEPTO contraseñas)
+		limpiarYHabilitarCampos(nombreField, apellidoField, emailField, telefonoField);
+	} finally {
+		// Quitar indicador de carga
+		dniField.classList.remove('is-loading');
+		dniField.removeAttribute('title');
+		
+		// Limpiar mensaje de carga si hay error
+		const loadingMsg = document.getElementById('dni-loading-msg');
+		if (loadingMsg && loadingMsg.className.includes('text-info')) {
+			loadingMsg.className = 'text-danger mt-1';
+			loadingMsg.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>Error al consultar datos';
+			setTimeout(() => loadingMsg.remove(), 3000);
+		}
+		
+		console.log('✅ Autocompletado terminado'); // DEBUG
+	}
+}
+
+/**
+ * Deshabilita los campos para solo lectura
+ */
+function deshabilitarCampos(...campos) {
+	campos.forEach(campo => {
+		campo.readOnly = true;
+		campo.classList.add('campo-autocompletado');
+		campo.classList.remove('campo-editable');
+	});
+}
+
+/**
+ * Limpia y habilita los campos para edición manual
+ */
+function limpiarYHabilitarCampos(...campos) {
+	campos.forEach(campo => {
+		campo.value = '';
+		campo.readOnly = false;
+		campo.classList.remove('campo-autocompletado');
+		campo.classList.add('campo-editable');
+	});
+}
+
+/**
+ * Agrega clase visual para campos autocompletados
+ */
+function agregarClaseAutocompletado(...campos) {
+	campos.forEach(campo => {
+		campo.classList.add('campo-autocompletado');
+		campo.classList.remove('campo-editable');
+	});
+}
+
+/**
+ * Ejecuta el autocompletado para el formulario de empresa
+ */
+async function ejecutarAutocompletado(dniFieldId) {
+	console.log('🚀 Ejecutando autocompletado para empresa...');
+	await autocompletarPersona(dniFieldId, 'nombre', 'apellido', 'email', 'telefono');
+	garantizarContraseniasEditables('password', 'password2');
+}
+
+/**
+ * Ejecuta el autocompletado para el formulario de admin
+ */
+async function ejecutarAutocompletadoAdmin(dniFieldId) {
+	console.log('🚀 Ejecutando autocompletado para admin...');
+	await autocompletarPersona(dniFieldId, 'adminEstNombre', 'adminEstApellido', 'adminEstEmail', 'adminEstTelefono');
+	garantizarContraseniasEditables('adminEstPassword', 'adminEstPassword2');
+}
+
+/**
+ * Garantiza que los campos de contraseña siempre estén habilitados para edición
+ * @param {string} passwordFieldId - ID del campo contraseña
+ * @param {string} password2FieldId - ID del campo repetir contraseña
+ */
+function garantizarContraseniasEditables(passwordFieldId, password2FieldId) {
+	const passwordField = document.getElementById(passwordFieldId);
+	const password2Field = document.getElementById(password2FieldId);
+	
+	if (passwordField) {
+		passwordField.readOnly = false;
+		// NO modificar clases - solo asegurar que esté editable
+		// Las clases visuales son para los campos de datos básicos únicamente
+	}
+	
+	if (password2Field) {
+		password2Field.readOnly = false;
+		// NO modificar clases - solo asegurar que esté editable
+		// Las clases visuales son para los campos de datos básicos únicamente
+	}
+}
+
+// ========================================================================================
+// FUNCIONES DE TESTING Y VERIFICACIÓN DE DATOS
+// ========================================================================================
+
+// Función para probar con DNIs que probablemente existan
+window.probarDNIsComunes = async function() {
+	console.log('🔍 === PROBANDO DNIs COMUNES ===');
+	
+	// Lista de DNIs comunes para probar
+	const dnisComunes = [
+		'12345678', '87654321', '11111111', '22222222', '33333333',
+		'10000000', '20000000', '30000000', '40000000', '50000000',
+		'35876866', '35668877', '12000000', '25000000', '18000000'
+	];
+	
+	console.log('🔍 Probando con', dnisComunes.length, 'DNIs diferentes...');
+	
+	for (const dni of dnisComunes) {
+		console.log(`🔍 Probando DNI: ${dni}`);
+		try {
+			const resultado = await consultarPersonaPorDni(dni);
+			if (resultado) {
+				console.log(`✅ ¡ENCONTRADO! DNI: ${dni}`, resultado);
+				console.log(`✅ Usa este DNI para probar el autocompletado: ${dni}`);
+				return dni; // Retornar el primer DNI que encuentre
+			} else {
+				console.log(`❌ No encontrado: ${dni}`);
+			}
+		} catch (error) {
+			console.log(`❌ Error con ${dni}:`, error);
+		}
+		
+		// Pausa pequeña para no saturar el servidor
+		await new Promise(resolve => setTimeout(resolve, 100));
+	}
+	
+	console.log('❌ No se encontraron DNIs válidos en la lista');
+	return null;
+};
+
+// Función para verificar qué endpoints están disponibles
+window.verificarEndpoints = async function() {
+	console.log('🌐 === VERIFICANDO ENDPOINTS DISPONIBLES ===');
+	
+	const endpoints = [
+		'http://localhost:9090/personas/persona',
+		'http://localhost:9090/personas',
+		'http://localhost:9090/api/personas',
+		'http://localhost:9090/persona',
+		'http://localhost:9090/personas/list',
+		'http://localhost:9090/personas/all'
+	];
+	
+	for (const endpoint of endpoints) {
+		try {
+			console.log(`🌐 Probando: ${endpoint}`);
+			const response = await fetch(endpoint);
+			console.log(`📡 ${endpoint} - Status: ${response.status}`);
+			
+			if (response.ok) {
+				const data = await response.json();
+				console.log(`✅ ${endpoint} - Datos:`, data);
+				
+				// Si es un array, mostrar algunos DNIs
+				if (Array.isArray(data) && data.length > 0) {
+					console.log(`✅ DNIs disponibles en ${endpoint}:`);
+					data.slice(0, 5).forEach(persona => {
+						console.log(`   - DNI: ${persona.dni || persona.id} (${persona.nombre || persona.nombrePersona})`);
+					});
+				}
+			}
+		} catch (error) {
+			console.log(`❌ ${endpoint} - Error:`, error);
+		}
+	}
+};
+
+// Función específica para probar el endpoint personas/persona/{dni}
+window.probarEndpointPersonas = async function(dni = '35876866') {
+	console.log('🧪 === PROBANDO ENDPOINT PERSONAS/PERSONA ===');
+	console.log('🧪 DNI de prueba:', dni);
+	
+	try {
+		const url = `http://localhost:9090/personas/persona/${dni}`;
+		console.log('🧪 URL:', url);
+		
+		const response = await fetch(url, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'Accept': 'application/json'
+			},
+			mode: 'cors'
+		});
+		
+		console.log('🧪 Status:', response.status);
+		console.log('🧪 StatusText:', response.statusText);
+		console.log('🧪 Headers:', Object.fromEntries(response.headers.entries()));
+		
+		if (response.ok) {
+			const data = await response.json();
+			console.log('✅ ¡Endpoint funciona! Datos recibidos:', data);
+			console.log('✅ Estructura del objeto:');
+			Object.entries(data).forEach(([key, value]) => {
+				console.log(`✅   ${key}: "${value}" (${typeof value})`);
+			});
+			return data;
+		} else if (response.status === 404) {
+			console.log('⚠️ DNI no encontrado (404) - Esto es normal si el DNI no existe');
+			return null;
+		} else {
+			console.log('❌ Error del servidor:', response.status, response.statusText);
+			const errorText = await response.text();
+			console.log('❌ Detalles del error:', errorText);
+			return null;
+		}
+	} catch (error) {
+		console.error('❌ Error de conexión:', error);
+		console.error('❌ Verifica que el backend esté ejecutándose en localhost:9090');
+		return null;
+	}
+};
