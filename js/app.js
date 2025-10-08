@@ -952,6 +952,30 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 		}
 	}
 
+	// Event listener para checkbox "Sin administrador de establecimiento"
+	const sinAdminCheckbox = document.getElementById('sinAdminEstablecimiento');
+	if (sinAdminCheckbox) {
+		sinAdminCheckbox.addEventListener('change', function() {
+			// Limpiar mensajes de error de los campos del administrador cuando se marca/desmarca
+			const adminFields = [
+				'adminEstNombre', 'adminEstApellido', 'adminEstDni', 
+				'adminEstEmail', 'adminEstTelefono', 'adminEstPassword', 'adminEstPassword2'
+			];
+			
+			adminFields.forEach(fieldId => {
+				const field = document.getElementById(fieldId);
+				if (field) {
+					// Limpiar mensajes de error
+					const feedbackDiv = field.parentNode.querySelector('.field-feedback');
+					if (feedbackDiv) {
+						feedbackDiv.remove();
+					}
+					field.classList.remove('is-invalid');
+				}
+			});
+		});
+	}
+
 	// Resto de pasos del wizard...
 	
 	// Paso 3: Ubicación del Establecimiento
@@ -1085,14 +1109,74 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 
 	if (btnSiguiente4) {
 		btnSiguiente4.addEventListener('click', function() {
+			let hasErrors = false;
+			
+			// Validar especies
 			const especiesList = document.getElementById('especies-list');
 			const especiesSeleccionadas = especiesList ? especiesList.querySelectorAll('input[type="checkbox"]:checked') : [];
 			
 			if (especiesSeleccionadas.length === 0) {
 				showFieldFeedback(especiesList, false, 'Debe seleccionar al menos una especie.');
-				return;
+				hasErrors = true;
 			} else {
 				showFieldFeedback(especiesList, true, `${especiesSeleccionadas.length} especie(s) seleccionada(s).`);
+			}
+			
+			// Validar administrador de establecimiento
+			const sinAdminCheckbox = document.getElementById('sinAdminEstablecimiento');
+			const sinAdmin = sinAdminCheckbox ? sinAdminCheckbox.checked : false;
+			
+			if (!sinAdmin) {
+				// Si NO está marcado "sin admin", entonces todos los campos son obligatorios
+				const adminNombre = document.getElementById('adminEstNombre');
+				const adminApellido = document.getElementById('adminEstApellido');
+				const adminDni = document.getElementById('adminEstDni');
+				const adminEmail = document.getElementById('adminEstEmail');
+				const adminTelefono = document.getElementById('adminEstTelefono');
+				const adminPassword = document.getElementById('adminEstPassword');
+				const adminPassword2 = document.getElementById('adminEstPassword2');
+				
+				// Validar cada campo del administrador
+				const adminFields = [
+					{field: adminNombre, name: 'Nombre del administrador'},
+					{field: adminApellido, name: 'Apellido del administrador'},
+					{field: adminDni, name: 'DNI del administrador'},
+					{field: adminEmail, name: 'Email del administrador'},
+					{field: adminTelefono, name: 'Teléfono del administrador'}
+				];
+				
+				adminFields.forEach(({field, name}) => {
+					if (field && !field.value.trim()) {
+						showFieldFeedback(field, false, `${name} es obligatorio.`);
+						hasErrors = true;
+					}
+				});
+				
+				// Validar contraseñas solo si NO están deshabilitadas (usuarios nuevos)
+				if (adminPassword && !adminPassword.readOnly) {
+					if (!adminPassword.value.trim()) {
+						showFieldFeedback(adminPassword, false, 'La contraseña del administrador es obligatoria.');
+						hasErrors = true;
+					} else if (adminPassword.value.length !== 6) {
+						showFieldFeedback(adminPassword, false, 'La contraseña debe tener exactamente 6 caracteres.');
+						hasErrors = true;
+					}
+				}
+				
+				if (adminPassword2 && !adminPassword2.readOnly) {
+					if (!adminPassword2.value.trim()) {
+						showFieldFeedback(adminPassword2, false, 'Debe repetir la contraseña.');
+						hasErrors = true;
+					} else if (adminPassword.value !== adminPassword2.value) {
+						showFieldFeedback(adminPassword2, false, 'Las contraseñas no coinciden.');
+						hasErrors = true;
+					}
+				}
+			}
+			
+			// Si hay errores, no continuar
+			if (hasErrors) {
+				return;
 			}
 			
 			paso4.classList.add('d-none');
