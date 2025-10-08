@@ -1558,7 +1558,7 @@ async function consultarPersonaPorDni(dni) {
 	}
 
 	try {
-		const url = `http://localhost:9090/personas/persona/${dni.trim()}`;
+		const url = `http://localhost:9090/personas/persona-registrada/${dni.trim()}`;
 		console.log('🌐 Haciendo fetch a:', url);
 		
 		// Agregar headers para CORS si es necesario
