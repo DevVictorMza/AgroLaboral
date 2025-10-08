@@ -539,6 +539,12 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 				errorMsg = 'El campo CUIT es obligatorio.';
 			} else if (!(/^\d{11}$/.test(cuitValue))) {
 				errorMsg = 'El CUIT debe tener exactamente 11 números.';
+			} else if (cuitInput.classList.contains('is-invalid')) {
+				// Verificar si el CUIT ya está registrado (campo marcado como inválido por validación backend)
+				const feedbackDiv = cuitInput.parentNode.querySelector('.field-feedback');
+				if (feedbackDiv && feedbackDiv.textContent.includes('ya está registrado')) {
+					errorMsg = 'No puede continuar: el CUIT ya está registrado en el sistema.';
+				}
 			}
 			
 			// Validar Razón Social obligatorio
