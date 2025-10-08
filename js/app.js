@@ -724,8 +724,8 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 				}
 			});
 			
-			// Validar contraseña
-			if (passwordInput) {
+			// Validar contraseña (SOLO si NO está deshabilitada)
+			if (passwordInput && !passwordInput.readOnly) {
 				let passwordErrorDiv = document.getElementById('password-error');
 				if (!passwordErrorDiv) {
 					passwordErrorDiv = document.createElement('div');
@@ -746,10 +746,17 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 					passwordErrorDiv.textContent = '';
 					passwordInput.classList.remove('is-invalid');
 				}
+			} else if (passwordInput && passwordInput.readOnly) {
+				// Si la contraseña está deshabilitada (usuario existente), limpiar errores
+				let passwordErrorDiv = document.getElementById('password-error');
+				if (passwordErrorDiv) {
+					passwordErrorDiv.textContent = '';
+				}
+				passwordInput.classList.remove('is-invalid');
 			}
 			
-			// Validar confirmación de contraseña
-			if (password2Input) {
+			// Validar confirmación de contraseña (SOLO si NO está deshabilitada)
+			if (password2Input && !password2Input.readOnly) {
 				let password2ErrorDiv = document.getElementById('password2-error');
 				if (!password2ErrorDiv) {
 					password2ErrorDiv = document.createElement('div');
@@ -770,6 +777,13 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 					password2ErrorDiv.textContent = '';
 					password2Input.classList.remove('is-invalid');
 				}
+			} else if (password2Input && password2Input.readOnly) {
+				// Si la confirmación está deshabilitada (usuario existente), limpiar errores
+				let password2ErrorDiv = document.getElementById('password2-error');
+				if (password2ErrorDiv) {
+					password2ErrorDiv.textContent = '';
+				}
+				password2Input.classList.remove('is-invalid');
 			}
 			
 			if (hasErrors) return;
@@ -1405,12 +1419,21 @@ function recopilarDatosWizard() {
 		const adminEstPassword = document.getElementById('adminEstPassword')?.value;
 		
 		// Validaciones básicas
-		if (!cuit || !razonSocial || !dni || !nombre || !apellido || !email || !telefono || !password) {
+		// IMPORTANTE: Para usuarios existentes (contraseña deshabilitada), no requerir contraseña
+		const passwordField = document.getElementById('password');
+		const passwordRequired = passwordField && !passwordField.readOnly;
+		
+		if (!cuit || !razonSocial || !dni || !nombre || !apellido || !email || !telefono) {
 			throw new Error('Faltan datos obligatorios en los pasos 1 y 2');
 		}
 		
-		// Validación específica de longitud de contraseña
-		if (password.length > 6) {
+		// Si la contraseña es requerida (usuario nuevo) pero no está presente
+		if (passwordRequired && !password) {
+			throw new Error('La contraseña es obligatoria para usuarios nuevos');
+		}
+		
+		// Validación específica de longitud de contraseña (solo si hay contraseña)
+		if (password && password.length > 6) {
 			throw new Error('La contraseña no puede exceder los 6 caracteres');
 		}
 		
@@ -1446,15 +1469,28 @@ function recopilarDatosWizard() {
 				apellido: apellido,
 				nombrePersona: nombre,
 				telefono: telefono,
-				email: email,
-				contrasenia: password.substring(0, 6) // Asegurar máximo 6 caracteres
+				email: email
 			}
 		};
 		
+		// Solo agregar contraseña si es un usuario nuevo (contraseña requerida)
+		if (passwordRequired && password) {
+			datosRegistro.dtoPersonaEmpresaRegistro.contrasenia = password.substring(0, 6);
+		}
+		
 		// Administrador de establecimiento: Solo incluir la clave si hay datos válidos
-		if (!sinAdminEst && adminEstNombre && adminEstApellido && adminEstDni && adminEstEmail && adminEstTelefono && adminEstPassword) {
-			// Validación específica de longitud de contraseña del admin
-			if (adminEstPassword.length > 6) {
+		// IMPORTANTE: Para usuarios existentes (contraseña deshabilitada), no requerir contraseña
+		const adminPasswordField = document.getElementById('adminEstPassword');
+		const adminPasswordRequired = adminPasswordField && !adminPasswordField.readOnly;
+		
+		if (!sinAdminEst && adminEstNombre && adminEstApellido && adminEstDni && adminEstEmail && adminEstTelefono) {
+			// Si la contraseña es requerida (usuario nuevo) pero no está presente
+			if (adminPasswordRequired && !adminEstPassword) {
+				throw new Error('La contraseña del administrador es obligatoria para usuarios nuevos');
+			}
+			
+			// Validación específica de longitud de contraseña del admin (solo si hay contraseña)
+			if (adminEstPassword && adminEstPassword.length > 6) {
 				throw new Error('La contraseña del administrador no puede exceder los 6 caracteres');
 			}
 			
@@ -1463,9 +1499,13 @@ function recopilarDatosWizard() {
 				apellido: adminEstApellido,
 				nombrePersona: adminEstNombre,
 				telefono: adminEstTelefono,
-				email: adminEstEmail,
-				contrasenia: adminEstPassword.substring(0, 6) // Asegurar máximo 6 caracteres
+				email: adminEstEmail
 			};
+			
+			// Solo agregar contraseña si es un usuario nuevo (contraseña requerida)
+			if (adminPasswordRequired && adminEstPassword) {
+				datosRegistro.dtoPersonaEstablecimientoRegistro.contrasenia = adminEstPassword.substring(0, 6);
+			}
 		}
 		// NOTA: Si no hay administrador, simplemente no se incluye la clave dtoPersonaEstablecimientoRegistro
 		
@@ -1646,6 +1686,7 @@ async function consultarPersonaPorDni(dni) {
  * @param {string} apellidoFieldId - ID del campo apellido  
  * @param {string} emailFieldId - ID del campo email
  * @param {string} telefonoFieldId - ID del campo teléfono
+ * @returns {Object|null} - El objeto persona si se encontró, null si no
  */
 async function autocompletarPersona(dniFieldId, nombreFieldId, apellidoFieldId, emailFieldId, telefonoFieldId) {
 	console.log('🚀 Iniciando autocompletado para:', dniFieldId); // DEBUG
@@ -1665,7 +1706,7 @@ async function autocompletarPersona(dniFieldId, nombreFieldId, apellidoFieldId, 
 			email: !!emailField,
 			telefono: !!telefonoField
 		}); // DEBUG
-		return;
+		return null;
 	}
 
 	const dni = dniField.value.trim();
@@ -1675,7 +1716,7 @@ async function autocompletarPersona(dniFieldId, nombreFieldId, apellidoFieldId, 
 		console.log('⚠️ DNI vacío, limpiando campos'); // DEBUG
 		// Si no hay DNI, limpiar y habilitar campos (EXCEPTO contraseñas)
 		limpiarYHabilitarCampos(nombreField, apellidoField, emailField, telefonoField);
-		return;
+		return null;
 	}
 
 	// Mostrar indicador de carga con feedback visual
@@ -1749,6 +1790,8 @@ async function autocompletarPersona(dniFieldId, nombreFieldId, apellidoFieldId, 
 				loadingMsg.innerHTML = '<i class="fas fa-check-circle me-1"></i>Datos encontrados y autocompletados';
 				setTimeout(() => loadingMsg.remove(), 3000);
 			}
+			
+			return persona; // Retornar la persona encontrada
 		} else {
 			console.log('📝 Persona no encontrada, habilitando edición manual'); // DEBUG
 			// Persona no encontrada: limpiar y habilitar campos para edición manual
@@ -1762,11 +1805,14 @@ async function autocompletarPersona(dniFieldId, nombreFieldId, apellidoFieldId, 
 				loadingMsg.innerHTML = '<i class="fas fa-info-circle me-1"></i>DNI no encontrado. Complete los datos manualmente';
 				setTimeout(() => loadingMsg.remove(), 5000);
 			}
+			
+			return null; // No se encontró persona
 		}
 	} catch (error) {
 		console.error('❌ Error en autocompletado:', error);
 		// En caso de error, permitir edición manual (EXCEPTO contraseñas)
 		limpiarYHabilitarCampos(nombreField, apellidoField, emailField, telefonoField);
+		return null; // Error en la consulta
 	} finally {
 		// Quitar indicador de carga
 		dniField.classList.remove('is-loading');
@@ -1822,8 +1868,14 @@ function agregarClaseAutocompletado(...campos) {
  */
 async function ejecutarAutocompletado(dniFieldId) {
 	console.log('🚀 Ejecutando autocompletado para empresa...');
-	await autocompletarPersona(dniFieldId, 'nombre', 'apellido', 'email', 'telefono');
-	garantizarContraseniasEditables('password', 'password2');
+	const persona = await autocompletarPersona(dniFieldId, 'nombre', 'apellido', 'email', 'telefono');
+	
+	// Si encontró una persona, deshabilitar contraseñas. Si no, habilitarlas.
+	if (persona) {
+		deshabilitarContraseniasPersonaExistente('password', 'password2');
+	} else {
+		habilitarContraseniasPersonaNueva('password', 'password2');
+	}
 }
 
 /**
@@ -1831,29 +1883,101 @@ async function ejecutarAutocompletado(dniFieldId) {
  */
 async function ejecutarAutocompletadoAdmin(dniFieldId) {
 	console.log('🚀 Ejecutando autocompletado para admin...');
-	await autocompletarPersona(dniFieldId, 'adminEstNombre', 'adminEstApellido', 'adminEstEmail', 'adminEstTelefono');
-	garantizarContraseniasEditables('adminEstPassword', 'adminEstPassword2');
+	const persona = await autocompletarPersona(dniFieldId, 'adminEstNombre', 'adminEstApellido', 'adminEstEmail', 'adminEstTelefono');
+	
+	// Si encontró una persona, deshabilitar contraseñas. Si no, habilitarlas.
+	if (persona) {
+		deshabilitarContraseniasPersonaExistente('adminEstPassword', 'adminEstPassword2');
+	} else {
+		habilitarContraseniasPersonaNueva('adminEstPassword', 'adminEstPassword2');
+	}
 }
 
 /**
- * Garantiza que los campos de contraseña siempre estén habilitados para edición
+ * Deshabilita los campos de contraseña para usuarios ya registrados
  * @param {string} passwordFieldId - ID del campo contraseña
  * @param {string} password2FieldId - ID del campo repetir contraseña
  */
-function garantizarContraseniasEditables(passwordFieldId, password2FieldId) {
+function deshabilitarContraseniasPersonaExistente(passwordFieldId, password2FieldId) {
+	const passwordField = document.getElementById(passwordFieldId);
+	const password2Field = document.getElementById(password2FieldId);
+	
+	if (passwordField) {
+		passwordField.readOnly = true;
+		passwordField.value = '';
+		passwordField.placeholder = 'No requerida para usuario existente';
+		passwordField.classList.add('campo-autocompletado');
+		passwordField.classList.remove('campo-editable');
+	}
+	
+	if (password2Field) {
+		password2Field.readOnly = true;
+		password2Field.value = '';
+		password2Field.placeholder = 'No requerida para usuario existente';
+		password2Field.classList.add('campo-autocompletado');
+		password2Field.classList.remove('campo-editable');
+	}
+	
+	// Agregar mensaje explicativo
+	mostrarMensajeContrasenaExistente(passwordFieldId);
+}
+
+/**
+ * Habilita los campos de contraseña para usuarios nuevos
+ * @param {string} passwordFieldId - ID del campo contraseña
+ * @param {string} password2FieldId - ID del campo repetir contraseña
+ */
+function habilitarContraseniasPersonaNueva(passwordFieldId, password2FieldId) {
 	const passwordField = document.getElementById(passwordFieldId);
 	const password2Field = document.getElementById(password2FieldId);
 	
 	if (passwordField) {
 		passwordField.readOnly = false;
-		// NO modificar clases - solo asegurar que esté editable
-		// Las clases visuales son para los campos de datos básicos únicamente
+		passwordField.placeholder = 'Ingrese una contraseña';
+		passwordField.classList.remove('campo-autocompletado');
+		passwordField.classList.add('campo-editable');
 	}
 	
 	if (password2Field) {
 		password2Field.readOnly = false;
-		// NO modificar clases - solo asegurar que esté editable
-		// Las clases visuales son para los campos de datos básicos únicamente
+		password2Field.placeholder = 'Repita la contraseña';
+		password2Field.classList.remove('campo-autocompletado');
+		password2Field.classList.add('campo-editable');
+	}
+	
+	// Quitar mensaje explicativo si existe
+	quitarMensajeContrasenaExistente(passwordFieldId);
+}
+
+/**
+ * Muestra mensaje explicativo para contraseñas de usuarios existentes
+ * @param {string} passwordFieldId - ID del campo contraseña principal
+ */
+function mostrarMensajeContrasenaExistente(passwordFieldId) {
+	const passwordField = document.getElementById(passwordFieldId);
+	if (!passwordField) return;
+	
+	// Quitar mensaje anterior si existe
+	quitarMensajeContrasenaExistente(passwordFieldId);
+	
+	// Crear nuevo mensaje
+	const mensaje = document.createElement('div');
+	mensaje.id = 'password-existing-msg-' + passwordFieldId;
+	mensaje.className = 'text-info mt-1';
+	mensaje.innerHTML = '<i class="fas fa-info-circle me-1"></i>No es necesaria la contraseña para usuarios ya registrados';
+	
+	// Agregar después del campo de contraseña
+	passwordField.parentNode.appendChild(mensaje);
+}
+
+/**
+ * Quita el mensaje explicativo de contraseñas
+ * @param {string} passwordFieldId - ID del campo contraseña principal
+ */
+function quitarMensajeContrasenaExistente(passwordFieldId) {
+	const mensaje = document.getElementById('password-existing-msg-' + passwordFieldId);
+	if (mensaje) {
+		mensaje.remove();
 	}
 }
 
