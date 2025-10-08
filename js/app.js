@@ -877,6 +877,50 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 			renspaInput.addEventListener('input', function() {
 				this.value = this.value.replace(/\D/g, '').slice(0, 11);
 			});
+			
+			// Validación de RENSPA con debounce (similar al CUIT)
+			let debounceTimeout;
+			renspaInput.addEventListener('input', function() {
+				const renspaValue = this.value.trim();
+				
+				// Limpiar timeout anterior
+				clearTimeout(debounceTimeout);
+				
+				// Validación básica de formato primero
+				if (!renspaValue) {
+					// Campo vacío, limpiar feedback
+					const tempDiv = this.parentNode.querySelector('.field-feedback');
+					if (tempDiv) tempDiv.remove();
+					this.classList.remove('is-valid', 'is-invalid');
+					return;
+				}
+				
+				if (!/^\d{1,11}$/.test(renspaValue)) {
+					showFieldFeedback(this, false, 'El RENSPA debe contener entre 1 y 11 números.');
+					return;
+				}
+				
+				// Validación en backend con debounce
+				const tempDiv = this.parentNode.querySelector('.field-feedback');
+				if (tempDiv) {
+					tempDiv.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Validando RENSPA...';
+				}
+				
+				debounceTimeout = setTimeout(() => {
+					fetch(`http://localhost:9090/establecimientos/validar-renspa?numeroRenspa=${encodeURIComponent(renspaValue)}`)
+						.then(response => response.json())
+						.then(data => {
+							if (data && data.disponible) {
+								showFieldFeedback(this, true, '¡RENSPA disponible!');
+							} else {
+								showFieldFeedback(this, false, 'El RENSPA ya está registrado.');
+							}
+						})
+						.catch(() => {
+							showFieldFeedback(this, false, 'Error al validar RENSPA en el servidor.');
+						});
+				}, 400);
+			});
 		}
 		
 		// Formateo y autocompletado para DNI del administrador de establecimiento
@@ -963,6 +1007,13 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 			} else if (!/^\d{1,11}$/.test(renspaValue)) {
 				showFieldFeedback(renspaInput, false, 'El RENSPA debe contener entre 1 y 11 números.');
 				hasErrors = true;
+			} else if (renspaInput.classList.contains('is-invalid')) {
+				// Verificar si el RENSPA ya está registrado (campo marcado como inválido por validación backend)
+				const feedbackDiv = renspaInput.parentNode.querySelector('.field-feedback');
+				if (feedbackDiv && feedbackDiv.textContent.includes('ya está registrado')) {
+					showFieldFeedback(renspaInput, false, 'No puede continuar: el RENSPA ya está registrado en el sistema.');
+					hasErrors = true;
+				}
 			} else {
 				showFieldFeedback(renspaInput, true, '');
 			}
