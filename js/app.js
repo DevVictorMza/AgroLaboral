@@ -1741,7 +1741,7 @@ function recopilarDatosWizard() {
 			datosRegistro.dtoPersonaEmpresaRegistro.contrasenia = password.substring(0, 6);
 		}
 		
-		// Administrador de establecimiento: Solo incluir la clave si hay datos válidos
+		// Administrador de establecimiento: Solo incluir la propiedad si hay administrador
 		// IMPORTANTE: Para usuarios existentes (contraseña deshabilitada), no requerir contraseña
 		const adminPasswordField = document.getElementById('adminEstPassword');
 		const adminPasswordRequired = adminPasswordField && !adminPasswordField.readOnly;
@@ -1770,7 +1770,7 @@ function recopilarDatosWizard() {
 				datosRegistro.dtoPersonaEstablecimientoRegistro.contrasenia = adminEstPassword.substring(0, 6);
 			}
 		}
-		// NOTA: Si no hay administrador, simplemente no se incluye la clave dtoPersonaEstablecimientoRegistro
+		// CRÍTICO: Si no hay administrador (sinAdminEst = true), NO incluir la propiedad dtoPersonaEstablecimientoRegistro
 		
 		return datosRegistro;
 		
@@ -1784,6 +1784,18 @@ function recopilarDatosWizard() {
 // Función para enviar registro al backend
 async function enviarRegistroAlBackend(datos) {
 	try {
+		// Log para confirmar que la solución funciona correctamente
+		console.log('📤 JSON enviado al backend:', JSON.stringify(datos, null, 2));
+		
+		const tieneAdministrador = 'dtoPersonaEstablecimientoRegistro' in datos;
+		console.log('🏢 ¿Incluye administrador de establecimiento?:', tieneAdministrador);
+		
+		if (tieneAdministrador) {
+			console.log('✅ dtoPersonaEstablecimientoRegistro incluido en el JSON');
+		} else {
+			console.log('✅ dtoPersonaEstablecimientoRegistro OMITIDO del JSON (correcto para sin administrador)');
+		}
+		
 		const response = await fetch('http://localhost:9090/registro', {
 			method: 'POST',
 			headers: {
