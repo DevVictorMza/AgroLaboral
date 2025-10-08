@@ -139,8 +139,10 @@
                         <div class="mb-4">
                             <h5 class="fw-bold mb-3">Establecimiento</h5>
                             <div class="mb-3">
-                                <label for="nombreEstablecimiento" class="form-label">Nombre</label>
-                                <input type="text" class="form-control" id="nombreEstablecimiento" name="nombreEstablecimiento" placeholder="Ej: Finca Los Olivos">
+                                <label for="nombreEstablecimiento" class="form-label">Nombre <small class="text-muted">(se convertirá a mayúsculas)</small></label>
+                                <input type="text" class="form-control" id="nombreEstablecimiento" name="nombreEstablecimiento" 
+                                       placeholder="Ejemplo: Finca Los Olivos"
+                                       autocomplete="organization">
                             </div>
                             <div class="mb-3">
                                 <label for="renspa" class="form-label">Número de RENSPA</label>
@@ -198,16 +200,29 @@
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label for="calle" class="form-label">Calle</label>
-                                <input type="text" class="form-control" id="calle" name="calle" placeholder="Ej: Ruta 50">
+                                <label for="calle" class="form-label">Calle <small class="text-muted">(máximo 25 caracteres)</small></label>
+                                <input type="text" class="form-control" id="calle" name="calle" 
+                                       placeholder="Ejemplo: RUTA 50" 
+                                       maxlength="25"
+                                       autocomplete="street-address">
                             </div>
                             <div class="mb-3">
-                                <label for="numeracion" class="form-label">Numeración</label>
-                                <input type="text" class="form-control" id="numeracion" name="numeracion" placeholder="Ej: 1234">
+                                <label for="numeracion" class="form-label">Numeración <small class="text-muted">(máximo 5 números)</small></label>
+                                <input type="text" class="form-control" id="numeracion" name="numeracion" 
+                                       placeholder="Ingrese numeración" 
+                                       maxlength="5"
+                                       inputmode="numeric"
+                                       pattern="[0-9]*"
+                                       autocomplete="address-line2">
                             </div>
                             <div class="mb-3">
-                                <label for="codigoPostal" class="form-label">Código Postal</label>
-                                <input type="text" class="form-control" id="codigoPostal" name="codigoPostal" placeholder="Ej: 5584">
+                                <label for="codigoPostal" class="form-label">Código Postal <small class="text-muted">(máximo 5 números)</small></label>
+                                <input type="text" class="form-control" id="codigoPostal" name="codigoPostal" 
+                                       placeholder="Ingrese código postal" 
+                                       maxlength="5"
+                                       inputmode="numeric"
+                                       pattern="[0-9]*"
+                                       autocomplete="postal-code">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Mapa de Geolocalización</label>

@@ -950,6 +950,128 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 				}
 			});
 		}
+		
+		// Formateo para campo "Calle" - solo mayúsculas y máximo 25 caracteres
+		const calleInput = document.getElementById('calle');
+		if (calleInput) {
+			// Crear contenedor para el contador de caracteres si no existe
+			if (!calleInput.parentNode.querySelector('.char-counter')) {
+				const counter = document.createElement('div');
+				counter.className = 'char-counter';
+				counter.textContent = '0/25';
+				calleInput.parentNode.style.position = 'relative';
+				calleInput.parentNode.appendChild(counter);
+			}
+			
+			calleInput.addEventListener('input', function() {
+				// Convertir a mayúsculas y limitar a 25 caracteres
+				let value = this.value.toUpperCase();
+				// Permitir solo letras, números, espacios y algunos caracteres especiales comunes en direcciones
+				value = value.replace(/[^A-Z0-9\s\.\,\-\/\\]/g, '');
+				// Limitar a 25 caracteres
+				value = value.slice(0, 25);
+				this.value = value;
+				
+				// Actualizar contador de caracteres
+				const counter = this.parentNode.querySelector('.char-counter');
+				if (counter) {
+					const currentLength = value.length;
+					counter.textContent = `${currentLength}/25`;
+					
+					// Cambiar color según la cantidad de caracteres
+					counter.classList.remove('warning', 'danger');
+					if (currentLength >= 23) {
+						counter.classList.add('danger');
+					} else if (currentLength >= 20) {
+						counter.classList.add('warning');
+					}
+				}
+			});
+		}
+		
+		// Formateo para campo "Numeración" - solo números y máximo 5 caracteres
+		const numeracionInput = document.getElementById('numeracion');
+		if (numeracionInput) {
+			// Crear contenedor para el contador de caracteres si no existe
+			if (!numeracionInput.parentNode.querySelector('.char-counter')) {
+				const counter = document.createElement('div');
+				counter.className = 'char-counter';
+				counter.textContent = '0/5';
+				numeracionInput.parentNode.style.position = 'relative';
+				numeracionInput.parentNode.appendChild(counter);
+			}
+			
+			numeracionInput.addEventListener('input', function() {
+				// Permitir solo números y limitar a 5 caracteres
+				let value = this.value.replace(/\D/g, '');
+				// Limitar a 5 caracteres
+				value = value.slice(0, 5);
+				this.value = value;
+				
+				// Actualizar contador de caracteres
+				const counter = this.parentNode.querySelector('.char-counter');
+				if (counter) {
+					const currentLength = value.length;
+					counter.textContent = `${currentLength}/5`;
+					
+					// Cambiar color según la cantidad de caracteres
+					counter.classList.remove('warning', 'danger');
+					if (currentLength >= 5) {
+						counter.classList.add('danger');
+					} else if (currentLength >= 4) {
+						counter.classList.add('warning');
+					}
+				}
+			});
+		}
+		
+		// Formateo para campo "Código Postal" - solo números y máximo 5 caracteres
+		const codigoPostalInput = document.getElementById('codigoPostal');
+		if (codigoPostalInput) {
+			// Crear contenedor para el contador de caracteres si no existe
+			if (!codigoPostalInput.parentNode.querySelector('.char-counter')) {
+				const counter = document.createElement('div');
+				counter.className = 'char-counter';
+				counter.textContent = '0/5';
+				codigoPostalInput.parentNode.style.position = 'relative';
+				codigoPostalInput.parentNode.appendChild(counter);
+			}
+			
+			codigoPostalInput.addEventListener('input', function() {
+				// Permitir solo números y limitar a 5 caracteres
+				let value = this.value.replace(/\D/g, '');
+				// Limitar a 5 caracteres
+				value = value.slice(0, 5);
+				this.value = value;
+				
+				// Actualizar contador de caracteres
+				const counter = this.parentNode.querySelector('.char-counter');
+				if (counter) {
+					const currentLength = value.length;
+					counter.textContent = `${currentLength}/5`;
+					
+					// Cambiar color según la cantidad de caracteres
+					counter.classList.remove('warning', 'danger');
+					if (currentLength >= 5) {
+						counter.classList.add('danger');
+					} else if (currentLength >= 4) {
+						counter.classList.add('warning');
+					}
+				}
+			});
+		}
+		
+		// Formateo para campo "Nombre Establecimiento" - solo mayúsculas
+		const nombreEstablecimientoInput = document.getElementById('nombreEstablecimiento');
+		if (nombreEstablecimientoInput) {
+			nombreEstablecimientoInput.addEventListener('input', function() {
+				// Convertir a mayúsculas
+				let value = this.value.toUpperCase();
+				// Permitir letras, números, espacios y algunos caracteres especiales comunes en nombres de establecimientos
+				value = value.replace(/[^A-Z0-9\s\.\,\-\_]/g, '');
+				this.value = value;
+			});
+		}
 	}
 
 	// Event listener para checkbox "Sin administrador de establecimiento"
