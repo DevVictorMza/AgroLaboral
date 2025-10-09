@@ -2514,35 +2514,50 @@ function estaAutenticado() {
 // Función para actualizar la interfaz según el estado de autenticación
 function actualizarInterfazLogin(autenticado) {
 	const btnLogin = document.getElementById('btn-login');
+	const btnRegistro = document.getElementById('btn-registro');
 	
 	if (autenticado) {
 		const usuario = obtenerUsuario();
 		const nombreUsuario = usuario ? usuario.nombre || usuario.dni : 'Usuario';
 		
-		// Cambiar el botón login por un dropdown de usuario
-		btnLogin.outerHTML = `
-			<div class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-					<i class="fas fa-user me-1"></i>${nombreUsuario}
-				</a>
-				<ul class="dropdown-menu" aria-labelledby="userDropdown">
-					<li><a class="dropdown-item" href="#" id="btn-logout"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
-				</ul>
-			</div>
-		`;
+		// Ocultar el botón de login
+		if (btnLogin) {
+			btnLogin.style.display = 'none';
+		}
 		
-		// Agregar event listener para logout
-		document.getElementById('btn-logout').addEventListener('click', function(e) {
-			e.preventDefault();
-			cerrarSesion();
-		});
+		// Reemplazar el botón "Registro Empleador" con el dropdown del usuario
+		if (btnRegistro) {
+			btnRegistro.parentElement.outerHTML = `
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+						<i class="fas fa-user me-1"></i>${nombreUsuario}
+					</a>
+					<ul class="dropdown-menu" aria-labelledby="userDropdown">
+						<li><a class="dropdown-item" href="#" id="btn-logout"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
+					</ul>
+				</li>
+			`;
+			
+			// Agregar event listener para logout
+			document.getElementById('btn-logout').addEventListener('click', function(e) {
+				e.preventDefault();
+				cerrarSesion();
+			});
+		}
 		
 	} else {
-		// Restaurar botón de login
+		// Mostrar el botón de login
+		if (btnLogin) {
+			btnLogin.style.display = 'block';
+		}
+		
+		// Restaurar botón de "Registro Empleador"
 		const userDropdown = document.getElementById('userDropdown');
 		if (userDropdown) {
 			userDropdown.parentElement.outerHTML = `
-				<a class="nav-link" href="#" id="btn-login" data-bs-toggle="modal" data-bs-target="#modalLogin" onclick="return false;">Login</a>
+				<li class="nav-item">
+					<a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#modalRegistroEmpleador" id="btn-registro" onclick="return false;">Registro Empleador</a>
+				</li>
 			`;
 		}
 	}
