@@ -2378,3 +2378,373 @@ window.probarEndpointPersonas = async function(dni = '35876866') {
 		return null;
 	}
 };
+
+// ==========================================
+// FUNCIONALIDAD DE LOGIN Y AUTENTICACIÓN
+// ==========================================
+
+// Configuración de autenticación
+const AUTH_CONFIG = {
+	endpoints: {
+		login: 'http://localhost:9090/aut/login',
+		verify: 'http://localhost:9090/aut/verify', // Para verificar token
+		// Agregar otros endpoints según tu backend
+	},
+	storage: {
+		tokenKey: 'agro_lab_token',
+		userKey: 'agro_lab_user'
+	}
+};
+
+// Función para validar formato DNI
+function validarDNI(dni) {
+	if (!dni || dni.trim() === '') {
+		return { valido: false, mensaje: 'El DNI es obligatorio' };
+	}
+	
+	const dniLimpio = dni.trim();
+	if (!/^\d{7,8}$/.test(dniLimpio)) {
+		return { valido: false, mensaje: 'El DNI debe tener 7 u 8 dígitos numéricos' };
+	}
+	
+	return { valido: true, dni: dniLimpio };
+}
+
+// Función para validar contraseña
+function validarContrasenaLogin(contrasenia) {
+	if (!contrasenia || contrasenia.trim() === '') {
+		return { valido: false, mensaje: 'La contraseña es obligatoria' };
+	}
+	
+	if (contrasenia.length !== 6) {
+		return { valido: false, mensaje: 'La contraseña debe tener exactamente 6 caracteres' };
+	}
+	
+	return { valido: true, contrasenia: contrasenia };
+}
+
+// Función para enviar credenciales al backend
+async function autenticarUsuario(dni, contrasenia) {
+	try {
+		console.log('🔐 Iniciando autenticación para DNI:', dni);
+		
+		const credenciales = {
+			dni: dni,
+			contrasenia: contrasenia
+		};
+		
+		console.log('📤 Enviando credenciales al backend:', JSON.stringify(credenciales, null, 2));
+		
+		const response = await fetch(AUTH_CONFIG.endpoints.login, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(credenciales)
+		});
+		
+		console.log('📥 Respuesta del backend:', response.status, response.statusText);
+		
+		if (response.ok) {
+			const data = await response.json();
+			console.log('✅ Login exitoso, datos recibidos:', data);
+			return { exito: true, datos: data };
+		} else if (response.status === 401) {
+			console.log('❌ Credenciales inválidas (401)');
+			return { exito: false, mensaje: 'DNI o contraseña incorrectos' };
+		} else if (response.status === 404) {
+			console.log('❌ Usuario no encontrado (404)');
+			return { exito: false, mensaje: 'El usuario no existe' };
+		} else {
+			console.log('❌ Error del servidor:', response.status);
+			const errorText = await response.text();
+			console.log('❌ Detalles:', errorText);
+			return { exito: false, mensaje: 'Error del servidor. Intenta nuevamente.' };
+		}
+		
+	} catch (error) {
+		console.error('❌ Error de conexión:', error);
+		return { exito: false, mensaje: 'Error de conexión. Verifica tu internet.' };
+	}
+}
+
+// Función para almacenar datos de sesión
+function almacenarSesion(token, datosUsuario) {
+	try {
+		localStorage.setItem(AUTH_CONFIG.storage.tokenKey, token);
+		localStorage.setItem(AUTH_CONFIG.storage.userKey, JSON.stringify(datosUsuario));
+		console.log('✅ Sesión almacenada correctamente');
+		return true;
+	} catch (error) {
+		console.error('❌ Error almacenando sesión:', error);
+		return false;
+	}
+}
+
+// Función para obtener token almacenado
+function obtenerToken() {
+	return localStorage.getItem(AUTH_CONFIG.storage.tokenKey);
+}
+
+// Función para obtener datos del usuario
+function obtenerUsuario() {
+	try {
+		const userData = localStorage.getItem(AUTH_CONFIG.storage.userKey);
+		return userData ? JSON.parse(userData) : null;
+	} catch (error) {
+		console.error('❌ Error obteniendo datos de usuario:', error);
+		return null;
+	}
+}
+
+// Función para cerrar sesión
+function cerrarSesion() {
+	localStorage.removeItem(AUTH_CONFIG.storage.tokenKey);
+	localStorage.removeItem(AUTH_CONFIG.storage.userKey);
+	console.log('✅ Sesión cerrada');
+	actualizarInterfazLogin(false);
+}
+
+// Función para verificar si el usuario está autenticado
+function estaAutenticado() {
+	const token = obtenerToken();
+	return token !== null && token !== '';
+}
+
+// Función para actualizar la interfaz según el estado de autenticación
+function actualizarInterfazLogin(autenticado) {
+	const btnLogin = document.getElementById('btn-login');
+	
+	if (autenticado) {
+		const usuario = obtenerUsuario();
+		const nombreUsuario = usuario ? usuario.nombre || usuario.dni : 'Usuario';
+		
+		// Cambiar el botón login por un dropdown de usuario
+		btnLogin.outerHTML = `
+			<div class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+					<i class="fas fa-user me-1"></i>${nombreUsuario}
+				</a>
+				<ul class="dropdown-menu" aria-labelledby="userDropdown">
+					<li><a class="dropdown-item" href="#" id="btn-logout"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
+				</ul>
+			</div>
+		`;
+		
+		// Agregar event listener para logout
+		document.getElementById('btn-logout').addEventListener('click', function(e) {
+			e.preventDefault();
+			cerrarSesion();
+		});
+		
+	} else {
+		// Restaurar botón de login
+		const userDropdown = document.getElementById('userDropdown');
+		if (userDropdown) {
+			userDropdown.parentElement.outerHTML = `
+				<a class="nav-link" href="#" id="btn-login" data-bs-toggle="modal" data-bs-target="#modalLogin" onclick="return false;">Login</a>
+			`;
+		}
+	}
+}
+
+// Función para mostrar mensajes de error en el formulario
+function mostrarErrorLogin(mensaje) {
+	// Buscar o crear container de error
+	let errorContainer = document.getElementById('login-error');
+	if (!errorContainer) {
+		errorContainer = document.createElement('div');
+		errorContainer.id = 'login-error';
+		errorContainer.className = 'alert alert-danger mt-3';
+		errorContainer.style.display = 'none';
+		
+		const form = document.getElementById('form-login');
+		form.insertBefore(errorContainer, form.querySelector('.d-grid'));
+	}
+	
+	errorContainer.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>${mensaje}`;
+	errorContainer.style.display = 'block';
+	
+	// Ocultar el error después de 5 segundos
+	setTimeout(() => {
+		errorContainer.style.display = 'none';
+	}, 5000);
+}
+
+// Función principal de manejo del login
+async function manejarLogin() {
+	const dni = document.getElementById('dni-login').value;
+	const contrasenia = document.getElementById('password-login').value;
+	
+	// Validar DNI
+	const validacionDNI = validarDNI(dni);
+	if (!validacionDNI.valido) {
+		mostrarErrorLogin(validacionDNI.mensaje);
+		return;
+	}
+	
+	// Validar contraseña
+	const validacionContrasenia = validarContrasenaLogin(contrasenia);
+	if (!validacionContrasenia.valido) {
+		mostrarErrorLogin(validacionContrasenia.mensaje);
+		return;
+	}
+	
+	// Deshabilitar botón mientras se procesa
+	const btnIniciarSesion = document.getElementById('btn-iniciar-sesion');
+	const textoOriginal = btnIniciarSesion.innerHTML;
+	btnIniciarSesion.disabled = true;
+	btnIniciarSesion.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Iniciando...';
+	
+	try {
+		// Intentar autenticar
+		const resultado = await autenticarUsuario(validacionDNI.dni, validacionContrasenia.contrasenia);
+		
+		if (resultado.exito) {
+			// Login exitoso
+			console.log('✅ Login exitoso');
+			
+			// Almacenar sesión (ajustar según la estructura de tu JWT)
+			const token = resultado.datos.token || resultado.datos.jwt || resultado.datos;
+			const datosUsuario = {
+				dni: validacionDNI.dni,
+				// Agregar más datos según lo que devuelva tu backend
+				nombre: resultado.datos.nombre || resultado.datos.nombreUsuario,
+				email: resultado.datos.email
+			};
+			
+			if (almacenarSesion(token, datosUsuario)) {
+				// Cerrar modal
+				const modal = bootstrap.Modal.getInstance(document.getElementById('modalLogin'));
+				modal.hide();
+				
+				// Actualizar interfaz
+				actualizarInterfazLogin(true);
+				
+				// Limpiar formulario
+				document.getElementById('form-login').reset();
+				
+				// ✅ REDIRECCIÓN AL PANEL DE CONTROL
+				console.log('🔄 Redirigiendo al dashboard...');
+				
+				// Esperar un momento para que se complete el cierre del modal
+				setTimeout(() => {
+					// Redirigir al dashboard
+					window.location.href = 'dashboard.html';
+					// O usar: window.location.replace('dashboard.html'); para no permitir "volver atrás"
+				}, 500);
+				
+				console.log('✅ Sesión iniciada correctamente');
+			}
+		} else {
+			// Login falló
+			mostrarErrorLogin(resultado.mensaje);
+		}
+		
+	} catch (error) {
+		console.error('❌ Error inesperado en login:', error);
+		mostrarErrorLogin('Error inesperado. Intenta nuevamente.');
+	} finally {
+		// Restaurar botón
+		btnIniciarSesion.disabled = false;
+		btnIniciarSesion.innerHTML = textoOriginal;
+	}
+}
+
+// Función para agregar token JWT a las peticiones
+function agregarAutorizacion(headers = {}) {
+	const token = obtenerToken();
+	if (token) {
+		headers['Authorization'] = `Bearer ${token}`;
+	}
+	return headers;
+}
+
+// Función wrapper para fetch con autenticación automática
+async function fetchConAuth(url, options = {}) {
+	// Agregar headers de autorización
+	options.headers = agregarAutorizacion(options.headers || {});
+	
+	try {
+		const response = await fetch(url, options);
+		
+		// Verificar si el token expiró (401)
+		if (response.status === 401) {
+			console.log('🔒 Token expirado o inválido, cerrando sesión');
+			cerrarSesion();
+			// Opcional: Mostrar modal de login automáticamente
+			// const modalLogin = new bootstrap.Modal(document.getElementById('modalLogin'));
+			// modalLogin.show();
+		}
+		
+		return response;
+	} catch (error) {
+		console.error('❌ Error en petición autenticada:', error);
+		throw error;
+	}
+}
+
+// Función para verificar validez del token (opcional)
+async function verificarToken() {
+	const token = obtenerToken();
+	if (!token) return false;
+	
+	try {
+		// Hacer una petición a un endpoint protegido para verificar el token
+		const response = await fetchConAuth(AUTH_CONFIG.endpoints.verify, {
+			method: 'GET'
+		});
+		
+		return response.ok;
+	} catch (error) {
+		console.error('❌ Error verificando token:', error);
+		return false;
+	}
+}
+
+// Event listeners cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+	// Event listener para el botón de iniciar sesión
+	const btnIniciarSesion = document.getElementById('btn-iniciar-sesion');
+	if (btnIniciarSesion) {
+		btnIniciarSesion.addEventListener('click', manejarLogin);
+	}
+	
+	// Event listener para submit del formulario (Enter)
+	const formLogin = document.getElementById('form-login');
+	if (formLogin) {
+		formLogin.addEventListener('submit', function(e) {
+			e.preventDefault();
+			manejarLogin();
+		});
+	}
+	
+	// Verificar si ya hay una sesión activa al cargar la página
+	if (estaAutenticado()) {
+		actualizarInterfazLogin(true);
+	}
+	
+	// Aplicar validaciones en tiempo real a los campos
+	const dniInput = document.getElementById('dni-login');
+	const passwordInput = document.getElementById('password-login');
+	
+	if (dniInput) {
+		dniInput.addEventListener('input', function() {
+			// Permitir solo números
+			this.value = this.value.replace(/[^0-9]/g, '');
+			// Limitar a 8 dígitos
+			if (this.value.length > 8) {
+				this.value = this.value.slice(0, 8);
+			}
+		});
+	}
+	
+	if (passwordInput) {
+		passwordInput.addEventListener('input', function() {
+			// Limitar a 6 caracteres
+			if (this.value.length > 6) {
+				this.value = this.value.slice(0, 6);
+			}
+		});
+	}
+});
