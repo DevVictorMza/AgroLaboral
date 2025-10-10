@@ -85,7 +85,7 @@
                             <h5 class="fw-bold mb-3">Datos de Empresa</h5>
                             <div class="mb-3">
                                 <label for="cuit" class="form-label">CUIT</label>
-                                <input type="text" class="form-control" id="cuit" name="cuit" placeholder="Ej: 20-12345678-9">
+                                <input type="text" class="form-control" id="cuit" name="cuit" placeholder="Ej: 20123456789">
                             </div>
                             <div class="mb-3">
                                 <label for="razonSocial" class="form-label">Razón Social</label>
@@ -139,7 +139,7 @@
                         <div class="mb-4">
                             <h5 class="fw-bold mb-3">Establecimiento</h5>
                             <div class="mb-3">
-                                <label for="nombreEstablecimiento" class="form-label">Nombre <small class="text-muted">(se convertirá a mayúsculas)</small></label>
+                                <label for="nombreEstablecimiento" class="form-label">Nombre <small class="text-muted">(se convierte automáticamente a mayúsculas)</small></label>
                                 <input type="text" class="form-control" id="nombreEstablecimiento" name="nombreEstablecimiento" 
                                        placeholder="Ejemplo: Finca Los Olivos"
                                        autocomplete="organization">
@@ -161,46 +161,31 @@
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <label for="departamento" class="form-label">Departamento</label>
-                                <select class="form-select" id="departamento" name="departamento">
-                                    <option value="">Cargando departamentos...</option>
-                                </select>
+                                <label class="form-label">Departamento</label>
+                                <div class="dropdown">
+                                    <button class="form-control text-start dropdown-toggle" type="button" id="dropdownDepartamento" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Seleccionar departamento
+                                    </button>
+                                    <ul class="dropdown-menu w-100" aria-labelledby="dropdownDepartamento" id="departamento-list">
+                                        <li class="px-3 py-2 text-muted">Cargando departamentos...</li>
+                                    </ul>
+                                    <input type="hidden" id="departamento" name="departamento">
+                                </div>
                             </div>
                             <div class="mb-3">
-                                <label for="distrito" class="form-label">Distrito</label>
-                                <select class="form-select" id="distrito" name="distrito">
-                                    <option value="">Seleccionar distrito</option>
-                                    <!--
-                                    <option>Palmira</option>
-                                    <option>Alto Verde</option>
-                                    <option>Chapanay</option>
-                                    <option>El Central</option>
-                                    <option>El Divisadero</option>
-                                    <option>El Espino</option>
-                                    <option>El Ramblón</option>
-                                    <option>Ingeniero Giagnoni</option>
-                                    <option>Montecaseros</option>
-                                    <option>Chivilcoy</option>
-                                    <option>Algarrobo Grande</option>
-                                    <option>Alto Salvador</option>
-                                    <option>Colonia Las Rosas</option>
-                                    <option>Colonia Segovia</option>
-                                    <option>Colonia Italia</option>
-                                    <option>El Ñango</option>
-                                    <option>El Ramblón</option>
-                                    <option>El Central</option>
-                                    <option>El Divisadero</option>
-                                    <option>El Espino</option>
-                                    <option>Ingeniero Giagnoni</option>
-                                    <option>Montecaseros</option>
-                                    <option>Chivilcoy</option>
-                                    <option>Algarrobo Grande</option>
-                                    <option>Alto Salvador</option>
-                                    -->
-                                </select>
+                                <label class="form-label">Distrito</label>
+                                <div class="dropdown">
+                                    <button class="form-control text-start dropdown-toggle" type="button" id="dropdownDistrito" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Seleccionar distrito
+                                    </button>
+                                    <ul class="dropdown-menu w-100" aria-labelledby="dropdownDistrito" id="distrito-list">
+                                        <li class="px-3 py-2 text-muted">Seleccionar distrito</li>
+                                    </ul>
+                                    <input type="hidden" id="distrito" name="distrito">
+                                </div>
                             </div>
                             <div class="mb-3">
-                                <label for="calle" class="form-label">Calle <small class="text-muted">(máximo 25 caracteres)</small></label>
+                                <label for="calle" class="form-label">Calle <small class="text-muted">(máximo 25 caracteres - se convierte a mayúsculas)</small></label>
                                 <input type="text" class="form-control" id="calle" name="calle" 
                                        placeholder="Ejemplo: RUTA 50" 
                                        maxlength="25"

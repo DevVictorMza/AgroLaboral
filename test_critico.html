@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Crítico - Escritura en Minúsculas</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 700px; 
+            margin: 2rem auto; 
+            padding: 2rem; 
+            background: #f5f5f5; 
+        }
+        .test-container { 
+            background: white; 
+            padding: 2rem; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+        }
+        input { 
+            width: 100%; 
+            padding: 1rem; 
+            margin: 0.5rem 0; 
+            border: 2px solid #ddd; 
+            border-radius: 6px; 
+            font-size: 16px; 
+            transition: all 0.2s ease;
+        }
+        .uppercase-field { 
+            background: #f8f9fa; 
+            text-transform: uppercase; 
+        }
+        .uppercase-converting { 
+            background: #e3f2fd !important; 
+            border-color: #2196f3 !important; 
+        }
+        label { 
+            display: block; 
+            margin: 1rem 0 0.5rem 0; 
+            font-weight: bold; 
+            color: #333;
+        }
+        .char-counter {
+            position: absolute;
+            right: 8px;
+            bottom: 8px;
+            font-size: 12px;
+            color: #666;
+            background: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+        }
+        .result {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .critical-test {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🚨 Test Crítico: Escritura en Minúsculas</h1>
+        
+        <div class="critical-test">
+            <h3>⚠️ Problema a Resolver:</h3>
+            <p><strong>El usuario NO puede escribir en minúsculas</strong> - solo funciona con Bloq Mayús activado.</p>
+            <p><strong>DEBE FUNCIONAR:</strong> Escribir normalmente en minúsculas y ver conversión automática a mayúsculas.</p>
+        </div>
+        
+        <div id="status" class="result info">🔄 Sistema inicializando...</div>
+        
+        <div style="position: relative;">
+            <label for="nombreEstablecimiento">✅ Nombre Establecimiento (CON conversión):</label>
+            <input type="text" 
+                   id="nombreEstablecimiento" 
+                   class="uppercase-field"
+                   placeholder="ESCRIBA AQUÍ EN MINÚSCULAS: finca los olivos"
+                   maxlength="50">
+            <div class="char-counter">0/50</div>
+        </div>
+
+        <div style="position: relative;">
+            <label for="calle">✅ Calle (CON conversión):</label>
+            <input type="text" 
+                   id="calle" 
+                   class="uppercase-field"
+                   placeholder="ESCRIBA AQUÍ EN MINÚSCULAS: avenida libertador"
+                   maxlength="25">
+            <div class="char-counter">0/25</div>
+        </div>
+
+        <div>
+            <label for="normal">🔍 Campo Normal (para comparar):</label>
+            <input type="text" 
+                   id="normal"
+                   placeholder="este campo mantiene minúsculas">
+        </div>
+
+        <div id="testLog" class="result info" style="margin-top: 2rem;">
+            <strong>Log de Pruebas:</strong><br>
+            <div id="logContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let logContent = document.getElementById('logContent');
+        
+        function log(message, type = 'info') {
+            console.log(message);
+            const timestamp = new Date().toLocaleTimeString();
+            logContent.innerHTML += `<div style="margin: 2px 0; color: ${type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#17a2b8'}">[${timestamp}] ${message}</div>`;
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+        
+        // Función para contador de caracteres simplificada
+        function addCharacterCounter(inputId, maxLength) {
+            const input = document.getElementById(inputId);
+            const counter = input.parentNode.querySelector('.char-counter');
+            
+            function updateCounter() {
+                const currentLength = input.value.length;
+                counter.textContent = `${currentLength}/${maxLength}`;
+                counter.style.color = currentLength >= maxLength * 0.9 ? '#dc3545' : 
+                                     currentLength >= maxLength * 0.8 ? '#ffc107' : '#666';
+            }
+            
+            input.addEventListener('input', updateCounter);
+            log(`📊 Contador configurado para ${inputId}`, 'info');
+        }
+
+        // Función para conversión a mayúsculas MEJORADA
+        function addUppercaseConverter(inputId) {
+            const input = document.getElementById(inputId);
+            if (!input) {
+                log(`❌ Campo ${inputId} no encontrado`, 'error');
+                return false;
+            }
+            
+            log(`🔧 Configurando conversión para ${inputId}`, 'info');
+            
+            function convertToUppercase() {
+                const start = input.selectionStart;
+                const end = input.selectionEnd;
+                const value = input.value;
+                const upperValue = value.toUpperCase();
+                
+                if (value !== upperValue) {
+                    input.value = upperValue;
+                    input.setSelectionRange(start, end);
+                    
+                    input.classList.add('uppercase-converting');
+                    setTimeout(() => input.classList.remove('uppercase-converting'), 120);
+                    
+                    log(`✅ Convertido en ${inputId}: "${value}" → "${upperValue}"`, 'success');
+                    updateStatus(`✅ ¡FUNCIONA! Convertido: "${value}" → "${upperValue}"`);
+                }
+            }
+            
+            // Event listeners críticos
+            input.addEventListener('input', () => {
+                log(`📝 Input detectado en ${inputId}: "${input.value}"`, 'info');
+                setTimeout(convertToUppercase, 0);
+            });
+            
+            input.addEventListener('keydown', (e) => {
+                log(`⌨️ Tecla presionada en ${inputId}: ${e.key} (code: ${e.code})`, 'info');
+                setTimeout(convertToUppercase, 0);
+            });
+            
+            input.addEventListener('paste', () => {
+                log(`📋 Pegado detectado en ${inputId}`, 'info');
+                setTimeout(convertToUppercase, 10);
+            });
+            
+            // Configuración
+            input.style.textTransform = 'uppercase';
+            input.setAttribute('data-uppercase', 'true');
+            input.setAttribute('autocapitalize', 'characters');
+            
+            log(`✅ Campo ${inputId} configurado correctamente`, 'success');
+            return true;
+        }
+        
+        function updateStatus(message) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = message.includes('✅') ? 'result success' : 
+                              message.includes('❌') ? 'result error' : 'result info';
+        }
+        
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🚀 Iniciando test crítico...', 'info');
+            updateStatus('🔄 Configurando sistema...');
+            
+            // Configurar contadores
+            addCharacterCounter('nombreEstablecimiento', 50);
+            addCharacterCounter('calle', 25);
+            
+            // Configurar conversión (CRÍTICO)
+            const result1 = addUppercaseConverter('nombreEstablecimiento');
+            const result2 = addUppercaseConverter('calle');
+            
+            if (result1 && result2) {
+                log('✅ SISTEMA CONFIGURADO CORRECTAMENTE', 'success');
+                updateStatus('✅ Sistema listo - PRUEBE escribir en minúsculas');
+            } else {
+                log('❌ ERROR EN LA CONFIGURACIÓN', 'error');
+                updateStatus('❌ Error en la configuración del sistema');
+            }
+            
+            // Test automático después de 2 segundos
+            setTimeout(() => {
+                log('🤖 Ejecutando test automático...', 'info');
+                const testField = document.getElementById('nombreEstablecimiento');
+                testField.value = 'test automático';
+                testField.dispatchEvent(new Event('input', { bubbles: true }));
+            }, 2000);
+        });
+        
+        // Monitor global crítico
+        document.addEventListener('keydown', function(e) {
+            if (e.target.getAttribute('data-uppercase') === 'true') {
+                log(`🎯 Tecla global: ${e.key} en campo ${e.target.id}`, 'info');
+            }
+        });
+    </script>
+</body>
+</html>

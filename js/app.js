@@ -26,6 +26,75 @@ function showFieldFeedback(input, isValid, message) {
 	}
 }
 
+// Función genérica para agregar contador de caracteres con colores
+function addCharacterCounter(inputId, maxLength, options = {}) {
+	const input = document.getElementById(inputId);
+	if (!input) return;
+	
+	const config = {
+		warningThreshold: options.warningThreshold || Math.floor(maxLength * 0.8), // 80% por defecto
+		dangerThreshold: options.dangerThreshold || Math.floor(maxLength * 0.92),   // 92% por defecto
+		allowOnlyNumbers: options.allowOnlyNumbers || false,
+		allowUppercase: options.allowUppercase || false,
+		customRegex: options.customRegex || null,
+		...options
+	};
+	
+	// Crear contenedor para el contador si no existe
+	if (!input.parentNode.querySelector('.char-counter')) {
+		const counter = document.createElement('div');
+		counter.className = 'char-counter';
+		counter.textContent = `0/${maxLength}`;
+		input.parentNode.style.position = 'relative';
+		input.parentNode.appendChild(counter);
+	}
+	
+	// Event listener para el input
+	input.addEventListener('input', function() {
+		let value = this.value;
+		
+		// Verificar si el campo tiene conversión automática a mayúsculas
+		const hasUppercaseConverter = this.getAttribute('data-uppercase') === 'true';
+		
+		// Aplicar transformaciones según configuración
+		if (config.allowOnlyNumbers) {
+			value = value.replace(/\D/g, '');
+		} else if (config.customRegex && !hasUppercaseConverter) {
+			// Solo aplicar regex si NO tiene conversión automática a mayúsculas
+			value = value.replace(config.customRegex, '');
+		} else if (config.customRegex && hasUppercaseConverter) {
+			// Si tiene conversión automática, permitir minúsculas temporalmente
+			// Convertir a mayúsculas antes de aplicar el regex
+			const upperValue = value.toUpperCase();
+			value = upperValue.replace(config.customRegex, '');
+		}
+		
+		if (config.allowUppercase && !hasUppercaseConverter) {
+			// Solo convertir aquí si NO tiene un convertidor automático
+			value = value.toUpperCase();
+		}
+		
+		// Limitar caracteres
+		value = value.slice(0, maxLength);
+		this.value = value;
+		
+		// Actualizar contador
+		const counter = this.parentNode.querySelector('.char-counter');
+		if (counter) {
+			const currentLength = value.length;
+			counter.textContent = `${currentLength}/${maxLength}`;
+			
+			// Cambiar color según la cantidad de caracteres
+			counter.classList.remove('warning', 'danger');
+			if (currentLength >= config.dangerThreshold) {
+				counter.classList.add('danger');
+			} else if (currentLength >= config.warningThreshold) {
+				counter.classList.add('warning');
+			}
+		}
+	});
+}
+
 // Agregar estado de carga a botón o contenedor
 function addLoadingState(element, message = 'Procesando...') {
 	// Si es un botón
@@ -54,6 +123,66 @@ function addLoadingState(element, message = 'Procesando...') {
 			if (loadingDiv) loadingDiv.remove();
 		};
 	}
+}
+
+// Función para convertir automáticamente texto a mayúsculas mientras se escribe
+function addUppercaseConverter(inputId) {
+	const input = document.getElementById(inputId);
+	if (!input) return;
+	
+	console.log(`Configurando conversión automática para: ${inputId}`);
+	
+	// Función principal para convertir a mayúsculas
+	function convertToUppercase() {
+		const start = input.selectionStart;
+		const end = input.selectionEnd;
+		const value = input.value;
+		const upperValue = value.toUpperCase();
+		
+		if (value !== upperValue) {
+			input.value = upperValue;
+			input.setSelectionRange(start, end);
+			
+			// Breve feedback visual
+			input.classList.add('uppercase-converting');
+			setTimeout(() => input.classList.remove('uppercase-converting'), 100);
+			
+			console.log(`Convertido: "${value}" → "${upperValue}"`);
+		}
+	}
+	
+	// Event listeners para todos los tipos de entrada
+	input.addEventListener('input', function(e) {
+		setTimeout(convertToUppercase, 0);
+	});
+	
+	input.addEventListener('keydown', function(e) {
+		setTimeout(convertToUppercase, 0);
+	});
+	
+	input.addEventListener('keyup', function(e) {
+		setTimeout(convertToUppercase, 0);
+	});
+	
+	input.addEventListener('paste', function(e) {
+		setTimeout(convertToUppercase, 10);
+	});
+	
+	input.addEventListener('change', function(e) {
+		convertToUppercase();
+	});
+	
+	// Configurar el campo para mayúsculas
+	input.style.textTransform = 'uppercase';
+	input.setAttribute('data-uppercase', 'true');
+	input.setAttribute('autocapitalize', 'characters');
+	
+	// Convertir valor inicial
+	if (input.value) {
+		input.value = input.value.toUpperCase();
+	}
+	
+	console.log(`✅ Campo ${inputId} configurado para conversión automática`);
 }
 
 // Inicialización del mapa principal de la página (no el del wizard)
@@ -951,127 +1080,146 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 			});
 		}
 		
-		// Formateo para campo "Calle" - solo mayúsculas y máximo 25 caracteres
-		const calleInput = document.getElementById('calle');
-		if (calleInput) {
-			// Crear contenedor para el contador de caracteres si no existe
-			if (!calleInput.parentNode.querySelector('.char-counter')) {
-				const counter = document.createElement('div');
-				counter.className = 'char-counter';
-				counter.textContent = '0/25';
-				calleInput.parentNode.style.position = 'relative';
-				calleInput.parentNode.appendChild(counter);
-			}
-			
-			calleInput.addEventListener('input', function() {
-				// Convertir a mayúsculas y limitar a 25 caracteres
-				let value = this.value.toUpperCase();
-				// Permitir solo letras, números, espacios y algunos caracteres especiales comunes en direcciones
-				value = value.replace(/[^A-Z0-9\s\.\,\-\/\\]/g, '');
-				// Limitar a 25 caracteres
-				value = value.slice(0, 25);
-				this.value = value;
-				
-				// Actualizar contador de caracteres
-				const counter = this.parentNode.querySelector('.char-counter');
-				if (counter) {
-					const currentLength = value.length;
-					counter.textContent = `${currentLength}/25`;
-					
-					// Cambiar color según la cantidad de caracteres
-					counter.classList.remove('warning', 'danger');
-					if (currentLength >= 23) {
-						counter.classList.add('danger');
-					} else if (currentLength >= 20) {
-						counter.classList.add('warning');
-					}
-				}
-			});
-		}
+		// CONFIGURACIÓN DE CONTADORES DE CARACTERES PARA TODOS LOS CAMPOS
 		
-		// Formateo para campo "Numeración" - solo números y máximo 5 caracteres
-		const numeracionInput = document.getElementById('numeracion');
-		if (numeracionInput) {
-			// Crear contenedor para el contador de caracteres si no existe
-			if (!numeracionInput.parentNode.querySelector('.char-counter')) {
-				const counter = document.createElement('div');
-				counter.className = 'char-counter';
-				counter.textContent = '0/5';
-				numeracionInput.parentNode.style.position = 'relative';
-				numeracionInput.parentNode.appendChild(counter);
-			}
-			
-			numeracionInput.addEventListener('input', function() {
-				// Permitir solo números y limitar a 5 caracteres
-				let value = this.value.replace(/\D/g, '');
-				// Limitar a 5 caracteres
-				value = value.slice(0, 5);
-				this.value = value;
-				
-				// Actualizar contador de caracteres
-				const counter = this.parentNode.querySelector('.char-counter');
-				if (counter) {
-					const currentLength = value.length;
-					counter.textContent = `${currentLength}/5`;
-					
-					// Cambiar color según la cantidad de caracteres
-					counter.classList.remove('warning', 'danger');
-					if (currentLength >= 5) {
-						counter.classList.add('danger');
-					} else if (currentLength >= 4) {
-						counter.classList.add('warning');
-					}
-				}
-			});
-		}
+		// Campo CUIT - solo números (11 dígitos sin guiones)
+		addCharacterCounter('cuit', 11, { 
+			allowOnlyNumbers: true, // Solo números, sin guiones
+			warningThreshold: 9,
+			dangerThreshold: 10
+		});
 		
-		// Formateo para campo "Código Postal" - solo números y máximo 5 caracteres
-		const codigoPostalInput = document.getElementById('codigoPostal');
-		if (codigoPostalInput) {
-			// Crear contenedor para el contador de caracteres si no existe
-			if (!codigoPostalInput.parentNode.querySelector('.char-counter')) {
-				const counter = document.createElement('div');
-				counter.className = 'char-counter';
-				counter.textContent = '0/5';
-				codigoPostalInput.parentNode.style.position = 'relative';
-				codigoPostalInput.parentNode.appendChild(counter);
-			}
-			
-			codigoPostalInput.addEventListener('input', function() {
-				// Permitir solo números y limitar a 5 caracteres
-				let value = this.value.replace(/\D/g, '');
-				// Limitar a 5 caracteres
-				value = value.slice(0, 5);
-				this.value = value;
-				
-				// Actualizar contador de caracteres
-				const counter = this.parentNode.querySelector('.char-counter');
-				if (counter) {
-					const currentLength = value.length;
-					counter.textContent = `${currentLength}/5`;
-					
-					// Cambiar color según la cantidad de caracteres
-					counter.classList.remove('warning', 'danger');
-					if (currentLength >= 5) {
-						counter.classList.add('danger');
-					} else if (currentLength >= 4) {
-						counter.classList.add('warning');
-					}
-				}
-			});
-		}
+		// Campo DNI - solo números (8 dígitos máximo)
+		addCharacterCounter('dni', 8, { 
+			allowOnlyNumbers: true, // Solo números
+			warningThreshold: 6,
+			dangerThreshold: 7
+		});
 		
-		// Formateo para campo "Nombre Establecimiento" - solo mayúsculas
-		const nombreEstablecimientoInput = document.getElementById('nombreEstablecimiento');
-		if (nombreEstablecimientoInput) {
-			nombreEstablecimientoInput.addEventListener('input', function() {
-				// Convertir a mayúsculas
-				let value = this.value.toUpperCase();
-				// Permitir letras, números, espacios y algunos caracteres especiales comunes en nombres de establecimientos
-				value = value.replace(/[^A-Z0-9\s\.\,\-\_]/g, '');
-				this.value = value;
-			});
-		}
+		// Campos de texto con límites específicos
+		addCharacterCounter('razonSocial', 50, { 
+			allowUppercase: true, 
+			customRegex: /[^A-Z0-9\s\.\,\-\_]/g,
+			warningThreshold: 40,
+			dangerThreshold: 47
+		});
+		
+		addCharacterCounter('nombre', 30, { 
+			allowUppercase: true, 
+			customRegex: /[^A-Z\s]/g,
+			warningThreshold: 24,
+			dangerThreshold: 28
+		});
+		
+		addCharacterCounter('apellido', 30, { 
+			allowUppercase: true, 
+			customRegex: /[^A-Z\s]/g,
+			warningThreshold: 24,
+			dangerThreshold: 28
+		});
+		
+		addCharacterCounter('email', 60, {
+			warningThreshold: 50,
+			dangerThreshold: 57
+		});
+		
+		addCharacterCounter('telefono', 13, { 
+			allowOnlyNumbers: true,
+			warningThreshold: 10,
+			dangerThreshold: 12
+		});
+		
+		addCharacterCounter('nombreEstablecimiento', 50, { 
+			allowUppercase: true, 
+			customRegex: /[^A-Za-z0-9\s\.\,\-\_]/g,  // Permite mayúsculas Y minúsculas
+			warningThreshold: 40,
+			dangerThreshold: 47
+		});
+		
+		addCharacterCounter('renspa', 11, { 
+			allowOnlyNumbers: true,
+			warningThreshold: 9,
+			dangerThreshold: 10
+		});
+		
+		addCharacterCounter('calle', 25, { 
+			allowUppercase: true, 
+			customRegex: /[^A-Za-z0-9\s\.\,\-\/\\]/g,  // Permite mayúsculas Y minúsculas
+			warningThreshold: 20,
+			dangerThreshold: 23
+		});
+		
+		addCharacterCounter('numeracion', 5, { 
+			allowOnlyNumbers: true,
+			warningThreshold: 4,
+			dangerThreshold: 5
+		});
+		
+		addCharacterCounter('codigoPostal', 5, { 
+			allowOnlyNumbers: true,
+			warningThreshold: 4,
+			dangerThreshold: 5
+		});
+		
+		// Inicializar conversión automática a mayúsculas
+		console.log('🔧 Inicializando conversión automática a mayúsculas...');
+		addUppercaseConverter('nombreEstablecimiento');
+		addUppercaseConverter('calle');
+		console.log('✅ Conversión automática configurada');
+		
+		// Event listener global para debugging de campos de mayúsculas
+		document.addEventListener('input', function(e) {
+			if (e.target.getAttribute('data-uppercase') === 'true') {
+				console.log(`📝 Input detectado en campo uppercase ${e.target.id}: "${e.target.value}"`);
+			}
+		});
+		
+		// Campos del administrador del establecimiento
+		addCharacterCounter('adminEstNombre', 30, { 
+			allowUppercase: true, 
+			customRegex: /[^A-Z\s]/g,
+			warningThreshold: 24,
+			dangerThreshold: 28
+		});
+		
+		addCharacterCounter('adminEstApellido', 30, { 
+			allowUppercase: true, 
+			customRegex: /[^A-Z\s]/g,
+			warningThreshold: 24,
+			dangerThreshold: 28
+		});
+		
+		addCharacterCounter('adminEstEmail', 60, {
+			warningThreshold: 50,
+			dangerThreshold: 57
+		});
+		
+		addCharacterCounter('adminEstTelefono', 13, { 
+			allowOnlyNumbers: true,
+			warningThreshold: 10,
+			dangerThreshold: 12
+		});
+		
+		// Campos de contraseña - máximo 6 caracteres
+		addCharacterCounter('password', 6, { 
+			warningThreshold: 5,
+			dangerThreshold: 6
+		});
+		
+		addCharacterCounter('password2', 6, { 
+			warningThreshold: 5,
+			dangerThreshold: 6
+		});
+		
+		addCharacterCounter('adminEstPassword', 6, { 
+			warningThreshold: 5,
+			dangerThreshold: 6
+		});
+		
+		addCharacterCounter('adminEstPassword2', 6, { 
+			warningThreshold: 5,
+			dangerThreshold: 6
+		});
 	}
 
 	// Event listener para checkbox "Sin administrador de establecimiento"
@@ -1124,15 +1272,15 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 		btnSiguiente3.addEventListener('click', function() {
 			const nombreEstablecimientoInput = document.getElementById('nombreEstablecimiento');
 			const renspaInput = document.getElementById('renspa');
-			const departamentoSelect = document.getElementById('departamento');
-			const distritoSelect = document.getElementById('distrito');
+			const departamentoInput = document.getElementById('departamento');
+			const distritoInput = document.getElementById('distrito');
 			const latitudInput = document.getElementById('latitud');
 			const longitudInput = document.getElementById('longitud');
 			
 			const nombreEstablecimientoValue = nombreEstablecimientoInput ? nombreEstablecimientoInput.value.trim() : '';
 			const renspaValue = renspaInput ? renspaInput.value.trim() : '';
-			const departamentoValue = departamentoSelect ? departamentoSelect.value : '';
-			const distritoValue = distritoSelect ? distritoSelect.value : '';
+			const departamentoValue = departamentoInput ? departamentoInput.value : '';
+			const distritoValue = distritoInput ? distritoInput.value : '';
 			const latitudValue = latitudInput ? latitudInput.value : '';
 			const longitudValue = longitudInput ? longitudInput.value : '';
 			
@@ -1164,20 +1312,24 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 				showFieldFeedback(renspaInput, true, '');
 			}
 			
-			// Validar departamento
+			// Validar departamento (ahora es un campo oculto con dropdown)
 			if (!departamentoValue) {
-				showFieldFeedback(departamentoSelect, false, 'Debe seleccionar un departamento.');
+				const departamentoDropdown = document.getElementById('dropdownDepartamento');
+				showFieldFeedback(departamentoDropdown, false, 'Debe seleccionar un departamento.');
 				hasErrors = true;
 			} else {
-				showFieldFeedback(departamentoSelect, true, '');
+				const departamentoDropdown = document.getElementById('dropdownDepartamento');
+				showFieldFeedback(departamentoDropdown, true, '');
 			}
 			
-			// Validar distrito
+			// Validar distrito (ahora es un campo oculto con dropdown)
 			if (!distritoValue) {
-				showFieldFeedback(distritoSelect, false, 'Debe seleccionar un distrito.');
+				const distritoDropdown = document.getElementById('dropdownDistrito');
+				showFieldFeedback(distritoDropdown, false, 'Debe seleccionar un distrito.');
 				hasErrors = true;
 			} else {
-				showFieldFeedback(distritoSelect, true, '');
+				const distritoDropdown = document.getElementById('dropdownDistrito');
+				showFieldFeedback(distritoDropdown, true, '');
 			}
 			
 			// Validar coordenadas
@@ -1455,12 +1607,56 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 		}
 	}
 
-	// Cargar departamentos
-	function cargarDepartamentos() {
-		const select = document.getElementById('departamento');
-		if (!select) return;
+	// Actualizar departamento seleccionado en el dropdown y campo oculto
+	function actualizarDepartamentoSeleccionado() {
+		const departamentoList = document.getElementById('departamento-list');
+		const dropdownButton = document.getElementById('dropdownDepartamento');
+		const hiddenInput = document.getElementById('departamento');
 		
-		addLoadingState(select.parentNode, 'Cargando departamentos...');
+		if (!departamentoList || !dropdownButton || !hiddenInput) return;
+		
+		const departamentoSeleccionado = departamentoList.querySelector('input[type="radio"]:checked');
+		
+		if (departamentoSeleccionado) {
+			const label = departamentoList.querySelector(`label[for="${departamentoSeleccionado.id}"]`);
+			const texto = label ? label.textContent.trim() : '';
+			
+			dropdownButton.textContent = texto;
+			hiddenInput.value = departamentoSeleccionado.value;
+		} else {
+			dropdownButton.textContent = 'Seleccionar departamento';
+			hiddenInput.value = '';
+		}
+	}
+
+	// Actualizar distrito seleccionado en el dropdown y campo oculto
+	function actualizarDistritoSeleccionado() {
+		const distritoList = document.getElementById('distrito-list');
+		const dropdownButton = document.getElementById('dropdownDistrito');
+		const hiddenInput = document.getElementById('distrito');
+		
+		if (!distritoList || !dropdownButton || !hiddenInput) return;
+		
+		const distritoSeleccionado = distritoList.querySelector('input[type="radio"]:checked');
+		
+		if (distritoSeleccionado) {
+			const label = distritoList.querySelector(`label[for="${distritoSeleccionado.id}"]`);
+			const texto = label ? label.textContent.trim() : '';
+			
+			dropdownButton.textContent = texto;
+			hiddenInput.value = distritoSeleccionado.value;
+		} else {
+			dropdownButton.textContent = 'Seleccionar distrito';
+			hiddenInput.value = '';
+		}
+	}
+
+	// Cargar departamentos con dropdown estilo especies
+	function cargarDepartamentos() {
+		const departamentoList = document.getElementById('departamento-list');
+		if (!departamentoList) return;
+		
+		departamentoList.innerHTML = '<li class="px-3 py-2 text-muted">Cargando departamentos...</li>';
 		
 		fetch('http://localhost:9090/departamentos')
 			.then(response => {
@@ -1470,70 +1666,91 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 				return response.json();
 			})
 			.then(departamentos => {
-				let html = '<option value="">Seleccionar departamento</option>';
+				let html = '';
 				departamentos.forEach(dep => {
-					html += `<option value="${dep.idDepartamento}">${dep.nombreDepartamento}</option>`;
+					html += `
+						<li class="px-3 py-1">
+							<div class="form-check">
+								<input class="form-check-input" type="radio" name="departamento-radio" value="${dep.idDepartamento}" id="radio-dept-${dep.idDepartamento}">
+								<label class="form-check-label" for="radio-dept-${dep.idDepartamento}">
+									${dep.nombreDepartamento}
+								</label>
+							</div>
+						</li>
+					`;
 				});
-				select.innerHTML = html;
+				departamentoList.innerHTML = html;
 				
-				// Event listener para cargar distritos
-				select.addEventListener('change', function() {
-					cargarDistritos(this.value);
+				// Event listeners para actualizar dropdown y cargar distritos
+				departamentoList.querySelectorAll('input[type="radio"]').forEach(radio => {
+					radio.addEventListener('change', function() {
+						if (this.checked) {
+							actualizarDepartamentoSeleccionado();
+							cargarDistritos(this.value);
+						}
+					});
 				});
-				
-				// Limpiar loading state
-				const loadingDiv = select.parentNode.querySelector('.loading-state');
-				if (loadingDiv) loadingDiv.remove();
 			})
 			.catch(error => {
 				console.error('Error cargando departamentos:', error);
-				select.innerHTML = `
-					<option value="">Seleccionar departamento</option>
-					<option value="1">Capital</option>
-					<option value="2">Godoy Cruz</option>
-					<option value="3">Maipú</option>
-					<option value="4">Las Heras</option>
+				departamentoList.innerHTML = `
+					<li class="px-3 py-1">
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="departamento-radio" value="1" id="radio-dept-1">
+							<label class="form-check-label" for="radio-dept-1">JUNÍN</label>
+						</div>
+					</li>
+					<li class="px-3 py-1">
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="departamento-radio" value="2" id="radio-dept-2">
+							<label class="form-check-label" for="radio-dept-2">LA PAZ</label>
+						</div>
+					</li>
+					<li class="px-3 py-1">
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="departamento-radio" value="3" id="radio-dept-3">
+							<label class="form-check-label" for="radio-dept-3">RIVADAVIA</label>
+						</div>
+					</li>
+					<li class="px-3 py-1">
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="departamento-radio" value="4" id="radio-dept-4">
+							<label class="form-check-label" for="radio-dept-4">GUAYMALLÉN</label>
+						</div>
+					</li>
 				`;
 				
-				// Event listener para datos por defecto
-				select.addEventListener('change', function() {
-					cargarDistritos(this.value);
+				// Event listeners para datos por defecto
+				departamentoList.querySelectorAll('input[type="radio"]').forEach(radio => {
+					radio.addEventListener('change', function() {
+						if (this.checked) {
+							actualizarDepartamentoSeleccionado();
+							cargarDistritos(this.value);
+						}
+					});
 				});
-				
-				// Limpiar loading state
-				const loadingDiv = select.parentNode.querySelector('.loading-state');
-				if (loadingDiv) loadingDiv.remove();
-			})
-			.catch(error => {
-				console.error('Error cargando departamentos:', error);
-				select.innerHTML = `
-					<option value="">Seleccionar departamento</option>
-					<option value="1">Capital</option>
-					<option value="2">Godoy Cruz</option>
-					<option value="3">Maipú</option>
-					<option value="4">Las Heras</option>
-				`;
-				
-				// Event listener para datos por defecto
-				select.addEventListener('change', function() {
-					cargarDistritos(this.value);
-				});
-				
-				// Limpiar loading state
-				const loadingDiv = select.parentNode.querySelector('.loading-state');
-				if (loadingDiv) loadingDiv.remove();
 			});
 	}
 	
-	// Cargar distritos basado en departamento seleccionado
+	// Cargar distritos basado en departamento seleccionado (estilo dropdown especies)
 	function cargarDistritos(departamentoId) {
-		const select = document.getElementById('distrito');
-		if (!select || !departamentoId) {
-			if (select) select.innerHTML = '<option value="">Primero seleccione un departamento</option>';
+		const distritoList = document.getElementById('distrito-list');
+		const dropdownDistrito = document.getElementById('dropdownDistrito');
+		
+		if (!distritoList || !departamentoId) {
+			if (distritoList) {
+				distritoList.innerHTML = '<li class="px-3 py-2 text-muted">Primero seleccione un departamento</li>';
+			}
+			if (dropdownDistrito) {
+				dropdownDistrito.textContent = 'Seleccionar distrito';
+			}
+			// Limpiar campo oculto
+			const hiddenInput = document.getElementById('distrito');
+			if (hiddenInput) hiddenInput.value = '';
 			return;
 		}
 		
-		addLoadingState(select.parentNode, 'Cargando distritos...');
+		distritoList.innerHTML = '<li class="px-3 py-2 text-muted">Cargando distritos...</li>';
 		
 		fetch(`http://localhost:9090/distritos/departamento/${departamentoId}`)
 			.then(response => {
@@ -1543,15 +1760,29 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 				return response.json();
 			})
 			.then(distritos => {
-				let html = '<option value="">Seleccionar distrito</option>';
+				let html = '';
 				distritos.forEach(distrito => {
-					html += `<option value="${distrito.idDistrito}">${distrito.nombreDistrito}</option>`;
+					html += `
+						<li class="px-3 py-1">
+							<div class="form-check">
+								<input class="form-check-input" type="radio" name="distrito-radio" value="${distrito.idDistrito}" id="radio-dist-${distrito.idDistrito}">
+								<label class="form-check-label" for="radio-dist-${distrito.idDistrito}">
+									${distrito.nombreDistrito}
+								</label>
+							</div>
+						</li>
+					`;
 				});
-				select.innerHTML = html;
+				distritoList.innerHTML = html;
 				
-				// Limpiar loading state
-				const loadingDiv = select.parentNode.querySelector('.loading-state');
-				if (loadingDiv) loadingDiv.remove();
+				// Event listeners para actualizar dropdown
+				distritoList.querySelectorAll('input[type="radio"]').forEach(radio => {
+					radio.addEventListener('change', function() {
+						if (this.checked) {
+							actualizarDistritoSeleccionado();
+						}
+					});
+				});
 			})
 			.catch(error => {
 				console.error('Error cargando distritos desde backend:', error);
@@ -1564,18 +1795,29 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 				};
 				
 				const distritos = distritosData[departamentoId] || [];
-				let html = '<option value="">Seleccionar distrito</option>';
+				let html = '';
 				distritos.forEach(distrito => {
-					html += `<option value="${distrito.idDistrito}">${distrito.nombreDistrito}</option>`;
+					html += `
+						<li class="px-3 py-1">
+							<div class="form-check">
+								<input class="form-check-input" type="radio" name="distrito-radio" value="${distrito.idDistrito}" id="radio-dist-${distrito.idDistrito}">
+								<label class="form-check-label" for="radio-dist-${distrito.idDistrito}">
+									${distrito.nombreDistrito}
+								</label>
+							</div>
+						</li>
+					`;
 				});
-				select.innerHTML = html;
+				distritoList.innerHTML = html;
 				
-				// Limpiar loading state
-				const loadingDiv = select.parentNode.querySelector('.loading-state');
-				if (loadingDiv) {
-					loadingDiv.remove();
-					console.log('Loading state de distritos eliminado después del error');
-				}
+				// Event listeners para datos por defecto
+				distritoList.querySelectorAll('input[type="radio"]').forEach(radio => {
+					radio.addEventListener('change', function() {
+						if (this.checked) {
+							actualizarDistritoSeleccionado();
+						}
+					});
+				});
 			});
 	}
 });

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba Final - Conversión Mayúsculas</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 600px; 
+            margin: 2rem auto; 
+            padding: 2rem; 
+            background: #f0f0f0; 
+        }
+        .test-box { 
+            background: white; 
+            padding: 2rem; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+        }
+        input { 
+            width: 100%; 
+            padding: 1rem; 
+            margin: 0.5rem 0; 
+            border: 2px solid #ddd; 
+            border-radius: 4px; 
+            font-size: 16px; 
+        }
+        .uppercase-field { 
+            background: #f8f9fa; 
+            text-transform: uppercase; 
+        }
+        .uppercase-converting { 
+            background: #e3f2fd !important; 
+            border-color: #2196f3 !important; 
+        }
+        label { 
+            display: block; 
+            margin: 1rem 0 0.5rem 0; 
+            font-weight: bold; 
+        }
+        .result {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="test-box">
+        <h1>🧪 Prueba Final: Conversión Automática</h1>
+        
+        <div class="info result">
+            <strong>Instrucciones:</strong> Escriba en minúsculas. Debe convertirse automáticamente a mayúsculas.
+        </div>
+        
+        <label for="nombreEstablecimiento">Nombre Establecimiento:</label>
+        <input type="text" id="nombreEstablecimiento" class="uppercase-field" 
+               placeholder="escriba aquí: finca los olivos">
+        
+        <label for="calle">Calle:</label>
+        <input type="text" id="calle" class="uppercase-field" 
+               placeholder="escriba aquí: avenida libertador">
+        
+        <label for="normal">Campo Normal (para comparar):</label>
+        <input type="text" id="normal" placeholder="este mantiene minúsculas">
+        
+        <div id="status" class="result info">Sistema listo...</div>
+    </div>
+
+    <script>
+        console.log('🚀 Iniciando prueba de conversión automática');
+        
+        function addUppercaseConverter(inputId) {
+            const input = document.getElementById(inputId);
+            if (!input) {
+                console.error(`❌ Campo ${inputId} no encontrado`);
+                return false;
+            }
+            
+            console.log(`🔧 Configurando ${inputId}`);
+            
+            function convertToUppercase() {
+                const start = input.selectionStart;
+                const end = input.selectionEnd;
+                const value = input.value;
+                const upperValue = value.toUpperCase();
+                
+                if (value !== upperValue) {
+                    input.value = upperValue;
+                    input.setSelectionRange(start, end);
+                    
+                    input.classList.add('uppercase-converting');
+                    setTimeout(() => input.classList.remove('uppercase-converting'), 150);
+                    
+                    console.log(`✅ ${inputId}: "${value}" → "${upperValue}"`);
+                    updateStatus(`Convertido: "${value}" → "${upperValue}"`);
+                }
+            }
+            
+            // Múltiples eventos para capturar toda entrada
+            input.addEventListener('input', () => setTimeout(convertToUppercase, 0));
+            input.addEventListener('keydown', () => setTimeout(convertToUppercase, 0));
+            input.addEventListener('keyup', () => setTimeout(convertToUppercase, 0));
+            input.addEventListener('paste', () => setTimeout(convertToUppercase, 10));
+            
+            // Configuración del campo
+            input.style.textTransform = 'uppercase';
+            input.setAttribute('data-uppercase', 'true');
+            input.setAttribute('autocapitalize', 'characters');
+            
+            console.log(`✅ ${inputId} configurado correctamente`);
+            return true;
+        }
+        
+        function updateStatus(message) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = 'result success';
+            setTimeout(() => {
+                status.textContent = 'Sistema listo...';
+                status.className = 'result info';
+            }, 3000);
+        }
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📋 DOM cargado, configurando campos...');
+            
+            const resultado1 = addUppercaseConverter('nombreEstablecimiento');
+            const resultado2 = addUppercaseConverter('calle');
+            
+            if (resultado1 && resultado2) {
+                console.log('✅ Todos los campos configurados correctamente');
+                updateStatus('✅ Sistema configurado - Pruebe escribir en minúsculas');
+            } else {
+                console.error('❌ Error al configurar algunos campos');
+                updateStatus('❌ Error en la configuración');
+            }
+        });
+        
+        // Monitor global
+        document.addEventListener('input', function(e) {
+            if (e.target.getAttribute('data-uppercase') === 'true') {
+                console.log(`📝 Input en ${e.target.id}: "${e.target.value}"`);
+            }
+        });
+    </script>
+</body>
+</html>
