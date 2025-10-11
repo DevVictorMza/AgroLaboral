@@ -1491,7 +1491,10 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 	}
 	
 	// Inicialización del mapa de geolocalización para el paso 3 del wizard
+
 	let establecimientoMap = null;
+	let establecimientoMarker = null;
+
 	function initEstablecimientoMap() {
 		if (establecimientoMap) {
 			establecimientoMap.invalidateSize();
@@ -1502,18 +1505,85 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 			maxZoom: 19,
 			attribution: '© OpenStreetMap'
 		}).addTo(establecimientoMap);
-		
-		let marker = null;
+
 		establecimientoMap.on('click', function(e) {
 			const { lat, lng } = e.latlng;
 			document.getElementById('latitud').value = lat.toFixed(6);
 			document.getElementById('longitud').value = lng.toFixed(6);
-			if (marker) {
-				marker.setLatLng(e.latlng);
+			if (establecimientoMarker) {
+				establecimientoMarker.setLatLng(e.latlng);
 			} else {
-				marker = L.marker(e.latlng).addTo(establecimientoMap);
+				establecimientoMarker = L.marker(e.latlng).addTo(establecimientoMap);
 			}
 		});
+
+		// Asignar el evento al botón de búsqueda después de inicializar el mapa
+		const buscarBtn = document.getElementById('btn-buscar-ubicacion');
+		if (buscarBtn) {
+			buscarBtn.addEventListener('click', buscarDireccion);
+		}
+	}
+
+	// Función de geocodificación para buscar y colocar el marcador
+	function buscarDireccion() {
+		const calle = document.getElementById('calle').value.trim();
+		const numeracion = document.getElementById('numeracion').value.trim();
+		// Obtener el texto visible de los dropdowns
+		let departamento = '';
+		let distrito = '';
+		const departamentoSelect = document.getElementById('departamento');
+		if (departamentoSelect) {
+			if (departamentoSelect.selectedIndex >= 0) {
+				departamento = departamentoSelect.options[departamentoSelect.selectedIndex].text.trim();
+			}
+		}
+		const distritoSelect = document.getElementById('distrito');
+		if (distritoSelect) {
+			if (distritoSelect.selectedIndex >= 0) {
+				distrito = distritoSelect.options[distritoSelect.selectedIndex].text.trim();
+			}
+		}
+		const codigoPostal = document.getElementById('codigoPostal') ? document.getElementById('codigoPostal').value.trim() : '';
+
+		// Construir dirección completa, incluyendo código postal si existe
+		let direccionCompleta = `${calle} ${numeracion}, ${distrito}, ${departamento}, Argentina`;
+		if (codigoPostal) {
+			direccionCompleta = `${calle} ${numeracion}, ${codigoPostal}, ${distrito}, ${departamento}, Argentina`;
+		}
+
+		if (calle === "" || numeracion === "") {
+			alert("Por favor, ingrese la Calle y la Numeración para buscar.");
+			return;
+		}
+
+		// Mostrar en consola la dirección para depuración
+		console.log('🔎 Dirección buscada:', direccionCompleta);
+
+		// Usar Nominatim para geocodificación
+		const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(direccionCompleta)}`;
+		fetch(url)
+			.then(response => response.json())
+			.then(data => {
+				if (data && data.length > 0) {
+					const lat = parseFloat(data[0].lat);
+					const lon = parseFloat(data[0].lon);
+					document.getElementById('latitud').value = lat.toFixed(6);
+					document.getElementById('longitud').value = lon.toFixed(6);
+					if (establecimientoMarker) {
+						establecimientoMarker.setLatLng([lat, lon]);
+					} else {
+						establecimientoMarker = L.marker([lat, lon]).addTo(establecimientoMap);
+					}
+					// Centrar y hacer zoom en la ubicación encontrada
+					establecimientoMap.setView([lat, lon], 18, { animate: true });
+				} else {
+					alert('No se encontró la ubicación. Verifique los datos ingresados.');
+				}
+			})
+			.catch(err => {
+				alert('Error al buscar la dirección. Intente nuevamente.');
+				console.error(err);
+			});
 	}
 
 	// Cargar especies desde endpoint
