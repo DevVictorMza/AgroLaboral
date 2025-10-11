@@ -634,10 +634,28 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 
 	// Inicializar mapa principal
 	var map = L.map('map').setView([-32.89, -68.83], 8); // Mendoza
-	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+
+	// Capa estándar OSM
+	var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 		maxZoom: 18,
 		attribution: '© OpenStreetMap contributors'
-	}).addTo(map);
+	});
+
+	// Capa satelital Esri World Imagery (gratuita)
+	// Capa satelital MapTiler (gratuita, sin API key para pruebas limitadas)
+	// Capa satelital Esri World Imagery (gratuita)
+	var esriSatLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+		maxZoom: 18,
+		attribution: 'Tiles © Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+	});
+
+	// Control de capas
+	var baseMaps = {
+		"Mapa estándar": osmLayer,
+		"Vista satelital": esriSatLayer
+	};
+	osmLayer.addTo(map);
+	L.control.layers(baseMaps).addTo(map);
 
 	// --- Lógica del wizard de registro de empleador ---
 	const paso1 = document.getElementById('form-registro-empleador-paso1');
