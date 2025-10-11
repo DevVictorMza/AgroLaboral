@@ -1518,11 +1518,24 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 			establecimientoMap.invalidateSize();
 			return;
 		}
+
 		establecimientoMap = L.map('establecimiento-map').setView([-32.8908, -68.8272], 10);
-		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		// Capas base
+		const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 			maxZoom: 19,
 			attribution: '© OpenStreetMap'
-		}).addTo(establecimientoMap);
+		});
+		const esriSatLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+			maxZoom: 19,
+			attribution: 'Tiles © Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR, and the GIS User Community'
+		});
+		osmLayer.addTo(establecimientoMap);
+		// Control de capas
+		const baseMaps = {
+			"Mapa estándar": osmLayer,
+			"Satélite": esriSatLayer
+		};
+		L.control.layers(baseMaps).addTo(establecimientoMap);
 
 		establecimientoMap.on('click', function(e) {
 			const { lat, lng } = e.latlng;
