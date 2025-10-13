@@ -1313,11 +1313,11 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 			if (hasErrors) return;
 			
 			paso3.classList.add('d-none');
-			paso4.classList.remove('d-none');
+			paso5.classList.remove('d-none');
 			
 			// Actualizar barra de progreso
 			const progressBar = document.querySelector('.wizard-progress-bar-inner');
-			if (progressBar) progressBar.style.width = '80%';
+			if (progressBar) progressBar.style.width = '100%';
 			
 			// Actualizar labels de pasos
 			const wizardLabels = document.querySelectorAll('.wizard-step-label');
