@@ -219,8 +219,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 	addPasswordToggle('password');
 	addPasswordToggle('password2');
-	addPasswordToggle('adminEstPassword');
-	addPasswordToggle('adminEstPassword2');
 
 	// Inicializar autocompletado por DNI - NOTA: Los event listeners ya están configurados arriba
 	console.log('🔧 Sistema de autocompletado DNI inicializado correctamente');
@@ -583,54 +581,6 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 		});
 	}
 
-	// Validación de contraseñas del administrador de establecimiento
-	const adminPasswordInput = document.getElementById('adminEstPassword');
-	const adminPassword2Input = document.getElementById('adminEstPassword2');
-	if (adminPassword2Input && adminPasswordInput) {
-		// Mensaje de éxito
-		let adminSuccessMsg = document.getElementById('adminEst-password-success-msg');
-		if (!adminSuccessMsg) {
-			adminSuccessMsg = document.createElement('div');
-			adminSuccessMsg.id = 'adminEst-password-success-msg';
-			adminSuccessMsg.className = 'text-success mt-1';
-			adminPassword2Input.parentNode.appendChild(adminSuccessMsg);
-		}
-		function updateAdminPasswordMatch() {
-			const adminPasswordValue = adminPasswordInput.value;
-			const adminPassword2Value = adminPassword2Input.value;
-			let adminPassword2Icon = document.getElementById('adminEstPassword2-icon');
-			if (!adminPassword2Icon) {
-				adminPassword2Icon = document.createElement('span');
-				adminPassword2Icon.id = 'adminEstPassword2-icon';
-				adminPassword2Icon.style.marginLeft = '8px';
-				adminPassword2Input.parentNode.appendChild(adminPassword2Icon);
-			}
-			// Validación de exactamente 6 caracteres
-			if (adminPasswordValue.length !== 6 || adminPassword2Value.length !== 6) {
-				adminPassword2Icon.innerHTML = '';
-				adminSuccessMsg.textContent = '';
-				return;
-			}
-			if (!adminPassword2Value) {
-				adminPassword2Icon.innerHTML = '';
-				adminSuccessMsg.textContent = '';
-			} else if (adminPasswordValue !== adminPassword2Value) {
-				adminPassword2Icon.innerHTML = '<i class="bi bi-x-circle-fill" style="color:#dc3545;font-size:1.2em;vertical-align:middle;"></i>';
-				adminSuccessMsg.textContent = '';
-			} else {
-				adminPassword2Icon.innerHTML = '<i class="bi bi-check-circle-fill" style="color:#198754;font-size:1.2em;vertical-align:middle;"></i>';
-				adminSuccessMsg.textContent = '¡Sus contraseñas coinciden!';
-			}
-		}
-		adminPassword2Input.addEventListener('input', function() {
-			this.value = this.value.replace(/\s/g, '').slice(0, 6);
-			updateAdminPasswordMatch();
-		});
-		adminPasswordInput.addEventListener('input', function() {
-			this.value = this.value.replace(/\s/g, '').slice(0, 6);
-			updateAdminPasswordMatch();
-		});
-	}
 
 	// Inicializar mapa principal
 	var map = L.map('map').setView([-32.89, -68.83], 8); // Mendoza

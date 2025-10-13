@@ -75,8 +75,7 @@
                             <div class="wizard-step-label active"><span>1.</span> <span>Datos<br>de Empresa</span></div>
                             <div class="wizard-step-label active"><span>2.</span> <span>Administrador</span></div>
                             <div class="wizard-step-label active"><span>3.</span> <span>Establecimiento</span></div>
-                            <div class="wizard-step-label"><span>4.</span> <span>Admin.<br>Establec.</span></div>
-                            <div class="wizard-step-label"><span>5.</span> <span>Confirmación</span></div>
+                            <div class="wizard-step-label"><span>4.</span> <span>Confirmación</span></div>
                         </div>
                     </div>
                     <!-- Paso 1: Datos de empresa -->
@@ -236,49 +235,6 @@
                         </div>
                     </form>
                     <!-- Paso 4: Administrador de Establecimiento (opcional) -->
-                    <form id="form-registro-empleador-paso4" class="d-none">
-                                            <div class="mb-4">
-                                                <h5 class="fw-bold mb-3">Administrador de Establecimiento <span class="text-muted">(opcional)</span></h5>
-                                                <div class="form-check mb-3">
-                                                    <input class="form-check-input" type="checkbox" id="sinAdminEstablecimiento">
-                                                    <label class="form-check-label" for="sinAdminEstablecimiento">
-                                                        No agregar administrador de establecimiento
-                                                    </label>
-                                                </div>
-                        <div class="mb-3">
-                          <label for="adminEstDni" class="form-label">DNI</label>
-                          <input type="text" class="form-control" id="adminEstDni" name="adminEstDni" placeholder="DNI">
-                        </div>
-                        <div class="mb-3">
-                          <label for="adminEstNombre" class="form-label">Nombre</label>
-                          <input type="text" class="form-control" id="adminEstNombre" name="adminEstNombre" placeholder="Nombre">
-                        </div>
-                        <div class="mb-3">
-                          <label for="adminEstApellido" class="form-label">Apellido</label>
-                          <input type="text" class="form-control" id="adminEstApellido" name="adminEstApellido" placeholder="Apellido">
-                        </div>
-                        <div class="mb-3">
-                          <label for="adminEstEmail" class="form-label">Email</label>
-                          <input type="email" class="form-control" id="adminEstEmail" name="adminEstEmail" placeholder="Email">
-                        </div>
-                        <div class="mb-3">
-                          <label for="adminEstTelefono" class="form-label">Teléfono</label>
-                          <input type="text" class="form-control" id="adminEstTelefono" name="adminEstTelefono" placeholder="Teléfono">
-                          <div id="adminEstTelefono-error" class="text-danger mt-1"></div>
-                        </div>
-                        <div class="mb-3">
-                          <label for="adminEstPassword" class="form-label">Contraseña</label>
-                          <input type="password" class="form-control" id="adminEstPassword" name="adminEstPassword" placeholder="Contraseña">
-                        </div>
-                        <div class="mb-3">
-                          <label for="adminEstPassword2" class="form-label">Repetir Contraseña</label>
-                          <input type="password" class="form-control" id="adminEstPassword2" name="adminEstPassword2" placeholder="Repetir Contraseña">
-                        </div>
-                      </div>
-                      <div class="d-flex justify-content-between">
-                        <button type="button" class="btn btn-primary" id="btn-siguiente-paso4">Siguiente</button>
-                      </div>
-                    </form>
                     <!-- Paso 5: Confirmación (oculto por ahora) -->
                     <form id="form-registro-empleador-paso5" class="d-none">
                         <div id="mensaje-error-confirmacion" class="alert alert-danger d-none" role="alert">
