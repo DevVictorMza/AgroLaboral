@@ -312,7 +312,17 @@
     <div id="public-view">
     <!-- Mapa Interactivo de Establecimientos/Fincas -->
     <main class="container py-5">
-        <h2 class="text-center mb-4">Mapa Interactivo de Establecimientos/Fincas</h2>
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-10">
+                <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-mapa">
+                    <div class="card-body text-center">
+                        <div class="mb-3 servicio-icon servicio-icon-mapa"><i class="fas fa-map-marked-alt"></i></div>
+                        <h2 class="fw-bold">Mapa Interactivo de Establecimientos/Fincas</h2>
+                        <p class="mb-0">Explora la ubicación de todas las fincas y establecimientos agrícolas registrados en nuestra plataforma</p>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row justify-content-center">
             <div class="col-lg-10">
                 <div id="map" class="my-3"></div>
@@ -321,8 +331,17 @@
     </main>
     <!-- Servicios -->
     <section id="servicios" class="container py-5">
-        <h2 class="text-center fw-bold mb-2">Nuestros Servicios</h2>
-        <p class="text-center mb-5">Conectamos el talento agrícola con las mejores oportunidades laborales</p>
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-10">
+                <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-servicios">
+                    <div class="card-body text-center">
+                        <div class="mb-3 servicio-icon servicio-icon-servicios"><i class="fas fa-cogs"></i></div>
+                        <h2 class="fw-bold">Nuestros Servicios</h2>
+                        <p class="mb-0">Conectamos el talento agrícola con las mejores oportunidades laborales</p>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row g-4 justify-content-center">
             <div class="col-md-4">
                 <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-ubicacion">
@@ -382,74 +401,91 @@
     </section>
     <!-- Cómo Funciona -->
     <section id="como-funciona" class="container py-5">
-        <h2 class="text-center fw-bold mb-2">¿Cómo Funciona?</h2>
-        <p class="text-center mb-5">Simple, rápido y efectivo</p>
-        <div class="row justify-content-center gap-4">
-            <div class="col-md-5 funciona-card shadow servicio-card mb-4">
-                <h4 class="fw-bold text-success text-center mb-4">Para Trabajadores</h4>
-                <ul class="list-unstyled">
-                    <li class="d-flex mb-4 align-items-start">
-                        <span class="funciona-num funciona-num-trabajador me-3">1</span>
-                        <div>
-                            <span class="fw-bold">Regístrate y Crea tu Perfil</span><br>
-                            <span class="text-muted">Completa tu información personal, experiencia y habilidades</span>
-                        </div>
-                    </li>
-                    <li class="d-flex mb-4 align-items-start">
-                        <span class="funciona-num funciona-num-trabajador me-3">2</span>
-                        <div>
-                            <span class="fw-bold">Busca Ofertas de Trabajo</span><br>
-                            <span class="text-muted">Explora trabajos disponibles en tu área geográfica</span>
-                        </div>
-                    </li>
-                    <li class="d-flex mb-4 align-items-start">
-                        <span class="funciona-num funciona-num-trabajador me-3">3</span>
-                        <div>
-                            <span class="fw-bold">Aplica y Conecta</span><br>
-                            <span class="text-muted">Envía tu solicitud y conecta directamente con empleadores</span>
-                        </div>
-                    </li>
-                    <li class="d-flex mb-4 align-items-start">
-                        <span class="funciona-num funciona-num-trabajador me-3">4</span>
-                        <div>
-                            <span class="fw-bold">Trabaja y Recibe Pago</span><br>
-                            <span class="text-muted">Completa el trabajo y recibe tu pago de forma segura</span>
-                        </div>
-                    </li>
-                </ul>
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-10">
+                <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-funciona">
+                    <div class="card-body text-center">
+                        <div class="mb-3 servicio-icon servicio-icon-funciona"><i class="fas fa-question-circle"></i></div>
+                        <h2 class="fw-bold">¿Cómo Funciona?</h2>
+                        <p class="mb-0">Simple, rápido y efectivo</p>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-5 funciona-card shadow servicio-card mb-4">
-                <h4 class="fw-bold text-primary text-center mb-4">Para Empleadores</h4>
-                <ul class="list-unstyled">
-                    <li class="d-flex mb-4 align-items-start">
-                        <span class="funciona-num funciona-num-empleador me-3">1</span>
-                        <div>
-                            <span class="fw-bold">Crea tu Cuenta Empresarial</span><br>
-                            <span class="text-muted">Registra tu empresa y verifica tu información</span>
-                        </div>
-                    </li>
-                    <li class="d-flex mb-4 align-items-start">
-                        <span class="funciona-num funciona-num-empleador me-3">2</span>
-                        <div>
-                            <span class="fw-bold">Publica Ofertas de Trabajo</span><br>
-                            <span class="text-muted">Describe el trabajo, ubicación y requisitos necesarios</span>
-                        </div>
-                    </li>
-                    <li class="d-flex mb-4 align-items-start">
-                        <span class="funciona-num funciona-num-empleador me-3">3</span>
-                        <div>
-                            <span class="fw-bold">Revisa Candidatos</span><br>
-                            <span class="text-muted">Examina perfiles y selecciona a los mejores candidatos</span>
-                        </div>
-                    </li>
-                    <li class="d-flex mb-4 align-items-start">
-                        <span class="funciona-num funciona-num-empleador me-3">4</span>
-                        <div>
-                            <span class="fw-bold">Contrata y Supervisa</span><br>
-                            <span class="text-muted">Contrata trabajadores y supervisa el progreso del trabajo</span>
-                        </div>
-                    </li>
-                </ul>
+        </div>
+        <div class="row justify-content-center g-4">
+            <div class="col-lg-5">
+                <div class="funciona-card shadow servicio-card h-100 d-flex flex-column">
+                    <div class="p-4">
+                        <h4 class="fw-bold text-success text-center mb-4">Para Trabajadores</h4>
+                        <ul class="list-unstyled flex-grow-1">
+                            <li class="d-flex mb-4 align-items-start">
+                                <span class="funciona-num funciona-num-trabajador me-3">1</span>
+                                <div>
+                                    <span class="fw-bold">Regístrate y Crea tu Perfil</span><br>
+                                    <span class="text-muted">Completa tu información personal, experiencia y habilidades</span>
+                                </div>
+                            </li>
+                            <li class="d-flex mb-4 align-items-start">
+                                <span class="funciona-num funciona-num-trabajador me-3">2</span>
+                                <div>
+                                    <span class="fw-bold">Busca Ofertas de Trabajo</span><br>
+                                    <span class="text-muted">Explora trabajos disponibles en tu área geográfica</span>
+                                </div>
+                            </li>
+                            <li class="d-flex mb-4 align-items-start">
+                                <span class="funciona-num funciona-num-trabajador me-3">3</span>
+                                <div>
+                                    <span class="fw-bold">Aplica y Conecta</span><br>
+                                    <span class="text-muted">Envía tu solicitud y conecta directamente con empleadores</span>
+                                </div>
+                            </li>
+                            <li class="d-flex mb-0 align-items-start">
+                                <span class="funciona-num funciona-num-trabajador me-3">4</span>
+                                <div>
+                                    <span class="fw-bold">Trabaja y Recibe Pago</span><br>
+                                    <span class="text-muted">Completa el trabajo y recibe tu pago de forma segura</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="funciona-card shadow servicio-card h-100 d-flex flex-column">
+                    <div class="p-4">
+                        <h4 class="fw-bold text-primary text-center mb-4">Para Empleadores</h4>
+                        <ul class="list-unstyled flex-grow-1">
+                            <li class="d-flex mb-4 align-items-start">
+                                <span class="funciona-num funciona-num-empleador me-3">1</span>
+                                <div>
+                                    <span class="fw-bold">Crea tu Cuenta Empresarial</span><br>
+                                    <span class="text-muted">Registra tu empresa y verifica tu información</span>
+                                </div>
+                            </li>
+                            <li class="d-flex mb-4 align-items-start">
+                                <span class="funciona-num funciona-num-empleador me-3">2</span>
+                                <div>
+                                    <span class="fw-bold">Publica Ofertas de Trabajo</span><br>
+                                    <span class="text-muted">Describe el trabajo, ubicación y requisitos necesarios</span>
+                                </div>
+                            </li>
+                            <li class="d-flex mb-4 align-items-start">
+                                <span class="funciona-num funciona-num-empleador me-3">3</span>
+                                <div>
+                                    <span class="fw-bold">Revisa Candidatos</span><br>
+                                    <span class="text-muted">Examina perfiles y selecciona a los mejores candidatos</span>
+                                </div>
+                            </li>
+                            <li class="d-flex mb-0 align-items-start">
+                                <span class="funciona-num funciona-num-empleador me-3">4</span>
+                                <div>
+                                    <span class="fw-bold">Contrata y Supervisa</span><br>
+                                    <span class="text-muted">Contrata trabajadores y supervisa el progreso del trabajo</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
