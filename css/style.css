@@ -1502,3 +1502,341 @@ main h2 {
     border-color: #4a5568 !important;
     color: #e2e8f0 !important;
 }
+
+/* ===================================
+   WIZARD PROGRESS BAR - SISTEMA AVANZADO
+   =================================== */
+
+/* Contenedor principal del wizard */
+.wizard-progress {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(42, 42, 42, 0.95) 0%, rgba(26, 26, 26, 0.98) 100%);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.wizard-progress::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Barra de progreso principal */
+.wizard-progress-bar {
+    height: 8px;
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0.1) 0%, 
+        rgba(255, 255, 255, 0.05) 100%);
+    border-radius: 50px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 1.5rem;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.wizard-progress-bar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, 
+        var(--success-green) 0%, 
+        var(--light-green) 50%, 
+        var(--accent-blue) 100%);
+    border-radius: 50px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(39, 174, 96, 0.4);
+    width: 0%;
+}
+
+.wizard-progress-bar-inner::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0.3) 0%, 
+        rgba(255, 255, 255, 0.1) 50%, 
+        rgba(255, 255, 255, 0.3) 100%);
+    animation: progressPulse 2s ease-in-out infinite;
+}
+
+@keyframes progressPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.7; }
+}
+
+/* Contenedor de labels de pasos */
+.wizard-steps-labels {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+/* Estilo individual de cada paso */
+.wizard-step-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    padding: 0.5rem;
+    border-radius: 12px;
+    min-width: 100px;
+}
+
+.wizard-step-label:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Número del paso */
+.wizard-step-label span:first-child {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    
+    /* Estado por defecto - pending */
+    background: linear-gradient(135deg, rgba(108, 117, 125, 0.8) 0%, rgba(73, 80, 87, 0.9) 100%);
+    color: rgba(255, 255, 255, 0.7);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Texto del paso */
+.wizard-step-label span:last-child {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.2;
+    transition: all 0.3s ease;
+}
+
+/* Estado ACTIVO */
+.wizard-step-label.active span:first-child {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-blue) 100%);
+    color: #ffffff;
+    border-color: rgba(74, 144, 226, 0.6);
+    box-shadow: 0 4px 20px rgba(74, 144, 226, 0.4),
+                0 0 0 4px rgba(74, 144, 226, 0.1);
+    animation: activePulse 2s ease-in-out infinite;
+    transform: scale(1.1);
+}
+
+.wizard-step-label.active span:last-child {
+    color: var(--accent-blue);
+    font-weight: 600;
+    text-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
+}
+
+@keyframes activePulse {
+    0%, 100% { 
+        box-shadow: 0 4px 20px rgba(74, 144, 226, 0.4),
+                    0 0 0 4px rgba(74, 144, 226, 0.1);
+    }
+    50% { 
+        box-shadow: 0 6px 25px rgba(74, 144, 226, 0.6),
+                    0 0 0 8px rgba(74, 144, 226, 0.2);
+    }
+}
+
+/* Estado COMPLETADO */
+.wizard-step-label.completed span:first-child {
+    background: linear-gradient(135deg, var(--success-green) 0%, var(--light-green) 100%);
+    color: #ffffff;
+    border-color: rgba(39, 174, 96, 0.6);
+    box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+    animation: completedBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.wizard-step-label.completed span:last-child {
+    color: var(--light-green);
+    font-weight: 600;
+}
+
+@keyframes completedBounce {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2) rotate(10deg); }
+    100% { transform: scale(1.1) rotate(0deg); }
+}
+
+/* Checkmark para pasos completados */
+.wizard-step-label.completed span:first-child::before {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.2rem;
+    font-weight: 900;
+    animation: checkmarkAppear 0.4s ease-out 0.2s both;
+}
+
+.wizard-step-label.completed span:first-child {
+    font-size: 0; /* Oculta el número */
+}
+
+@keyframes checkmarkAppear {
+    0% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0) rotate(-180deg); 
+    }
+    100% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1) rotate(0deg); 
+    }
+}
+
+/* Estados de loading */
+.wizard-step-label.loading span:first-child {
+    background: linear-gradient(135deg, var(--warning-orange) 0%, var(--light-orange) 100%);
+    color: #ffffff;
+    border-color: rgba(243, 156, 18, 0.6);
+    animation: loadingSpinner 1s linear infinite;
+}
+
+.wizard-step-label.loading span:first-child::before {
+    content: '⟳';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.2rem;
+    animation: rotate 1s linear infinite;
+}
+
+.wizard-step-label.loading span:first-child {
+    font-size: 0; /* Oculta el número */
+}
+
+@keyframes loadingSpinner {
+    0%, 100% { box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3); }
+    50% { box-shadow: 0 6px 20px rgba(243, 156, 18, 0.5); }
+}
+
+@keyframes rotate {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Efectos hover para pasos navegables */
+.wizard-step-label.completed:hover span:first-child,
+.wizard-step-label.active:hover span:first-child {
+    transform: scale(1.15);
+    filter: brightness(1.1);
+}
+
+.wizard-step-label.completed:hover {
+    background: rgba(39, 174, 96, 0.1);
+}
+
+.wizard-step-label.active:hover {
+    background: rgba(74, 144, 226, 0.1);
+}
+
+/* Responsive Design para 3 pasos */
+@media (max-width: 768px) {
+    .wizard-progress {
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .wizard-step-label {
+        min-width: 90px;
+        padding: 0.25rem;
+    }
+    
+    .wizard-step-label span:first-child {
+        width: 32px;
+        height: 32px;
+        font-size: 0.875rem;
+    }
+    
+    .wizard-step-label span:last-child {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .wizard-steps-labels {
+        flex-wrap: nowrap;
+        gap: 0.25rem;
+    }
+    
+    .wizard-step-label {
+        flex: 1;
+        min-width: 80px;
+    }
+    
+    .wizard-step-label span:last-child {
+        font-size: 0.7rem;
+        line-height: 1.1;
+    }
+}
+
+/* Efectos adicionales */
+.wizard-progress-bar {
+    position: relative;
+}
+
+.wizard-progress-bar::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(90deg, transparent, rgba(39, 174, 96, 0.3), transparent);
+    border-radius: 50px;
+    opacity: 0;
+    animation: glowEffect 3s ease-in-out infinite;
+}
+
+@keyframes glowEffect {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+}
+
+/* Animación de entrada para todo el wizard */
+.wizard-progress {
+    animation: wizardFadeIn 0.8s ease-out;
+}
+
+@keyframes wizardFadeIn {
+    0% { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    100% { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}

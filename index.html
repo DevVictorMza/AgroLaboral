@@ -69,173 +69,49 @@
                     <!-- Wizard Steps -->
                     <div class="wizard-progress mb-4">
                         <div class="progress wizard-progress-bar">
-                            <div class="progress-bar bg-primary wizard-progress-bar-inner" role="progressbar"></div>
+                            <div class="progress-bar wizard-progress-bar-inner" role="progressbar"></div>
                         </div>
-                        <div class="d-flex justify-content-between mt-2 wizard-steps-labels">
-                            <div class="wizard-step-label active"><span>1.</span> <span>Datos<br>de Empresa</span></div>
-                            <div class="wizard-step-label active"><span>2.</span> <span>Administrador</span></div>
-                            <div class="wizard-step-label active"><span>3.</span> <span>Establecimiento</span></div>
-                            <div class="wizard-step-label"><span>4.</span> <span>Confirmación</span></div>
+                        <div class="wizard-steps-labels d-flex justify-content-between mt-2">
+                            <div class="wizard-step-label active" data-step="0">
+                                <span>1</span> 
+                                <span>Datos<br>de Empresa</span>
+                            </div>
+                            <div class="wizard-step-label" data-step="1">
+                                <span>2</span> 
+                                <span>Confirmación</span>
+                            </div>
                         </div>
                     </div>
                     <!-- Paso 1: Datos de empresa -->
                     <form id="form-registro-empleador-paso1">
                         <div class="mb-4">
                             <h5 class="fw-bold mb-3">Datos de Empresa</h5>
-                            <div class="mb-3">
+                            <div class="mb-3" style="position: relative;">
                                 <label for="cuit" class="form-label">CUIT</label>
                                 <input type="text" class="form-control" id="cuit" name="cuit" placeholder="Ej: 20123456789">
+                                <div class="char-counter">0/11</div>
                             </div>
-                            <div class="mb-3">
+                            <div class="mb-3" style="position: relative;">
                                 <label for="razonSocial" class="form-label">Razón Social</label>
                                 <input type="text" class="form-control" id="razonSocial" name="razonSocial" placeholder="Ej: Finca Los Olivos">
+                                <div class="char-counter">0/50</div>
+                            </div>
+                            <div class="mb-3" style="position: relative;">
+                                <label for="password" class="form-label">Contraseña</label>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Ingrese contraseña (6 caracteres)" maxlength="6">
+                                <div class="char-counter">0/6</div>
+                            </div>
+                            <div class="mb-3" style="position: relative;">
+                                <label for="password2" class="form-label">Repetir Contraseña</label>
+                                <input type="password" class="form-control" id="password2" name="password2" placeholder="Repita la contraseña" maxlength="6">
+                                <div class="char-counter">0/6</div>
                             </div>
                         </div>
                         <div class="d-flex justify-content-end">
                             <button type="button" class="btn btn-primary" id="btn-siguiente-paso1">Siguiente</button>
                         </div>
                     </form>
-                    <!-- Paso 2: Administrador de Empresa (oculto por ahora) -->
-                    <form id="form-registro-empleador-paso2" class="d-none">
-                        <div class="mb-4">
-                            <h5 class="fw-bold mb-3">Administrador de Empresa</h5>
-                            <div class="mb-3">
-                                <label for="dni" class="form-label">DNI</label>
-                                <input type="text" class="form-control" id="dni" name="dni" placeholder="Ej: 12345678">
-                            </div>
-                            <div class="mb-3">
-                                <label for="nombre" class="form-label">Nombre</label>
-                                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ej: Juan">
-                            </div>
-                            <div class="mb-3">
-                                <label for="apellido" class="form-label">Apellido</label>
-                                <input type="text" class="form-control" id="apellido" name="apellido" placeholder="Ej: Pérez">
-                            </div>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" placeholder="Ej: juan@email.com">
-                            </div>
-                            <div class="mb-3">
-                                <label for="telefono" class="form-label">Teléfono</label>
-                                <input type="text" class="form-control" id="telefono" name="telefono" placeholder="Ej: 2611234567">
-                            </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Contraseña</label>
-                                <input type="password" class="form-control" id="password" name="password">
-                            </div>
-                            <div class="mb-3">
-                                <label for="password2" class="form-label">Repetir Contraseña</label>
-                                <input type="password" class="form-control" id="password2" name="password2">
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <button type="button" class="btn btn-outline-secondary" id="btn-anterior-paso2">Anterior</button>
-                            <button type="button" class="btn btn-primary" id="btn-siguiente-paso2">Siguiente</button>
-                        </div>
-                    </form>
-                    <!-- Paso 3: Establecimiento (oculto por ahora) -->
-                    <form id="form-registro-empleador-paso3" class="d-none">
-                        <div class="mb-4">
-                            <h5 class="fw-bold mb-3">Establecimiento</h5>
-                            <div class="mb-3">
-                                <label for="nombreEstablecimiento" class="form-label">Nombre <small class="text-muted">(se convierte automáticamente a mayúsculas)</small></label>
-                                <input type="text" class="form-control" id="nombreEstablecimiento" name="nombreEstablecimiento" 
-                                       placeholder="Ejemplo: Finca Los Olivos"
-                                       autocomplete="organization">
-                            </div>
-                            <div class="mb-3">
-                                <label for="renspa" class="form-label">Número de RENSPA</label>
-                                <input type="text" class="form-control" id="renspa" name="renspa" placeholder="Ej: 1234567890">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Especies</label>
-                                <div class="dropdown">
-                                    <button class="form-control text-start dropdown-toggle" type="button" id="dropdownEspecies" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Seleccionar especies
-                                    </button>
-                                    <ul class="dropdown-menu w-100" aria-labelledby="dropdownEspecies" id="especies-list">
-                                        <li class="px-3 py-2 text-muted">Cargando especies...</li>
-                                    </ul>
-                                    <input type="hidden" id="especies" name="especies">
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Departamento</label>
-                                <div class="dropdown">
-                                    <button class="form-control text-start dropdown-toggle" type="button" id="dropdownDepartamento" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Seleccionar departamento
-                                    </button>
-                                    <ul class="dropdown-menu w-100" aria-labelledby="dropdownDepartamento" id="departamento-list">
-                                        <li class="px-3 py-2 text-muted">Cargando departamentos...</li>
-                                    </ul>
-                                    <input type="hidden" id="departamento" name="departamento">
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Distrito</label>
-                                <div class="dropdown">
-                                    <button class="form-control text-start dropdown-toggle" type="button" id="dropdownDistrito" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Seleccionar distrito
-                                    </button>
-                                    <ul class="dropdown-menu w-100" aria-labelledby="dropdownDistrito" id="distrito-list">
-                                        <li class="px-3 py-2 text-muted">Seleccionar distrito</li>
-                                    </ul>
-                                    <input type="hidden" id="distrito" name="distrito">
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="calle" class="form-label">Calle <small class="text-muted">(máximo 25 caracteres - se convierte a mayúsculas)</small></label>
-                                <input type="text" class="form-control" id="calle" name="calle" 
-                                       placeholder="Ejemplo: RUTA 50" 
-                                       maxlength="25"
-                                       autocomplete="street-address">
-                            </div>
-                            <div class="mb-3">
-                                <label for="numeracion" class="form-label">Numeración <small class="text-muted">(máximo 5 números)</small></label>
-                                <input type="text" class="form-control" id="numeracion" name="numeracion" 
-                                       placeholder="Ingrese numeración" 
-                                       maxlength="5"
-                                       inputmode="numeric"
-                                       pattern="[0-9]*"
-                                       autocomplete="address-line2">
-                            </div>
-                            <div class="mb-3">
-                                <label for="codigoPostal" class="form-label">Código Postal <small class="text-muted">(máximo 5 números)</small></label>
-                                <input type="text" class="form-control" id="codigoPostal" name="codigoPostal" 
-                                       placeholder="Ingrese código postal" 
-                                       maxlength="5"
-                                       inputmode="numeric"
-                                       pattern="[0-9]*"
-                                       autocomplete="postal-code">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Mapa de Geolocalización</label>
-                                <div class="mb-2">
-                                    <button type="button" class="btn btn-outline-primary btn-sm" id="btn-buscar-ubicacion">
-                                        <i class="fas fa-search-location me-2"></i>Buscar Ubicación
-                                    </button>
-                                </div>
-                                <div id="establecimiento-map" class="map-panel"></div>
-                                <small class="text-muted">Haz clic en el mapa para seleccionar la ubicación del establecimiento. Las coordenadas se llenarán automáticamente.</small>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="latitud" class="form-label">Latitud</label>
-                                    <input type="text" class="form-control" id="latitud" name="latitud" readonly>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="longitud" class="form-label">Longitud</label>
-                                    <input type="text" class="form-control" id="longitud" name="longitud" readonly>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <button type="button" class="btn btn-outline-secondary" id="btn-anterior-paso3">Anterior</button>
-                            <button type="button" class="btn btn-primary" id="btn-siguiente-paso3">Siguiente</button>
-                        </div>
-                    </form>
-                    <!-- Paso 4: Administrador de Establecimiento (opcional) -->
-                    <!-- Paso 5: Confirmación (oculto por ahora) -->
+                    <!-- Paso 2: Confirmación (oculto por ahora) -->
                     <form id="form-registro-empleador-paso5" class="d-none">
                         <div id="mensaje-error-confirmacion" class="alert alert-danger d-none" role="alert">
                             Faltan datos obligatorios en el resumen. Por favor, revise los pasos anteriores.

@@ -609,18 +609,9 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 
 	// --- Lógica del wizard de registro de empleador ---
 	const paso1 = document.getElementById('form-registro-empleador-paso1');
-	const paso2 = document.getElementById('form-registro-empleador-paso2');
-	const paso3 = document.getElementById('form-registro-empleador-paso3');
-	const paso4 = document.getElementById('form-registro-empleador-paso4');
-	const paso5 = document.getElementById('form-registro-empleador-paso5');
+	const paso3 = document.getElementById('form-registro-empleador-paso5'); // Este ahora es el paso de confirmación
 	const btnSiguiente1 = document.getElementById('btn-siguiente-paso1');
-	const btnAnterior2 = document.getElementById('btn-anterior-paso2');
-	const btnSiguiente2 = document.getElementById('btn-siguiente-paso2');
-	const btnAnterior3 = document.getElementById('btn-anterior-paso3');
-	const btnSiguiente3 = document.getElementById('btn-siguiente-paso3');
-	const btnAnterior4 = document.getElementById('btn-anterior-paso4');
-	const btnSiguiente4 = document.getElementById('btn-siguiente-paso4');
-	const btnAnterior5 = document.getElementById('btn-anterior-paso5');
+	const btnAnterior3 = document.getElementById('btn-anterior-paso5'); // Actualizado para el botón correcto
 
 	// Paso 1: Datos de empresa
 	if (btnSiguiente1) {
@@ -684,15 +675,76 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 				razonInput.classList.remove('is-invalid');
 			}
 			
+			// Validar contraseñas
+			const passwordInput = document.getElementById('password');
+			const password2Input = document.getElementById('password2');
+			const passwordValue = passwordInput.value;
+			const password2Value = password2Input.value;
+			let passwordErrorMsg = '';
+			let password2ErrorMsg = '';
+			
+			// Validar contraseña principal
+			if (!passwordValue) {
+				passwordErrorMsg = 'La contraseña es obligatoria.';
+			} else if (passwordValue.length !== 6) {
+				passwordErrorMsg = 'La contraseña debe tener exactamente 6 caracteres.';
+			} else if (passwordValue.includes(' ')) {
+				passwordErrorMsg = 'La contraseña no puede contener espacios.';
+			}
+			
+			// Validar confirmación de contraseña
+			if (!password2Value) {
+				password2ErrorMsg = 'Debe repetir la contraseña.';
+			} else if (password2Value !== passwordValue) {
+				password2ErrorMsg = 'Las contraseñas no coinciden.';
+			}
+			
+			// Mostrar error contraseña
+			let passwordErrorDiv = document.getElementById('password-error');
+			if (!passwordErrorDiv) {
+				passwordErrorDiv = document.createElement('div');
+				passwordErrorDiv.id = 'password-error';
+				passwordErrorDiv.className = 'text-danger mt-1';
+				passwordInput.parentNode.appendChild(passwordErrorDiv);
+			}
+			if (passwordErrorMsg) {
+				passwordErrorDiv.textContent = passwordErrorMsg;
+				passwordInput.classList.add('is-invalid');
+				if (!errorMsg && !razonErrorMsg) passwordInput.focus();
+			} else {
+				passwordErrorDiv.textContent = '';
+				passwordInput.classList.remove('is-invalid');
+			}
+			
+			// Mostrar error repetir contraseña
+			let password2ErrorDiv = document.getElementById('password2-error');
+			if (!password2ErrorDiv) {
+				password2ErrorDiv = document.createElement('div');
+				password2ErrorDiv.id = 'password2-error';
+				password2ErrorDiv.className = 'text-danger mt-1';
+				password2Input.parentNode.appendChild(password2ErrorDiv);
+			}
+			if (password2ErrorMsg) {
+				password2ErrorDiv.textContent = password2ErrorMsg;
+				password2Input.classList.add('is-invalid');
+				if (!errorMsg && !razonErrorMsg && !passwordErrorMsg) password2Input.focus();
+			} else {
+				password2ErrorDiv.textContent = '';
+				password2Input.classList.remove('is-invalid');
+			}
+			
 			// Si hay algún error, no avanzar
-			if (errorMsg || razonErrorMsg) return;
+			if (errorMsg || razonErrorMsg || passwordErrorMsg || password2ErrorMsg) return;
+			
+			// Llenar datos de confirmación
+			llenarResumenConfirmacion();
 			
 			paso1.classList.add('d-none');
-			paso2.classList.remove('d-none');
+			paso3.classList.remove('d-none');
 			
 			// Actualizar barra de progreso
 			const progressBar = document.querySelector('.wizard-progress-bar-inner');
-			if (progressBar) progressBar.style.width = '40%';
+			if (progressBar) progressBar.style.width = '100%';
 			
 			// Actualizar labels de pasos
 			const wizardLabels = document.querySelectorAll('.wizard-step-label');
@@ -753,17 +805,70 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 				this.value = this.value.toUpperCase();
 			});
 		}
+		
+		// Validación de contraseñas en tiempo real
+		const passwordInput = document.getElementById('password');
+		const password2Input = document.getElementById('password2');
+		
+		if (passwordInput) {
+			passwordInput.addEventListener('input', function() {
+				// No permitir espacios en contraseña
+				this.value = this.value.replace(/\s/g, '');
+				
+				// Validar coincidencia si hay confirmación
+				if (password2Input && password2Input.value) {
+					validatePasswordMatch();
+				}
+			});
+		}
+		
+		if (password2Input) {
+			password2Input.addEventListener('input', function() {
+				// No permitir espacios en confirmación
+				this.value = this.value.replace(/\s/g, '');
+				
+				// Validar coincidencia en tiempo real
+				validatePasswordMatch();
+			});
+		}
+		
+		// Función para validar coincidencia de contraseñas
+		function validatePasswordMatch() {
+			const password = passwordInput.value;
+			const password2 = password2Input.value;
+			
+			let password2ErrorDiv = document.getElementById('password2-error');
+			if (!password2ErrorDiv) {
+				password2ErrorDiv = document.createElement('div');
+				password2ErrorDiv.id = 'password2-error';
+				password2ErrorDiv.className = 'text-danger mt-1';
+				password2Input.parentNode.appendChild(password2ErrorDiv);
+			}
+			
+			if (password2 && password2 !== password) {
+				password2ErrorDiv.textContent = 'Las contraseñas no coinciden.';
+				password2Input.classList.add('is-invalid');
+				password2Input.classList.remove('is-valid');
+			} else if (password2 && password2 === password && password.length === 6) {
+				password2ErrorDiv.textContent = '';
+				password2Input.classList.remove('is-invalid');
+				password2Input.classList.add('is-valid');
+			} else if (password2 === '') {
+				password2ErrorDiv.textContent = '';
+				password2Input.classList.remove('is-invalid', 'is-valid');
+			}
+		}
 	}
 
-	// Paso 2: Administrador de Empresa
-	if (btnAnterior2) {
-		btnAnterior2.addEventListener('click', function() {
-			paso2.classList.add('d-none');
+	// Paso 2: Confirmación
+	if (btnAnterior3) {
+		btnAnterior3.addEventListener('click', function() {
+			paso3.classList.add('d-none');
 			paso1.classList.remove('d-none');
 			
 			// Actualizar barra de progreso
 			const progressBar = document.querySelector('.wizard-progress-bar-inner');
-			if (progressBar) progressBar.style.width = '20%';
+			if (progressBar) progressBar.style.width = '50%';
 			
 			// Actualizar labels de pasos
 			const wizardLabels = document.querySelectorAll('.wizard-step-label');
@@ -774,1103 +879,36 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 			});
 		});
 	}
-
-	if (btnSiguiente2) {
-		btnSiguiente2.addEventListener('click', function() {
-			const dniInput = document.getElementById('dni');
-			const nombreInput = document.getElementById('nombre');
-			const apellidoInput = document.getElementById('apellido');
-			const emailInput = document.getElementById('email');
-			const telefonoInput = document.getElementById('telefono');
-			const passwordInput = document.getElementById('password');
-			const password2Input = document.getElementById('password2');
-			
-			const dniValue = dniInput.value.trim();
-			const nombreValue = nombreInput.value.trim();
-			const apellidoValue = apellidoInput.value.trim();
-			const emailValue = emailInput.value.trim();
-			const telefonoValue = telefonoInput.value.trim();
-			const passwordValue = passwordInput ? passwordInput.value : '';
-			const password2Value = password2Input ? password2Input.value : '';
-			
-			let hasErrors = false;
-			
-			// Validaciones básicas
-			const validations = [
-				{input: dniInput, value: dniValue, regex: /^\d{7,8}$/, message: 'El DNI debe tener entre 7 y 8 números.', required: true},
-				{input: nombreInput, value: nombreValue, regex: /^[A-ZÁÉÍÓÚÑ ]+$/, message: 'El nombre solo debe contener letras y espacios.', required: true},
-				{input: apellidoInput, value: apellidoValue, regex: /^[A-ZÁÉÍÓÚÑ ]+$/, message: 'El apellido solo debe contener letras y espacios.', required: true},
-				{input: emailInput, value: emailValue, regex: /^([a-zA-Z0-9_\.-]+)@([a-zA-Z0-9\.-]+)\.([a-zA-Z]{2,})$/, message: 'Ingrese un email válido.', required: true},
-				{input: telefonoInput, value: telefonoValue, regex: /^\d{1,13}$/, message: 'El teléfono debe contener entre 1 y 13 números.', required: true}
-			];
-			
-			validations.forEach(validation => {
-				let errorDiv = document.getElementById(validation.input.id + '-error');
-				if (!errorDiv) {
-					errorDiv = document.createElement('div');
-					errorDiv.id = validation.input.id + '-error';
-					errorDiv.className = 'text-danger mt-1';
-					validation.input.parentNode.appendChild(errorDiv);
-				}
-				
-				if (!validation.value && validation.required) {
-					errorDiv.textContent = 'Este campo es obligatorio.';
-					validation.input.classList.add('is-invalid');
-					hasErrors = true;
-				} else if (validation.value && !validation.regex.test(validation.value)) {
-					errorDiv.textContent = validation.message;
-					validation.input.classList.add('is-invalid');
-					hasErrors = true;
-				} else {
-					errorDiv.textContent = '';
-					validation.input.classList.remove('is-invalid');
-				}
-			});
-			
-			// Validar contraseña (SOLO si NO está deshabilitada)
-			if (passwordInput && !passwordInput.readOnly) {
-				let passwordErrorDiv = document.getElementById('password-error');
-				if (!passwordErrorDiv) {
-					passwordErrorDiv = document.createElement('div');
-					passwordErrorDiv.id = 'password-error';
-					passwordErrorDiv.className = 'text-danger mt-1';
-					passwordInput.parentNode.appendChild(passwordErrorDiv);
-				}
-				
-				if (!passwordValue) {
-					passwordErrorDiv.textContent = 'La contraseña es obligatoria.';
-					passwordInput.classList.add('is-invalid');
-					hasErrors = true;
-				} else if (passwordValue.length !== 6) {
-					passwordErrorDiv.textContent = 'La contraseña debe tener 6 caracteres.';
-					passwordInput.classList.add('is-invalid');
-					hasErrors = true;
-				} else {
-					passwordErrorDiv.textContent = '';
-					passwordInput.classList.remove('is-invalid');
-				}
-			} else if (passwordInput && passwordInput.readOnly) {
-				// Si la contraseña está deshabilitada (usuario existente), limpiar errores
-				let passwordErrorDiv = document.getElementById('password-error');
-				if (passwordErrorDiv) {
-					passwordErrorDiv.textContent = '';
-				}
-				passwordInput.classList.remove('is-invalid');
-			}
-			
-			// Validar confirmación de contraseña (SOLO si NO está deshabilitada)
-			if (password2Input && !password2Input.readOnly) {
-				let password2ErrorDiv = document.getElementById('password2-error');
-				if (!password2ErrorDiv) {
-					password2ErrorDiv = document.createElement('div');
-					password2ErrorDiv.id = 'password2-error';
-					password2ErrorDiv.className = 'text-danger mt-1';
-					password2Input.parentNode.appendChild(password2ErrorDiv);
-				}
-				
-				if (!password2Value) {
-					password2ErrorDiv.textContent = 'Repita la contraseña.';
-					password2Input.classList.add('is-invalid');
-					hasErrors = true;
-				} else if (passwordValue !== password2Value) {
-					password2ErrorDiv.textContent = 'Las contraseñas no coinciden.';
-					password2Input.classList.add('is-invalid');
-					hasErrors = true;
-				} else {
-					password2ErrorDiv.textContent = '';
-					password2Input.classList.remove('is-invalid');
-				}
-			} else if (password2Input && password2Input.readOnly) {
-				// Si la confirmación está deshabilitada (usuario existente), limpiar errores
-				let password2ErrorDiv = document.getElementById('password2-error');
-				if (password2ErrorDiv) {
-					password2ErrorDiv.textContent = '';
-				}
-				password2Input.classList.remove('is-invalid');
-			}
-			
-			if (hasErrors) return;
-			
-			paso2.classList.add('d-none');
-			paso3.classList.remove('d-none');
-			
-			// Actualizar barra de progreso
-			const progressBar = document.querySelector('.wizard-progress-bar-inner');
-			if (progressBar) progressBar.style.width = '60%';
-			
-			// Actualizar labels de pasos
-			const wizardLabels = document.querySelectorAll('.wizard-step-label');
-			wizardLabels.forEach((el, idx) => {
-				if (idx === 2) {
-					el.classList.add('active');
-				}
-			});
-			
-			setTimeout(function() {
-				initEstablecimientoMap();
-				cargarEspecies();
-				cargarDepartamentos();
-			}, 200);
-		});
-		
-		// Formateo de inputs en tiempo real
-		const dniInput = document.getElementById('dni');
-		if (dniInput) {
-			// Event listener para formateo y validación en tiempo real
-			dniInput.addEventListener('input', function() {
-				// Formatear: solo números, máximo 8 dígitos
-				this.value = this.value.replace(/\D/g, '').slice(0, 8);
-			});
-			
-			// Event listener para autocompletado cuando se sale del campo
-			dniInput.addEventListener('blur', async function() {
-				const dniValue = this.value.trim();
-				if (dniValue && dniValue.length >= 7) {
-					console.log('🔥 Activando autocompletado desde blur del DNI:', dniValue);
-					await ejecutarAutocompletado('dni');
-				}
-			});
-			
-			// Event listener adicional para el evento change
-			dniInput.addEventListener('change', async function() {
-				const dniValue = this.value.trim();
-				if (dniValue && dniValue.length >= 7) {
-					console.log('🔥 Activando autocompletado desde change del DNI:', dniValue);
-					await ejecutarAutocompletado('dni');
-				}
-			});
-		}
-		
-		const nombreInput = document.getElementById('nombre');
-		if (nombreInput) {
-			nombreInput.addEventListener('input', function() {
-				this.value = this.value.toUpperCase().replace(/[^A-ZÁÉÍÓÚÑ ]/g, '');
-			});
-		}
-		
-		const apellidoInput = document.getElementById('apellido');
-		if (apellidoInput) {
-			apellidoInput.addEventListener('input', function() {
-				this.value = this.value.toUpperCase().replace(/[^A-ZÁÉÍÓÚÑ ]/g, '');
-			});
-		}
-		
-		const telefonoInput = document.getElementById('telefono');
-		if (telefonoInput) {
-			telefonoInput.addEventListener('input', function() {
-				this.value = this.value.replace(/\D/g, '').slice(0, 13);
-			});
-		}
-		
-		const adminEstTelefonoInput = document.getElementById('adminEstTelefono');
-		if (adminEstTelefonoInput) {
-			adminEstTelefonoInput.addEventListener('input', function() {
-				this.value = this.value.replace(/\D/g, '').slice(0, 13);
-			});
-		}
-		
-		const renspaInput = document.getElementById('renspa');
-		if (renspaInput) {
-			renspaInput.addEventListener('input', function() {
-				this.value = this.value.replace(/\D/g, '').slice(0, 11);
-			});
-			
-			// Validación de RENSPA con debounce (similar al CUIT)
-			let debounceTimeout;
-			renspaInput.addEventListener('input', function() {
-				const renspaValue = this.value.trim();
-				
-				// Limpiar timeout anterior
-				clearTimeout(debounceTimeout);
-				
-				// Validación básica de formato primero
-				if (!renspaValue) {
-					// Campo vacío, limpiar feedback
-					const tempDiv = this.parentNode.querySelector('.field-feedback');
-					if (tempDiv) tempDiv.remove();
-					this.classList.remove('is-valid', 'is-invalid');
-					return;
-				}
-				
-				if (!/^\d{1,11}$/.test(renspaValue)) {
-					showFieldFeedback(this, false, 'El RENSPA debe contener entre 1 y 11 números.');
-					return;
-				}
-				
-				// Validación en backend con debounce
-				const tempDiv = this.parentNode.querySelector('.field-feedback');
-				if (tempDiv) {
-					tempDiv.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Validando RENSPA...';
-				}
-				
-				debounceTimeout = setTimeout(() => {
-					fetch(`http://localhost:9090/establecimientos/validar-renspa?numeroRenspa=${encodeURIComponent(renspaValue)}`)
-						.then(response => response.json())
-						.then(data => {
-							if (data && data.disponible) {
-								showFieldFeedback(this, true, '¡RENSPA disponible!');
-							} else {
-								showFieldFeedback(this, false, 'El RENSPA ya está registrado.');
-							}
-						})
-						.catch(() => {
-							showFieldFeedback(this, false, 'Error al validar RENSPA en el servidor.');
-						});
-				}, 400);
-			});
-		}
-		
-		// Formateo y autocompletado para DNI del administrador de establecimiento
-		const adminEstDniInput = document.getElementById('adminEstDni');
-		if (adminEstDniInput) {
-			// Event listener para formateo en tiempo real
-			adminEstDniInput.addEventListener('input', function() {
-				// Formatear: solo números, máximo 8 dígitos
-				this.value = this.value.replace(/\D/g, '').slice(0, 8);
-			});
-			
-			// Event listener para autocompletado cuando se sale del campo
-			adminEstDniInput.addEventListener('blur', async function() {
-				const dniValue = this.value.trim();
-				if (dniValue && dniValue.length >= 7) {
-					console.log('🔥 Activando autocompletado desde blur del adminEstDni:', dniValue);
-					await ejecutarAutocompletadoAdmin('adminEstDni');
-				}
-			});
-			
-			// Event listener adicional para el evento change
-			adminEstDniInput.addEventListener('change', async function() {
-				const dniValue = this.value.trim();
-				if (dniValue && dniValue.length >= 7) {
-					console.log('🔥 Activando autocompletado desde change del adminEstDni:', dniValue);
-					await ejecutarAutocompletadoAdmin('adminEstDni');
-				}
-			});
-		}
-		
-		// CONFIGURACIÓN DE CONTADORES DE CARACTERES PARA TODOS LOS CAMPOS
-		
-		// Campo CUIT - solo números (11 dígitos sin guiones)
-		addCharacterCounter('cuit', 11, { 
-			allowOnlyNumbers: true, // Solo números, sin guiones
-			warningThreshold: 9,
-			dangerThreshold: 10
-		});
-		
-		// Campo DNI - solo números (8 dígitos máximo)
-		addCharacterCounter('dni', 8, { 
-			allowOnlyNumbers: true, // Solo números
-			warningThreshold: 6,
-			dangerThreshold: 7
-		});
-		
-		// Campos de texto con límites específicos
-		addCharacterCounter('razonSocial', 50, { 
-			allowUppercase: true, 
-			customRegex: /[^A-Z0-9\s\.\,\-\_]/g,
-			warningThreshold: 40,
-			dangerThreshold: 47
-		});
-		
-		addCharacterCounter('nombre', 30, { 
-			allowUppercase: true, 
-			customRegex: /[^A-Z\s]/g,
-			warningThreshold: 24,
-			dangerThreshold: 28
-		});
-		
-		addCharacterCounter('apellido', 30, { 
-			allowUppercase: true, 
-			customRegex: /[^A-Z\s]/g,
-			warningThreshold: 24,
-			dangerThreshold: 28
-		});
-		
-		addCharacterCounter('email', 60, {
-			warningThreshold: 50,
-			dangerThreshold: 57
-		});
-		
-		addCharacterCounter('telefono', 13, { 
-			allowOnlyNumbers: true,
-			warningThreshold: 10,
-			dangerThreshold: 12
-		});
-		
-		addCharacterCounter('nombreEstablecimiento', 50, { 
-			allowUppercase: true, 
-			customRegex: /[^A-Za-z0-9\s\.\,\-\_]/g,  // Permite mayúsculas Y minúsculas
-			warningThreshold: 40,
-			dangerThreshold: 47
-		});
-		
-		addCharacterCounter('renspa', 11, { 
-			allowOnlyNumbers: true,
-			warningThreshold: 9,
-			dangerThreshold: 10
-		});
-		
-		addCharacterCounter('calle', 25, { 
-			allowUppercase: true, 
-			customRegex: /[^A-Za-z0-9\s\.\,\-\/\\]/g,  // Permite mayúsculas Y minúsculas
-			warningThreshold: 20,
-			dangerThreshold: 23
-		});
-		
-		addCharacterCounter('numeracion', 5, { 
-			allowOnlyNumbers: true,
-			warningThreshold: 4,
-			dangerThreshold: 5
-		});
-		
-		addCharacterCounter('codigoPostal', 5, { 
-			allowOnlyNumbers: true,
-			warningThreshold: 4,
-			dangerThreshold: 5
-		});
-		
-		// Inicializar conversión automática a mayúsculas
-		console.log('🔧 Inicializando conversión automática a mayúsculas...');
-		addUppercaseConverter('nombreEstablecimiento');
-		addUppercaseConverter('calle');
-		console.log('✅ Conversión automática configurada');
-		
-		// Event listener global para debugging de campos de mayúsculas
-		document.addEventListener('input', function(e) {
-			if (e.target.getAttribute('data-uppercase') === 'true') {
-				console.log(`📝 Input detectado en campo uppercase ${e.target.id}: "${e.target.value}"`);
-			}
-		});
-		
-		// Campos del administrador del establecimiento
-		addCharacterCounter('adminEstNombre', 30, { 
-			allowUppercase: true, 
-			customRegex: /[^A-Z\s]/g,
-			warningThreshold: 24,
-			dangerThreshold: 28
-		});
-		
-		addCharacterCounter('adminEstApellido', 30, { 
-			allowUppercase: true, 
-			customRegex: /[^A-Z\s]/g,
-			warningThreshold: 24,
-			dangerThreshold: 28
-		});
-		
-		addCharacterCounter('adminEstEmail', 60, {
-			warningThreshold: 50,
-			dangerThreshold: 57
-		});
-		
-		addCharacterCounter('adminEstTelefono', 13, { 
-			allowOnlyNumbers: true,
-			warningThreshold: 10,
-			dangerThreshold: 12
-		});
-		
-		// Campos de contraseña - máximo 6 caracteres
-		addCharacterCounter('password', 6, { 
-			warningThreshold: 5,
-			dangerThreshold: 6
-		});
-		
-		addCharacterCounter('password2', 6, { 
-			warningThreshold: 5,
-			dangerThreshold: 6
-		});
-		
-		addCharacterCounter('adminEstPassword', 6, { 
-			warningThreshold: 5,
-			dangerThreshold: 6
-		});
-		
-		addCharacterCounter('adminEstPassword2', 6, { 
-			warningThreshold: 5,
-			dangerThreshold: 6
-		});
-	}
-
-	// Event listener para checkbox "Sin administrador de establecimiento"
-	const sinAdminCheckbox = document.getElementById('sinAdminEstablecimiento');
-	if (sinAdminCheckbox) {
-		sinAdminCheckbox.addEventListener('change', function() {
-			// Limpiar mensajes de error de los campos del administrador cuando se marca/desmarca
-			const adminFields = [
-				'adminEstNombre', 'adminEstApellido', 'adminEstDni', 
-				'adminEstEmail', 'adminEstTelefono', 'adminEstPassword', 'adminEstPassword2'
-			];
-			
-			adminFields.forEach(fieldId => {
-				const field = document.getElementById(fieldId);
-				if (field) {
-					// Limpiar mensajes de error
-					const feedbackDiv = field.parentNode.querySelector('.field-feedback');
-					if (feedbackDiv) {
-						feedbackDiv.remove();
-					}
-					field.classList.remove('is-invalid');
-				}
-			});
-		});
-	}
-
-	// Resto de pasos del wizard...
 	
-	// Paso 3: Ubicación del Establecimiento
-	if (btnAnterior3) {
-		btnAnterior3.addEventListener('click', function() {
-			paso3.classList.add('d-none');
-			paso2.classList.remove('d-none');
-			
-			// Actualizar barra de progreso
-			const progressBar = document.querySelector('.wizard-progress-bar-inner');
-			if (progressBar) progressBar.style.width = '40%';
-			
-			// Actualizar labels de pasos
-			const wizardLabels = document.querySelectorAll('.wizard-step-label');
-			wizardLabels.forEach((el, idx) => {
-				if (idx === 2) {
-					el.classList.remove('active');
-				}
-			});
-		});
-	}
-
-	if (btnSiguiente3) {
-		btnSiguiente3.addEventListener('click', function() {
-			const nombreEstablecimientoInput = document.getElementById('nombreEstablecimiento');
-			const renspaInput = document.getElementById('renspa');
-			const departamentoInput = document.getElementById('departamento');
-			const distritoInput = document.getElementById('distrito');
-			const latitudInput = document.getElementById('latitud');
-			const longitudInput = document.getElementById('longitud');
-			
-			const nombreEstablecimientoValue = nombreEstablecimientoInput ? nombreEstablecimientoInput.value.trim() : '';
-			const renspaValue = renspaInput ? renspaInput.value.trim() : '';
-			const departamentoValue = departamentoInput ? departamentoInput.value : '';
-			const distritoValue = distritoInput ? distritoInput.value : '';
-			const latitudValue = latitudInput ? latitudInput.value : '';
-			const longitudValue = longitudInput ? longitudInput.value : '';
-			
-			let hasErrors = false;
-			
-			// Validar nombre del establecimiento
-			if (!nombreEstablecimientoValue) {
-				showFieldFeedback(nombreEstablecimientoInput, false, 'El nombre del establecimiento es obligatorio.');
-				hasErrors = true;
-			} else {
-				showFieldFeedback(nombreEstablecimientoInput, true, '');
-			}
-			
-			// Validar RENSPA
-			if (!renspaValue) {
-				showFieldFeedback(renspaInput, false, 'El número de RENSPA es obligatorio.');
-				hasErrors = true;
-			} else if (!/^\d{1,11}$/.test(renspaValue)) {
-				showFieldFeedback(renspaInput, false, 'El RENSPA debe contener entre 1 y 11 números.');
-				hasErrors = true;
-			} else if (renspaInput.classList.contains('is-invalid')) {
-				// Verificar si el RENSPA ya está registrado (campo marcado como inválido por validación backend)
-				const feedbackDiv = renspaInput.parentNode.querySelector('.field-feedback');
-				if (feedbackDiv && feedbackDiv.textContent.includes('ya está registrado')) {
-					showFieldFeedback(renspaInput, false, 'No puede continuar: el RENSPA ya está registrado en el sistema.');
-					hasErrors = true;
-				}
-			} else {
-				showFieldFeedback(renspaInput, true, '');
-			}
-			
-			// Validar departamento (ahora es un campo oculto con dropdown)
-			if (!departamentoValue) {
-				const departamentoDropdown = document.getElementById('dropdownDepartamento');
-				showFieldFeedback(departamentoDropdown, false, 'Debe seleccionar un departamento.');
-				hasErrors = true;
-			} else {
-				const departamentoDropdown = document.getElementById('dropdownDepartamento');
-				showFieldFeedback(departamentoDropdown, true, '');
-			}
-			
-			// Validar distrito (ahora es un campo oculto con dropdown)
-			if (!distritoValue) {
-				const distritoDropdown = document.getElementById('dropdownDistrito');
-				showFieldFeedback(distritoDropdown, false, 'Debe seleccionar un distrito.');
-				hasErrors = true;
-			} else {
-				const distritoDropdown = document.getElementById('dropdownDistrito');
-				showFieldFeedback(distritoDropdown, true, '');
-			}
-			
-			// Validar coordenadas
-			if (!latitudValue || !longitudValue) {
-				const mapContainer = document.getElementById('establecimiento-map');
-				showFieldFeedback(mapContainer, false, 'Debe marcar la ubicación en el mapa.');
-				hasErrors = true;
-			} else {
-				const mapContainer = document.getElementById('establecimiento-map');
-				showFieldFeedback(mapContainer, true, 'Ubicación seleccionada correctamente.');
-			}
-			
-			if (hasErrors) return;
-			
-			paso3.classList.add('d-none');
-			paso5.classList.remove('d-none');
-			
-			// Actualizar barra de progreso
-			const progressBar = document.querySelector('.wizard-progress-bar-inner');
-			if (progressBar) progressBar.style.width = '100%';
-			
-			// Actualizar labels de pasos
-			const wizardLabels = document.querySelectorAll('.wizard-step-label');
-			wizardLabels.forEach((el, idx) => {
-				if (idx === 3) {
-					el.classList.add('active');
-				}
-			});
-		});
-	}
-
-	// Paso 4: Especies
-	if (btnAnterior4) {
-		btnAnterior4.addEventListener('click', function() {
-			paso4.classList.add('d-none');
-			paso3.classList.remove('d-none');
-			
-			// Actualizar barra de progreso
-			const progressBar = document.querySelector('.wizard-progress-bar-inner');
-			if (progressBar) progressBar.style.width = '60%';
-			
-			// Actualizar labels de pasos
-			const wizardLabels = document.querySelectorAll('.wizard-step-label');
-			wizardLabels.forEach((el, idx) => {
-				if (idx === 3) {
-					el.classList.remove('active');
-				}
-			});
-		});
-	}
-
-	if (btnSiguiente4) {
-		btnSiguiente4.addEventListener('click', function() {
-			let hasErrors = false;
-			
-			// Validar especies
-			const especiesList = document.getElementById('especies-list');
-			const especiesSeleccionadas = especiesList ? especiesList.querySelectorAll('input[type="checkbox"]:checked') : [];
-			
-			if (especiesSeleccionadas.length === 0) {
-				showFieldFeedback(especiesList, false, 'Debe seleccionar al menos una especie.');
-				hasErrors = true;
-			} else {
-				showFieldFeedback(especiesList, true, `${especiesSeleccionadas.length} especie(s) seleccionada(s).`);
-			}
-			
-			// Validar administrador de establecimiento
-			const sinAdminCheckbox = document.getElementById('sinAdminEstablecimiento');
-			const sinAdmin = sinAdminCheckbox ? sinAdminCheckbox.checked : false;
-			
-			if (!sinAdmin) {
-				// Si NO está marcado "sin admin", entonces todos los campos son obligatorios
-				const adminNombre = document.getElementById('adminEstNombre');
-				const adminApellido = document.getElementById('adminEstApellido');
-				const adminDni = document.getElementById('adminEstDni');
-				const adminEmail = document.getElementById('adminEstEmail');
-				const adminTelefono = document.getElementById('adminEstTelefono');
-				const adminPassword = document.getElementById('adminEstPassword');
-				const adminPassword2 = document.getElementById('adminEstPassword2');
-				
-				// Validar cada campo del administrador
-				const adminFields = [
-					{field: adminNombre, name: 'Nombre del administrador'},
-					{field: adminApellido, name: 'Apellido del administrador'},
-					{field: adminDni, name: 'DNI del administrador'},
-					{field: adminEmail, name: 'Email del administrador'},
-					{field: adminTelefono, name: 'Teléfono del administrador'}
-				];
-				
-				adminFields.forEach(({field, name}) => {
-					if (field && !field.value.trim()) {
-						showFieldFeedback(field, false, `${name} es obligatorio.`);
-						hasErrors = true;
-					}
-				});
-				
-				// Validar contraseñas solo si NO están deshabilitadas (usuarios nuevos)
-				if (adminPassword && !adminPassword.readOnly) {
-					if (!adminPassword.value.trim()) {
-						showFieldFeedback(adminPassword, false, 'La contraseña del administrador es obligatoria.');
-						hasErrors = true;
-					} else if (adminPassword.value.length !== 6) {
-						showFieldFeedback(adminPassword, false, 'La contraseña debe tener exactamente 6 caracteres.');
-						hasErrors = true;
-					}
-				}
-				
-				if (adminPassword2 && !adminPassword2.readOnly) {
-					if (!adminPassword2.value.trim()) {
-						showFieldFeedback(adminPassword2, false, 'Debe repetir la contraseña.');
-						hasErrors = true;
-					} else if (adminPassword.value !== adminPassword2.value) {
-						showFieldFeedback(adminPassword2, false, 'Las contraseñas no coinciden.');
-						hasErrors = true;
-					}
-				}
-			}
-			
-			// Si hay errores, no continuar
-			if (hasErrors) {
-				return;
-			}
-			
-			paso4.classList.add('d-none');
-			paso5.classList.remove('d-none');
-			
-			// Actualizar barra de progreso
-			const progressBar = document.querySelector('.wizard-progress-bar-inner');
-			if (progressBar) progressBar.style.width = '100%';
-			
-			// Actualizar labels de pasos
-			const wizardLabels = document.querySelectorAll('.wizard-step-label');
-			wizardLabels.forEach((el, idx) => {
-				if (idx === 4) {
-					el.classList.add('active');
-				}
-			});
-		});
-	}
-
-	// Paso 5: Confirmación
-	if (btnAnterior5) {
-		btnAnterior5.addEventListener('click', function() {
-			paso5.classList.add('d-none');
-			paso4.classList.remove('d-none');
-			
-			// Actualizar barra de progreso
-			const progressBar = document.querySelector('.wizard-progress-bar-inner');
-			if (progressBar) progressBar.style.width = '80%';
-			
-			// Actualizar labels de pasos
-			const wizardLabels = document.querySelectorAll('.wizard-step-label');
-			wizardLabels.forEach((el, idx) => {
-				if (idx === 4) {
-					el.classList.remove('active');
-				}
-			});
-		});
-	}
+	// Configuración de contadores de caracteres
+	addCharacterCounter('cuit', 11, { 
+		allowOnlyNumbers: true,
+		warningThreshold: 9,
+		dangerThreshold: 10
+	});
 	
-	// Inicialización del mapa de geolocalización para el paso 3 del wizard
-
-	let establecimientoMap = null;
-	let establecimientoMarker = null;
-
-	function initEstablecimientoMap() {
-		if (establecimientoMap) {
-			establecimientoMap.invalidateSize();
-			return;
-		}
-
-		establecimientoMap = L.map('establecimiento-map').setView([-32.8908, -68.8272], 10);
-		// Capas base
-		const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-			maxZoom: 19,
-			attribution: '© OpenStreetMap'
-		});
-		const esriSatLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-			maxZoom: 19,
-			attribution: 'Tiles © Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR, and the GIS User Community'
-		});
-		osmLayer.addTo(establecimientoMap);
-		// Control de capas
-		const baseMaps = {
-			"Mapa estándar": osmLayer,
-			"Satélite": esriSatLayer
-		};
-		L.control.layers(baseMaps).addTo(establecimientoMap);
-
-		establecimientoMap.on('click', function(e) {
-			const { lat, lng } = e.latlng;
-			document.getElementById('latitud').value = lat.toFixed(6);
-			document.getElementById('longitud').value = lng.toFixed(6);
-			if (establecimientoMarker) {
-				establecimientoMarker.setLatLng(e.latlng);
-			} else {
-				establecimientoMarker = L.marker(e.latlng).addTo(establecimientoMap);
-			}
-		});
-
-		// Asignar el evento al botón de búsqueda después de inicializar el mapa
-		const buscarBtn = document.getElementById('btn-buscar-ubicacion');
-		if (buscarBtn) {
-			buscarBtn.addEventListener('click', buscarDireccion);
-		}
-	}
-
-	// Función de geocodificación para buscar y colocar el marcador
-	function buscarDireccion() {
-		const calle = document.getElementById('calle').value.trim();
-		const numeracion = document.getElementById('numeracion').value.trim();
-		// Obtener el texto visible de los dropdowns
-		let departamento = '';
-		let distrito = '';
-		const departamentoSelect = document.getElementById('departamento');
-		if (departamentoSelect) {
-			if (departamentoSelect.selectedIndex >= 0) {
-				departamento = departamentoSelect.options[departamentoSelect.selectedIndex].text.trim();
-			}
-		}
-		const distritoSelect = document.getElementById('distrito');
-		if (distritoSelect) {
-			if (distritoSelect.selectedIndex >= 0) {
-				distrito = distritoSelect.options[distritoSelect.selectedIndex].text.trim();
-			}
-		}
-		const codigoPostal = document.getElementById('codigoPostal') ? document.getElementById('codigoPostal').value.trim() : '';
-
-		// Construir dirección completa, incluyendo código postal si existe
-		let direccionCompleta = `${calle} ${numeracion}, ${distrito}, ${departamento}, Argentina`;
-		if (codigoPostal) {
-			direccionCompleta = `${calle} ${numeracion}, ${codigoPostal}, ${distrito}, ${departamento}, Argentina`;
-		}
-
-		if (calle === "" || numeracion === "") {
-			alert("Por favor, ingrese la Calle y la Numeración para buscar.");
-			return;
-		}
-
-		// Mostrar en consola la dirección para depuración
-		console.log('🔎 Dirección buscada:', direccionCompleta);
-
-		// Usar Nominatim para geocodificación
-		const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(direccionCompleta)}`;
-		fetch(url)
-			.then(response => response.json())
-			.then(data => {
-				if (data && data.length > 0) {
-					const lat = parseFloat(data[0].lat);
-					const lon = parseFloat(data[0].lon);
-					document.getElementById('latitud').value = lat.toFixed(6);
-					document.getElementById('longitud').value = lon.toFixed(6);
-					if (establecimientoMarker) {
-						establecimientoMarker.setLatLng([lat, lon]);
-					} else {
-						establecimientoMarker = L.marker([lat, lon]).addTo(establecimientoMap);
-					}
-					// Centrar y hacer zoom en la ubicación encontrada
-					establecimientoMap.setView([lat, lon], 18, { animate: true });
-				} else {
-					alert('No se encontró la ubicación. Verifique los datos ingresados.');
-				}
-			})
-			.catch(err => {
-				alert('Error al buscar la dirección. Intente nuevamente.');
-				console.error(err);
-			});
-	}
-
-	// Cargar especies desde endpoint
-	function cargarEspecies() {
-		const especiesList = document.getElementById('especies-list');
-		if (!especiesList) return;
-		
-		addLoadingState(especiesList, 'Cargando especies...');
-		
-		fetch('http://localhost:9090/especies')
-			.then(response => response.json())
-			.then(especies => {
-				let html = '';
-				especies.forEach(especie => {
-					html += `
-						<li class="px-3 py-1">
-							<div class="form-check">
-								<input class="form-check-input" type="checkbox" value="${especie.idEspecie}" id="chk-especie-${especie.idEspecie}">
-								<label class="form-check-label" for="chk-especie-${especie.idEspecie}">
-									${especie.nombreEspecie}
-								</label>
-							</div>
-						</li>
-					`;
-				});
-				especiesList.innerHTML = html;
-				
-				// Event listeners para actualizar dropdown y campo oculto
-				especiesList.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-					checkbox.addEventListener('change', function() {
-						actualizarEspeciesSeleccionadas();
-					});
-				});
-			})
-			.catch(error => {
-				console.error('Error cargando especies:', error);
-				especiesList.innerHTML = `
-					<li class="px-3 py-1">
-						<div class="form-check">
-							<input class="form-check-input" type="checkbox" value="1" id="chk-especie-1">
-							<label class="form-check-label" for="chk-especie-1">VID</label>
-						</div>
-					</li>
-					<li class="px-3 py-1">
-						<div class="form-check">
-							<input class="form-check-input" type="checkbox" value="2" id="chk-especie-2">
-							<label class="form-check-label" for="chk-especie-2">OLIVO</label>
-						</div>
-					</li>
-					<li class="px-3 py-1">
-						<div class="form-check">
-							<input class="form-check-input" type="checkbox" value="3" id="chk-especie-3">
-							<label class="form-check-label" for="chk-especie-3">CEREZO</label>
-						</div>
-					</li>
-				`;
-				
-				// Event listeners para datos por defecto
-				especiesList.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-					checkbox.addEventListener('change', function() {
-						actualizarEspeciesSeleccionadas();
-					});
-				});
-			});
-	}
+	addCharacterCounter('razonSocial', 50, { 
+		allowUppercase: true, 
+		customRegex: /[^A-Z0-9\s\.\,\-\_]/g,
+		warningThreshold: 40,
+		dangerThreshold: 47
+	});
 	
-	// Actualizar especies seleccionadas en el dropdown y campo oculto
-	function actualizarEspeciesSeleccionadas() {
-		const especiesList = document.getElementById('especies-list');
-		const dropdownButton = document.getElementById('dropdownEspecies');
-		const hiddenInput = document.getElementById('especies');
-		
-		if (!especiesList || !dropdownButton || !hiddenInput) return;
-		
-		const especiesSeleccionadas = especiesList.querySelectorAll('input[type="checkbox"]:checked');
-		const especiesTexto = Array.from(especiesSeleccionadas).map(checkbox => {
-			const label = especiesList.querySelector(`label[for="${checkbox.id}"]`);
-			return label ? label.textContent.trim() : '';
-		}).filter(texto => texto !== '');
-		
-		const especiesIds = Array.from(especiesSeleccionadas).map(checkbox => checkbox.value);
-		
-		if (especiesTexto.length > 0) {
-			dropdownButton.textContent = especiesTexto.length === 1 ? 
-				especiesTexto[0] : 
-				`${especiesTexto.length} especies seleccionadas`;
-			hiddenInput.value = especiesIds.join(',');
-		} else {
-			dropdownButton.textContent = 'Seleccionar especies';
-			hiddenInput.value = '';
-		}
-	}
-
-	// Actualizar departamento seleccionado en el dropdown y campo oculto
-	function actualizarDepartamentoSeleccionado() {
-		const departamentoList = document.getElementById('departamento-list');
-		const dropdownButton = document.getElementById('dropdownDepartamento');
-		const hiddenInput = document.getElementById('departamento');
-		
-		if (!departamentoList || !dropdownButton || !hiddenInput) return;
-		
-		const departamentoSeleccionado = departamentoList.querySelector('input[type="radio"]:checked');
-		
-		if (departamentoSeleccionado) {
-			const label = departamentoList.querySelector(`label[for="${departamentoSeleccionado.id}"]`);
-			const texto = label ? label.textContent.trim() : '';
-			
-			dropdownButton.textContent = texto;
-			hiddenInput.value = departamentoSeleccionado.value;
-		} else {
-			dropdownButton.textContent = 'Seleccionar departamento';
-			hiddenInput.value = '';
-		}
-	}
-
-	// Actualizar distrito seleccionado en el dropdown y campo oculto
-	function actualizarDistritoSeleccionado() {
-		const distritoList = document.getElementById('distrito-list');
-		const dropdownButton = document.getElementById('dropdownDistrito');
-		const hiddenInput = document.getElementById('distrito');
-		
-		if (!distritoList || !dropdownButton || !hiddenInput) return;
-		
-		const distritoSeleccionado = distritoList.querySelector('input[type="radio"]:checked');
-		
-		if (distritoSeleccionado) {
-			const label = distritoList.querySelector(`label[for="${distritoSeleccionado.id}"]`);
-			const texto = label ? label.textContent.trim() : '';
-			
-			dropdownButton.textContent = texto;
-			hiddenInput.value = distritoSeleccionado.value;
-		} else {
-			dropdownButton.textContent = 'Seleccionar distrito';
-			hiddenInput.value = '';
-		}
-	}
-
-	// Cargar departamentos con dropdown estilo especies
-	function cargarDepartamentos() {
-		const departamentoList = document.getElementById('departamento-list');
-		if (!departamentoList) return;
-		
-		departamentoList.innerHTML = '<li class="px-3 py-2 text-muted">Cargando departamentos...</li>';
-		
-		fetch('http://localhost:9090/departamentos')
-			.then(response => {
-				if (!response.ok) {
-					throw new Error(`HTTP error! status: ${response.status}`);
-				}
-				return response.json();
-			})
-			.then(departamentos => {
-				let html = '';
-				departamentos.forEach(dep => {
-					html += `
-						<li class="px-3 py-1">
-							<div class="form-check">
-								<input class="form-check-input" type="radio" name="departamento-radio" value="${dep.idDepartamento}" id="radio-dept-${dep.idDepartamento}">
-								<label class="form-check-label" for="radio-dept-${dep.idDepartamento}">
-									${dep.nombreDepartamento}
-								</label>
-							</div>
-						</li>
-					`;
-				});
-				departamentoList.innerHTML = html;
-				
-				// Event listeners para actualizar dropdown y cargar distritos
-				departamentoList.querySelectorAll('input[type="radio"]').forEach(radio => {
-					radio.addEventListener('change', function() {
-						if (this.checked) {
-							actualizarDepartamentoSeleccionado();
-							cargarDistritos(this.value);
-						}
-					});
-				});
-			})
-			.catch(error => {
-				console.error('Error cargando departamentos:', error);
-				departamentoList.innerHTML = `
-					<li class="px-3 py-1">
-						<div class="form-check">
-							<input class="form-check-input" type="radio" name="departamento-radio" value="1" id="radio-dept-1">
-							<label class="form-check-label" for="radio-dept-1">JUNÍN</label>
-						</div>
-					</li>
-					<li class="px-3 py-1">
-						<div class="form-check">
-							<input class="form-check-input" type="radio" name="departamento-radio" value="2" id="radio-dept-2">
-							<label class="form-check-label" for="radio-dept-2">LA PAZ</label>
-						</div>
-					</li>
-					<li class="px-3 py-1">
-						<div class="form-check">
-							<input class="form-check-input" type="radio" name="departamento-radio" value="3" id="radio-dept-3">
-							<label class="form-check-label" for="radio-dept-3">RIVADAVIA</label>
-						</div>
-					</li>
-					<li class="px-3 py-1">
-						<div class="form-check">
-							<input class="form-check-input" type="radio" name="departamento-radio" value="4" id="radio-dept-4">
-							<label class="form-check-label" for="radio-dept-4">GUAYMALLÉN</label>
-						</div>
-					</li>
-				`;
-				
-				// Event listeners para datos por defecto
-				departamentoList.querySelectorAll('input[type="radio"]').forEach(radio => {
-					radio.addEventListener('change', function() {
-						if (this.checked) {
-							actualizarDepartamentoSeleccionado();
-							cargarDistritos(this.value);
-						}
-					});
-				});
-			});
-	}
+	// Campos de contraseña - exactamente 6 caracteres
+	addCharacterCounter('password', 6, { 
+		warningThreshold: 5,
+		dangerThreshold: 6
+	});
 	
-	// Cargar distritos basado en departamento seleccionado (estilo dropdown especies)
-	function cargarDistritos(departamentoId) {
-		const distritoList = document.getElementById('distrito-list');
-		const dropdownDistrito = document.getElementById('dropdownDistrito');
-		
-		if (!distritoList || !departamentoId) {
-			if (distritoList) {
-				distritoList.innerHTML = '<li class="px-3 py-2 text-muted">Primero seleccione un departamento</li>';
-			}
-			if (dropdownDistrito) {
-				dropdownDistrito.textContent = 'Seleccionar distrito';
-			}
-			// Limpiar campo oculto
-			const hiddenInput = document.getElementById('distrito');
-			if (hiddenInput) hiddenInput.value = '';
-			return;
-		}
-		
-		distritoList.innerHTML = '<li class="px-3 py-2 text-muted">Cargando distritos...</li>';
-		
-		fetch(`http://localhost:9090/distritos/departamento/${departamentoId}`)
-			.then(response => {
-				if (!response.ok) {
-					throw new Error(`HTTP error! status: ${response.status}`);
-				}
-				return response.json();
-			})
-			.then(distritos => {
-				let html = '';
-				distritos.forEach(distrito => {
-					html += `
-						<li class="px-3 py-1">
-							<div class="form-check">
-								<input class="form-check-input" type="radio" name="distrito-radio" value="${distrito.idDistrito}" id="radio-dist-${distrito.idDistrito}">
-								<label class="form-check-label" for="radio-dist-${distrito.idDistrito}">
-									${distrito.nombreDistrito}
-								</label>
-							</div>
-						</li>
-					`;
-				});
-				distritoList.innerHTML = html;
-				
-				// Event listeners para actualizar dropdown
-				distritoList.querySelectorAll('input[type="radio"]').forEach(radio => {
-					radio.addEventListener('change', function() {
-						if (this.checked) {
-							actualizarDistritoSeleccionado();
-						}
-					});
-				});
-			})
-			.catch(error => {
-				console.error('Error cargando distritos desde backend:', error);
-				// Fallback a datos estáticos solo en caso de error
-				const distritosData = {
-					'1': [{idDistrito: 1, nombreDistrito: 'JUNÍN CENTRO'}, {idDistrito: 2, nombreDistrito: 'JUNÍN NORTE'}],
-					'2': [{idDistrito: 3, nombreDistrito: 'LA PAZ CENTRO'}, {idDistrito: 4, nombreDistrito: 'LA PAZ SUR'}],
-					'3': [{idDistrito: 5, nombreDistrito: 'RIVADAVIA CENTRO'}, {idDistrito: 6, nombreDistrito: 'RIVADAVIA OESTE'}],
-					'4': [{idDistrito: 7, nombreDistrito: 'GUAYMALLÉN NORTE'}, {idDistrito: 8, nombreDistrito: 'GUAYMALLÉN SUR'}]
-				};
-				
-				const distritos = distritosData[departamentoId] || [];
-				let html = '';
-				distritos.forEach(distrito => {
-					html += `
-						<li class="px-3 py-1">
-							<div class="form-check">
-								<input class="form-check-input" type="radio" name="distrito-radio" value="${distrito.idDistrito}" id="radio-dist-${distrito.idDistrito}">
-								<label class="form-check-label" for="radio-dist-${distrito.idDistrito}">
-									${distrito.nombreDistrito}
-								</label>
-							</div>
-						</li>
-					`;
-				});
-				distritoList.innerHTML = html;
-				
-				// Event listeners para datos por defecto
-				distritoList.querySelectorAll('input[type="radio"]').forEach(radio => {
-					radio.addEventListener('change', function() {
-						if (this.checked) {
-							actualizarDistritoSeleccionado();
-						}
-					});
-				});
-			});
-	}
+	addCharacterCounter('password2', 6, { 
+		warningThreshold: 5,
+		dangerThreshold: 6
+	});
+	
+	// Inicialización completada
+	console.log('✅ Wizard de 2 pasos inicializado correctamente');
+	
+	// === FUNCIONES DE UTILIDAD ===
 });
 
 // --- EFECTO SCROLL PARA NAVBAR TRANSPARENTE ---
@@ -1942,128 +980,35 @@ function recopilarDatosWizard() {
 		// Paso 1: Datos de empresa
 		const cuit = document.getElementById('cuit')?.value?.trim();
 		const razonSocial = document.getElementById('razonSocial')?.value?.trim();
-		
-		// Paso 2: Administrador de empresa
-		const dni = document.getElementById('dni')?.value?.trim();
-		const nombre = document.getElementById('nombre')?.value?.trim();
-		const apellido = document.getElementById('apellido')?.value?.trim();
-		const email = document.getElementById('email')?.value?.trim();
-		const telefono = document.getElementById('telefono')?.value?.trim();
 		const password = document.getElementById('password')?.value;
-		
-		// Paso 3: Datos de establecimiento
-		const nombreEstablecimiento = document.getElementById('nombreEstablecimiento')?.value?.trim();
-		const renspa = document.getElementById('renspa')?.value?.trim();
-		const calle = document.getElementById('calle')?.value?.trim();
-		const numeracion = document.getElementById('numeracion')?.value?.trim();
-		const codigoPostal = document.getElementById('codigoPostal')?.value?.trim();
-		const distrito = document.getElementById('distrito')?.value;
-		const latitud = document.getElementById('latitud')?.value;
-		const longitud = document.getElementById('longitud')?.value;
-		
-		// Paso 4: Especies seleccionadas
-		const especiesInput = document.getElementById('especies')?.value;
-		const especiesIds = especiesInput ? especiesInput.split(',').filter(id => id.trim()).map(id => parseInt(id)) : [];
-		
-		// Paso 4: Administrador de establecimiento (opcional)
-		const sinAdminEst = document.getElementById('sinAdminEstablecimiento')?.checked;
-		const adminEstNombre = document.getElementById('adminEstNombre')?.value?.trim();
-		const adminEstApellido = document.getElementById('adminEstApellido')?.value?.trim();
-		const adminEstDni = document.getElementById('adminEstDni')?.value?.trim();
-		const adminEstEmail = document.getElementById('adminEstEmail')?.value?.trim();
-		const adminEstTelefono = document.getElementById('adminEstTelefono')?.value?.trim();
-		const adminEstPassword = document.getElementById('adminEstPassword')?.value;
+		const password2 = document.getElementById('password2')?.value;
 		
 		// Validaciones básicas
-		// IMPORTANTE: Para usuarios existentes (contraseña deshabilitada), no requerir contraseña
-		const passwordField = document.getElementById('password');
-		const passwordRequired = passwordField && !passwordField.readOnly;
-		
-		if (!cuit || !razonSocial || !dni || !nombre || !apellido || !email || !telefono) {
-			throw new Error('Faltan datos obligatorios en los pasos 1 y 2');
+		if (!cuit || !razonSocial || !password || !password2) {
+			throw new Error('Faltan datos obligatorios en el paso 1');
 		}
 		
-		// Si la contraseña es requerida (usuario nuevo) pero no está presente
-		if (passwordRequired && !password) {
-			throw new Error('La contraseña es obligatoria para usuarios nuevos');
+		// Validaciones de contraseña
+		if (password.length !== 6) {
+			throw new Error('La contraseña debe tener exactamente 6 caracteres');
 		}
 		
-		// Validación específica de longitud de contraseña (solo si hay contraseña)
-		if (password && password.length > 6) {
-			throw new Error('La contraseña no puede exceder los 6 caracteres');
+		if (password.includes(' ')) {
+			throw new Error('La contraseña no puede contener espacios');
 		}
 		
-		if (!nombreEstablecimiento || !renspa || !calle || !numeracion || !codigoPostal || !distrito || !latitud || !longitud) {
-			throw new Error('Faltan datos obligatorios del establecimiento en el paso 3');
-		}
-		
-		if (especiesIds.length === 0) {
-			throw new Error('Debe seleccionar al menos una especie');
+		if (password !== password2) {
+			throw new Error('Las contraseñas no coinciden');
 		}
 		
 		// Estructurar JSON según el formato esperado por el backend
 		const datosRegistro = {
 			dtoEmpresaRegistro: {
 				cuit: cuit,
-				razonSocial: razonSocial
-			},
-			dtoEstablecimientoRegistro: {
-				numeroRenspa: renspa,
-				nombreEstablecimiento: nombreEstablecimiento,
-				calle: calle,
-				numeracion: numeracion,
-				codigoPostal: codigoPostal,
-				localizacion: {
-					latitud: parseFloat(latitud),
-					longitud: parseFloat(longitud)
-				},
-				idDistrito: parseInt(distrito),
-				idEspecies: especiesIds
-			},
-			dtoPersonaEmpresaRegistro: {
-				dni: dni,
-				apellido: apellido,
-				nombrePersona: nombre,
-				telefono: telefono,
-				email: email
+				razonSocial: razonSocial,
+				contrasenia: password
 			}
 		};
-		
-		// Solo agregar contraseña si es un usuario nuevo (contraseña requerida)
-		if (passwordRequired && password) {
-			datosRegistro.dtoPersonaEmpresaRegistro.contrasenia = password.substring(0, 6);
-		}
-		
-		// Administrador de establecimiento: Solo incluir la propiedad si hay administrador
-		// IMPORTANTE: Para usuarios existentes (contraseña deshabilitada), no requerir contraseña
-		const adminPasswordField = document.getElementById('adminEstPassword');
-		const adminPasswordRequired = adminPasswordField && !adminPasswordField.readOnly;
-		
-		if (!sinAdminEst && adminEstNombre && adminEstApellido && adminEstDni && adminEstEmail && adminEstTelefono) {
-			// Si la contraseña es requerida (usuario nuevo) pero no está presente
-			if (adminPasswordRequired && !adminEstPassword) {
-				throw new Error('La contraseña del administrador es obligatoria para usuarios nuevos');
-			}
-			
-			// Validación específica de longitud de contraseña del admin (solo si hay contraseña)
-			if (adminEstPassword && adminEstPassword.length > 6) {
-				throw new Error('La contraseña del administrador no puede exceder los 6 caracteres');
-			}
-			
-			datosRegistro.dtoPersonaEstablecimientoRegistro = {
-				dni: adminEstDni,
-				apellido: adminEstApellido,
-				nombrePersona: adminEstNombre,
-				telefono: adminEstTelefono,
-				email: adminEstEmail
-			};
-			
-			// Solo agregar contraseña si es un usuario nuevo (contraseña requerida)
-			if (adminPasswordRequired && adminEstPassword) {
-				datosRegistro.dtoPersonaEstablecimientoRegistro.contrasenia = adminEstPassword.substring(0, 6);
-			}
-		}
-		// CRÍTICO: Si no hay administrador (sinAdminEst = true), NO incluir la propiedad dtoPersonaEstablecimientoRegistro
 		
 		return datosRegistro;
 		
@@ -2077,17 +1022,8 @@ function recopilarDatosWizard() {
 // Función para enviar registro al backend
 async function enviarRegistroAlBackend(datos) {
 	try {
-		// Log para confirmar que la solución funciona correctamente
+		// Log para confirmar los datos enviados
 		console.log('📤 JSON enviado al backend:', JSON.stringify(datos, null, 2));
-		
-		const tieneAdministrador = 'dtoPersonaEstablecimientoRegistro' in datos;
-		console.log('🏢 ¿Incluye administrador de establecimiento?:', tieneAdministrador);
-		
-		if (tieneAdministrador) {
-			console.log('✅ dtoPersonaEstablecimientoRegistro incluido en el JSON');
-		} else {
-			console.log('✅ dtoPersonaEstablecimientoRegistro OMITIDO del JSON (correcto para sin administrador)');
-		}
 		
 		const response = await fetch('http://localhost:9090/registro', {
 			method: 'POST',
@@ -2443,21 +1379,6 @@ async function ejecutarAutocompletado(dniFieldId) {
 		deshabilitarContraseniasPersonaExistente('password', 'password2');
 	} else {
 		habilitarContraseniasPersonaNueva('password', 'password2');
-	}
-}
-
-/**
- * Ejecuta el autocompletado para el formulario de admin
- */
-async function ejecutarAutocompletadoAdmin(dniFieldId) {
-	console.log('🚀 Ejecutando autocompletado para admin...');
-	const persona = await autocompletarPersona(dniFieldId, 'adminEstNombre', 'adminEstApellido', 'adminEstEmail', 'adminEstTelefono');
-	
-	// Si encontró una persona, deshabilitar contraseñas. Si no, habilitarlas.
-	if (persona) {
-		deshabilitarContraseniasPersonaExistente('adminEstPassword', 'adminEstPassword2');
-	} else {
-		habilitarContraseniasPersonaNueva('adminEstPassword', 'adminEstPassword2');
 	}
 }
 
@@ -3056,3 +1977,465 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	}
 });
+
+/* ===================================
+   WIZARD PROGRESS SYSTEM - JAVASCRIPT
+   =================================== */
+
+class WizardProgressManager {
+    constructor(wizardContainer) {
+        this.container = wizardContainer;
+        this.progressBar = wizardContainer.querySelector('.wizard-progress-bar-inner');
+        this.steps = wizardContainer.querySelectorAll('.wizard-step-label');
+        this.currentStep = 0;
+        this.totalSteps = this.steps.length;
+        
+        this.initializeWizard();
+    }
+    
+    initializeWizard() {
+        // Configurar eventos de click en pasos navegables
+        this.steps.forEach((step, index) => {
+            step.addEventListener('click', () => {
+                if (this.canNavigateToStep(index)) {
+                    this.goToStep(index);
+                }
+            });
+        });
+        
+        // Establecer estado inicial
+        this.updateProgress();
+    }
+    
+    canNavigateToStep(stepIndex) {
+        // Permitir navegación a pasos completados o el paso actual
+        return stepIndex <= this.currentStep || this.steps[stepIndex].classList.contains('completed');
+    }
+    
+    goToStep(stepIndex) {
+        if (stepIndex < 0 || stepIndex >= this.totalSteps) return;
+        
+        // Animar transición
+        this.animateStepTransition(this.currentStep, stepIndex);
+        this.currentStep = stepIndex;
+        this.updateProgress();
+    }
+    
+    nextStep() {
+        if (this.currentStep < this.totalSteps - 1) {
+            // Marcar paso actual como completado
+            this.completeStep(this.currentStep);
+            this.currentStep++;
+            this.updateProgress();
+            
+            // Feedback visual de progreso
+            this.showProgressFeedback();
+        }
+    }
+    
+    previousStep() {
+        if (this.currentStep > 0) {
+            this.currentStep--;
+            this.updateProgress();
+        }
+    }
+    
+    completeStep(stepIndex) {
+        const step = this.steps[stepIndex];
+        if (!step) return;
+        
+        // Agregar estado loading temporalmente
+        step.classList.add('loading');
+        step.classList.remove('active');
+        
+        // Simular procesamiento
+        setTimeout(() => {
+            step.classList.remove('loading');
+            step.classList.add('completed');
+            
+            // Efecto de confetti virtual
+            this.triggerCompletionEffect(step);
+        }, 800);
+    }
+    
+    updateProgress() {
+        // Actualizar barra de progreso
+        const progressPercentage = (this.currentStep / (this.totalSteps - 1)) * 100;
+        this.progressBar.style.width = `${progressPercentage}%`;
+        
+        // Actualizar estados de pasos
+        this.steps.forEach((step, index) => {
+            step.classList.remove('active');
+            
+            if (index < this.currentStep) {
+                if (!step.classList.contains('completed')) {
+                    step.classList.add('completed');
+                    this.triggerCompletionEffect(step);
+                }
+            } else if (index === this.currentStep) {
+                step.classList.add('active');
+                step.classList.remove('completed');
+            } else {
+                step.classList.remove('completed');
+            }
+        });
+        
+        // Actualizar color de barra según progreso
+        this.updateProgressBarColor(progressPercentage);
+    }
+    
+    updateProgressBarColor(percentage) {
+        if (percentage === 100) {
+            this.progressBar.style.background = `linear-gradient(90deg, 
+                var(--success-green) 0%, 
+                var(--light-green) 100%)`;
+            this.progressBar.style.boxShadow = '0 0 20px rgba(39, 174, 96, 0.6)';
+        } else if (percentage >= 50) {
+            this.progressBar.style.background = `linear-gradient(90deg, 
+                var(--primary-blue) 0%, 
+                var(--accent-blue) 100%)`;
+            this.progressBar.style.boxShadow = '0 0 20px rgba(74, 144, 226, 0.4)';
+        } else {
+            this.progressBar.style.background = `linear-gradient(90deg, 
+                var(--warning-orange) 0%, 
+                var(--light-orange) 100%)`;
+            this.progressBar.style.boxShadow = '0 0 20px rgba(243, 156, 18, 0.4)';
+        }
+    }
+    
+    animateStepTransition(fromStep, toStep) {
+        const fromElement = this.steps[fromStep];
+        const toElement = this.steps[toStep];
+        
+        if (fromElement) {
+            fromElement.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                fromElement.style.transform = '';
+            }, 200);
+        }
+        
+        if (toElement) {
+            toElement.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                toElement.style.transform = '';
+            }, 300);
+        }
+    }
+    
+    triggerCompletionEffect(stepElement) {
+        // Crear efecto de partículas/confetti
+        const rect = stepElement.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        for (let i = 0; i < 8; i++) {
+            this.createParticle(centerX, centerY);
+        }
+        
+        // Efecto de pulso
+        stepElement.style.animation = 'completedBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+    }
+    
+    createParticle(x, y) {
+        const particle = document.createElement('div');
+        particle.style.cssText = `
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: var(--success-green);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            left: ${x}px;
+            top: ${y}px;
+        `;
+        
+        document.body.appendChild(particle);
+        
+        // Animar partícula
+        const angle = (Math.PI * 2 * Math.random());
+        const distance = 50 + Math.random() * 50;
+        const duration = 800 + Math.random() * 400;
+        
+        particle.animate([
+            { 
+                transform: 'translate(0, 0) scale(1)', 
+                opacity: 1 
+            },
+            { 
+                transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(0)`,
+                opacity: 0 
+            }
+        ], {
+            duration: duration,
+            easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
+        }).onfinish = () => {
+            particle.remove();
+        };
+    }
+    
+    showProgressFeedback() {
+        // Mostrar toast de progreso
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success-green);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            z-index: 9999;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        `;
+        toast.innerHTML = `
+            <i class="fas fa-check-circle me-2"></i>
+            Paso ${this.currentStep} completado
+        `;
+        
+        document.body.appendChild(toast);
+        
+        // Animar entrada
+        setTimeout(() => {
+            toast.style.transform = 'translateX(0)';
+        }, 100);
+        
+        // Remover después de 3 segundos
+        setTimeout(() => {
+            toast.style.transform = 'translateX(100%)';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+    
+    // Métodos públicos para uso externo
+    setStepCompleted(stepIndex, completed = true) {
+        const step = this.steps[stepIndex];
+        if (!step) return;
+        
+        if (completed) {
+            step.classList.add('completed');
+            step.classList.remove('active');
+        } else {
+            step.classList.remove('completed');
+        }
+    }
+    
+    setStepLoading(stepIndex, loading = true) {
+        const step = this.steps[stepIndex];
+        if (!step) return;
+        
+        if (loading) {
+            step.classList.add('loading');
+            step.classList.remove('active', 'completed');
+        } else {
+            step.classList.remove('loading');
+        }
+    }
+    
+    reset() {
+        this.currentStep = 0;
+        this.steps.forEach(step => {
+            step.classList.remove('active', 'completed', 'loading');
+        });
+        this.updateProgress();
+    }
+    
+    finish() {
+        // Completar todos los pasos
+        this.currentStep = this.totalSteps - 1;
+        this.steps.forEach((step, index) => {
+            if (index <= this.currentStep) {
+                step.classList.add('completed');
+                step.classList.remove('active');
+            }
+        });
+        this.updateProgress();
+        
+        // Efecto final
+        this.showCompletionCelebration();
+    }
+    
+    showCompletionCelebration() {
+        const celebration = document.createElement('div');
+        celebration.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, var(--success-green), var(--light-green));
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            z-index: 9999;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: celebrationPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        `;
+        celebration.innerHTML = `
+            <i class="fas fa-trophy" style="font-size: 3rem; margin-bottom: 1rem; color: #FFD700;"></i>
+            <h3 style="margin: 0 0 0.5rem 0;">¡Registro Completado!</h3>
+            <p style="margin: 0; opacity: 0.9;">Todos los pasos han sido finalizados exitosamente</p>
+        `;
+        
+        document.body.appendChild(celebration);
+        
+        // Crear confetti masivo
+        for (let i = 0; i < 50; i++) {
+            setTimeout(() => {
+                this.createParticle(
+                    window.innerWidth * Math.random(),
+                    -10
+                );
+            }, i * 50);
+        }
+        
+        // Remover celebración después de 4 segundos
+        setTimeout(() => {
+            celebration.style.animation = 'fadeOut 0.3s ease-out forwards';
+            setTimeout(() => celebration.remove(), 300);
+        }, 4000);
+    }
+}
+
+// Inicializar wizard automáticamente
+document.addEventListener('DOMContentLoaded', function() {
+    const wizardContainers = document.querySelectorAll('.wizard-progress');
+    const wizards = [];
+    
+    wizardContainers.forEach(container => {
+        const wizard = new WizardProgressManager(container);
+        wizards.push(wizard);
+        
+        // Hacer accesible globalmente
+        container.wizardManager = wizard;
+    });
+    
+    // Hacer disponible globalmente
+    window.wizardManagers = wizards;
+});
+
+// Agregar estilos de animación adicionales
+const additionalStyles = `
+    @keyframes celebrationPop {
+        0% { 
+            opacity: 0; 
+            transform: translate(-50%, -50%) scale(0.3) rotate(-10deg); 
+        }
+        100% { 
+            opacity: 1; 
+            transform: translate(-50%, -50%) scale(1) rotate(0deg); 
+        }
+    }
+    
+    @keyframes fadeOut {
+        from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        to { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+    }
+`;
+
+// Inyectar estilos adicionales
+if (!document.querySelector('#wizard-additional-styles')) {
+    const styleSheet = document.createElement('style');
+    styleSheet.id = 'wizard-additional-styles';
+    styleSheet.textContent = additionalStyles;
+    document.head.appendChild(styleSheet);
+}
+
+// Función utilitaria para obtener el primer wizard
+function getFirstWizard() {
+    const container = document.querySelector('.wizard-progress');
+    return container ? container.wizardManager : null;
+}
+
+// Función para validar paso actual (ejemplo de integración)
+function validateCurrentWizardStep() {
+    const wizard = getFirstWizard();
+    if (!wizard) return false;
+    
+    // Aquí puedes agregar tu lógica de validación
+    // Por ejemplo, validar formularios del paso actual
+    
+    const currentStepElement = wizard.steps[wizard.currentStep];
+    const stepIndex = wizard.currentStep;
+    
+    // Simulación de validación
+    const isValid = Math.random() > 0.3; // 70% de probabilidad de ser válido
+    
+    if (isValid) {
+        wizard.completeStep(stepIndex);
+        return true;
+    } else {
+        // Mostrar error
+        showWizardStepError(stepIndex, 'Por favor complete todos los campos requeridos');
+        return false;
+    }
+}
+
+function showWizardStepError(stepIndex, message) {
+    const errorToast = document.createElement('div');
+    errorToast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: var(--bs-danger);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        z-index: 9999;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        max-width: 300px;
+    `;
+    errorToast.innerHTML = `
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Paso ${stepIndex + 1}:</strong><br>
+        ${message}
+    `;
+    
+    document.body.appendChild(errorToast);
+    
+    setTimeout(() => {
+        errorToast.style.transform = 'translateX(0)';
+    }, 100);
+    
+    setTimeout(() => {
+        errorToast.style.transform = 'translateX(100%)';
+        setTimeout(() => errorToast.remove(), 300);
+    }, 4000);
+}
+
+// Función para llenar el resumen de confirmación
+function llenarResumenConfirmacion() {
+	const cuit = document.getElementById('cuit-empleador').value;
+	const razonSocial = document.getElementById('razon-social-empleador').value;
+	const password = document.getElementById('password').value;
+	
+	// Obtener la lista de confirmación
+	const confirmacionLista = document.getElementById('confirmacion-lista');
+	if (!confirmacionLista) return;
+	
+	// Limpiar lista anterior
+	confirmacionLista.innerHTML = '';
+	
+	// Agregar elementos a la lista
+	const items = [
+		{ label: 'CUIT', value: cuit },
+		{ label: 'Razón Social', value: razonSocial },
+		{ label: 'Contraseña', value: '•'.repeat(password.length) }
+	];
+	
+	items.forEach(item => {
+		const listItem = document.createElement('li');
+		listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+		listItem.innerHTML = `
+			<strong>${item.label}:</strong>
+			<span>${item.value}</span>
+		`;
+		confirmacionLista.appendChild(listItem);
+	});
+}
