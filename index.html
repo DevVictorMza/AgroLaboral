@@ -147,12 +147,15 @@
                     <form id="form-login">
                         <div class="mb-4">
                             <div class="mb-3">
-                                <label for="dni-login" class="form-label">DNI</label>
-                                <input type="text" class="form-control" id="dni-login" name="dni-login" placeholder="Ej: 12345678">
+                                <label for="cuit-login" class="form-label">CUIT</label>
+                                <input type="text" class="form-control" id="cuit-login" name="cuit-login" placeholder="Ej: 20123456789">
                             </div>
                             <div class="mb-3" style="position: relative;">
                                 <label for="password-login" class="form-label">Contraseña</label>
                                 <input type="password" class="form-control" id="password-login" name="password-login" placeholder="Ingresa tu contraseña">
+                            </div>
+                            <div id="login-error" class="alert alert-danger d-none">
+                                <i class="fas fa-exclamation-circle me-2"></i><span></span>
                             </div>
                         </div>
                         <div class="d-grid gap-2">

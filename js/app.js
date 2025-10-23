@@ -6,13 +6,32 @@ const BACKEND_CONFIG = {
     BASE_URL: 'http://localhost:8080',
     ENDPOINTS: {
         VALIDATE_CUIT: '/publico/empresas/existe/',
-        REGISTER_COMPANY: 'publico/empresas/registro'
+        REGISTER_COMPANY: 'publico/empresas/registro',
+        LOGIN: '/publico/login',
+        PROFILE: '/privado/empresas/perfil'
     },
     TIMEOUTS: {
         VALIDATION: 5000,
-        REGISTRATION: 10000
+        REGISTRATION: 10000,
+        LOGIN: 5000,
+        PROFILE: 5000
     },
     DEVELOPMENT_MODE: true
+};
+
+// Configuración de autenticación
+const AUTH_CONFIG = {
+    endpoints: {
+        login: '/publico/login',
+    },
+    storage: {
+        tokenKey: 'cepas_lab_token',
+        userKey: 'cepas_lab_user'
+    },
+    routes: {
+        dashboard: 'dashboard.html',
+        login: 'index.html'
+    }
 };
 
 // Función para construir URLs del backend
@@ -32,6 +51,124 @@ async function fetchWithConfig(url, options = {}) {
     };
     
     return fetch(url, { ...defaultOptions, ...options });
+}
+
+// Función para realizar peticiones autenticadas
+async function fetchWithAuth(endpoint, options = {}) {
+    const token = obtenerToken();
+    if (!token) {
+        throw new Error('No hay token de autenticación');
+    }
+
+    const defaultOptions = {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+        },
+        mode: 'cors',
+        credentials: 'include'
+    };
+    
+    const url = buildURL(endpoint);
+    return fetchWithConfig(url, { ...defaultOptions, ...options });
+}
+
+// ===========================
+// FUNCIONES DE PERFIL DE EMPRESA
+// ===========================
+
+async function cargarPerfilEmpresa() {
+    try {
+        console.log('🔄 Cargando perfil de empresa...');
+        
+        const response = await fetchWithAuth(BACKEND_CONFIG.ENDPOINTS.PROFILE);
+        
+        if (!response.ok) {
+            if (response.status === 401) {
+                console.error('❌ Token expirado o inválido');
+                cerrarSesion();
+                window.location.href = AUTH_CONFIG.routes.login;
+                return;
+            }
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+
+        const perfil = await response.json();
+        console.log('✅ Perfil cargado:', perfil);
+
+        // Almacenar datos del perfil
+        localStorage.setItem('perfil_empresa', JSON.stringify(perfil));
+
+        // Actualizar UI
+        actualizarPerfilUI(perfil);
+
+    } catch (error) {
+        console.error('❌ Error cargando perfil:', error);
+        mostrarErrorPerfil(error.message);
+    }
+}
+
+function actualizarPerfilUI(perfil) {
+    // Actualizar el header del dashboard
+    const headerProfile = document.querySelector('.profile-header');
+    if (headerProfile) {
+        headerProfile.innerHTML = `
+            <div class="profile-info">
+                <h4 class="mb-0">${perfil.razonSocial}</h4>
+                <p class="text-muted mb-2">CUIT: ${perfil.cuit}</p>
+                <small class="text-muted">
+                    <i class="fas fa-calendar-alt me-1"></i>
+                    Miembro desde: ${new Date(perfil.fechaAlta).toLocaleDateString()}
+                </small>
+            </div>
+        `;
+    }
+
+    // Actualizar sección de datos completos
+    const profileSection = document.querySelector('.profile-details');
+    if (profileSection) {
+        profileSection.innerHTML = `
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Datos de la Empresa</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted">ID Empresa</label>
+                            <p class="mb-0">${perfil.idEmpresa}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted">CUIT</label>
+                            <p class="mb-0">${perfil.cuit}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted">Razón Social</label>
+                            <p class="mb-0">${perfil.razonSocial}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted">Fecha de Alta</label>
+                            <p class="mb-0">${new Date(perfil.fechaAlta).toLocaleString()}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+function mostrarErrorPerfil(mensaje) {
+    const errorContainer = document.createElement('div');
+    errorContainer.className = 'alert alert-danger alert-dismissible fade show';
+    errorContainer.innerHTML = `
+        <i class="fas fa-exclamation-circle me-2"></i>
+        ${mensaje}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) {
+        mainContent.insertBefore(errorContainer, mainContent.firstChild);
+    }
 }
 
 // ===========================
@@ -1795,31 +1932,18 @@ window.probarEndpointPersonas = async function(dni = '35876866') {
 // FUNCIONALIDAD DE LOGIN Y AUTENTICACIÓN
 // ==========================================
 
-// Configuración de autenticación
-const AUTH_CONFIG = {
-	endpoints: {
-		login: 'http://localhost:9090/aut/login',
-		verify: 'http://localhost:9090/aut/verify', // Para verificar token
-		// Agregar otros endpoints según tu backend
-	},
-	storage: {
-		tokenKey: 'agro_lab_token',
-		userKey: 'agro_lab_user'
-	}
-};
-
-// Función para validar formato DNI
-function validarDNI(dni) {
-	if (!dni || dni.trim() === '') {
-		return { valido: false, mensaje: 'El DNI es obligatorio' };
+// Función para validar formato CUIT
+function validarCUITLogin(cuit) {
+	if (!cuit || cuit.trim() === '') {
+		return { valido: false, mensaje: 'El CUIT es obligatorio' };
 	}
 	
-	const dniLimpio = dni.trim();
-	if (!/^\d{7,8}$/.test(dniLimpio)) {
-		return { valido: false, mensaje: 'El DNI debe tener 7 u 8 dígitos numéricos' };
+	const cuitLimpio = cuit.replace(/[-\s]/g, '');
+	if (!/^\d{11}$/.test(cuitLimpio)) {
+		return { valido: false, mensaje: 'El CUIT debe tener 11 dígitos' };
 	}
 	
-	return { valido: true, dni: dniLimpio };
+	return { valido: true, cuit: cuitLimpio };
 }
 
 // Función para validar contraseña
@@ -1828,30 +1952,27 @@ function validarContrasenaLogin(contrasenia) {
 		return { valido: false, mensaje: 'La contraseña es obligatoria' };
 	}
 	
-	if (contrasenia.length !== 6) {
-		return { valido: false, mensaje: 'La contraseña debe tener exactamente 6 caracteres' };
+	if (contrasenia.length < 6) {
+		return { valido: false, mensaje: 'La contraseña debe tener al menos 6 caracteres' };
 	}
 	
 	return { valido: true, contrasenia: contrasenia };
 }
 
 // Función para enviar credenciales al backend
-async function autenticarUsuario(dni, contrasenia) {
+async function autenticarUsuario(cuit, contrasenia) {
 	try {
-		console.log('🔐 Iniciando autenticación para DNI:', dni);
+		console.log('🔐 Iniciando autenticación para CUIT:', cuit);
 		
 		const credenciales = {
-			dni: dni,
+			cuit: cuit,
 			contrasenia: contrasenia
 		};
 		
 		console.log('📤 Enviando credenciales al backend:', JSON.stringify(credenciales, null, 2));
 		
-		const response = await fetch(AUTH_CONFIG.endpoints.login, {
+		const response = await fetchWithConfig(buildURL(AUTH_CONFIG.endpoints.login), {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
 			body: JSON.stringify(credenciales)
 		});
 		
@@ -1859,8 +1980,21 @@ async function autenticarUsuario(dni, contrasenia) {
 		
 		if (response.ok) {
 			const data = await response.json();
-			console.log('✅ Login exitoso, datos recibidos:', data);
-			return { exito: true, datos: data };
+			console.log('✅ Login exitoso, JWT recibido');
+			
+			// Almacenar datos del usuario autenticado
+			const userData = {
+				cuit: cuit,
+				token: data.token
+			};
+			
+			return { 
+				exito: true, 
+				datos: {
+					token: data.token,
+					usuario: userData
+				}
+			};
 		} else if (response.status === 401) {
 			console.log('❌ Credenciales inválidas (401)');
 			return { exito: false, mensaje: 'DNI o contraseña incorrectos' };
@@ -1913,6 +2047,7 @@ function obtenerUsuario() {
 function cerrarSesion() {
 	localStorage.removeItem(AUTH_CONFIG.storage.tokenKey);
 	localStorage.removeItem(AUTH_CONFIG.storage.userKey);
+	localStorage.removeItem('perfil_empresa');
 	console.log('✅ Sesión cerrada');
 	actualizarInterfazLogin(false);
 }
@@ -1930,7 +2065,7 @@ function actualizarInterfazLogin(autenticado) {
 	
 	if (autenticado) {
 		const usuario = obtenerUsuario();
-		const nombreUsuario = usuario ? usuario.nombre || usuario.dni : 'Usuario';
+		const nombreUsuario = usuario ? usuario.razonSocial || usuario.cuit : 'Usuario';
 		
 		// Ocultar el botón de login
 		if (btnLogin) {
@@ -2149,28 +2284,80 @@ document.addEventListener('DOMContentLoaded', function() {
 	// Verificar si ya hay una sesión activa al cargar la página
 	if (estaAutenticado()) {
 		actualizarInterfazLogin(true);
+		
+		// Si estamos en index.html, redirigir al dashboard
+		if (window.location.pathname.endsWith('index.html')) {
+			window.location.href = AUTH_CONFIG.routes.dashboard;
+		}
 	}
 	
-	// Aplicar validaciones en tiempo real a los campos
-	const dniInput = document.getElementById('dni-login');
-	const passwordInput = document.getElementById('password-login');
+	// Función para manejar el proceso de login
+	async function manejarLogin() {
+		const cuitInput = document.getElementById('cuit-login');
+		const passwordInput = document.getElementById('password-login');
+		const btnIniciarSesion = document.getElementById('btn-iniciar-sesion');
+		const errorDiv = document.getElementById('login-error');
+		
+		// Validar campos
+		const cuitValidation = validarCUITLogin(cuitInput.value);
+		const passwordValidation = validarContrasenaLogin(passwordInput.value);
+		
+		// Mostrar errores si los hay
+		if (!cuitValidation.valido || !passwordValidation.valido) {
+			errorDiv.querySelector('span').textContent = 
+				!cuitValidation.valido ? cuitValidation.mensaje : passwordValidation.mensaje;
+			errorDiv.classList.remove('d-none');
+			return;
+		}
+		
+		// Ocultar error previo
+		errorDiv.classList.add('d-none');
+		
+		// Deshabilitar botón y mostrar loading
+		const removeLoading = addLoadingState(btnIniciarSesion, 'Iniciando sesión...');
+		
+		try {
+			const resultado = await autenticarUsuario(cuitValidation.cuit, passwordValidation.contrasenia);
+			
+			if (resultado.exito) {
+				// Almacenar datos de sesión
+				almacenarSesion(resultado.datos.token, resultado.datos.usuario);
+				
+				// Actualizar interfaz
+				actualizarInterfazLogin(true);
+				
+				// Cerrar modal
+				const modal = bootstrap.Modal.getInstance(document.getElementById('modalLogin'));
+				if (modal) modal.hide();
+				
+				// Limpiar formulario
+				formLogin.reset();
+				
+				// Redirigir al dashboard
+				window.location.href = AUTH_CONFIG.routes.dashboard;
+			} else {
+				errorDiv.querySelector('span').textContent = resultado.mensaje;
+				errorDiv.classList.remove('d-none');
+			}
+		} catch (error) {
+			console.error('Error en login:', error);
+			errorDiv.querySelector('span').textContent = 'Error al intentar iniciar sesión. Por favor intente nuevamente.';
+			errorDiv.classList.remove('d-none');
+		} finally {
+			// Restaurar botón
+			removeLoading();
+		}
+	}
 	
-	if (dniInput) {
-		dniInput.addEventListener('input', function() {
+	// Aplicar validaciones en tiempo real al CUIT
+	const cuitInput = document.getElementById('cuit-login');
+	if (cuitInput) {
+		cuitInput.addEventListener('input', function() {
 			// Permitir solo números
 			this.value = this.value.replace(/[^0-9]/g, '');
-			// Limitar a 8 dígitos
-			if (this.value.length > 8) {
-				this.value = this.value.slice(0, 8);
-			}
-		});
-	}
-	
-	if (passwordInput) {
-		passwordInput.addEventListener('input', function() {
-			// Limitar a 6 caracteres
-			if (this.value.length > 6) {
-				this.value = this.value.slice(0, 6);
+			// Limitar a 11 dígitos
+			if (this.value.length > 11) {
+				this.value = this.value.slice(0, 11);
 			}
 		});
 	}
