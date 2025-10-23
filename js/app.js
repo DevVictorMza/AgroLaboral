@@ -1,4 +1,42 @@
+// ===========================
+// CONFIGURACIÓN DEL BACKEND
+// ===========================
+
+const BACKEND_CONFIG = {
+    BASE_URL: 'http://localhost:8080',
+    ENDPOINTS: {
+        VALIDATE_CUIT: '/publico/empresas/existe/',
+        REGISTER_COMPANY: 'publico/empresas/registro'
+    },
+    TIMEOUTS: {
+        VALIDATION: 5000,
+        REGISTRATION: 10000
+    },
+    DEVELOPMENT_MODE: true
+};
+
+// Función para construir URLs del backend
+function buildURL(endpoint, parameter = '') {
+    return `${BACKEND_CONFIG.BASE_URL}${endpoint}${parameter}`;
+}
+
+// Función para realizar peticiones con configuración centralizada
+async function fetchWithConfig(url, options = {}) {
+    const defaultOptions = {
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        mode: 'cors',
+        credentials: 'include'
+    };
+    
+    return fetch(url, { ...defaultOptions, ...options });
+}
+
+// ===========================
 // FUNCIONES DE FEEDBACK VISUAL
+// ===========================
 
 // Mostrar feedback de campo
 function showFieldFeedback(input, isValid, message) {
@@ -183,6 +221,165 @@ function addUppercaseConverter(inputId) {
 	}
 	
 	console.log(`✅ Campo ${inputId} configurado para conversión automática`);
+}
+
+// ===========================
+// VALIDACIÓN DE CUIT
+// ===========================
+
+// Función para validar formato de CUIT argentino
+function validateCUITFormat(cuit) {
+	// Remover guiones y espacios
+	const cleanCuit = cuit.replace(/[-\s]/g, '');
+	
+	// Verificar que tenga exactamente 11 dígitos
+	if (!/^\d{11}$/.test(cleanCuit)) {
+		return { valid: false, message: 'El CUIT debe tener 11 dígitos' };
+	}
+	
+	// Algoritmo de verificación de CUIT argentino
+	const weights = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
+	const digits = cleanCuit.split('').map(Number);
+	const checkDigit = digits[10];
+	
+	let sum = 0;
+	for (let i = 0; i < 10; i++) {
+		sum += digits[i] * weights[i];
+	}
+	
+	const remainder = sum % 11;
+	let expectedCheckDigit = 11 - remainder;
+	
+	if (expectedCheckDigit === 11) expectedCheckDigit = 0;
+	if (expectedCheckDigit === 10) expectedCheckDigit = 9;
+	
+	if (checkDigit !== expectedCheckDigit) {
+		return { valid: false, message: 'CUIT inválido - dígito verificador incorrecto' };
+	}
+	
+	return { valid: true, message: 'Formato de CUIT válido' };
+}
+
+// Variable para almacenar timeouts de debounce
+let cuitValidationTimeout = null;
+
+// Función para validar CUIT con el backend
+async function validateCUITWithBackend(cuit, inputElement) {
+	try {
+		// Mostrar estado de carga
+		showCUITLoading(inputElement, true);
+		
+		// Construir URL del endpoint
+		const url = buildURL(BACKEND_CONFIG.ENDPOINTS.VALIDATE_CUIT, cuit);
+		console.log(`🔍 Validando CUIT: ${cuit} en endpoint: ${url}`);
+		
+		const response = await fetchWithConfig(url, {
+			method: 'GET',
+			signal: AbortSignal.timeout(BACKEND_CONFIG.TIMEOUTS.VALIDATION)
+		});
+		
+		console.log(`📡 Response status: ${response.status}`);
+		
+		if (response.ok) {
+			const exists = await response.json();
+			console.log('📄 Response data:', exists);
+			
+			// Ocultar estado de carga
+			showCUITLoading(inputElement, false);
+			
+			if (exists === true) {
+				showFieldFeedback(inputElement, false, 'Este CUIT ya está registrado en el sistema');
+				console.log('❌ CUIT ya registrado en base de datos');
+				return { available: false, exists: true };
+			} else {
+				showFieldFeedback(inputElement, true, '¡CUIT disponible para registro!');
+				console.log('✅ CUIT disponible para registro');
+				return { available: true, exists: false };
+			}
+		} else if (response.status === 404) {
+			// 404 puede significar que no existe (disponible)
+			showCUITLoading(inputElement, false);
+			showFieldFeedback(inputElement, true, '¡CUIT disponible para registro!');
+			console.log('✅ CUIT disponible (404 - no encontrado en BD)');
+			return { available: true, exists: false };
+		} else {
+			throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+		}
+		
+	} catch (error) {
+		console.error('❌ Error al validar CUIT:', error);
+		showCUITLoading(inputElement, false);
+		
+		// Diferentes mensajes según el tipo de error
+		if (error.name === 'TimeoutError') {
+			showFieldFeedback(inputElement, false, 'Timeout: El servidor tardó demasiado en responder');
+		} else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+			showFieldFeedback(inputElement, false, 'Error de conexión: Verifique que el servidor backend esté ejecutándose');
+		} else {
+			showFieldFeedback(inputElement, false, 'Error al validar CUIT. Intente nuevamente');
+		}
+		
+		return { available: null, error: error.message };
+	}
+}
+
+// Función para mostrar/ocultar estado de carga en el campo CUIT
+function showCUITLoading(inputElement, show) {
+	const loadingIcon = inputElement.parentNode.querySelector('.cuit-loading');
+	
+	if (show) {
+		if (!loadingIcon) {
+			const icon = document.createElement('div');
+			icon.className = 'cuit-loading';
+			icon.innerHTML = '<i class="fas fa-spinner fa-spin text-primary"></i>';
+			icon.style.position = 'absolute';
+			icon.style.right = '12px';
+			icon.style.top = '50%';
+			icon.style.transform = 'translateY(-50%)';
+			icon.style.zIndex = '10';
+			
+			// Asegurar posición relativa en el contenedor
+			if (getComputedStyle(inputElement.parentNode).position === 'static') {
+				inputElement.parentNode.style.position = 'relative';
+			}
+			
+			inputElement.parentNode.appendChild(icon);
+		}
+	} else {
+		if (loadingIcon) {
+			loadingIcon.remove();
+		}
+	}
+}
+
+// Función principal para validar CUIT (formato + backend)
+function validateCUIT(inputElement) {
+	const cuit = inputElement.value.trim();
+	
+	// Limpiar timeout anterior
+	if (cuitValidationTimeout) {
+		clearTimeout(cuitValidationTimeout);
+	}
+	
+	// Si está vacío, limpiar feedback
+	if (cuit === '') {
+		showFieldFeedback(inputElement, false, '');
+		showCUITLoading(inputElement, false);
+		return;
+	}
+	
+	// Validar formato primero
+	const formatValidation = validateCUITFormat(cuit);
+	if (!formatValidation.valid) {
+		showFieldFeedback(inputElement, false, formatValidation.message);
+		showCUITLoading(inputElement, false);
+		return;
+	}
+	
+	// Si el formato es válido, validar con backend usando debounce
+	cuitValidationTimeout = setTimeout(async () => {
+		await validateCUITWithBackend(cuit, inputElement);
+	}, 500); // Debounce de 500ms
 }
 
 // Inicialización del mapa principal de la página (no el del wizard)
@@ -609,7 +806,7 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 
 	// --- Lógica del wizard de registro de empleador ---
 	const paso1 = document.getElementById('form-registro-empleador-paso1');
-	const paso3 = document.getElementById('form-registro-empleador-paso5'); // Este ahora es el paso de confirmación
+	const paso2 = document.getElementById('form-registro-empleador-paso2'); // Este es el paso de confirmación
 	const btnSiguiente1 = document.getElementById('btn-siguiente-paso1');
 	const btnAnterior3 = document.getElementById('btn-anterior-paso5'); // Actualizado para el botón correcto
 
@@ -740,7 +937,7 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 			llenarResumenConfirmacion();
 			
 			paso1.classList.add('d-none');
-			paso3.classList.remove('d-none');
+			paso2.classList.remove('d-none');
 			
 			// Actualizar barra de progreso
 			const progressBar = document.querySelector('.wizard-progress-bar-inner');
@@ -782,7 +979,7 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 				}
 				
 				debounceTimeout = setTimeout(() => {
-					fetch(`http://localhost:9090/empresas/validar-cuit?cuit=${encodeURIComponent(cuitValue)}`)
+					fetch(`http://localhost:8080/publico/empresas/existe/${encodeURIComponent(cuitValue)}`)
 						.then(response => response.json())
 						.then(data => {
 							if (data && data.disponible) {
@@ -988,9 +1185,14 @@ function recopilarDatosWizard() {
 			throw new Error('Faltan datos obligatorios en el paso 1');
 		}
 		
+		// Validación de longitud máxima de razón social
+		if (razonSocial.length > 255) {
+			throw new Error('La razón social no puede exceder los 255 caracteres');
+		}
+		
 		// Validaciones de contraseña
-		if (password.length !== 6) {
-			throw new Error('La contraseña debe tener exactamente 6 caracteres');
+		if (password.length < 6) {
+			throw new Error('La contraseña debe tener al menos 6 caracteres');
 		}
 		
 		if (password.includes(' ')) {
@@ -1001,18 +1203,14 @@ function recopilarDatosWizard() {
 			throw new Error('Las contraseñas no coinciden');
 		}
 		
-		// Estructurar JSON según el formato esperado por el backend
+		// Estructurar JSON según el DTO esperado por el backend (EmpresaRegistroDTO)
 		const datosRegistro = {
-			dtoEmpresaRegistro: {
-				cuit: cuit,
-				razonSocial: razonSocial,
-				contrasenia: password
-			}
+			cuit: cuit,
+			razonSocial: razonSocial,
+			contrasenia: password
 		};
-		
-		return datosRegistro;
-		
-	} catch (error) {
+
+		return datosRegistro;	} catch (error) {
 		console.error('Error recopilando datos del wizard:', error);
 		mostrarMensajeError(error.message);
 		return null;
@@ -1025,7 +1223,7 @@ async function enviarRegistroAlBackend(datos) {
 		// Log para confirmar los datos enviados
 		console.log('📤 JSON enviado al backend:', JSON.stringify(datos, null, 2));
 		
-		const response = await fetch('http://localhost:9090/registro', {
+		const response = await fetch('http://localhost:8080/publico/empresas/registro', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -2411,9 +2609,19 @@ function showWizardStepError(stepIndex, message) {
 
 // Función para llenar el resumen de confirmación
 function llenarResumenConfirmacion() {
-	const cuit = document.getElementById('cuit-empleador').value;
-	const razonSocial = document.getElementById('razon-social-empleador').value;
-	const password = document.getElementById('password').value;
+	const cuitElement = document.getElementById('cuit');
+	const razonSocialElement = document.getElementById('razonSocial');
+	const passwordElement = document.getElementById('password');
+	
+	// Validar que los elementos existen
+	if (!cuitElement || !razonSocialElement || !passwordElement) {
+		console.error('No se encontraron algunos campos del formulario');
+		return;
+	}
+	
+	const cuit = cuitElement.value;
+	const razonSocial = razonSocialElement.value;
+	const password = passwordElement.value;
 	
 	// Obtener la lista de confirmación
 	const confirmacionLista = document.getElementById('confirmacion-lista');
@@ -2439,3 +2647,67 @@ function llenarResumenConfirmacion() {
 		confirmacionLista.appendChild(listItem);
 	});
 }
+
+// ===========================
+// INICIALIZACIÓN VALIDACIÓN CUIT
+// ===========================
+
+// Inicializar validación de CUIT cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+	const cuitInput = document.getElementById('cuit');
+	
+	if (cuitInput) {
+		console.log('🚀 Inicializando validación de CUIT');
+		
+		// Configurar contenedor como relativo para posicionamiento del spinner
+		if (getComputedStyle(cuitInput.parentNode).position === 'static') {
+			cuitInput.parentNode.style.position = 'relative';
+		}
+		
+		// Agregar clase para identificar el contenedor
+		cuitInput.parentNode.classList.add('input-container');
+		
+		// Event listener para validación en tiempo real
+		cuitInput.addEventListener('input', function() {
+			validateCUIT(this);
+		});
+		
+		// Event listener para validación al perder el foco
+		cuitInput.addEventListener('blur', function() {
+			if (this.value.trim()) {
+				validateCUIT(this);
+			}
+		});
+		
+		// Event listener para limpiar feedback cuando se enfoca
+		cuitInput.addEventListener('focus', function() {
+			// Solo limpiar si no hay error de formato
+			const formatValidation = validateCUITFormat(this.value.trim());
+			if (formatValidation.valid || this.value.trim() === '') {
+				// No limpiar, mantener el feedback para ver el estado
+			}
+		});
+		
+		console.log('✅ Validación de CUIT inicializada correctamente');
+	} else {
+		console.warn('⚠️ Campo CUIT no encontrado en el DOM');
+	}
+	
+	// Verificar conectividad con el backend
+	if (BACKEND_CONFIG.DEVELOPMENT_MODE) {
+		console.log('🔧 Modo desarrollo: verificando conectividad con backend...');
+		setTimeout(async () => {
+			try {
+				const testUrl = buildURL(BACKEND_CONFIG.ENDPOINTS.VALIDATE_CUIT, '00000000000');
+				const response = await fetchWithConfig(testUrl, {
+					method: 'GET',
+					signal: AbortSignal.timeout(3000)
+				});
+				console.log(`✅ Backend conectado correctamente (status: ${response.status})`);
+			} catch (error) {
+				console.warn('⚠️ No se pudo conectar con el backend:', error.message);
+				console.log('🔧 Asegúrate de que el servidor Spring Boot esté ejecutándose en puerto 8080');
+			}
+		}, 1000);
+	}
+});
