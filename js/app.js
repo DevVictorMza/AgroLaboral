@@ -1882,51 +1882,6 @@ window.verificarEndpoints = async function() {
 	}
 };
 
-// Función específica para probar el endpoint personas/persona/{dni}
-window.probarEndpointPersonas = async function(dni = '35876866') {
-	console.log('🧪 === PROBANDO ENDPOINT PERSONAS/PERSONA ===');
-	console.log('🧪 DNI de prueba:', dni);
-	
-	try {
-		const url = `http://localhost:9090/personas/persona/${dni}`;
-		console.log('🧪 URL:', url);
-		
-		const response = await fetch(url, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				'Accept': 'application/json'
-			},
-			mode: 'cors'
-		});
-		
-		console.log('🧪 Status:', response.status);
-		console.log('🧪 StatusText:', response.statusText);
-		console.log('🧪 Headers:', Object.fromEntries(response.headers.entries()));
-		
-		if (response.ok) {
-			const data = await response.json();
-			console.log('✅ ¡Endpoint funciona! Datos recibidos:', data);
-			console.log('✅ Estructura del objeto:');
-			Object.entries(data).forEach(([key, value]) => {
-				console.log(`✅   ${key}: "${value}" (${typeof value})`);
-			});
-			return data;
-		} else if (response.status === 404) {
-			console.log('⚠️ DNI no encontrado (404) - Esto es normal si el DNI no existe');
-			return null;
-		} else {
-			console.log('❌ Error del servidor:', response.status, response.statusText);
-			const errorText = await response.text();
-			console.log('❌ Detalles del error:', errorText);
-			return null;
-		}
-	} catch (error) {
-		console.error('❌ Error de conexión:', error);
-		console.error('❌ Verifica que el backend esté ejecutándose en localhost:9090');
-		return null;
-	}
-};
 
 // ==========================================
 // FUNCIONALIDAD DE LOGIN Y AUTENTICACIÓN
@@ -2281,15 +2236,36 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	}
 	
-	// Verificar si ya hay una sesión activa al cargar la página
-	if (estaAutenticado()) {
-		actualizarInterfazLogin(true);
-		
-		// Si estamos en index.html, redirigir al dashboard
-		if (window.location.pathname.endsWith('index.html')) {
-			window.location.href = AUTH_CONFIG.routes.dashboard;
-		}
-	}
+// Verificar si ya hay una sesión activa al cargar la página
+if (estaAutenticado()) {
+    // Validar el token con el backend antes de redirigir
+    verificarToken().then(valido => {
+        if (valido) {
+            actualizarInterfazLogin(true);
+            // Si estamos en index.html, redirigir al dashboard
+            if (window.location.pathname.endsWith('index.html')) {
+                window.location.href = AUTH_CONFIG.routes.dashboard;
+            }
+        } else {
+            // Token inválido, limpiar y mostrar login
+            localStorage.removeItem(AUTH_CONFIG.storage.tokenKey);
+            localStorage.removeItem(AUTH_CONFIG.storage.userKey);
+            actualizarInterfazLogin(false);
+            // Opcional: mostrar mensaje de sesión expirada
+            if (window.location.pathname.endsWith('index.html')) {
+                alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+            }
+        }
+    }).catch(() => {
+        // Error de red, limpiar y mostrar login
+        localStorage.removeItem(AUTH_CONFIG.storage.tokenKey);
+        localStorage.removeItem(AUTH_CONFIG.storage.userKey);
+        actualizarInterfazLogin(false);
+        if (window.location.pathname.endsWith('index.html')) {
+            alert('No se pudo validar la sesión. Por favor, inicia sesión nuevamente.');
+        }
+    });
+}
 	
 	// Función para manejar el proceso de login
 	async function manejarLogin() {
