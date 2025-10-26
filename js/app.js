@@ -6,9 +6,14 @@ const BACKEND_CONFIG = {
     BASE_URL: 'http://localhost:8080',
     ENDPOINTS: {
         VALIDATE_CUIT: '/publico/empresas/existe/',
-        REGISTER_COMPANY: 'publico/empresas/registro',
+        REGISTER_COMPANY: '/publico/empresas/registro',
         LOGIN: '/publico/login',
-        PROFILE: '/privado/empresas/perfil'
+        PROFILE: '/privado/empresas/perfil',
+        // Endpoints para fincas/establecimientos
+        REGISTER_FINCA: '/privado/establecimientos/registro',
+        DEPARTAMENTOS: '/publico/departamentos',
+        DISTRITOS: '/publico/distritos',
+        ESPECIES: '/privado/especies'
     },
     TIMEOUTS: {
         VALIDATION: 5000,
@@ -29,7 +34,6 @@ const AUTH_CONFIG = {
         userKey: 'cepas_lab_user'
     },
     routes: {
-        dashboard: 'dashboard.html',
         login: 'index.html'
     }
 };
@@ -54,7 +58,7 @@ async function fetchWithConfig(url, options = {}) {
 }
 
 // Función para realizar peticiones autenticadas
-async function fetchWithAuth(endpoint, options = {}) {
+async function fetchWithAuth(url, options = {}) {
     const token = obtenerToken();
     if (!token) {
         throw new Error('No hay token de autenticación');
@@ -70,7 +74,7 @@ async function fetchWithAuth(endpoint, options = {}) {
         credentials: 'include'
     };
     
-    const url = buildURL(endpoint);
+    // Usar directamente la URL que se pasa, no construirla de nuevo
     return fetchWithConfig(url, { ...defaultOptions, ...options });
 }
 
@@ -82,13 +86,19 @@ async function cargarPerfilEmpresa() {
     try {
         console.log('🔄 Cargando perfil de empresa...');
         
-        const response = await fetchWithAuth(BACKEND_CONFIG.ENDPOINTS.PROFILE);
+        const url = buildURL(BACKEND_CONFIG.ENDPOINTS.PROFILE);
+        console.log('📡 URL del perfil:', url);
+        
+        const response = await fetchWithAuth(url);
+        
+        console.log('📡 Response status:', response.status);
+        console.log('📡 Response headers:', response.headers);
         
         if (!response.ok) {
             if (response.status === 401) {
                 console.error('❌ Token expirado o inválido');
                 cerrarSesion();
-                window.location.href = AUTH_CONFIG.routes.login;
+                actualizarInterfazLogin(false);
                 return;
             }
             throw new Error(`Error HTTP: ${response.status}`);
@@ -100,8 +110,15 @@ async function cargarPerfilEmpresa() {
         // Almacenar datos del perfil
         localStorage.setItem('perfil_empresa', JSON.stringify(perfil));
 
-        // Actualizar UI
-        actualizarPerfilUI(perfil);
+        // Actualizar navbar con avatar
+        actualizarInterfazLogin(true, perfil);
+
+        // Generar contenido del dashboard
+        generarDashboard(perfil);
+
+        // Abrir el offcanvas del dashboard automáticamente tras login
+        const dashboardOffcanvas = new bootstrap.Offcanvas(document.getElementById('dashboardOffcanvas'));
+        dashboardOffcanvas.show();
 
     } catch (error) {
         console.error('❌ Error cargando perfil:', error);
@@ -134,19 +151,19 @@ function actualizarPerfilUI(perfil) {
                     <h5 class="card-title mb-4">Datos de la Empresa</h5>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="text-muted">ID Empresa</label>
+                            <div class="text-muted small">ID Empresa</div>
                             <p class="mb-0">${perfil.idEmpresa}</p>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="text-muted">CUIT</label>
+                            <div class="text-muted small">CUIT</div>
                             <p class="mb-0">${perfil.cuit}</p>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="text-muted">Razón Social</label>
+                            <div class="text-muted small">Razón Social</div>
                             <p class="mb-0">${perfil.razonSocial}</p>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="text-muted">Fecha de Alta</label>
+                            <div class="text-muted small">Fecha de Alta</div>
                             <p class="mb-0">${new Date(perfil.fechaAlta).toLocaleString()}</p>
                         </div>
                     </div>
@@ -157,6 +174,230 @@ function actualizarPerfilUI(perfil) {
 }
 
 function mostrarErrorPerfil(mensaje) {
+    const errorContainer = document.createElement('div');
+    errorContainer.className = 'alert alert-danger';
+    errorContainer.textContent = `Error cargando perfil: ${mensaje}`;
+    document.body.appendChild(errorContainer);
+}
+
+// Función para generar el contenido completo del dashboard
+function generarDashboard(perfil) {
+    const dashboardContent = document.getElementById('dashboard-content');
+    
+    dashboardContent.innerHTML = `
+        <style>
+            .dashboard-container {
+                background: #000000;
+                color: #FFFFFF;
+                min-height: 100vh;
+                padding: 2rem;
+            }
+            .dashboard-card {
+                background: #2A2A2A;
+                border: 1px solid #444444;
+                border-radius: 8px;
+                color: #FFFFFF;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            }
+            .btn-primary-custom {
+                background: linear-gradient(135deg, #4A90E2, #357ABD);
+                border: none;
+                color: white;
+                font-weight: 600;
+                padding: 12px 24px;
+                border-radius: 6px;
+                transition: all 0.3s ease;
+            }
+            .btn-primary-custom:hover {
+                background: linear-gradient(135deg, #357ABD, #2E6DA4);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 12px rgba(74, 144, 226, 0.3);
+            }
+            .text-muted-custom {
+                color: #CCCCCC !important;
+            }
+            .profile-header {
+                background: linear-gradient(135deg, #4A90E2, #357ABD);
+                border-radius: 8px;
+                padding: 2rem;
+                margin-bottom: 2rem;
+                text-align: center;
+            }
+            .stats-card {
+                background: #2A2A2A;
+                border: 1px solid #444444;
+                border-radius: 8px;
+                padding: 1.5rem;
+                text-align: center;
+                transition: transform 0.3s ease;
+            }
+            .stats-card:hover {
+                transform: translateY(-5px);
+            }
+            .stats-number {
+                font-size: 2.5rem;
+                font-weight: bold;
+                color: #4A90E2;
+            }
+            .empty-state {
+                text-align: center;
+                padding: 3rem;
+                color: #CCCCCC;
+            }
+            .empty-state i {
+                font-size: 4rem;
+                color: #4A90E2;
+                margin-bottom: 1rem;
+            }
+        </style>
+        
+        <div class="dashboard-container">
+            <!-- Header del perfil -->
+            <div class="profile-header">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h3 class="mb-0">${perfil.razonSocial}</h3>
+                        <p class="mb-1 opacity-75">CUIT: ${perfil.cuit}</p>
+                        <small class="opacity-75">
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            Miembro desde: ${new Date(perfil.fechaAlta).toLocaleDateString()}
+                        </small>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="avatar-lg">
+                            <i class="fas fa-building fa-3x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats cards -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card">
+                        <div class="stats-number">0</div>
+                        <div class="text-muted-custom">Fincas Registradas</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card">
+                        <div class="stats-number">0</div>
+                        <div class="text-muted-custom">Ofertas Activas</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card">
+                        <div class="stats-number">0</div>
+                        <div class="text-muted-custom">Trabajadores</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card">
+                        <div class="stats-number">0</div>
+                        <div class="text-muted-custom">Solicitudes</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gestión de Fincas -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="dashboard-card p-4">
+                        <h5 class="mb-4">
+                            <i class="fas fa-clipboard-list me-2 text-primary"></i>
+                            Gestión de Fincas
+                        </h5>
+                        <div class="empty-state" id="empty-fincas">
+                            <i class="fas fa-plus-circle"></i>
+                            <h6 class="text-muted-custom">No hay fincas registradas</h6>
+                            <p class="text-muted-custom mb-4">Comienza agregando tu primera propiedad agrícola</p>
+                            <button class="btn btn-primary-custom" onclick="abrirWizardFinca()">
+                                <i class="fas fa-plus me-2"></i>Agregar Primera Finca
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información de la empresa -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="dashboard-card p-4">
+                        <h5 class="mb-4">
+                            <i class="fas fa-building me-2 text-success"></i>
+                            Datos de la Empresa
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="text-muted-custom small">ID Empresa</div>
+                                <p class="mb-0 fw-bold">${perfil.idEmpresa}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="text-muted-custom small">CUIT</div>
+                                <p class="mb-0 fw-bold">${perfil.cuit}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="text-muted-custom small">Razón Social</div>
+                                <p class="mb-0 fw-bold">${perfil.razonSocial}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="text-muted-custom small">Fecha de Alta</div>
+                                <p class="mb-0 fw-bold">${new Date(perfil.fechaAlta).toLocaleString()}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Wizard Agregar Finca -->
+        <div class="modal fade" id="wizardFincaModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content bg-dark text-white">
+                    <div class="modal-header border-secondary">
+                        <h5 class="modal-title">
+                            <i class="fas fa-seedling me-2 text-success"></i>
+                            Agregar Nueva Finca
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" id="wizard-content">
+                        <!-- Contenido del wizard se carga aquí -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// ===========================
+// FUNCIONES DEL WIZARD DE FINCA
+// ===========================
+
+// Variable global para manejar el estado del wizard
+let wizardData = {
+    paso: 1,
+    datos: {}
+};
+
+// Función para abrir el wizard de finca
+function abrirWizardFinca() {
+    console.log('🚀 Iniciando wizard de finca...');
+    
+    try {
+        // Reiniciar datos del wizard
+        wizardData = { paso: 1, datos: {} };
+        
+        // Llamar a la nueva función que maneja el mapa correctamente
+        abrirWizardRegistroConMapa();
+        
+    } catch (error) {
+        console.error('❌ Error al abrir wizard:', error);
+        alert('Error al abrir el formulario de finca. Por favor recarga la página.');
+    }
+}
+
+function mostrarErrorPerfil2(mensaje) {
     const errorContainer = document.createElement('div');
     errorContainer.className = 'alert alert-danger alert-dismissible fade show';
     errorContainer.innerHTML = `
@@ -169,6 +410,1050 @@ function mostrarErrorPerfil(mensaje) {
     if (mainContent) {
         mainContent.insertBefore(errorContainer, mainContent.firstChild);
     }
+}
+
+// ===========================
+// WIZARD PASO 1: FORMULARIO DE DATOS
+// ===========================
+
+function cargarPaso1() {
+    const wizardContent = document.getElementById('wizard-content');
+    wizardContent.innerHTML = `
+        <div class="wizard-progress mb-4">
+            <div class="row">
+                <div class="col-6">
+                    <div class="step active">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Datos de la Finca</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Confirmación</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form id="finca-form" novalidate>
+            <div class="row">
+                <!-- Nombre del Establecimiento -->
+                <div class="col-12 mb-3">
+                    <label for="nombreEstablecimiento" class="form-label">
+                        Nombre del Establecimiento <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control bg-secondary text-white border-secondary" 
+                           id="nombreEstablecimiento" required minlength="3">
+                    <div class="field-feedback"></div>
+                </div>
+
+                <!-- Departamento -->
+                <div class="col-md-6 mb-3">
+                    <label for="idDepartamento" class="form-label">
+                        Departamento <span class="text-danger">*</span>
+                    </label>
+                    <select class="form-select text-white" 
+                            id="idDepartamento" required>
+                        <option value="">Seleccione un departamento...</option>
+                    </select>
+                    <div class="field-feedback"></div>
+                </div>
+
+                <!-- Distrito -->
+                <div class="col-md-6 mb-3">
+                    <label for="idDistrito" class="form-label">
+                        Distrito <span class="text-danger">*</span>
+                    </label>
+                    <select class="form-select text-white" 
+                            id="idDistrito" required disabled>
+                        <option value="">Primero seleccione un departamento</option>
+                    </select>
+                    <div class="field-feedback"></div>
+                </div>
+
+                <!-- Dirección -->
+                <div class="col-md-8 mb-3">
+                    <label for="calle" class="form-label">
+                        Calle <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control text-white" 
+                           id="calle" required>
+                    <div class="field-feedback"></div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="numeracion" class="form-label">
+                        Número <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control text-white" 
+                           id="numeracion" required>
+                    <div class="field-feedback"></div>
+                </div>
+
+                <!-- Código Postal -->
+                <div class="col-md-6 mb-3">
+                    <label for="codigoPostal" class="form-label">
+                        Código Postal <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control text-white" 
+                           id="codigoPostal" required pattern="[0-9]{4,5}">
+                    <div class="field-feedback"></div>
+                </div>
+
+                <!-- Espacio vacío para mantener el layout -->
+                <div class="col-md-6 mb-3"></div>
+
+                <!-- Coordenadas -->
+                <div class="col-md-6 mb-3">
+                    <label for="latitud" class="form-label">
+                        Latitud <span class="text-danger">*</span>
+                    </label>
+                    <input type="number" class="form-control text-white" 
+                           id="latitud" step="0.000001" min="-90" max="90" required>
+                    <div class="field-feedback"></div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="longitud" class="form-label">
+                        Longitud <span class="text-danger">*</span>
+                    </label>
+                    <input type="number" class="form-control text-white" 
+                           id="longitud" step="0.000001" min="-180" max="180" required>
+                    <div class="field-feedback"></div>
+                </div>
+
+                <!-- Mapa Leaflet -->
+                <div class="col-12 mb-3">
+                    <label class="form-label">
+                        <i class="fas fa-map-marker-alt me-2"></i>Ubicación en el Mapa
+                    </label>
+                    <div class="map-container">
+                        <div class="map-controls mb-2">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-outline-success btn-sm" 
+                                        id="mapSatellite" onclick="cambiarVistaMapaFinca('satellite')">
+                                    <i class="fas fa-satellite me-1"></i>Satelital
+                                </button>
+                                <button type="button" class="btn btn-success btn-sm" 
+                                        id="mapClassic" onclick="cambiarVistaMapaFinca('classic')">
+                                    <i class="fas fa-map me-1"></i>Clásico
+                                </button>
+                            </div>
+                            <small class="text-muted ms-3">Haga clic en el mapa para establecer la ubicación</small>
+                        </div>
+                        <div id="mapFinca" style="height: 300px; border-radius: 8px; overflow: hidden; border: 1px solid #444444;"></div>
+                    </div>
+                </div>
+
+                <!-- Especies -->
+                <div class="col-12 mb-3">
+                    <label for="especiesSelector" class="form-label">
+                        Especies Cultivadas <span class="text-danger">*</span>
+                    </label>
+                    <button type="button" class="btn btn-outline-secondary w-100 text-start" 
+                            id="especiesSelector"
+                            onclick="console.log('🖱️ Click en especies selector detectado'); if(typeof abrirModalEspecies === 'function') abrirModalEspecies(); else console.error('abrirModalEspecies no disponible');"
+                            style="background: #404040; border-color: #666666; color: white; min-height: 50px;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span id="especiesSelectorText">Seleccione las especies que cultiva...</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </button>
+                    <div class="field-feedback"></div>
+                    <small class="text-muted">Puede seleccionar hasta 5 especies diferentes</small>
+                </div>
+            </div>
+
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-primary-custom" onclick="validarYContinuarPaso2()">
+                    <i class="fas fa-arrow-right me-2"></i>Siguiente
+                </button>
+            </div>
+        </form>
+
+        <style>
+            .wizard-progress .step {
+                text-align: center;
+                padding: 1rem;
+                border-radius: 8px;
+                background: #2A2A2A;
+                border: 2px solid #444444;
+                margin: 0 0.5rem;
+            }
+            .wizard-progress .step.active {
+                background: linear-gradient(135deg, #4A90E2, #357ABD);
+                border-color: #4A90E2;
+            }
+            .step-number {
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                background: #444444;
+                color: white;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 0.5rem;
+                font-weight: bold;
+            }
+            .step.active .step-number {
+                background: white;
+                color: #4A90E2;
+            }
+            .step-label {
+                font-size: 0.9rem;
+                font-weight: 600;
+            }
+            .field-feedback {
+                margin-top: 0.25rem;
+                font-size: 0.875rem;
+            }
+            .especies-checkbox {
+                margin: 0.5rem;
+                padding: 0.75rem;
+                border: 2px solid #444444;
+                border-radius: 6px;
+                background: #2A2A2A;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+            .especies-checkbox:hover {
+                border-color: #4A90E2;
+            }
+            .especies-checkbox.selected {
+                border-color: #27AE60;
+                background: rgba(39, 174, 96, 0.1);
+            }
+        </style>
+    `;
+
+    // Cargar datos iniciales
+    cargarDepartamentos();
+    // cargarEspecies(); // Ahora se carga automáticamente en el modal de especies
+    
+    // Configurar eventos
+    configurarEventosPaso1();
+    
+    // Configurar modal de especies después de crear el wizard
+    if (typeof configurarModalEspecies === 'function') {
+        setTimeout(() => {
+            configurarModalEspecies();
+        }, 100);
+    }
+}
+
+// ===========================
+// CARGA DINÁMICA DE DATOS
+// ===========================
+
+async function cargarDepartamentos() {
+    try {
+        const response = await fetchWithConfig(buildURL(BACKEND_CONFIG.ENDPOINTS.DEPARTAMENTOS));
+        
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const departamentos = await response.json();
+        const select = document.getElementById('idDepartamento');
+        
+        select.innerHTML = '<option value="">Seleccione un departamento...</option>';
+        
+        departamentos.forEach(depto => {
+            const option = document.createElement('option');
+            option.value = depto.idDepartamento;
+            option.textContent = depto.nombreDepartamento;
+            select.appendChild(option);
+        });
+        
+        console.log('✅ Departamentos cargados:', departamentos.length);
+        
+    } catch (error) {
+        console.error('❌ Error cargando departamentos:', error);
+        const select = document.getElementById('idDepartamento');
+        select.innerHTML = '<option value="">Error cargando departamentos</option>';
+        mostrarMensajeError('Error al cargar departamentos. Verifique su conexión.');
+    }
+}
+
+async function cargarDistritos(idDepartamento) {
+    const selectDistrito = document.getElementById('idDistrito');
+    
+    try {
+        selectDistrito.disabled = true;
+        selectDistrito.innerHTML = '<option value="">Cargando distritos...</option>';
+        
+        const response = await fetchWithConfig(buildURL(BACKEND_CONFIG.ENDPOINTS.DISTRITOS, `/${idDepartamento}`));
+        
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const distritos = await response.json();
+        
+        selectDistrito.innerHTML = '<option value="">Seleccione un distrito...</option>';
+        
+        distritos.forEach(distrito => {
+            const option = document.createElement('option');
+            option.value = distrito.idDistrito;
+            option.textContent = distrito.nombreDistrito;
+            selectDistrito.appendChild(option);
+        });
+        
+        selectDistrito.disabled = false;
+        console.log('✅ Distritos cargados:', distritos.length);
+        
+    } catch (error) {
+        console.error('❌ Error cargando distritos:', error);
+        selectDistrito.innerHTML = '<option value="">Error cargando distritos</option>';
+        selectDistrito.disabled = false;
+        mostrarMensajeError('Error al cargar distritos. Verifique su conexión.');
+    }
+}
+
+// Función de carga de especies movida a especies-modal.js
+/*
+async function cargarEspecies() {
+    const dropdownMenu = document.getElementById('especiesDropdownMenu');
+    
+    try {
+        const response = await fetchWithAuth(buildURL(BACKEND_CONFIG.ENDPOINTS.ESPECIES));
+        
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error('Token expirado. Por favor, inicie sesión nuevamente.');
+            }
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const especies = await response.json();
+        
+        // Limpiar el menú dropdown
+        dropdownMenu.innerHTML = `
+            <li class="dropdown-header text-white">
+                <small id="especiesCounter">Seleccione hasta 5 especies (0/5 seleccionadas)</small>
+            </li>
+            <li><hr class="dropdown-divider" style="border-color: #666666;"></li>
+        `;
+        
+        // Agregar cada especie como checkbox
+        especies.forEach(especie => {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `
+                <label class="dropdown-item d-flex align-items-center text-white" 
+                       style="background: transparent; cursor: pointer; min-height: 50px;"
+                       onmouseover="this.style.background='#555555'" 
+                       onmouseout="this.style.background='transparent'"
+                       ontouchstart="this.style.background='#555555'"
+                       ontouchend="this.style.background='transparent'">
+                    <input type="checkbox" 
+                           class="form-check-input" 
+                           id="especie_${especie.idEspecie}" 
+                           value="${especie.idEspecie}"
+                           onchange="toggleEspecieCheckbox(${especie.idEspecie}, '${especie.nombreEspecie.replace(/'/g, "\\'")}')">
+                    <i class="fas fa-seedling text-success"></i>
+                    <span style="flex: 1; margin-left: 12px; margin-right: 12px;">${especie.nombreEspecie}</span>
+                    <i class="fas fa-check text-success" 
+                       id="check_${especie.idEspecie}" 
+                       style="display: none; font-size: 18px;"></i>
+                </label>
+            `;
+            dropdownMenu.appendChild(listItem);
+        });
+        
+        console.log('✅ Especies cargadas en dropdown:', especies.length);
+        
+    } catch (error) {
+        console.error('❌ Error cargando especies:', error);
+        dropdownMenu.innerHTML = `
+            <li class="dropdown-header text-white">
+                <small>Error al cargar especies</small>
+            </li>
+            <li><hr class="dropdown-divider" style="border-color: #666666;"></li>
+            <li class="dropdown-item text-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                ${error.message}
+            </li>
+        `;
+    }
+}
+*/
+
+// Variables globales para especies (manejadas en especies-modal.js)
+// let especiesSeleccionadas = [];
+
+// Función de especies removida - ahora en especies-modal.js
+// function toggleEspecieCheckbox(idEspecie, nombreEspecie) { ... }
+
+function mostrarMensajeError(mensaje) {
+    // Crear toast de error
+    const toast = document.createElement('div');
+    toast.className = 'toast align-items-center text-white bg-danger border-0';
+    toast.setAttribute('role', 'alert');
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                ${mensaje}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    document.body.appendChild(toast);
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+    
+    // Remover del DOM después de que se oculte
+    toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+    });
+}
+
+// ===========================
+// CONFIGURACIÓN DE EVENTOS Y VALIDACIONES
+// ===========================
+
+function configurarEventosPaso1() {
+    console.log('🔧 Configurando eventos del Paso 1...');
+    
+    // CRÍTICO: Asegurar que todos los elementos estén disponibles
+    setTimeout(() => {
+        try {
+            // Evento cambio de departamento para cargar distritos
+            const selectDepartamento = document.getElementById('idDepartamento');
+            if (selectDepartamento) {
+                selectDepartamento.addEventListener('change', function() {
+                    console.log('📍 Departamento seleccionado:', this.value);
+                    const idDepartamento = this.value;
+                    if (idDepartamento) {
+                        cargarDistritos(idDepartamento);
+                    } else {
+                        const selectDistrito = document.getElementById('idDistrito');
+                        selectDistrito.innerHTML = '<option value="">Primero seleccione un departamento</option>';
+                        selectDistrito.disabled = true;
+                    }
+                    validarCampo(this);
+                });
+                console.log('✅ Event listener de departamento configurado');
+            }
+
+            // REFUERZO: Event listeners para asegurar interactividad
+            const campos = ['nombreEstablecimiento', 'calle', 'numeracion', 'codigoPostal', 'latitud', 'longitud', 'idDistrito'];
+            
+            campos.forEach(campoId => {
+                const campo = document.getElementById(campoId);
+                if (campo) {
+                    // Múltiples event listeners para máxima compatibilidad
+                    ['blur', 'change', 'input', 'keyup', 'focus'].forEach(evento => {
+                        campo.addEventListener(evento, function(e) {
+                            console.log(`🎯 Evento ${evento} en ${campoId}:`, e.target.value);
+                            
+                            if (evento === 'blur') {
+                                validarCampo(campo);
+                            } else if (evento === 'input' || evento === 'keyup') {
+                                // Limpiar errores mientras escribe
+                                campo.classList.remove('is-invalid');
+                                const feedback = campo.parentNode.querySelector('.field-feedback');
+                                if (feedback) feedback.innerHTML = '';
+                            }
+                        });
+                    });
+                    
+                    // FORZAR activación de campo
+                    campo.style.pointerEvents = 'auto';
+                    campo.removeAttribute('readonly');
+                    campo.removeAttribute('disabled');
+                    
+                    console.log(`✅ Campo ${campoId} configurado y activado`);
+                }
+            });
+
+            // Event listener para el dropdown de especies
+            const dropdownEspecies = document.getElementById('especiesDropdown');
+            if (dropdownEspecies) {
+                // Prevenir que el dropdown se cierre al hacer clic en checkboxes
+                const dropdownMenu = document.getElementById('especiesDropdownMenu');
+                if (dropdownMenu) {
+                    dropdownMenu.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                    });
+                }
+                
+                // Mejorar comportamiento en móviles
+                if (window.innerWidth <= 768) {
+                    // Cerrar dropdown al hacer clic fuera en móviles
+                    document.addEventListener('click', function(e) {
+                        const dropdown = document.querySelector('#especiesDropdown');
+                        const menu = document.querySelector('#especiesDropdownMenu');
+                        
+                        if (dropdown && menu && !dropdown.contains(e.target) && !menu.contains(e.target)) {
+                            const bsDropdown = bootstrap.Dropdown.getInstance(dropdown);
+                            if (bsDropdown) {
+                                bsDropdown.hide();
+                            }
+                        }
+                    });
+                }
+                
+                console.log('✅ Dropdown de especies configurado');
+            }
+            
+            console.log('✅ Todos los event listeners configurados');
+            
+        } catch (error) {
+            console.error('❌ Error configurando eventos:', error);
+        }
+    }, 100);
+}
+
+function validarCampo(campo) {
+    const valor = campo.value.trim();
+    let esValido = true;
+    let mensaje = '';
+
+    // Validaciones específicas por campo
+    switch (campo.id) {
+        case 'nombreEstablecimiento':
+            if (!valor) {
+                esValido = false;
+                mensaje = 'El nombre del establecimiento es obligatorio';
+            } else if (valor.length < 3) {
+                esValido = false;
+                mensaje = 'El nombre debe tener al menos 3 caracteres';
+            }
+            break;
+
+        case 'calle':
+        case 'numeracion':
+            if (!valor) {
+                esValido = false;
+                mensaje = 'Este campo es obligatorio';
+            }
+            break;
+
+        case 'codigoPostal':
+            if (!valor) {
+                esValido = false;
+                mensaje = 'El código postal es obligatorio';
+            } else if (!/^[0-9]{4,5}$/.test(valor)) {
+                esValido = false;
+                mensaje = 'El código postal debe tener 4 o 5 dígitos';
+            }
+            break;
+
+        case 'latitud':
+            if (!valor) {
+                esValido = false;
+                mensaje = 'La latitud es obligatoria';
+            } else {
+                const lat = parseFloat(valor);
+                if (isNaN(lat) || lat < -90 || lat > 90) {
+                    esValido = false;
+                    mensaje = 'La latitud debe estar entre -90 y 90';
+                }
+            }
+            break;
+
+        case 'longitud':
+            if (!valor) {
+                esValido = false;
+                mensaje = 'La longitud es obligatoria';
+            } else {
+                const lng = parseFloat(valor);
+                if (isNaN(lng) || lng < -180 || lng > 180) {
+                    esValido = false;
+                    mensaje = 'La longitud debe estar entre -180 y 180';
+                }
+            }
+            break;
+
+        case 'idDepartamento':
+        case 'idDistrito':
+            if (!valor) {
+                esValido = false;
+                mensaje = 'Debe seleccionar una opción';
+            }
+            break;
+    }
+
+    // Aplicar feedback visual
+    mostrarFeedbackCampo(campo, esValido, mensaje);
+    return esValido;
+}
+
+// Función de validación de especies removida - ahora en especies-modal.js
+// function validarEspecies() { ... }
+
+function mostrarFeedbackCampo(campo, esValido, mensaje) {
+    const feedback = campo.parentNode.querySelector('.field-feedback');
+    
+    // Limpiar clases previas
+    campo.classList.remove('is-valid', 'is-invalid');
+    
+    if (mensaje) {
+        if (esValido) {
+            campo.classList.add('is-valid');
+            if (feedback) {
+                feedback.innerHTML = `<div class="text-success"><i class="fas fa-check-circle me-1"></i>${mensaje}</div>`;
+            }
+        } else {
+            campo.classList.add('is-invalid');
+            if (feedback) {
+                feedback.innerHTML = `<div class="text-danger"><i class="fas fa-exclamation-circle me-1"></i>${mensaje}</div>`;
+            }
+        }
+    } else if (feedback) {
+        feedback.innerHTML = '';
+    }
+}
+
+// ===========================
+// VALIDACIÓN Y PASO 2
+// ===========================
+
+function validarYContinuarPaso2() {
+    const campos = ['nombreEstablecimiento', 'calle', 'numeracion', 'codigoPostal', 'latitud', 'longitud', 'idDepartamento', 'idDistrito'];
+    let todosValidos = true;
+
+    // Validar todos los campos
+    campos.forEach(campoId => {
+        const campo = document.getElementById(campoId);
+        if (campo && !validarCampo(campo)) {
+            todosValidos = false;
+        }
+    });
+
+    // Validar especies
+    if (typeof validarCampoEspecies === 'function' && !validarCampoEspecies()) {
+        todosValidos = false;
+    }
+
+    if (!todosValidos) {
+        mostrarMensajeError('Por favor, complete todos los campos obligatorios correctamente.');
+        return;
+    }
+
+    // Recopilar datos del formulario
+    const especiesIds = typeof obtenerEspeciesSeleccionadas === 'function' ? obtenerEspeciesSeleccionadas() : [];
+    
+    wizardData.datos = {
+        nombreEstablecimiento: document.getElementById('nombreEstablecimiento').value.trim(),
+        calle: document.getElementById('calle').value.trim(),
+        numeracion: document.getElementById('numeracion').value.trim(),
+        codigoPostal: document.getElementById('codigoPostal').value.trim(),
+        latitud: parseFloat(document.getElementById('latitud').value),
+        longitud: parseFloat(document.getElementById('longitud').value),
+        idDepartamento: parseInt(document.getElementById('idDepartamento').value),
+        idDistrito: parseInt(document.getElementById('idDistrito').value),
+        idsEspecies: especiesIds
+    };
+
+    // Obtener nombres de especies para mostrar en confirmación
+    const especiesNombres = especiesIds.map(id => {
+        if (typeof especiesDisponibles !== 'undefined') {
+            const especie = especiesDisponibles.find(e => e.idEspecie === id);
+            return especie ? especie.nombreEspecie : `Especie ${id}`;
+        }
+        return `Especie ${id}`;
+    });
+
+    // Obtener nombres para mostrar en confirmación
+    wizardData.datosDisplay = {
+        nombreEstablecimiento: wizardData.datos.nombreEstablecimiento,
+        direccion: `${wizardData.datos.calle} ${wizardData.datos.numeracion}`,
+        codigoPostal: wizardData.datos.codigoPostal,
+        coordenadas: `${wizardData.datos.latitud}, ${wizardData.datos.longitud}`,
+        departamento: document.getElementById('idDepartamento').selectedOptions[0].text,
+        distrito: document.getElementById('idDistrito').selectedOptions[0].text,
+        especies: especiesNombres
+    };
+
+    // Avanzar al paso 2
+    wizardData.paso = 2;
+    cargarPaso2();
+}
+
+function cargarPaso2() {
+    const wizardContent = document.getElementById('wizard-content');
+    const datos = wizardData.datosDisplay;
+    
+    wizardContent.innerHTML = `
+        <div class="wizard-progress mb-4">
+            <div class="row">
+                <div class="col-6">
+                    <div class="step">
+                        <div class="step-number">✓</div>
+                        <div class="step-label">Datos de la Finca</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="step active">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Confirmación</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="confirmation-container">
+            <div class="text-center mb-4">
+                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                <h4>Confirmar Registro de Finca</h4>
+                <p class="text-muted">Revise los datos antes de proceder con el registro</p>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="confirmation-card p-4 mb-4">
+                        <h5 class="border-bottom border-secondary pb-2 mb-3">
+                            <i class="fas fa-building me-2 text-primary"></i>
+                            Información del Establecimiento
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="text-muted small">Nombre</div>
+                                <p class="mb-0 fw-bold">${datos.nombreEstablecimiento}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="text-muted small">Dirección</div>
+                                <p class="mb-0">${datos.direccion}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="text-muted small">Código Postal</div>
+                                <p class="mb-0">${datos.codigoPostal}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="text-muted small">Coordenadas</div>
+                                <p class="mb-0">
+                                    <i class="fas fa-map-marker-alt me-1 text-danger"></i>
+                                    ${datos.coordenadas}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="confirmation-card p-4 mb-4">
+                        <h5 class="border-bottom border-secondary pb-2 mb-3">
+                            <i class="fas fa-map-marked-alt me-2 text-info"></i>
+                            Ubicación Administrativa
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small">Departamento</label>
+                                <p class="mb-0 fw-bold">${datos.departamento}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small">Distrito</label>
+                                <p class="mb-0 fw-bold">${datos.distrito}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="confirmation-card p-4">
+                        <h5 class="border-bottom border-secondary pb-2 mb-3">
+                            <i class="fas fa-seedling me-2 text-success"></i>
+                            Especies Cultivadas (${datos.especies.length})
+                        </h5>
+                        <div class="especies-list">
+                            ${datos.especies.map(especie => 
+                                `<span class="badge bg-success me-2 mb-2 p-2">
+                                    <i class="fas fa-leaf me-1"></i>${especie}
+                                </span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer border-secondary">
+            <button type="button" class="btn btn-secondary" onclick="volverPaso1()">
+                <i class="fas fa-arrow-left me-2"></i>Volver
+            </button>
+            <button type="button" class="btn btn-success" onclick="confirmarRegistro()" id="btn-confirmar">
+                <i class="fas fa-check me-2"></i>Confirmar Registro
+            </button>
+        </div>
+
+        <style>
+            .confirmation-card {
+                background: #2A2A2A;
+                border: 1px solid #444444;
+                border-radius: 8px;
+                transition: transform 0.3s ease;
+            }
+            .confirmation-card:hover {
+                transform: translateY(-2px);
+            }
+            .especies-list .badge {
+                font-size: 0.9rem;
+            }
+        </style>
+    `;
+}
+
+function volverPaso1() {
+    wizardData.paso = 1;
+    cargarPaso1();
+    
+    // Restaurar datos en el formulario
+    setTimeout(() => {
+        const datos = wizardData.datos;
+        if (datos.nombreEstablecimiento) document.getElementById('nombreEstablecimiento').value = datos.nombreEstablecimiento;
+        if (datos.calle) document.getElementById('calle').value = datos.calle;
+        if (datos.numeracion) document.getElementById('numeracion').value = datos.numeracion;
+        if (datos.codigoPostal) document.getElementById('codigoPostal').value = datos.codigoPostal;
+        if (datos.latitud) document.getElementById('latitud').value = datos.latitud;
+        if (datos.longitud) document.getElementById('longitud').value = datos.longitud;
+        if (datos.idDepartamento) {
+            document.getElementById('idDepartamento').value = datos.idDepartamento;
+            cargarDistritos(datos.idDepartamento).then(() => {
+                document.getElementById('idDistrito').value = datos.idDistrito;
+            });
+        }
+        
+        // Restaurar especies seleccionadas
+        if (datos.idsEspecies && datos.especies) {
+            // Limpiar selecciones anteriores
+            especiesSeleccionadas = [];
+            
+            // Restaurar cada especie
+            datos.idsEspecies.forEach((id, index) => {
+                const checkbox = document.getElementById(`especie_${id}`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                    const checkIcon = document.getElementById(`check_${id}`);
+                    if (checkIcon) checkIcon.style.display = 'inline';
+                    
+                    // Agregar a la variable global
+                    if (datos.especies[index]) {
+                        especiesSeleccionadas.push({ 
+                            id: id, 
+                            nombre: datos.especies[index] 
+                        });
+                    }
+                }
+            });
+            
+            // Actualizar UI
+            const counter = document.getElementById('especiesCounter');
+            const buttonText = document.getElementById('especiesButtonText');
+            
+            if (counter) {
+                counter.textContent = `Seleccione hasta 5 especies (${especiesSeleccionadas.length}/5 seleccionadas)`;
+            }
+            
+            if (buttonText) {
+                if (especiesSeleccionadas.length === 1) {
+                    buttonText.textContent = especiesSeleccionadas[0].nombre;
+                } else if (especiesSeleccionadas.length > 1) {
+                    buttonText.textContent = `${especiesSeleccionadas.length} especies seleccionadas`;
+                }
+            }
+            
+            if (typeof validarCampoEspecies === 'function') {
+                validarCampoEspecies();
+            }
+        }
+    }, 500);
+}
+
+// ===========================
+// REGISTRO DE FINCA
+// ===========================
+
+async function confirmarRegistro() {
+    const btnConfirmar = document.getElementById('btn-confirmar');
+    const btnVolver = document.querySelector('.modal-footer .btn-secondary');
+    
+    try {
+        // Deshabilitar botones durante el proceso
+        btnConfirmar.disabled = true;
+        btnVolver.disabled = true;
+        btnConfirmar.innerHTML = '<div class="spinner-border spinner-border-sm me-2" role="status"></div>Registrando...';
+
+        // Preparar datos para envío
+        const datosEnvio = {
+            nombreEstablecimiento: wizardData.datos.nombreEstablecimiento,
+            calle: wizardData.datos.calle,
+            numeracion: wizardData.datos.numeracion,
+            codigoPostal: wizardData.datos.codigoPostal,
+            latitud: wizardData.datos.latitud,
+            longitud: wizardData.datos.longitud,
+            idDistrito: wizardData.datos.idDistrito,
+            idsEspecies: wizardData.datos.idsEspecies
+        };
+
+        console.log('📤 Enviando datos de finca:', datosEnvio);
+
+        // Enviar al backend
+        const response = await fetchWithAuth(buildURL(BACKEND_CONFIG.ENDPOINTS.REGISTER_FINCA), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(datosEnvio)
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error('Sesión expirada. Por favor, inicie sesión nuevamente.');
+            } else if (response.status === 400) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Datos inválidos. Verifique la información ingresada.');
+            } else if (response.status === 409) {
+                throw new Error('Ya existe una finca con estos datos.');
+            }
+            throw new Error(`Error del servidor: ${response.status}`);
+        }
+
+        const fincaRegistrada = await response.json();
+        console.log('✅ Finca registrada exitosamente:', fincaRegistrada);
+
+        // Mostrar mensaje de éxito
+        mostrarRegistroExitoso(fincaRegistrada);
+
+        // Cerrar modal después de un momento
+        setTimeout(() => {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('wizardFincaModal'));
+            modal.hide();
+            
+            // Actualizar dashboard
+            actualizarDashboardConFinca(fincaRegistrada);
+        }, 3000);
+
+    } catch (error) {
+        console.error('❌ Error registrando finca:', error);
+        
+        // Restaurar botones
+        btnConfirmar.disabled = false;
+        btnVolver.disabled = false;
+        btnConfirmar.innerHTML = '<i class="fas fa-check me-2"></i>Confirmar Registro';
+        
+        // Mostrar error
+        mostrarMensajeError(`Error al registrar la finca: ${error.message}`);
+    }
+}
+
+function mostrarRegistroExitoso(finca) {
+    const wizardContent = document.getElementById('wizard-content');
+    
+    wizardContent.innerHTML = `
+        <div class="text-center py-5">
+            <div class="success-animation mb-4">
+                <i class="fas fa-check-circle fa-5x text-success"></i>
+            </div>
+            <h3 class="text-success mb-3">¡Finca Registrada Exitosamente!</h3>
+            <p class="text-muted mb-4">
+                Su finca "${finca.nombreEstablecimiento || finca.nombre}" ha sido registrada correctamente.
+            </p>
+            
+            <div class="card bg-dark border-success mx-auto" style="max-width: 400px;">
+                <div class="card-body">
+                    <h6 class="card-title text-success">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Detalles del Registro
+                    </h6>
+                    <ul class="list-unstyled mb-0 text-start">
+                        <li><strong>ID:</strong> ${finca.idEstablecimiento || finca.id}</li>
+                        <li><strong>Nombre:</strong> ${finca.nombreEstablecimiento || finca.nombre}</li>
+                        <li><strong>Estado:</strong> <span class="badge bg-success">Activa</span></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <p class="text-muted small">
+                    <i class="fas fa-clock me-1"></i>
+                    Esta ventana se cerrará automáticamente en unos segundos
+                </p>
+            </div>
+        </div>
+
+        <style>
+            .success-animation i {
+                animation: successPulse 2s ease-in-out infinite;
+            }
+            
+            @keyframes successPulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+                100% { transform: scale(1); }
+            }
+        </style>
+    `;
+}
+
+function actualizarDashboardConFinca(finca) {
+    // Actualizar la sección de fincas en el dashboard
+    const emptyFincas = document.getElementById('empty-fincas');
+    if (emptyFincas) {
+        emptyFincas.innerHTML = `
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="finca-card p-3 border border-success rounded">
+                        <h6 class="text-success mb-2">
+                            <i class="fas fa-check-circle me-2"></i>
+                            ${finca.nombreEstablecimiento || finca.nombre}
+                        </h6>
+                        <p class="text-muted small mb-2">
+                            <i class="fas fa-map-marker-alt me-1"></i>
+                            ${wizardData.datosDisplay.direccion}
+                        </p>
+                        <p class="text-muted small mb-0">
+                            <i class="fas fa-seedling me-1"></i>
+                            ${wizardData.datosDisplay.especies.length} especie(s) cultivada(s)
+                        </p>
+                        <span class="badge bg-success mt-2">Registrada recientemente</span>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3 d-flex align-items-center justify-content-center">
+                    <button class="btn btn-outline-primary" onclick="abrirWizardFinca()">
+                        <i class="fas fa-plus me-2"></i>Agregar Otra Finca
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    // Actualizar contador de fincas
+    const statsNumber = document.querySelector('.stats-card .stats-number');
+    if (statsNumber && statsNumber.textContent === '0') {
+        statsNumber.textContent = '1';
+    }
+
+    // Mostrar toast de éxito
+    const toast = document.createElement('div');
+    toast.className = 'toast align-items-center text-white bg-success border-0';
+    toast.setAttribute('role', 'alert');
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-check-circle me-2"></i>
+                ¡Finca registrada exitosamente!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    // Crear contenedor de toasts si no existe
+    let toastContainer = document.querySelector('.toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+        document.body.appendChild(toastContainer);
+    }
+    
+    toastContainer.appendChild(toast);
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+    
+    toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+    });
 }
 
 // ===========================
@@ -916,7 +2201,8 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 	}
 
 
-	// Inicializar mapa principal
+	// Inicializar mapa principal (requiere Leaflet.js incluido)
+	/*
 	var map = L.map('map').setView([-32.89, -68.83], 8); // Mendoza
 
 	// Capa estándar OSM
@@ -940,6 +2226,7 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 	};
 	osmLayer.addTo(map);
 	L.control.layers(baseMaps).addTo(map);
+	*/
 
 	// --- Lógica del wizard de registro de empleador ---
 	const paso1 = document.getElementById('form-registro-empleador-paso1');
@@ -1255,9 +2542,9 @@ document.addEventListener('DOMContentLoaded', function() {
 		const videoSectionHeight = bannerContainer ? bannerContainer.offsetHeight : 500;
 		
 		// Ocultar navbar cuando se salga de la sección del video
-		if (window.scrollY > videoSectionHeight - 100) {
+		if (navbar && window.scrollY > videoSectionHeight - 100) {
 			navbar.classList.add('scrolled');
-		} else {
+		} else if (navbar) {
 			navbar.classList.remove('scrolled');
 		}
 	});
@@ -1292,9 +2579,9 @@ document.addEventListener('DOMContentLoaded', function() {
 								if (modalInstance) modalInstance.hide();
 							}
 							
-							// Redirigir al dashboard
+							// Cargar perfil y abrir dashboard
 							setTimeout(function() {
-								window.location.href = 'dashboard.html';
+								cargarPerfilEmpresa();
 							}, 500);
 						}, 1500);
 					})
@@ -1926,7 +3213,7 @@ async function autenticarUsuario(cuit, contrasenia) {
 		
 		console.log('📤 Enviando credenciales al backend:', JSON.stringify(credenciales, null, 2));
 		
-		const response = await fetchWithConfig(buildURL(AUTH_CONFIG.endpoints.login), {
+		const response = await fetchWithConfig(buildURL(BACKEND_CONFIG.ENDPOINTS.LOGIN), {
 			method: 'POST',
 			body: JSON.stringify(credenciales)
 		});
@@ -2000,10 +3287,22 @@ function obtenerUsuario() {
 
 // Función para cerrar sesión
 function cerrarSesion() {
+	// Cerrar el panel del dashboard si está abierto
+	const dashboardOffcanvas = document.getElementById('dashboardOffcanvas');
+	if (dashboardOffcanvas) {
+		const offcanvasInstance = bootstrap.Offcanvas.getInstance(dashboardOffcanvas);
+		if (offcanvasInstance) {
+			console.log('🔄 Cerrando panel del dashboard...');
+			offcanvasInstance.hide();
+		}
+	}
+	
+	// Limpiar datos de sesión
 	localStorage.removeItem(AUTH_CONFIG.storage.tokenKey);
 	localStorage.removeItem(AUTH_CONFIG.storage.userKey);
 	localStorage.removeItem('perfil_empresa');
-	console.log('✅ Sesión cerrada');
+	
+	console.log('✅ Sesión cerrada y panel cerrado');
 	actualizarInterfazLogin(false);
 }
 
@@ -2035,15 +3334,36 @@ function actualizarInterfazLogin(autenticado) {
 						<i class="fas fa-user me-1"></i>${nombreUsuario}
 					</a>
 					<ul class="dropdown-menu" aria-labelledby="userDropdown">
+						<li><a class="dropdown-item" href="#" id="btn-continuar-registro"><i class="fas fa-user-circle me-2"></i>Mi perfil</a></li>
+						<li><hr class="dropdown-divider"></li>
 						<li><a class="dropdown-item" href="#" id="btn-logout"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
 					</ul>
 				</li>
 			`;
 			
+			// Agregar event listener para continuar registro
+			document.getElementById('btn-continuar-registro').addEventListener('click', function(e) {
+				e.preventDefault();
+				abrirWizardRegistro();
+			});
+			
 			// Agregar event listener para logout
 			document.getElementById('btn-logout').addEventListener('click', function(e) {
 				e.preventDefault();
-				cerrarSesion();
+				
+				// Cerrar el dropdown primero
+				const dropdown = document.getElementById('userDropdown');
+				if (dropdown) {
+					const dropdownInstance = bootstrap.Dropdown.getInstance(dropdown);
+					if (dropdownInstance) {
+						dropdownInstance.hide();
+					}
+				}
+				
+				// Esperar un momento para que se cierre el dropdown antes de cerrar sesión
+				setTimeout(() => {
+					cerrarSesion();
+				}, 200);
 			});
 		}
 		
@@ -2146,9 +3466,9 @@ async function manejarLogin() {
 				
 				// Esperar un momento para que se complete el cierre del modal
 				setTimeout(() => {
-					// Redirigir al dashboard
-					window.location.href = 'dashboard.html';
-					// O usar: window.location.replace('dashboard.html'); para no permitir "volver atrás"
+					// Cargar perfil y abrir dashboard
+					cargarPerfilEmpresa();
+					// O usar: actualizar UI sin redirigir
 				}, 500);
 				
 				console.log('✅ Sesión iniciada correctamente');
@@ -2207,8 +3527,8 @@ async function verificarToken() {
 	if (!token) return false;
 	
 	try {
-		// Hacer una petición a un endpoint protegido para verificar el token
-		const response = await fetchConAuth(AUTH_CONFIG.endpoints.verify, {
+		// Hacer una petición al endpoint del perfil para verificar el token
+		const response = await fetchConAuth(buildURL(BACKEND_CONFIG.ENDPOINTS.PROFILE), {
 			method: 'GET'
 		});
 		
@@ -2242,10 +3562,8 @@ if (estaAutenticado()) {
     verificarToken().then(valido => {
         if (valido) {
             actualizarInterfazLogin(true);
-            // Si estamos en index.html, redirigir al dashboard
-            if (window.location.pathname.endsWith('index.html')) {
-                window.location.href = AUTH_CONFIG.routes.dashboard;
-            }
+            // Si ya hay token válido, cargar perfil
+            cargarPerfilEmpresa();
         } else {
             // Token inválido, limpiar y mostrar login
             localStorage.removeItem(AUTH_CONFIG.storage.tokenKey);
@@ -2309,8 +3627,8 @@ if (estaAutenticado()) {
 				// Limpiar formulario
 				formLogin.reset();
 				
-				// Redirigir al dashboard
-				window.location.href = AUTH_CONFIG.routes.dashboard;
+				// Cargar perfil y abrir dashboard
+				cargarPerfilEmpresa();
 			} else {
 				errorDiv.querySelector('span').textContent = resultado.mensaje;
 				errorDiv.classList.remove('d-none');
@@ -2853,10 +4171,50 @@ document.addEventListener('DOMContentLoaded', function() {
 		
 		console.log('✅ Validación de CUIT inicializada correctamente');
 	} else {
-		console.warn('⚠️ Campo CUIT no encontrado en el DOM');
+		// Campo CUIT no encontrado - esto es normal en páginas que no son de registro
+		// console.warn('⚠️ Campo CUIT no encontrado en el DOM');
+	}
+});
+
+// Función para abrir el wizard de registro desde cualquier parte de la aplicación
+function abrirWizardRegistro() {
+	console.log('🎯 Abriendo wizard de registro...');
+	
+	// Verificar si estamos en la página principal
+	const modal = document.getElementById('modalRegistroEmpleador');
+	if (modal) {
+		// Mostrar el modal
+		const modalInstance = new bootstrap.Modal(modal);
+		modalInstance.show();
+		
+		// Reinicializar el wizard si es necesario
+		setTimeout(() => {
+			const wizard = new RegistroWizard();
+			console.log('✅ Wizard reinicializado');
+		}, 300);
+		
+	} else {
+		// Si no estamos en la página principal, redirigir
+		console.log('🔄 Redirigiendo a página principal...');
+		window.location.href = 'index.html';
+		
+		// Guardar un flag para abrir el modal automáticamente
+		sessionStorage.setItem('openWizardOnLoad', 'true');
+	}
+}
+
+// Al cargar la página, verificar si se debe abrir el wizard automáticamente
+document.addEventListener('DOMContentLoaded', function() {
+	if (sessionStorage.getItem('openWizardOnLoad') === 'true') {
+		sessionStorage.removeItem('openWizardOnLoad');
+		
+		// Esperar a que todo se cargue
+		setTimeout(() => {
+			abrirWizardRegistro();
+		}, 1000);
 	}
 	
-	// Verificar conectividad con el backend
+	// Verificar conectividad con el backend al cargar
 	if (BACKEND_CONFIG.DEVELOPMENT_MODE) {
 		console.log('🔧 Modo desarrollo: verificando conectividad con backend...');
 		setTimeout(async () => {
@@ -2874,3 +4232,291 @@ document.addEventListener('DOMContentLoaded', function() {
 		}, 1000);
 	}
 });
+
+// ============================================================================
+// FUNCIONES PARA MAPA DE LEAFLET EN WIZARD DE FINCA
+// ============================================================================
+
+let mapFinca = null;
+let mapFincaMarker = null;
+let mapFincaSatelliteLayer = null;
+let mapFincaClassicLayer = null;
+
+// Inicializar el mapa de Leaflet para el wizard de finca
+function inicializarMapaFinca() {
+	console.log('🗺️ Inicializando mapa de Leaflet para wizard...');
+	
+	try {
+		// Verificar si Leaflet está disponible
+		if (typeof L === 'undefined') {
+			console.error('❌ Leaflet no está cargado');
+			setTimeout(() => {
+				console.log('⏳ Reintentando cargar mapa en 2 segundos...');
+				inicializarMapaFinca();
+			}, 2000);
+			return;
+		}
+
+		// Verificar que el contenedor del mapa existe
+		const mapContainer = document.getElementById('mapFinca');
+		if (!mapContainer) {
+			console.error('❌ Contenedor del mapa #mapFinca no encontrado');
+			return;
+		}
+
+		console.log('✅ Contenedor del mapa encontrado');
+
+		// Si el mapa ya existe, destruirlo
+		if (mapFinca) {
+			console.log('🔄 Destruyendo mapa existente...');
+			mapFinca.remove();
+			mapFinca = null;
+			mapFincaMarker = null;
+		}
+
+		// Crear el mapa centrado en Mendoza
+		mapFinca = L.map('mapFinca', {
+			center: [-32.8895, -68.8458], // Mendoza
+			zoom: 10,
+			zoomControl: true,
+			scrollWheelZoom: true,
+			doubleClickZoom: true,
+			dragging: true
+		});
+
+		console.log('✅ Mapa creado exitosamente');
+
+		// Capa satelital (Google Satellite)
+		mapFincaSatelliteLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+			attribution: '© Google',
+			maxZoom: 20
+		});
+
+		// Capa clásica (OpenStreetMap)
+		mapFincaClassicLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			attribution: '© OpenStreetMap contributors',
+			maxZoom: 19
+		});
+
+		// Agregar capa clásica por defecto
+		mapFincaClassicLayer.addTo(mapFinca);
+		console.log('✅ Capa clásica agregada');
+
+		// Evento de click en el mapa
+		mapFinca.on('click', function(e) {
+			const lat = e.latlng.lat;
+			const lng = e.latlng.lng;
+			
+			console.log(`🗺️ Click en mapa: Lat ${lat}, Lng ${lng}`);
+			
+			// Actualizar campos de coordenadas
+			const latInput = document.getElementById('latitud');
+			const lngInput = document.getElementById('longitud');
+			
+			if (latInput) latInput.value = lat.toFixed(6);
+			if (lngInput) lngInput.value = lng.toFixed(6);
+			
+			// Agregar o mover marcador
+			if (mapFincaMarker) {
+				mapFincaMarker.setLatLng([lat, lng]);
+			} else {
+				mapFincaMarker = L.marker([lat, lng], {
+					draggable: true
+				}).addTo(mapFinca);
+				
+				// Evento cuando se arrastra el marcador
+				mapFincaMarker.on('dragend', function(e) {
+					const position = e.target.getLatLng();
+					if (latInput) latInput.value = position.lat.toFixed(6);
+					if (lngInput) lngInput.value = position.lng.toFixed(6);
+					console.log(`🗺️ Marcador arrastrado a: Lat ${position.lat}, Lng ${position.lng}`);
+				});
+			}
+			
+			// Trigger validation
+			if (typeof validarCampo === 'function') {
+				if (latInput) validarCampo(latInput);
+				if (lngInput) validarCampo(lngInput);
+			}
+		});
+
+		// Eventos para actualizar mapa cuando se cambien las coordenadas manualmente
+		const latInput = document.getElementById('latitud');
+		const lngInput = document.getElementById('longitud');
+		
+		if (latInput) latInput.addEventListener('input', actualizarMarcadorDesdeCoordenadas);
+		if (lngInput) lngInput.addEventListener('input', actualizarMarcadorDesdeCoordenadas);
+
+		// Forzar redimensionamiento del mapa
+		setTimeout(() => {
+			mapFinca.invalidateSize();
+			console.log('🗺️ Mapa redimensionado');
+		}, 100);
+
+		console.log('✅ Mapa de Leaflet inicializado correctamente');
+		
+	} catch (error) {
+		console.error('❌ Error al inicializar mapa:', error);
+		// Mostrar mensaje de error en el contenedor del mapa
+		const mapContainer = document.getElementById('mapFinca');
+		if (mapContainer) {
+			mapContainer.innerHTML = `
+				<div class="d-flex align-items-center justify-content-center h-100 text-center">
+					<div>
+						<i class="fas fa-exclamation-triangle fa-2x text-warning mb-2"></i>
+						<p class="text-muted">Error al cargar el mapa</p>
+						<button class="btn btn-sm btn-outline-primary" onclick="inicializarMapaFinca()">
+							<i class="fas fa-redo me-1"></i>Reintentar
+						</button>
+					</div>
+				</div>
+			`;
+		}
+	}
+}
+
+// Cambiar vista del mapa (satelital/clásico)
+function cambiarVistaMapaFinca(tipo) {
+	if (!mapFinca) {
+		console.warn('⚠️ Mapa no inicializado, intentando inicializar...');
+		inicializarMapaFinca();
+		setTimeout(() => cambiarVistaMapaFinca(tipo), 1000);
+		return;
+	}
+	
+	try {
+		// Remover capas existentes
+		if (mapFinca.hasLayer(mapFincaSatelliteLayer)) {
+			mapFinca.removeLayer(mapFincaSatelliteLayer);
+		}
+		if (mapFinca.hasLayer(mapFincaClassicLayer)) {
+			mapFinca.removeLayer(mapFincaClassicLayer);
+		}
+		
+		// Agregar la capa seleccionada
+		if (tipo === 'satellite') {
+			mapFincaSatelliteLayer.addTo(mapFinca);
+			
+			// Actualizar botones
+			const btnSatellite = document.getElementById('mapSatellite');
+			const btnClassic = document.getElementById('mapClassic');
+			
+			if (btnSatellite) {
+				btnSatellite.classList.remove('btn-outline-success');
+				btnSatellite.classList.add('btn-success');
+			}
+			if (btnClassic) {
+				btnClassic.classList.remove('btn-success');
+				btnClassic.classList.add('btn-outline-success');
+			}
+		} else {
+			mapFincaClassicLayer.addTo(mapFinca);
+			
+			// Actualizar botones
+			const btnSatellite = document.getElementById('mapSatellite');
+			const btnClassic = document.getElementById('mapClassic');
+			
+			if (btnClassic) {
+				btnClassic.classList.remove('btn-outline-success');
+				btnClassic.classList.add('btn-success');
+			}
+			if (btnSatellite) {
+				btnSatellite.classList.remove('btn-success');
+				btnSatellite.classList.add('btn-outline-success');
+			}
+		}
+		
+		console.log(`🗺️ Vista cambiada a: ${tipo}`);
+		
+	} catch (error) {
+		console.error('❌ Error al cambiar vista del mapa:', error);
+	}
+}
+
+// Actualizar marcador cuando se cambien las coordenadas manualmente
+function actualizarMarcadorDesdeCoordenadas() {
+	if (!mapFinca) return;
+	
+	const lat = parseFloat(document.getElementById('latitud').value);
+	const lng = parseFloat(document.getElementById('longitud').value);
+	
+	if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+		if (mapFincaMarker) {
+			mapFincaMarker.setLatLng([lat, lng]);
+		} else {
+			mapFincaMarker = L.marker([lat, lng], {
+				draggable: true
+			}).addTo(mapFinca);
+			
+			mapFincaMarker.on('dragend', function(e) {
+				const position = e.target.getLatLng();
+				document.getElementById('latitud').value = position.lat.toFixed(6);
+				document.getElementById('longitud').value = position.lng.toFixed(6);
+			});
+		}
+		
+		// Centrar mapa en la nueva posición
+		mapFinca.setView([lat, lng], mapFinca.getZoom());
+	}
+}
+
+// Modificar la función abrirWizardRegistro para inicializar el mapa
+function abrirWizardRegistroConMapa() {
+	// Verificar que el elemento modal existe
+	const modalElement = document.getElementById('wizardFincaModal');
+	if (!modalElement) {
+		console.error('❌ Modal wizardFincaModal no encontrado');
+		return;
+	}
+	
+	console.log('✅ Modal element encontrado');
+	
+	// Crear instancia del modal con configuraciones explícitas
+	const modal = new bootstrap.Modal(modalElement, {
+		backdrop: 'static',
+		keyboard: true,
+		focus: true
+	});
+	
+	console.log('✅ Modal Bootstrap inicializado');
+	
+	// Cargar contenido del paso 1
+	cargarPaso1();
+	
+	console.log('✅ Contenido Paso 1 cargado');
+	
+	// Mostrar modal
+	modal.show();
+	
+	console.log('✅ Modal mostrado');
+	
+	// CRÍTICO: Inicializar el mapa después de que el modal esté completamente visible
+	modalElement.addEventListener('shown.bs.modal', function() {
+		console.log('🗺️ Modal completamente visible, inicializando mapa...');
+		setTimeout(() => {
+			inicializarMapaFinca();
+		}, 300);
+	}, { once: true });
+	
+	// CRÍTICO: Corregir backdrop después de mostrar
+	setTimeout(() => {
+		const backdrop = document.querySelector('.modal-backdrop');
+		if (backdrop) {
+			backdrop.style.pointerEvents = 'none';
+			console.log('✅ Backdrop configurado para no bloquear eventos');
+		}
+		
+		const modalDialog = modalElement.querySelector('.modal-dialog');
+		if (modalDialog) {
+			modalDialog.style.pointerEvents = 'auto';
+			console.log('✅ Modal-dialog configurado para recibir eventos');
+		}
+		
+		const firstInput = modalElement.querySelector('input:not([disabled])');
+		if (firstInput) {
+			firstInput.focus();
+			firstInput.click();
+			console.log('✅ Focus y click establecido en primer input');
+		}
+	}, 500);
+}

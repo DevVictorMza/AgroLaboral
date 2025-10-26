@@ -1970,3 +1970,823 @@ main h2 {
         right: 8px;
     }
 }
+
+/* ===========================
+   CORRECCIÓN CRÍTICA DEL MODAL BACKDROP
+   =========================== */
+
+/* El backdrop NO debe interceptar eventos y con opacidad más suave */
+.modal-backdrop {
+    pointer-events: none !important;
+    opacity: 0.3 !important; /* Reducido de 0.5 (default) a 0.3 para menos oscuridad */
+    background-color: rgba(0, 0, 0, 0.3) !important; /* Backdrop más claro */
+}
+
+/* El modal y su contenido SÍ deben recibir eventos */
+.modal,
+.modal-dialog,
+.modal-content {
+    pointer-events: auto !important;
+}
+
+/* Asegurar que TODOS los elementos del wizard sean interactivos */
+#wizardFincaModal .modal-dialog,
+#wizardFincaModal .modal-content,
+#wizardFincaModal input,
+#wizardFincaModal select,
+#wizardFincaModal textarea,
+#wizardFincaModal button {
+    pointer-events: auto !important;
+    z-index: 1056 !important;
+    position: relative !important;
+}
+
+/* ESTILOS MEJORADOS DEL WIZARD MODAL */
+#wizardFincaModal .modal-content {
+    background: linear-gradient(135deg, #2A2A2A 0%, #3A3A3A 100%) !important;
+    border: 1px solid #666666 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important; /* Sombra más suave */
+}
+
+#wizardFincaModal .modal-header {
+    background: linear-gradient(135deg, #4A90E2, #357ABD) !important;
+    border-bottom: 1px solid #666666 !important;
+}
+
+#wizardFincaModal .modal-body {
+    background: transparent !important;
+}
+
+/* Mejorar contraste general del modal */
+#wizardFincaModal {
+    -webkit-backdrop-filter: blur(2px) !important; /* Ligero efecto blur para Safari */
+    backdrop-filter: blur(2px) !important; /* Ligero efecto blur en lugar de solo oscuridad */
+}
+
+/* ===========================
+   ESTILOS WIZARD FINCA
+   =========================== */
+
+/* Wizard Progress */
+.wizard-progress .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background: #3A3A3A;
+    border: 1px solid #555555;
+}
+
+.wizard-progress .step.active {
+    background: linear-gradient(135deg, #4A90E2, #357ABD);
+    border-color: #4A90E2;
+    box-shadow: 0 0 15px rgba(74, 144, 226, 0.4);
+}
+
+.wizard-progress .step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #555555;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.wizard-progress .step.active .step-number {
+    background: #ffffff;
+    color: #4A90E2;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.wizard-progress .step-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+    color: #E0E0E0;
+}
+
+.wizard-progress .step.active .step-label {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* Form Styles for Wizard */
+.wizard-form .form-label {
+    color: #ffffff;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.wizard-form .form-control {
+    background-color: #404040 !important;
+    border: 1px solid #666666 !important;
+    color: #ffffff !important;
+    border-radius: 6px;
+    padding: 0.75rem;
+    transition: all 0.3s ease;
+    /* CRÍTICO: Asegurar interactividad */
+    pointer-events: auto !important;
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+.wizard-form .form-control:focus {
+    background-color: #4A4A4A !important;
+    border-color: #4A90E2 !important;
+    box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25) !important;
+    color: #ffffff !important;
+    outline: none !important;
+}
+
+.wizard-form .form-control::placeholder {
+    color: #AAAAAA !important;
+}
+
+.wizard-form .form-select {
+    background-color: #404040 !important;
+    border: 1px solid #666666 !important;
+    color: #ffffff !important;
+    border-radius: 6px;
+    padding: 0.75rem;
+    /* CRÍTICO: Asegurar interactividad */
+    pointer-events: auto !important;
+    user-select: text !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+.wizard-form .form-select:focus {
+    background-color: #4A4A4A !important;
+    border-color: #4A90E2 !important;
+    box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25) !important;
+    color: #ffffff !important;
+    outline: none !important;
+}
+
+/* Species Selection */
+.especies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.especie-card {
+    background: #3A3A3A;
+    border: 2px solid #666666;
+    border-radius: 8px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.especie-card:hover {
+    border-color: #4A90E2;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+}
+
+.especie-card.selected {
+    background: linear-gradient(135deg, #4A90E2, #357ABD);
+    border-color: #4A90E2;
+    box-shadow: 0 0 15px rgba(74, 144, 226, 0.4);
+}
+
+.especie-card i {
+    font-size: 2rem;
+    color: #4A90E2;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.especie-card.selected i {
+    color: #ffffff;
+}
+
+.especie-card h6 {
+    color: #E0E0E0;
+    margin: 0;
+    font-weight: 500;
+}
+
+.especie-card.selected h6 {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* Confirmation Cards */
+.confirmation-card {
+    background: #3A3A3A;
+    border: 1px solid #666666;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+}
+
+.confirmation-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.especies-list .badge {
+    font-size: 0.9rem;
+    background-color: #4A90E2 !important;
+    border: none;
+}
+
+/* Loading States */
+.wizard-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
+/* Responsive Wizard */
+@media (max-width: 768px) {
+    #wizardFincaModal .modal-dialog {
+        width: 95%;
+        max-width: none;
+        margin: 1rem;
+    }
+    
+    .especies-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 0.75rem;
+    }
+    
+    .wizard-progress .step {
+        padding: 0.75rem;
+    }
+    
+    .wizard-progress .step-number {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+    
+    .wizard-progress .step-label {
+        font-size: 0.8rem;
+    }
+}
+
+/* ===========================
+   CORRECCIONES DE ESTILOS INLINE
+   =========================== */
+
+/* Estilos para formularios con posición relativa */
+.mb-3.position-relative {
+    position: relative;
+}
+
+/* Estilos para el offcanvas del dashboard */
+#dashboardOffcanvas {
+    width: 90% !important;
+    max-width: 800px !important;
+}
+
+/* Estilos para contenedores de carga */
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+}
+
+.loading-container-small {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+}
+
+/* ===========================
+   ESTILOS RESPONSIVE PARA DROPDOWN DE ESPECIES
+   =========================== */
+
+/* Estilos generales para el dropdown de especies */
+#especiesDropdown {
+    min-height: 45px !important;
+    font-size: 14px !important;
+    padding: 8px 12px !important;
+}
+
+#especiesDropdownMenu {
+    min-width: 100% !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+}
+
+#especiesDropdownMenu .dropdown-item {
+    padding: 12px 16px !important;
+    border-bottom: 1px solid #555555 !important;
+    font-size: 14px !important;
+}
+
+#especiesDropdownMenu .dropdown-item:last-child {
+    border-bottom: none !important;
+}
+
+#especiesDropdownMenu .dropdown-item:hover {
+    background-color: #555555 !important;
+}
+
+#especiesDropdownMenu .form-check-input {
+    margin-right: 12px !important;
+    transform: scale(1.1) !important;
+}
+
+/* ================================
+   ESPECIES SELECTOR - DISEÑO PROFESIONAL RESPONSIVE
+   ================================ */
+
+/* Botón selector principal */
+#especiesSelector {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    position: relative;
+}
+
+#especiesSelector:hover {
+    background: #505050 !important;
+    border-color: #4A90E2 !important;
+}
+
+#especiesSelector:focus {
+    box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+}
+
+/* Grid de especies responsive */
+.especies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+/* Tarjeta de especie */
+.especie-card {
+    background: #343a40;
+    border: 2px solid #495057;
+    border-radius: 8px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    min-height: 60px;
+}
+
+.especie-card:hover {
+    background: #495057;
+    border-color: #4A90E2;
+    transform: translateY(-1px);
+}
+
+.especie-card.selected {
+    background: rgba(74, 144, 226, 0.2);
+    border-color: #4A90E2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.3);
+}
+
+.especie-card.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Contenido de la tarjeta */
+.especie-card input[type="checkbox"] {
+    margin-right: 12px;
+    transform: scale(1.2);
+}
+
+.especie-card .especie-icon {
+    margin-right: 10px;
+    font-size: 18px;
+    color: #27AE60;
+}
+
+.especie-card .especie-name {
+    flex: 1;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.especie-card .especie-check {
+    margin-left: auto;
+    color: #27AE60;
+    font-size: 16px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.especie-card.selected .especie-check {
+    opacity: 1;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 768px) {
+    .especies-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        max-height: 300px;
+    }
+    
+    .especie-card {
+        min-height: 50px;
+        padding: 10px 14px;
+    }
+    
+    .especie-card .especie-name {
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .especies-grid {
+        padding: 4px;
+        max-height: 250px;
+    }
+    
+    .especie-card {
+        min-height: 48px;
+        padding: 8px 12px;
+    }
+    
+    .especie-card .especie-icon {
+        font-size: 16px;
+        margin-right: 8px;
+    }
+    
+    .especie-card .especie-name {
+        font-size: 14px;
+    }
+}
+
+/* Modal de especies - responsive */
+#especiesModal .modal-dialog {
+    max-width: 600px;
+    margin: 1rem;
+}
+
+@media (max-width: 768px) {
+    #especiesModal .modal-dialog {
+        max-width: 95vw;
+        margin: 0.5rem;
+    }
+}
+
+/* Scrollbar personalizado para especies grid */
+.especies-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+.especies-grid::-webkit-scrollbar-track {
+    background: #2A2A2A;
+    border-radius: 3px;
+}
+
+.especies-grid::-webkit-scrollbar-thumb {
+    background: #4A90E2;
+    border-radius: 3px;
+}
+
+.especies-grid::-webkit-scrollbar-thumb:hover {
+    background: #357ABD;
+}
+
+/* ================================
+   FIN ESPECIES SELECTOR
+   ================================ */
+
+/* ================================
+   DROPDOWN USUARIO MEJORADO
+   ================================ */
+
+/* Dropdown toggle (nombre del usuario) */
+#userDropdown {
+    background: linear-gradient(135deg, var(--success-green), var(--light-green)) !important;
+    border: 2px solid transparent !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 0.6rem 1.2rem !important;
+    border-radius: 25px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    text-decoration: none !important;
+    box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3) !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+#userDropdown::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+#userDropdown:hover::before {
+    left: 100%;
+}
+
+#userDropdown:hover,
+#userDropdown:focus,
+#userDropdown.show {
+    background: linear-gradient(135deg, #219a52, var(--success-green)) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4) !important;
+    border-color: var(--light-green) !important;
+}
+
+#userDropdown i {
+    color: rgba(255, 255, 255, 0.9) !important;
+    margin-right: 0.5rem !important;
+}
+
+/* Dropdown menu */
+.navbar-nav .dropdown-menu {
+    background: rgba(42, 42, 42, 0.95) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 2px solid var(--success-green) !important;
+    border-radius: 15px !important;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(39, 174, 96, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    padding: 0.75rem 0 !important;
+    min-width: 200px !important;
+    margin-top: 0.5rem !important;
+    animation: dropdownFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Dropdown items */
+.navbar-nav .dropdown-item {
+    color: #FFFFFF !important;
+    padding: 0.75rem 1.5rem !important;
+    font-weight: 500 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border-radius: 0 !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.navbar-nav .dropdown-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--success-green), var(--light-green));
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: -1;
+}
+
+.navbar-nav .dropdown-item:hover::before,
+.navbar-nav .dropdown-item:focus::before {
+    left: 0;
+}
+
+.navbar-nav .dropdown-item:hover,
+.navbar-nav .dropdown-item:focus {
+    background: transparent !important;
+    color: white !important;
+    transform: translateX(5px) !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+}
+
+.navbar-nav .dropdown-item i {
+    color: var(--light-green) !important;
+    margin-right: 0.75rem !important;
+    font-size: 1.1rem !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.navbar-nav .dropdown-item:hover i,
+.navbar-nav .dropdown-item:focus i {
+    color: white !important;
+    transform: scale(1.1) !important;
+}
+
+/* Divider styling */
+.navbar-nav .dropdown-divider {
+    border-color: rgba(39, 174, 96, 0.3) !important;
+    margin: 0.5rem 1rem !important;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        var(--success-green) 50%, 
+        transparent 100%) !important;
+    height: 1px !important;
+    border: none !important;
+}
+
+/* Específico para "Mi perfil" */
+#btn-continuar-registro {
+    background: linear-gradient(90deg, 
+        rgba(39, 174, 96, 0.1) 0%, 
+        rgba(46, 204, 113, 0.1) 100%) !important;
+}
+
+#btn-continuar-registro:hover {
+    background: linear-gradient(135deg, var(--success-green), var(--light-green)) !important;
+}
+
+/* Específico para "Cerrar Sesión" */
+#btn-logout:hover {
+    background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+}
+
+#btn-logout:hover::before {
+    background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+}
+
+#btn-logout:hover i {
+    color: white !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #userDropdown {
+        padding: 0.5rem 1rem !important;
+        font-size: 0.9rem !important;
+    }
+    
+    .navbar-nav .dropdown-menu {
+        min-width: 180px !important;
+        margin-top: 0.25rem !important;
+    }
+    
+    .navbar-nav .dropdown-item {
+        padding: 0.6rem 1.2rem !important;
+        font-size: 0.9rem !important;
+    }
+}
+
+/* ================================
+   FIN DROPDOWN USUARIO MEJORADO
+   ================================ */
+
+/* ================================
+   MAPA LEAFLET EN WIZARD DE FINCA
+   ================================ */
+
+.map-container {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid #444444;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.map-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.map-controls .btn-group .btn {
+    font-size: 0.875rem;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.map-controls .btn-group .btn:first-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+}
+
+.map-controls .btn-group .btn:last-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.map-controls .btn-outline-success {
+    background: transparent;
+    border-color: var(--success-green);
+    color: var(--success-green);
+}
+
+.map-controls .btn-outline-success:hover {
+    background: var(--success-green);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+}
+
+.map-controls .btn-success {
+    background: var(--success-green);
+    border-color: var(--success-green);
+    color: white;
+    box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+}
+
+.map-controls .btn-success:hover {
+    background: var(--light-green);
+    border-color: var(--light-green);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.4);
+}
+
+#mapFinca {
+    border: 1px solid #444444;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+    transition: box-shadow 0.3s ease;
+}
+
+#mapFinca:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Estilos específicos para los controles de Leaflet en el wizard */
+#mapFinca .leaflet-control-zoom {
+    border: none !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+#mapFinca .leaflet-control-zoom a {
+    background: var(--card-bg) !important;
+    color: var(--text-light) !important;
+    border: 1px solid #444444 !important;
+    transition: all 0.2s ease !important;
+}
+
+#mapFinca .leaflet-control-zoom a:hover {
+    background: var(--success-green) !important;
+    color: white !important;
+    border-color: var(--success-green) !important;
+}
+
+#mapFinca .leaflet-control-attribution {
+    background: rgba(42, 42, 42, 0.9) !important;
+    color: var(--text-muted) !important;
+    font-size: 10px !important;
+    border-radius: 4px !important;
+}
+
+#mapFinca .leaflet-control-attribution a {
+    color: var(--success-green) !important;
+}
+
+/* Responsive para el mapa del wizard */
+@media (max-width: 768px) {
+    .map-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .map-controls .btn-group {
+        width: 100%;
+    }
+    
+    .map-controls .btn-group .btn {
+        flex: 1;
+    }
+    
+    .map-controls small {
+        text-align: center;
+        margin-top: 8px;
+    }
+    
+    #mapFinca {
+        height: 250px !important;
+    }
+}
+
+/* ================================
+   FIN MAPA LEAFLET EN WIZARD
+   ================================ */
