@@ -500,9 +500,6 @@ function cargarPaso1() {
                     <div class="field-feedback"></div>
                 </div>
 
-                <!-- Espacio vacío para mantener el layout -->
-                <div class="col-md-6 mb-3"></div>
-
                 <!-- Coordenadas -->
                 <div class="col-md-6 mb-3">
                     <label for="latitud" class="form-label">
@@ -528,17 +525,34 @@ function cargarPaso1() {
                     </label>
                     <div class="map-container">
                         <div class="map-controls mb-2">
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-outline-success btn-sm" 
-                                        id="mapSatellite" onclick="cambiarVistaMapaFinca('satellite')">
-                                    <i class="fas fa-satellite me-1"></i>Satelital
-                                </button>
-                                <button type="button" class="btn btn-success btn-sm" 
-                                        id="mapClassic" onclick="cambiarVistaMapaFinca('classic')">
-                                    <i class="fas fa-map me-1"></i>Clásico
-                                </button>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex gap-2">
+                                    <!-- Botón Buscar Ubicación -->
+                                    <button type="button" class="btn btn-search-location btn-sm" 
+                                            id="buscarUbicacionBtn" onclick="buscarUbicacion()" disabled>
+                                        <span class="btn-text">
+                                            <i class="fas fa-search-location me-1"></i>Buscar
+                                        </span>
+                                        <span class="btn-loading d-none">
+                                            <div class="spinner-border spinner-border-sm me-1" role="status"></div>
+                                            Buscando...
+                                        </span>
+                                    </button>
+                                    
+                                    <!-- Controles de vista del mapa -->
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-outline-success btn-sm" 
+                                                id="mapSatellite" onclick="cambiarVistaMapaFinca('satellite')">
+                                            <i class="fas fa-satellite me-1"></i>Satelital
+                                        </button>
+                                        <button type="button" class="btn btn-success btn-sm" 
+                                                id="mapClassic" onclick="cambiarVistaMapaFinca('classic')">
+                                            <i class="fas fa-map me-1"></i>Clásico
+                                        </button>
+                                    </div>
+                                </div>
+                                <small class="text-muted">Haga clic en el mapa para establecer la ubicación</small>
                             </div>
-                            <small class="text-muted ms-3">Haga clic en el mapa para establecer la ubicación</small>
                         </div>
                         <div id="mapFinca" style="height: 300px; border-radius: 8px; overflow: hidden; border: 1px solid #444444;"></div>
                     </div>
@@ -4352,6 +4366,21 @@ function inicializarMapaFinca() {
 			mapFinca.invalidateSize();
 			console.log('🗺️ Mapa redimensionado');
 		}, 100);
+		
+		// Inicializar eventos para búsqueda de ubicación
+		setTimeout(() => {
+			const camposCalle = document.getElementById('calle');
+			const camposNumero = document.getElementById('numeracion');
+			
+			if (camposCalle && camposNumero) {
+				camposCalle.addEventListener('input', actualizarEstadoBotonBusqueda);
+				camposNumero.addEventListener('input', actualizarEstadoBotonBusqueda);
+				
+				// Estado inicial del botón
+				actualizarEstadoBotonBusqueda();
+				console.log('✅ Eventos de búsqueda de ubicación inicializados');
+			}
+		}, 200);
 
 		console.log('✅ Mapa de Leaflet inicializado correctamente');
 		
@@ -4458,6 +4487,280 @@ function actualizarMarcadorDesdeCoordenadas() {
 		// Centrar mapa en la nueva posición
 		mapFinca.setView([lat, lng], mapFinca.getZoom());
 	}
+}
+
+// ============================================================================
+// FUNCIONES PARA BÚSQUEDA DE UBICACIÓN POR DIRECCIÓN
+// ============================================================================
+
+// Validar que los campos necesarios estén completos
+function validarCamposDireccion() {
+	const calle = document.getElementById('calle')?.value?.trim();
+	const numero = document.getElementById('numeracion')?.value?.trim();
+	
+	return calle && numero;
+}
+
+// Habilitar/deshabilitar botón según validación
+function actualizarEstadoBotonBusqueda() {
+	const btn = document.getElementById('buscarUbicacionBtn');
+	if (btn) {
+		btn.disabled = !validarCamposDireccion();
+	}
+}
+
+// Función principal de búsqueda de ubicación
+async function buscarUbicacion() {
+	console.log('🔍 Iniciando búsqueda de ubicación...');
+	
+	if (!validarCamposDireccion()) {
+		mostrarFeedbackBusqueda('error', 'Complete los campos de Calle y Número antes de buscar');
+		return;
+	}
+	
+	const btn = document.getElementById('buscarUbicacionBtn');
+	const btnText = btn.querySelector('.btn-text');
+	const btnLoading = btn.querySelector('.btn-loading');
+	
+	try {
+		// Mostrar estado de carga
+		btn.disabled = true;
+		btnText.classList.add('d-none');
+		btnLoading.classList.remove('d-none');
+		
+		// Construir dirección completa
+		const calle = document.getElementById('calle').value.trim();
+		const numero = document.getElementById('numeracion').value.trim();
+		const codigoPostal = document.getElementById('codigoPostal').value.trim();
+		
+		let direccionCompleta = `${calle} ${numero}`;
+		if (codigoPostal) {
+			direccionCompleta += `, ${codigoPostal}`;
+		}
+		direccionCompleta += ', Mendoza, Argentina';
+		
+		console.log('📍 Buscando dirección:', direccionCompleta);
+		
+		// Llamar a la API de geocodificación
+		const resultado = await geocodificarDireccion(direccionCompleta);
+		
+		if (resultado.success) {
+			actualizarMapaConUbicacion(resultado.lat, resultado.lng, resultado.direccionEncontrada);
+			mostrarFeedbackBusqueda('success', `Ubicación encontrada: ${resultado.direccionEncontrada}`);
+			
+			// Animación de éxito en el botón
+			btn.classList.add('success');
+			setTimeout(() => btn.classList.remove('success'), 600);
+		} else {
+			mostrarFeedbackBusqueda('error', resultado.error);
+			
+			// Animación de error en el botón
+			btn.classList.add('error');
+			setTimeout(() => btn.classList.remove('error'), 500);
+		}
+		
+	} catch (error) {
+		console.error('❌ Error en búsqueda de ubicación:', error);
+		mostrarFeedbackBusqueda('error', 'Error de conexión. Verifique su internet e intente nuevamente.');
+		
+		btn.classList.add('error');
+		setTimeout(() => btn.classList.remove('error'), 500);
+		
+	} finally {
+		// Restaurar estado del botón
+		btn.disabled = false;
+		btnText.classList.remove('d-none');
+		btnLoading.classList.add('d-none');
+	}
+}
+
+// Función para geocodificar usando API de Nominatim
+async function geocodificarDireccion(direccion) {
+	try {
+		const encodedAddress = encodeURIComponent(direccion);
+		const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&limit=5&countrycodes=ar&addressdetails=1`;
+		
+		console.log('🌐 URL de geocodificación:', url);
+		
+		const response = await fetch(url, {
+			headers: {
+				'User-Agent': 'AgroLaboral/1.0 (Aplicación de gestión agrícola)'
+			}
+		});
+		
+		if (!response.ok) {
+			throw new Error(`Error HTTP: ${response.status}`);
+		}
+		
+		const resultados = await response.json();
+		console.log('📊 Resultados de geocodificación:', resultados);
+		
+		if (resultados.length === 0) {
+			return {
+				success: false,
+				error: 'No se encontró la dirección especificada. Verifique los datos e intente nuevamente.'
+			};
+		}
+		
+		// Filtrar resultados que estén en Mendoza
+		const resultadosMendoza = resultados.filter(resultado => {
+			const address = resultado.address || {};
+			return address.state === 'Mendoza' || 
+				   address.city === 'Mendoza' ||
+				   resultado.display_name.toLowerCase().includes('mendoza');
+		});
+		
+		let mejorResultado = resultadosMendoza.length > 0 ? resultadosMendoza[0] : resultados[0];
+		
+		// Validar que esté en Argentina
+		if (!mejorResultado.address?.country_code || mejorResultado.address.country_code !== 'ar') {
+			return {
+				success: false,
+				error: 'La dirección encontrada está fuera de Argentina. Verifique los datos.'
+			};
+		}
+		
+		const lat = parseFloat(mejorResultado.lat);
+		const lng = parseFloat(mejorResultado.lon);
+		
+		// Validar coordenadas de Mendoza (aproximadas)
+		if (lat < -36 || lat > -30 || lng < -71 || lng > -66) {
+			console.warn('⚠️ Coordenadas fuera del rango esperado para Mendoza');
+		}
+		
+		return {
+			success: true,
+			lat: lat,
+			lng: lng,
+			direccionEncontrada: mejorResultado.display_name,
+			detalles: mejorResultado.address
+		};
+		
+	} catch (error) {
+		console.error('❌ Error en geocodificación:', error);
+		return {
+			success: false,
+			error: 'Error al conectar con el servicio de mapas. Intente nuevamente.'
+		};
+	}
+}
+
+// Actualizar el mapa con la ubicación encontrada
+function actualizarMapaConUbicacion(lat, lng, direccion) {
+	if (!mapFinca) {
+		console.error('❌ Mapa no disponible');
+		return;
+	}
+	
+	console.log(`🗺️ Actualizando mapa con ubicación: ${lat}, ${lng}`);
+	
+	// Actualizar campos de coordenadas
+	const latInput = document.getElementById('latitud');
+	const lngInput = document.getElementById('longitud');
+	
+	if (latInput) latInput.value = lat.toFixed(6);
+	if (lngInput) lngInput.value = lng.toFixed(6);
+	
+	// Centrar mapa con animación suave
+	mapFinca.setView([lat, lng], 16, {
+		animate: true,
+		duration: 1.5
+	});
+	
+	// Crear marcador especial con popup
+	if (mapFincaMarker) {
+		mapFinca.removeLayer(mapFincaMarker);
+	}
+	
+	// Marcador con color especial para ubicación encontrada
+	const iconoUbicacion = L.divIcon({
+		className: 'marcador-ubicacion-encontrada',
+		html: '<i class="fas fa-map-marker-alt"></i>',
+		iconSize: [30, 30],
+		iconAnchor: [15, 30],
+		popupAnchor: [0, -30]
+	});
+	
+	mapFincaMarker = L.marker([lat, lng], {
+		icon: iconoUbicacion,
+		draggable: true
+	}).addTo(mapFinca);
+	
+	// Popup con información
+	mapFincaMarker.bindPopup(`
+		<div class="popup-ubicacion">
+			<h6><i class="fas fa-map-marker-alt text-success"></i> Ubicación Encontrada</h6>
+			<p class="mb-1 small">${direccion}</p>
+			<small class="text-muted">Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}</small>
+		</div>
+	`).openPopup();
+	
+	// Evento cuando se arrastra el marcador
+	mapFincaMarker.on('dragend', function(e) {
+		const position = e.target.getLatLng();
+		if (latInput) latInput.value = position.lat.toFixed(6);
+		if (lngInput) lngInput.value = position.lng.toFixed(6);
+		console.log(`🗺️ Marcador arrastrado a: ${position.lat}, ${position.lng}`);
+	});
+	
+	// Trigger validation
+	if (typeof validarCampo === 'function') {
+		if (latInput) validarCampo(latInput);
+		if (lngInput) validarCampo(lngInput);
+	}
+	
+	// Highlight temporal del marcador
+	setTimeout(() => {
+		if (mapFincaMarker) {
+			mapFincaMarker.setIcon(L.divIcon({
+				className: 'marcador-ubicacion-normal',
+				html: '<i class="fas fa-map-marker-alt"></i>',
+				iconSize: [25, 25],
+				iconAnchor: [12.5, 25],
+				popupAnchor: [0, -25]
+			}));
+		}
+	}, 3000);
+}
+
+// Mostrar feedback visual de la búsqueda
+function mostrarFeedbackBusqueda(tipo, mensaje) {
+	const toast = document.createElement('div');
+	toast.className = `toast align-items-center text-white border-0 ${tipo === 'success' ? 'bg-success' : 'bg-danger'}`;
+	toast.setAttribute('role', 'alert');
+	toast.setAttribute('aria-live', 'assertive');
+	toast.setAttribute('aria-atomic', 'true');
+	
+	const icono = tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+	
+	toast.innerHTML = `
+		<div class="d-flex">
+			<div class="toast-body">
+				<i class="fas ${icono} me-2"></i>
+				${mensaje}
+			</div>
+			<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+		</div>
+	`;
+	
+	// Crear contenedor de toasts si no existe
+	let toastContainer = document.querySelector('.toast-container-search');
+	if (!toastContainer) {
+		toastContainer = document.createElement('div');
+		toastContainer.className = 'toast-container toast-container-search position-fixed top-0 end-0 p-3';
+		toastContainer.style.zIndex = '9999';
+		document.body.appendChild(toastContainer);
+	}
+	
+	toastContainer.appendChild(toast);
+	const bsToast = new bootstrap.Toast(toast, { delay: 4000 });
+	bsToast.show();
+	
+	toast.addEventListener('hidden.bs.toast', () => {
+		toast.remove();
+	});
+	
+	console.log(`📢 Feedback mostrado: ${tipo} - ${mensaje}`);
 }
 
 // Modificar la función abrirWizardRegistro para inicializar el mapa
