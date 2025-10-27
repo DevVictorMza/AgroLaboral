@@ -66,45 +66,21 @@ async function fetchWithConfig(url, options = {}) {
 async function fetchWithAuth(url, options = {}) {
     const token = obtenerToken();
     if (!token) {
-        console.error('❌ No hay token de autenticación disponible');
         throw new Error('No hay token de autenticación');
     }
 
-    // Asegurar que el token tiene el formato correcto
-    const tokenFormatted = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-    
     const defaultOptions = {
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': tokenFormatted,
+            'Authorization': `Bearer ${token}`,
             'Accept': 'application/json'
         },
         mode: 'cors',
         credentials: 'include'
     };
     
-    // Merge de opciones manteniendo headers existentes
-    const mergedOptions = {
-        ...defaultOptions,
-        ...options,
-        headers: {
-            ...defaultOptions.headers,
-            ...(options.headers || {})
-        }
-    };
-
-    // Log detallado de la petición
-    console.log('🚀 Petición autenticada:', {
-        url,
-        method: mergedOptions.method || 'GET',
-        headers: {
-            ...mergedOptions.headers,
-            'Authorization': 'Bearer [TOKEN OCULTO]'
-        }
-    });
-    
     // Usar directamente la URL que se pasa, no construirla de nuevo
-    return fetchWithConfig(url, mergedOptions);
+    return fetchWithConfig(url, { ...defaultOptions, ...options });
 }
 
 // ===========================
@@ -1316,83 +1292,32 @@ async function confirmarRegistroMejorado() {
     
     console.log('🚀 Iniciando proceso de registro de establecimiento...');
     
-    // PASO 1: Prueba de integración - Verificación inicial
-    console.log('🏁 Iniciando prueba de integración del registro...');
-    console.group('1️⃣ Verificación del estado inicial');
-    const tokenInicial = obtenerToken();
-    console.log('🔑 Token inicial:', tokenInicial ? 'Presente' : 'No disponible');
-    console.log('📦 Datos en localStorage:', {
-        jwt: localStorage.getItem('jwt_token') ? 'Presente' : 'No disponible',
-        user: localStorage.getItem('user_data') ? 'Presente' : 'No disponible'
-    });
-    console.groupEnd();
-    
-    // PASO 2: Verificar token JWT
-    console.group('2️⃣ Validación del token JWT');
-    console.log('🔑 Verificando token JWT antes del registro...');
-    const tokenValido = await validateCurrentToken();
-    console.log('✅ Resultado de validación:', tokenValido);
-    console.groupEnd();
-    
-    if (!tokenValido.valid) {
-        console.group('3️⃣ Intento de refresh del token');
-        console.log('❌ Token inválido. Intentando refresh...');
-        const refreshExitoso = await autoRefreshToken();
-        if (!refreshExitoso) {
-            console.error('💥 No se pudo refrescar el token. Abortando registro.');
-            console.groupEnd();
-            alert('Error de autenticación. Por favor, inicia sesión nuevamente.');
-            // Restaurar botones
-            btnConfirmar.disabled = false;
-            btnVolver.disabled = false;
-            btnConfirmar.innerHTML = 'Confirmar Registro';
-            return;
-        }
-        console.log('✅ Token refrescado exitosamente');
-        console.groupEnd();
-    }
-    
     // Deshabilitar botones durante el proceso
     btnConfirmar.disabled = true;
     btnVolver.disabled = true;
     btnConfirmar.innerHTML = '<div class="spinner-border spinner-border-sm me-2" role="status"></div>Registrando establecimiento...';
 
     try {
-        // Logs de debugging para JWT - DESPUÉS de validar el token
-        logTokenDebugInfo('DESPUÉS DE VALIDAR TOKEN - confirmarRegistro');
+        // Logs de debugging para JWT
+        logTokenDebugInfo('confirmarRegistro');
         
-        // PASO 4: Preparación de datos
-        console.group('6️⃣ Preparación de datos para envío');
+        // Preparar datos exactamente como espera el DTO del backend
         const datosEnvio = {
             nombreEstablecimiento: wizardData.datos.nombreEstablecimiento,
             calle: wizardData.datos.calle,
             numeracion: wizardData.datos.numeracion,
             codigoPostal: wizardData.datos.codigoPostal,
-            latitud: parseFloat(wizardData.datos.latitud),
-            longitud: parseFloat(wizardData.datos.longitud),
-            idDistrito: parseInt(wizardData.datos.idDistrito),
-            idsEspecies: Array.isArray(wizardData.datos.idsEspecies) 
-                ? wizardData.datos.idsEspecies.map(id => parseInt(id))
-                : [parseInt(wizardData.datos.idsEspecies)]
+            latitud: wizardData.datos.latitud,
+            longitud: wizardData.datos.longitud,
+            idDistrito: wizardData.datos.idDistrito,
+            idsEspecies: wizardData.datos.idsEspecies
         };
 
-        // Validación exhaustiva de datos
-        console.log('📋 Datos preparados:', JSON.stringify(datosEnvio, null, 2));
-        console.log('� Validación de tipos:', {
-            nombreEstablecimiento: typeof datosEnvio.nombreEstablecimiento,
-            calle: typeof datosEnvio.calle,
-            numeracion: typeof datosEnvio.numeracion,
-            codigoPostal: typeof datosEnvio.codigoPostal,
-            latitud: `${typeof datosEnvio.latitud} (${datosEnvio.latitud})`,
-            longitud: `${typeof datosEnvio.longitud} (${datosEnvio.longitud})`,
-            idDistrito: `${typeof datosEnvio.idDistrito} (${datosEnvio.idDistrito})`,
-            idsEspecies: `array[${datosEnvio.idsEspecies.length}] (${datosEnvio.idsEspecies.join(', ')})`
-        });
-        console.groupEnd();
+        // Validar datos antes del envío
+        console.log('📋 Validando datos de envío:', datosEnvio);
         
         if (!datosEnvio.nombreEstablecimiento || !datosEnvio.calle || !datosEnvio.numeracion || 
-            !datosEnvio.codigoPostal || !datosEnvio.idDistrito || !datosEnvio.idsEspecies?.length ||
-            isNaN(datosEnvio.latitud) || isNaN(datosEnvio.longitud) || isNaN(datosEnvio.idDistrito)) {
+            !datosEnvio.codigoPostal || !datosEnvio.idDistrito || !datosEnvio.idsEspecies?.length) {
             throw new Error('Faltan datos obligatorios para el registro');
         }
 
@@ -1400,9 +1325,8 @@ async function confirmarRegistroMejorado() {
         const establecimientoRegistrado = await executeWithTokenRetry(async () => {
             
             const url = buildURL(BACKEND_CONFIG.ENDPOINTS.REGISTER_FINCA);
-            console.log('🌐 URL COMPLETA DE PETICIÓN:', url);
-            console.log('📤 DATOS A ENVIAR:', JSON.stringify(datosEnvio, null, 2));
-            console.log('🔑 TOKEN ANTES DE PETICIÓN:', localStorage.getItem('jwt_token') ? 'Token presente' : 'No hay token');
+            console.log('📡 Enviando petición a:', url);
+            console.log('📤 Datos a enviar:', JSON.stringify(datosEnvio, null, 2));
 
             // Realizar petición autenticada al backend
             const response = await fetchWithAuth(url, {
@@ -1413,24 +1337,16 @@ async function confirmarRegistroMejorado() {
                 body: JSON.stringify(datosEnvio)
             });
 
-            console.log('📡 RESPUESTA COMPLETA - Status:', response.status);
-            console.log('📡 RESPUESTA COMPLETA - Status Text:', response.statusText);
-            console.log('📡 RESPUESTA COMPLETA - Headers:', [...response.headers.entries()]);
-            console.log('📡 RESPUESTA COMPLETA - URL:', response.url);
+            console.log('📡 Respuesta del servidor - Status:', response.status);
+            console.log('📡 Respuesta del servidor - Headers:', [...response.headers.entries()]);
 
-            // PASO 6: Manejo de errores HTTP
+            // Manejo específico de errores HTTP
             if (!response.ok) {
-                console.group('❌ Error en el registro');
                 let errorMessage = 'Error desconocido del servidor';
                 
                 try {
                     const errorData = await response.json();
-                    console.error('📝 Detalles del error:', {
-                        status: response.status,
-                        statusText: response.statusText,
-                        errorData: errorData,
-                        headers: Object.fromEntries([...response.headers.entries()])
-                    });
+                    console.error('❌ Error del servidor:', errorData);
                     
                     switch (response.status) {
                         case 401:
@@ -1479,9 +1395,7 @@ async function confirmarRegistroMejorado() {
 
             // Procesar respuesta exitosa
             const establecimiento = await response.json();
-            console.log('✅ ESTABLECIMIENTO REGISTRADO EXITOSAMENTE:', establecimiento);
-            console.log('✅ TIPO DE RESPUESTA:', typeof establecimiento);
-            console.log('✅ PROPIEDADES DE LA RESPUESTA:', Object.keys(establecimiento));
+            console.log('✅ Establecimiento registrado exitosamente:', establecimiento);
 
             // Validar estructura de respuesta
             if (!establecimiento) {
@@ -1491,9 +1405,6 @@ async function confirmarRegistroMejorado() {
             return establecimiento;
             
         }, 'Registro de Establecimiento');
-
-        console.log('🎉 PROCESO DE REGISTRO COMPLETADO EXITOSAMENTE');
-        console.log('🎉 DATOS DEL ESTABLECIMIENTO REGISTRADO:', establecimientoRegistrado);
 
         // Mostrar mensaje de éxito con datos del establecimiento
         mostrarRegistroExitoso(establecimientoRegistrado);
@@ -1556,6 +1467,99 @@ async function confirmarRegistro() {
     // Redirigir a la versión mejorada con manejo robusto de JWT
     return await confirmarRegistroMejorado();
 }
+
+function mostrarRegistroExitoso(establecimiento) {
+        console.log('� Validando datos de envío:', datosEnvio);
+        
+        if (!datosEnvio.nombreEstablecimiento || !datosEnvio.calle || !datosEnvio.numeracion || 
+            !datosEnvio.codigoPostal || !datosEnvio.idDistrito || !datosEnvio.idsEspecies?.length) {
+            throw new Error('Faltan datos obligatorios para el registro');
+        }
+
+        // Construir URL del endpoint
+        const url = buildURL(BACKEND_CONFIG.ENDPOINTS.REGISTER_FINCA);
+        console.log('📡 Enviando petición a:', url);
+        console.log('📤 Datos a enviar:', JSON.stringify(datosEnvio, null, 2));
+
+        // Realizar petición autenticada al backend
+        const response = await fetchWithAuth(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(datosEnvio)
+        });
+
+        console.log('📡 Respuesta del servidor - Status:', response.status);
+        console.log('📡 Respuesta del servidor - Headers:', [...response.headers.entries()]);
+
+        // Manejo específico de errores HTTP
+        if (!response.ok) {
+            let errorMessage = 'Error desconocido del servidor';
+            
+            try {
+                const errorData = await response.json();
+                console.error('❌ Error del servidor:', errorData);
+                
+                switch (response.status) {
+                    case 401:
+                        console.error('❌ Token expirado o inválido');
+                        // Cerrar sesión automáticamente
+                        cerrarSesion();
+                        throw new Error('Sesión expirada. Por favor, inicie sesión nuevamente.');
+                        
+                    case 400:
+                        errorMessage = errorData.message || errorData.error || 'Datos inválidos. Verifique la información ingresada.';
+                        if (errorData.errors && Array.isArray(errorData.errors)) {
+                            errorMessage = errorData.errors.join(', ');
+                        }
+                        break;
+                        
+                    case 409:
+                        errorMessage = 'Ya existe un establecimiento con estos datos.';
+                        break;
+                        
+                    case 422:
+                        errorMessage = 'Los datos enviados no cumplen con los requisitos del servidor.';
+                        break;
+                        
+                    case 500:
+                        errorMessage = 'Error interno del servidor. Intente nuevamente en unos momentos.';
+                        break;
+                        
+                    default:
+                        errorMessage = `Error del servidor (${response.status}): ${errorData.message || response.statusText}`;
+                }
+            } catch (parseError) {
+                console.error('❌ Error parsing respuesta de error:', parseError);
+                errorMessage = `Error del servidor (${response.status}): ${response.statusText}`;
+            }
+            
+            throw new Error(errorMessage);
+        }
+
+        // Procesar respuesta exitosa
+        const establecimientoRegistrado = await response.json();
+        console.log('✅ Establecimiento registrado exitosamente:', establecimientoRegistrado);
+
+        // Validar estructura de respuesta
+        if (!establecimientoRegistrado) {
+            throw new Error('Respuesta vacía del servidor');
+        }
+
+        // Mostrar mensaje de éxito con datos del establecimiento
+        mostrarRegistroExitoso(establecimientoRegistrado);
+
+        // Cerrar modal después de mostrar éxito
+        setTimeout(() => {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('wizardFincaModal'));
+            if (modal) {
+                modal.hide();
+            }
+            
+            // Actualizar dashboard con el nuevo establecimiento
+            actualizarDashboardConEstablecimiento(establecimientoRegistrado);
+
 
 function mostrarRegistroExitoso(establecimiento) {
     const wizardContent = document.getElementById('wizard-content');
@@ -3571,36 +3575,13 @@ function almacenarSesion(token, datosUsuario) {
 
 // Función para obtener token almacenado
 function obtenerToken() {
-    const token = localStorage.getItem(AUTH_CONFIG.storage.tokenKey);
-    if (!token) {
-        console.warn('🔒 Token no encontrado en localStorage');
-        return null;
-    }
-    console.log('🔑 Token obtenido de localStorage:', token ? 'Presente' : 'No disponible');
-    return token;
-}
-
-function guardarToken(token) {
-    if (!token) {
-        console.error('❌ Intento de guardar token inválido');
-        return false;
-    }
-    try {
-        localStorage.setItem(AUTH_CONFIG.storage.tokenKey, token);
-        console.log('✅ Token guardado en localStorage');
-        // Disparar evento para sincronización entre pestañas
-        window.dispatchEvent(new Event('tokenUpdated'));
-        return true;
-    } catch (error) {
-        console.error('❌ Error guardando token:', error);
-        return false;
-    }
+	return localStorage.getItem(AUTH_CONFIG.storage.tokenKey);
 }
 
 // Función para obtener datos del usuario
 function obtenerUsuario() {
-    try {
-        const userData = localStorage.getItem(AUTH_CONFIG.storage.userKey);
+	try {
+		const userData = localStorage.getItem(AUTH_CONFIG.storage.userKey);
 		return userData ? JSON.parse(userData) : null;
 	} catch (error) {
 		console.error('❌ Error obteniendo datos de usuario:', error);
@@ -3750,58 +3731,40 @@ function logTokenDebugInfo(operation = 'general') {
 
 // Función para ejecutar operación con retry automático de token
 async function executeWithTokenRetry(operation, operationName = 'unknown') {
-    const maxRetries = 2;
-    let lastError = null;
-    
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-            console.log(`🔄 Ejecutando ${operationName} - Intento ${attempt}/${maxRetries}`);
-            
-            // Verificar token antes de la operación
-            const tokenValidation = await validateCurrentToken();
-            console.log('🔑 Estado del token:', tokenValidation);
-            
-            if (!tokenValidation.valid) {
-                console.log(`🔐 Token inválido: ${tokenValidation.reason || 'Token expirado'}`);
-                
-                if (tokenValidation.reason === 'NO_TOKEN') {
-                    throw new Error('No hay token de autenticación. Debe iniciar sesión.');
-                }
-                
-                // Intentar renovar token
-                console.log('🔄 Intentando renovar token...');
-                const refreshSuccess = await autoRefreshToken();
-                if (!refreshSuccess) {
-                    console.error('❌ Fallo en refresh del token');
-                    throw new Error('No se pudo renovar el token. Inicie sesión nuevamente.');
-                }
-                console.log('✅ Token renovado exitosamente');
-            }
-            
-            // Ejecutar operación
-            try {
-                const result = await operation();
-                console.log(`✅ ${operationName} ejecutada exitosamente`);
-                return result;
-            } catch (operationError) {
-                console.error(`❌ Error en operación:`, operationError);
-                
-                // Manejar específicamente errores 403
-                if (operationError.status === 403 || 
-                    (operationError.message && operationError.message.includes('403'))) {
-                    console.log('🔒 Error 403 detectado - Intentando refresh del token...');
-                    const refreshSuccess = await autoRefreshToken();
-                    if (!refreshSuccess) {
-                        throw new Error('Error de autorización. Inicie sesión nuevamente.');
-                    }
-                    // Reintentar con nuevo token
-                    return await operation();
-                }
-                throw operationError;
-            }
-            
-        } catch (error) {
-            lastError = error;
+	const maxRetries = 2;
+	let lastError = null;
+	
+	for (let attempt = 1; attempt <= maxRetries; attempt++) {
+		try {
+			console.log(`🔄 Ejecutando ${operationName} - Intento ${attempt}/${maxRetries}`);
+			
+			// Verificar token antes de la operación
+			const tokenValidation = validateCurrentToken();
+			
+			if (!tokenValidation.valid) {
+				console.log(`🔐 Token inválido: ${tokenValidation.reason}`);
+				
+				if (tokenValidation.reason === 'NO_TOKEN') {
+					throw new Error('No hay token de autenticación. Debe iniciar sesión.');
+				}
+				
+				// Intentar renovar token
+				const refreshResult = await autoRefreshToken();
+				if (!refreshResult.success) {
+					throw new Error(`No se pudo renovar el token: ${refreshResult.error}`);
+				}
+			} else if (tokenValidation.nearExpiry && attempt === 1) {
+				console.log('🔐 Token próximo a expirar, renovando preventivamente...');
+				await autoRefreshToken();
+			}
+			
+			// Ejecutar operación
+			const result = await operation();
+			console.log(`✅ ${operationName} ejecutada exitosamente`);
+			return result;
+			
+		} catch (error) {
+			lastError = error;
 			console.error(`❌ Error en ${operationName} - Intento ${attempt}:`, error);
 			
 			// Si es error de autenticación y no es el último intento, renovar token
@@ -5105,47 +5068,33 @@ async function buscarUbicacion() {
 
 // Función para detectar servidor correcto con proxy
 async function detectarServidorProxy() {
-    // Usar puerto 3000 fijo para el proxy
-    const PROXY_PORT = 3000;
-    
-    try {
-        const response = await fetch(`http://localhost:${PROXY_PORT}/api/geocoding?q=test`, {
-            method: 'GET',
-            timeout: 2000,
-            signal: AbortSignal.timeout(2000)
-        });
-        
-        if (response.ok || response.status === 400) { // 400 es OK, significa que el endpoint existe
-            console.log(`✅ Servidor proxy encontrado en puerto ${PROXY_PORT}`);
-            return `http://localhost:${PROXY_PORT}`;
-        }
-    } catch (error) {
-        console.log(`❌ Servidor proxy no disponible:`, error.message);
-    }
-    
-    // Si no encuentra servidor proxy, mostrar instrucciones
-    throw new Error('No se encontró servidor proxy. Ejecute "python server.py" desde la terminal.');
-}
-
-// Función para probar la geocodificación
-async function probarGeocoding() {
-    console.log('🔍 Probando servicio de geocodificación...');
-    try {
-        const direccion = 'Avenida San Martín 100, Mendoza';
-        console.log('📍 Dirección de prueba:', direccion);
-        const resultado = await geocodificarDireccion(direccion);
-        console.log('✅ Geocodificación exitosa:', resultado);
-        return resultado;
-    } catch (error) {
-        console.error('❌ Error en prueba de geocodificación:', error);
-        throw error;
-    }
+	const puertosProbar = [3001, 3000, 8080];
+	
+	for (const puerto of puertosProbar) {
+		try {
+			const response = await fetch(`http://localhost:${puerto}/api/geocoding?q=test`, {
+				method: 'GET',
+				timeout: 2000,
+				signal: AbortSignal.timeout(2000)
+			});
+			
+			if (response.ok || response.status === 400) { // 400 es OK, significa que el endpoint existe
+				console.log(`✅ Servidor proxy encontrado en puerto ${puerto}`);
+				return `http://localhost:${puerto}`;
+			}
+		} catch (error) {
+			console.log(`❌ Puerto ${puerto} no disponible:`, error.message);
+		}
+	}
+	
+	// Si no encuentra servidor proxy, mostrar instrucciones
+	throw new Error('No se encontró servidor proxy. Ejecute "python server.py" desde la terminal.');
 }
 
 // Función para geocodificar usando API de Nominatim a través de proxy local
 async function geocodificarDireccion(direccion) {
-    try {
-        const encodedAddress = encodeURIComponent(direccion);
+	try {
+		const encodedAddress = encodeURIComponent(direccion);
 		
 		// Detectar servidor proxy automáticamente
 		let baseUrl;

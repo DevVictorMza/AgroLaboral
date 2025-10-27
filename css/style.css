@@ -2970,3 +2970,34 @@ main h2 {
 		margin-left: 0 !important;
 	}
 }
+
+/* ================================
+   ESTILOS PARA ERRORES EN BOTONES
+   ================================ */
+
+/* Animación de error para botones */
+.btn-error {
+	animation: btnErrorShake 0.5s ease-in-out;
+	background: linear-gradient(135deg, #dc3545, #c82333) !important;
+	border-color: #dc3545 !important;
+}
+
+@keyframes btnErrorShake {
+	0%, 100% { transform: translateX(0); }
+	25% { transform: translateX(-5px); }
+	50% { transform: translateX(5px); }
+	75% { transform: translateX(-5px); }
+}
+
+/* Estilos mejorados para cards de establecimiento */
+.establecimiento-card {
+	transition: all 0.3s ease;
+	background: #2A2A2A;
+	border: 1px solid #444444;
+}
+
+.establecimiento-card:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(39, 174, 96, 0.2);
+	border-color: #27AE60;
+}
