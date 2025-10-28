@@ -432,7 +432,22 @@ function generarDashboard(perfil) {
                 border-radius: 8px;
                 padding: 2rem;
                 margin-bottom: 2rem;
-                text-align: center;
+                text-align: left;
+                box-shadow: 0 8px 16px rgba(74, 144, 226, 0.2);
+            }
+            .company-details {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 6px;
+                padding: 1rem;
+                margin: 1rem 0;
+            }
+            .company-details p {
+                margin-bottom: 0.5rem !important;
+                font-size: 0.95rem;
+            }
+            .company-status .badge {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
             }
             .stats-card {
                 background: #2A2A2A;
@@ -463,20 +478,55 @@ function generarDashboard(perfil) {
         </style>
         
         <div class="dashboard-container">
-            <!-- Header del perfil -->
+            <!-- Header del perfil con todos los datos de la empresa -->
             <div class="profile-header">
                 <div class="row align-items-center">
                     <div class="col-md-8">
-                        <h3 class="mb-0">${perfil.razonSocial}</h3>
-                        <p class="mb-1 opacity-75">CUIT: ${perfil.cuit}</p>
-                        <small class="opacity-75">
-                            <i class="fas fa-calendar-alt me-1"></i>
-                            Miembro desde: ${new Date(perfil.fechaAlta).toLocaleDateString()}
-                        </small>
+                        <h3 class="mb-2">${perfil.razonSocial}</h3>
+                        
+                        <!-- Datos completos de la empresa -->
+                        <div class="company-details mb-3">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <p class="mb-1 opacity-75">
+                                        <i class="fas fa-id-card me-2"></i>
+                                        <strong>ID Empresa:</strong> ${perfil.idEmpresa}
+                                    </p>
+                                    <p class="mb-1 opacity-75">
+                                        <i class="fas fa-file-invoice me-2"></i>
+                                        <strong>CUIT:</strong> ${perfil.cuit}
+                                    </p>
+                                </div>
+                                <div class="col-sm-6">
+                                    <p class="mb-1 opacity-75">
+                                        <i class="fas fa-calendar-alt me-2"></i>
+                                        <strong>Miembro desde:</strong> ${new Date(perfil.fechaAlta).toLocaleDateString()}
+                                    </p>
+                                    <p class="mb-1 opacity-75">
+                                        <i class="fas fa-clock me-2"></i>
+                                        <strong>Hora de registro:</strong> ${new Date(perfil.fechaAlta).toLocaleTimeString()}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Badge de estado -->
+                        <div class="company-status">
+                            <span class="badge bg-success">
+                                <i class="fas fa-check-circle me-1"></i>
+                                Empresa Activa
+                            </span>
+                        </div>
                     </div>
                     <div class="col-md-4 text-end">
                         <div class="avatar-lg">
                             <i class="fas fa-building fa-3x"></i>
+                        </div>
+                        <div class="mt-2">
+                            <small class="opacity-75">
+                                <i class="fas fa-user-tie me-1"></i>
+                                Perfil Empresarial
+                            </small>
                         </div>
                     </div>
                 </div>
@@ -525,36 +575,6 @@ function generarDashboard(perfil) {
                             <button class="btn btn-primary-custom" onclick="abrirWizardFinca()">
                                 <i class="fas fa-plus me-2"></i>Agregar Primera Finca
                             </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Información de la empresa -->
-            <div class="row mt-4">
-                <div class="col-12">
-                    <div class="dashboard-card p-4">
-                        <h5 class="mb-4">
-                            <i class="fas fa-building me-2 text-success"></i>
-                            Datos de la Empresa
-                        </h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <div class="text-muted-custom small">ID Empresa</div>
-                                <p class="mb-0 fw-bold">${perfil.idEmpresa}</p>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <div class="text-muted-custom small">CUIT</div>
-                                <p class="mb-0 fw-bold">${perfil.cuit}</p>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <div class="text-muted-custom small">Razón Social</div>
-                                <p class="mb-0 fw-bold">${perfil.razonSocial}</p>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <div class="text-muted-custom small">Fecha de Alta</div>
-                                <p class="mb-0 fw-bold">${new Date(perfil.fechaAlta).toLocaleString()}</p>
-                            </div>
                         </div>
                     </div>
                 </div>
