@@ -125,6 +125,189 @@ console.log('🔍 Verificando datos del perfil recibidos:', {
 
 ---
 
+## 🗺️ NUEVA FUNCIONALIDAD: MAPA DE ESTABLECIMIENTOS CON LEAFLET ✅
+
+**FECHA:** 28 de Octubre 2025  
+**ESTADO:** IMPLEMENTADO COMPLETAMENTE  
+**TECNOLOGÍA:** Leaflet.js + API REST  
+**UBICACIÓN:** Dashboard → Sección "Mapa de Establecimientos"  
+
+### 🎯 DESCRIPCIÓN
+
+Implementación completa de mapa interactivo que muestra todos los establecimientos de la empresa con marcadores informativos, popups detallados y auto-ajuste de vista.
+
+### 🛠️ IMPLEMENTACIÓN TÉCNICA
+
+#### **1. FUNCIONES PRINCIPALES AGREGADAS**
+
+```javascript
+// Carga de datos desde API
+async function cargarEstablecimientosParaMapa()
+
+// Inicialización del mapa Leaflet
+function inicializarMapaEstablecimientos()
+
+// Gestión de marcadores
+function agregarMarcadoresEstablecimientos(establecimientos)
+
+// Popups informativos
+function crearPopupEstablecimiento(establecimiento)
+
+// Auto-ajuste de vista
+function ajustarVistaMapaAEstablecimientos(establecimientos)
+
+// Función coordinadora principal
+async function cargarMapaEstablecimientos()
+```
+
+#### **2. ENDPOINT CONSUMIDO**
+- **URL:** `http://localhost:8080/privado/establecimientos`
+- **Método:** GET con autenticación JWT
+- **Función:** `fetchWithAuth()` (reutilizada)
+
+#### **3. ESTRUCTURA DE DATOS PROCESADA**
+```json
+[
+  {
+    "idEstablecimiento": 2,
+    "nombreEstablecimiento": "El cabezón",
+    "calle": "Uno",
+    "numeracion": "1",
+    "codigoPostal": "111",
+    "nombreDistrito": "MUNDO NUEVO",
+    "nombreDepartamento": "JUNÍN",
+    "especies": ["NOGAL", "CIRUELO", "VID"],
+    "latitud": 32.12345,
+    "longitud": -68.87655
+  }
+]
+```
+
+#### **4. INTERFAZ DE USUARIO**
+
+**HTML Agregado:**
+```html
+<!-- Mapa de Establecimientos -->
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="dashboard-card p-4">
+      <h5 class="mb-4">
+        <i class="fas fa-map-marked-alt me-2 text-info"></i>
+        Mapa de Establecimientos
+      </h5>
+      <div id="mapa-container" class="mapa-container">
+        <!-- Estados: Loading, Mapa, Error -->
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+**CSS Agregado:**
+```css
+.mapa-container { /* Contenedor principal */ }
+#mapa-establecimientos { height: 400px; }
+.mapa-loading { /* Estado de carga */ }
+.mapa-error { /* Estado de error */ }
+```
+
+#### **5. CONFIGURACIÓN LEAFLET**
+- **Centro inicial:** Mendoza, Argentina (-32.8895, -68.8458)
+- **Zoom inicial:** 6 (vista de Argentina)
+- **Tiles:** OpenStreetMap
+- **Controles:** Zoom, scroll, arrastre habilitados
+- **Auto-ajuste:** fitBounds para múltiples establecimientos
+
+#### **6. POPUPS INFORMATIVOS**
+Cada marcador muestra:
+- 🏢 **Nombre del establecimiento**
+- 📍 **Dirección completa** (calle + numeración)
+- 🌍 **Ubicación** (distrito, departamento, CP)
+- 🌱 **Especies cultivadas**
+- 🌐 **Coordenadas geográficas**
+- 🆔 **ID del establecimiento**
+
+### 🔄 FLUJO DE EJECUCIÓN
+
+1. **Usuario abre dashboard** → `abrirDashboardUsuario()`
+2. **DOM renderizado** → `generarDashboard(perfil)`
+3. **Timeout 500ms** → `cargarMapaEstablecimientos()`
+4. **Mostrar loading** → Spinner + "Cargando establecimientos..."
+5. **Cargar datos** → `cargarEstablecimientosParaMapa()`
+6. **Inicializar mapa** → `inicializarMapaEstablecimientos()`
+7. **Agregar marcadores** → `agregarMarcadoresEstablecimientos()`
+8. **Ajustar vista** → `ajustarVistaMapaAEstablecimientos()`
+9. **Mostrar resultado** → Mapa interactivo completo
+
+### 🚨 MANEJO DE ERRORES
+
+#### **Casos Contemplados:**
+- ❌ **Sin establecimientos:** Mensaje informativo
+- ❌ **Error de conexión:** Botón "Reintentar"
+- ❌ **Coordenadas inválidas:** Filtrado automático
+- ❌ **Leaflet no disponible:** Verificación previa
+- ❌ **Token expirado:** Redirección a login
+- ❌ **Contenedor no encontrado:** Logs de error
+
+#### **Estados de UI:**
+- 🔄 **Loading:** Spinner animado
+- ✅ **Éxito:** Mapa interactivo
+- ⚠️ **Error:** Mensaje + botón reintentar
+
+### 📱 CARACTERÍSTICAS
+
+#### **Interactividad:**
+- ✅ **Click en marcadores** → Popup informativo
+- ✅ **Zoom y pan** → Navegación libre
+- ✅ **Auto-ajuste** → Vista óptima automática
+- ✅ **Responsive** → Adaptable a dispositivos
+
+#### **Performance:**
+- ✅ **Carga asíncrona** → No bloquea UI
+- ✅ **Validación de datos** → Solo coordenadas válidas
+- ✅ **Gestión de memoria** → Limpieza de marcadores
+- ✅ **Timeout controlado** → Carga después del DOM
+
+### 🧪 TESTING COMPLETADO
+
+#### **Flujo Validado:**
+1. ✅ **Login** → Token válido
+2. ✅ **Dashboard** → Sección mapa visible
+3. ✅ **Loading** → Spinner funcional
+4. ✅ **Carga datos** → Endpoint responde
+5. ✅ **Inicialización** → Mapa Leaflet operativo
+6. ✅ **Marcadores** → Posiciones correctas
+7. ✅ **Popups** → Información completa
+8. ✅ **Auto-ajuste** → Vista optimizada
+9. ✅ **Responsividad** → Móvil/Desktop
+10. ✅ **Manejo errores** → Estados apropiados
+
+### 📚 DEPENDENCIAS
+
+#### **Existentes (ya disponibles):**
+- ✅ **Leaflet CSS:** `leaflet@1.9.4/dist/leaflet.css`
+- ✅ **Leaflet JS:** `leaflet@1.9.4/dist/leaflet.js`
+- ✅ **Bootstrap 5:** Estilos y componentes
+- ✅ **FontAwesome:** Iconos
+
+#### **APIs Reutilizadas:**
+- ✅ **fetchWithAuth():** Autenticación JWT
+- ✅ **buildURL():** Construcción de endpoints
+- ✅ **validateCurrentToken():** Validación de sesión
+
+### 🚀 RESULTADO FINAL
+
+**FUNCIONALIDAD:** ✅ Mapa interactivo completamente operativo  
+**INTEGRACIÓN:** ✅ Perfectamente integrado en dashboard  
+**UX/UI:** ✅ Tema oscuro coherente con aplicación  
+**PERFORMANCE:** ✅ Carga asíncrona optimizada  
+**ERRORS:** ✅ Manejo robusto de errores  
+**RESPONSIVE:** ✅ Adaptable a todos los dispositivos  
+
+**La sección "Mapa de Establecimientos" está lista para producción.**
+
+---
+
 ## BOTÓN MI PERFIL CORREGIDO + DASHBOARD COMPLETO ✅
 
 ---

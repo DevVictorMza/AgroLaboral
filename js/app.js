@@ -475,6 +475,41 @@ function generarDashboard(perfil) {
                 color: #4A90E2;
                 margin-bottom: 1rem;
             }
+            /* Estilos para el mapa de establecimientos */
+            .mapa-container {
+                background: #2A2A2A;
+                border: 1px solid #444444;
+                border-radius: 8px;
+                padding: 0;
+                overflow: hidden;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            }
+            #mapa-establecimientos {
+                height: 400px;
+                width: 100%;
+                border-radius: 8px;
+                z-index: 1;
+            }
+            .mapa-loading {
+                height: 400px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #2A2A2A;
+                border-radius: 8px;
+                color: #FFFFFF;
+            }
+            .mapa-error {
+                height: 400px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #2A2A2A;
+                border-radius: 8px;
+                color: #FFFFFF;
+                text-align: center;
+                padding: 2rem;
+            }
         </style>
         
         <div class="dashboard-container">
@@ -579,6 +614,43 @@ function generarDashboard(perfil) {
                     </div>
                 </div>
             </div>
+
+            <!-- Mapa de Establecimientos -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="dashboard-card p-4">
+                        <h5 class="mb-4">
+                            <i class="fas fa-map-marked-alt me-2 text-info"></i>
+                            Mapa de Establecimientos
+                        </h5>
+                        <div id="mapa-container" class="mapa-container">
+                            <!-- Loading state -->
+                            <div id="mapa-loading" class="mapa-loading">
+                                <div class="text-center">
+                                    <div class="spinner-border text-info mb-3" role="status">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
+                                    <h6 class="text-white">Cargando establecimientos...</h6>
+                                    <p class="text-muted-custom mb-0">Preparando mapa interactivo</p>
+                                </div>
+                            </div>
+                            <!-- Mapa (se mostrará cuando esté listo) -->
+                            <div id="mapa-establecimientos" style="display: none;"></div>
+                            <!-- Error state -->
+                            <div id="mapa-error" class="mapa-error" style="display: none;">
+                                <div>
+                                    <i class="fas fa-map-marker-alt text-warning mb-3" style="font-size: 3rem;"></i>
+                                    <h6 class="text-white mb-3">Error cargando mapa</h6>
+                                    <p class="text-muted-custom mb-4">No se pudieron cargar los establecimientos en el mapa.</p>
+                                    <button class="btn btn-outline-info" onclick="cargarMapaEstablecimientos()">
+                                        <i class="fas fa-redo me-2"></i>Reintentar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Modal Wizard Agregar Finca -->
@@ -606,6 +678,12 @@ function generarDashboard(perfil) {
         setTimeout(() => {
             console.log('🔄 Iniciando carga de establecimientos tras renderizado...');
             inicializarEstablecimientos();
+            
+            // Cargar mapa de establecimientos después de la inicialización de fincas
+            setTimeout(() => {
+                console.log('🗺️ Iniciando carga del mapa de establecimientos...');
+                cargarMapaEstablecimientos();
+            }, 500);
         }, 200);
     });
 }
@@ -3705,7 +3783,8 @@ function recopilarDatosWizard() {
 			contrasenia: password
 		};
 
-		return datosRegistro;	} catch (error) {
+		return datosRegistro;
+	} catch (error) {
 		console.error('Error recopilando datos del wizard:', error);
 		mostrarMensajeError(error.message);
 		return null;
@@ -6216,3 +6295,944 @@ function abrirWizardRegistroConMapa() {
 		}
 	}, 500);
 }
+
+// ============================================================================
+// FUNCIONES PARA MAPA DE ESTABLECIMIENTOS EN DASHBOARD
+// ============================================================================
+
+let mapEstablecimientos = null;
+let marcadoresEstablecimientos = [];
+
+/**
+ * Cargar establecimientos desde el endpoint para mostrar en el mapa
+ */
+async function cargarEstablecimientosParaMapa() {
+    console.log('🗺️ Cargando establecimientos para el mapa...');
+    
+    try {
+        const url = buildURL(BACKEND_CONFIG.ENDPOINTS.GET_ESTABLECIMIENTOS);
+        console.log('📡 URL establecimientos:', url);
+        
+        const response = await fetchWithAuth(url);
+        
+        if (!response.ok) {
+            if (response.status === 401) {
+                console.error('❌ Token expirado al cargar establecimientos');
+                cerrarSesion();
+                throw new Error('Sesión expirada');
+            }
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const establecimientos = await response.json();
+        console.log('✅ Establecimientos cargados para mapa:', establecimientos);
+        console.log('🔍 Número total de establecimientos recibidos:', establecimientos.length);
+        
+        // Log detallado de cada establecimiento
+        establecimientos.forEach((est, index) => {
+            console.log(`📋 Establecimiento ${index + 1}:`, {
+                id: est.idEstablecimiento,
+                nombre: est.nombreEstablecimiento,
+                latitud: est.latitud,
+                longitud: est.longitud,
+                latitudTipo: typeof est.latitud,
+                longitudTipo: typeof est.longitud
+            });
+        });
+        
+        // Validar que los datos tengan coordenadas - VALIDACIÓN MEJORADA
+        const establecimientosValidos = establecimientos.filter(est => {
+            // Convertir a números para validación robusta
+            const lat = parseFloat(est.latitud);
+            const lng = parseFloat(est.longitud);
+            
+            // Verificar que existan, sean números válidos y estén en rango Argentina
+            const latValida = est.latitud !== null && est.latitud !== undefined && 
+                             est.latitud !== '' && !isNaN(lat) && 
+                             lat >= -55 && lat <= -21; // Rango aproximado Argentina
+            
+            const lngValida = est.longitud !== null && est.longitud !== undefined && 
+                             est.longitud !== '' && !isNaN(lng) && 
+                             lng >= -73 && lng <= -53; // Rango aproximado Argentina
+            
+            const esValido = latValida && lngValida;
+            
+            // Log detallado para debugging
+            if (!esValido) {
+                console.warn(`⚠️ Establecimiento ${est.nombreEstablecimiento} descartado:`, {
+                    id: est.idEstablecimiento,
+                    latitudOriginal: est.latitud,
+                    longitudOriginal: est.longitud,
+                    latitudConvertida: lat,
+                    longitudConvertida: lng,
+                    latitudValida: latValida,
+                    longitudValida: lngValida,
+                    razon: !latValida ? 'Latitud inválida' : 'Longitud inválida'
+                });
+            }
+            
+            return esValido;
+        });
+        
+        console.log(`📍 Establecimientos con coordenadas válidas: ${establecimientosValidos.length}/${establecimientos.length}`);
+        
+        // Log de establecimientos descartados
+        const establecimientosInvalidos = establecimientos.filter(est => 
+            !est.latitud || !est.longitud || 
+            isNaN(est.latitud) || isNaN(est.longitud)
+        );
+        
+        if (establecimientosInvalidos.length > 0) {
+            console.warn('⚠️ Establecimientos con coordenadas inválidas:', establecimientosInvalidos.map(est => ({
+                id: est.idEstablecimiento,
+                nombre: est.nombreEstablecimiento,
+                latitud: est.latitud,
+                longitud: est.longitud
+            })));
+        }
+        
+        return establecimientosValidos;
+        
+    } catch (error) {
+        console.error('❌ Error cargando establecimientos para mapa:', error);
+        throw error;
+    }
+}
+
+/**
+ * Inicializar el mapa de establecimientos en el dashboard
+ */
+function inicializarMapaEstablecimientos() {
+    console.log('🗺️ Inicializando mapa de establecimientos...');
+    
+    try {
+        // Verificar si Leaflet está disponible
+        if (typeof L === 'undefined') {
+            console.error('❌ Leaflet no está cargado');
+            throw new Error('Leaflet no disponible');
+        }
+
+        // Verificar que el contenedor del mapa existe
+        const mapContainer = document.getElementById('mapa-establecimientos');
+        if (!mapContainer) {
+            console.error('❌ Contenedor del mapa #mapa-establecimientos no encontrado');
+            throw new Error('Contenedor del mapa no encontrado');
+        }
+
+        console.log('✅ Contenedor del mapa encontrado');
+
+        // Si el mapa ya existe, destruirlo
+        if (mapEstablecimientos) {
+            console.log('🔄 Destruyendo mapa existente...');
+            mapEstablecimientos.remove();
+            mapEstablecimientos = null;
+            marcadoresEstablecimientos = [];
+        }
+
+        // Crear el mapa centrado en Argentina (Mendoza como referencia)
+        mapEstablecimientos = L.map('mapa-establecimientos', {
+            center: [-32.8895, -68.8458], // Mendoza, Argentina
+            zoom: 6, // Zoom más amplio para ver toda Argentina
+            zoomControl: true,
+            scrollWheelZoom: true,
+            doubleClickZoom: true,
+            dragging: true
+        });
+
+        console.log('✅ Mapa de establecimientos creado exitosamente');
+
+        // Agregar capa de OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(mapEstablecimientos);
+
+        console.log('✅ Capa de mapa agregada');
+
+        // Forzar redimensionamiento del mapa
+        setTimeout(() => {
+            mapEstablecimientos.invalidateSize();
+            console.log('🗺️ Mapa de establecimientos redimensionado');
+        }, 100);
+
+        console.log('✅ Mapa de establecimientos inicializado correctamente');
+        return mapEstablecimientos;
+        
+    } catch (error) {
+        console.error('❌ Error al inicializar mapa de establecimientos:', error);
+        throw error;
+    }
+}
+
+/**
+ * Agregar marcadores de establecimientos al mapa
+ */
+function agregarMarcadoresEstablecimientos(establecimientos) {
+    console.log('📍 Agregando marcadores de establecimientos al mapa...');
+    
+    try {
+        if (!mapEstablecimientos) {
+            throw new Error('Mapa no inicializado');
+        }
+
+        // Limpiar marcadores existentes
+        marcadoresEstablecimientos.forEach(marcador => {
+            mapEstablecimientos.removeLayer(marcador);
+        });
+        marcadoresEstablecimientos = [];
+
+        if (!establecimientos || establecimientos.length === 0) {
+            console.log('ℹ️ No hay establecimientos para mostrar en el mapa');
+            return;
+        }
+
+        console.log(`🗺️ Procesando ${establecimientos.length} establecimientos para marcadores...`);
+
+        // Array para rastrear coordenadas usadas y aplicar offset
+        let coordenadasUsadas = [];
+        let marcadoresCreados = 0;
+        let marcadoresConOffset = 0;
+
+        // Agregar marcador por cada establecimiento
+        establecimientos.forEach((establecimiento, index) => {
+            console.log(`🔄 Procesando establecimiento ${index + 1}/${establecimientos.length}:`, establecimiento.nombreEstablecimiento);
+            
+            try {
+                let lat = parseFloat(establecimiento.latitud);
+                let lng = parseFloat(establecimiento.longitud);
+
+                console.log(`📐 Coordenadas originales: Lat=${lat}, Lng=${lng}`);
+
+                if (isNaN(lat) || isNaN(lng)) {
+                    console.warn(`⚠️ Coordenadas inválidas para establecimiento ${establecimiento.nombreEstablecimiento}: lat=${lat}, lng=${lng}`);
+                    return;
+                }
+
+                // Verificar si hay coordenadas muy cercanas
+                const coordCercana = coordenadasUsadas.find(coord => {
+                    const distancia = Math.sqrt(Math.pow(coord.lat - lat, 2) + Math.pow(coord.lng - lng, 2));
+                    return distancia < 0.001; // Menos de ~100 metros
+                });
+
+                // Aplicar offset si hay coordenadas muy cercanas
+                if (coordCercana) {
+                    console.warn(`⚠️ Coordenadas muy cercanas detectadas para ${establecimiento.nombreEstablecimiento}`);
+                    console.log(`🔄 Aplicando offset para separar marcadores...`);
+                    
+                    // Aplicar offset pequeño pero visible
+                    const offsetBase = 0.002; // Aproximadamente 200 metros
+                    const offsetAngle = (coordenadasUsadas.length * 60) * (Math.PI / 180); // 60 grados de separación
+                    
+                    lat += Math.cos(offsetAngle) * offsetBase;
+                    lng += Math.sin(offsetAngle) * offsetBase;
+                    
+                    marcadoresConOffset++;
+                    console.log(`✅ Offset aplicado: Nueva posición [${lat.toFixed(6)}, ${lng.toFixed(6)}]`);
+                }
+
+                // Crear popup con información del establecimiento
+                const popupContent = crearPopupEstablecimiento(establecimiento);
+
+                // Crear marcador con icono personalizado si tiene offset
+                let marcador;
+                if (coordCercana) {
+                    // Icono diferente para marcadores con offset
+                    const iconoOffset = L.divIcon({
+                        html: `<div style="background: #ff6b6b; border: 2px solid #fff; border-radius: 50%; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">${index + 1}</div>`,
+                        className: 'marcador-offset',
+                        iconSize: [25, 25],
+                        iconAnchor: [12.5, 12.5]
+                    });
+                    
+                    marcador = L.marker([lat, lng], { icon: iconoOffset })
+                        .addTo(mapEstablecimientos)
+                        .bindPopup(popupContent);
+                } else {
+                    // Icono normal para marcadores sin offset
+                    const iconoNormal = L.divIcon({
+                        html: `<div style="background: #007bff; border: 2px solid #fff; border-radius: 50%; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">${index + 1}</div>`,
+                        className: 'marcador-normal',
+                        iconSize: [25, 25],
+                        iconAnchor: [12.5, 12.5]
+                    });
+                    
+                    marcador = L.marker([lat, lng], { icon: iconoNormal })
+                        .addTo(mapEstablecimientos)
+                        .bindPopup(popupContent);
+                }
+
+                marcadoresEstablecimientos.push(marcador);
+                coordenadasUsadas.push({ lat: lat, lng: lng, nombre: establecimiento.nombreEstablecimiento });
+                marcadoresCreados++;
+
+                console.log(`✅ Marcador ${marcadoresCreados} agregado exitosamente: ${establecimiento.nombreEstablecimiento} en [${lat.toFixed(6)}, ${lng.toFixed(6)}]`);
+
+            } catch (error) {
+                console.error(`❌ Error agregando marcador para ${establecimiento.nombreEstablecimiento}:`, error);
+            }
+        });
+
+        // Resumen detallado
+        console.log('\n📊 RESUMEN DE MARCADORES:');
+        console.log(`✅ Total marcadores creados: ${marcadoresCreados}/${establecimientos.length}`);
+        console.log(`🔄 Marcadores con offset aplicado: ${marcadoresConOffset}`);
+        console.log(`🎯 Marcadores visibles en mapa: ${marcadoresEstablecimientos.length}`);
+        
+        if (marcadoresCreados !== establecimientos.length) {
+            console.warn(`⚠️ DISCREPANCIA: Se esperaban ${establecimientos.length} marcadores, se crearon ${marcadoresCreados}`);
+        }
+
+        // Ajustar vista del mapa para mostrar todos los establecimientos
+        if (marcadoresEstablecimientos.length > 0) {
+            ajustarVistaMapaAEstablecimientos(establecimientos);
+        }
+
+    } catch (error) {
+        console.error('❌ Error agregando marcadores de establecimientos:', error);
+        throw error;
+    }
+}
+
+/**
+    }
+}
+
+/**
+ * Crear contenido HTML para popup de establecimiento
+ */
+function crearPopupEstablecimiento(establecimiento) {
+    const direccion = `${establecimiento.calle} ${establecimiento.numeracion}`;
+    const especies = establecimiento.especies && establecimiento.especies.length > 0 
+        ? establecimiento.especies.join(', ') 
+        : 'No especificadas';
+
+    return `
+        <div class="popup-establecimiento" style="font-family: Arial, sans-serif; font-size: 14px; max-width: 300px;">
+            <h6 style="margin: 0 0 8px 0; font-weight: bold; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 4px;">
+                <i class="fas fa-map-marker-alt" style="color: #e74c3c; margin-right: 5px;"></i>
+                ${establecimiento.nombreEstablecimiento}
+            </h6>
+            
+            <div style="margin-bottom: 8px;">
+                <strong style="color: #34495e;">📍 Dirección:</strong><br>
+                <span style="color: #7f8c8d;">${direccion}</span><br>
+                <span style="color: #7f8c8d;">${establecimiento.nombreDistrito}, ${establecimiento.nombreDepartamento}</span><br>
+                <small style="color: #95a5a6;">CP: ${establecimiento.codigoPostal}</small>
+            </div>
+
+            <div style="margin-bottom: 8px;">
+                <strong style="color: #34495e;">🌱 Especies:</strong><br>
+                <span style="color: #27ae60; font-style: ${establecimiento.especies && establecimiento.especies.length > 0 ? 'normal' : 'italic'};">
+                    ${especies}
+                </span>
+            </div>
+
+            <div style="margin-bottom: 4px;">
+                <strong style="color: #34495e;">🌐 Coordenadas:</strong><br>
+                <small style="color: #7f8c8d; font-family: monospace;">
+                    Lat: ${parseFloat(establecimiento.latitud).toFixed(6)}<br>
+                    Lng: ${parseFloat(establecimiento.longitud).toFixed(6)}
+                </small>
+            </div>
+
+            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #ecf0f1;">
+                <small style="color: #95a5a6;">
+                    <i class="fas fa-id-badge" style="margin-right: 3px;"></i>
+                    ID: ${establecimiento.idEstablecimiento}
+                </small>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Ajustar la vista del mapa para mostrar todos los establecimientos
+ */
+function ajustarVistaMapaAEstablecimientos(establecimientos) {
+    console.log('🔍 Ajustando vista del mapa para mostrar establecimientos...');
+    
+    try {
+        if (!mapEstablecimientos || !establecimientos || establecimientos.length === 0) {
+            return;
+        }
+
+        if (establecimientos.length === 1) {
+            // Si hay solo un establecimiento, centrar en él
+            const est = establecimientos[0];
+            const lat = parseFloat(est.latitud);
+            const lng = parseFloat(est.longitud);
+            
+            if (!isNaN(lat) && !isNaN(lng)) {
+                mapEstablecimientos.setView([lat, lng], 14);
+                console.log(`✅ Mapa centrado en único establecimiento: ${est.nombreEstablecimiento}`);
+            }
+        } else {
+            // Si hay múltiples establecimientos, calcular bounds inteligente
+            const coordenadas = [];
+            let latMin = Infinity, latMax = -Infinity;
+            let lngMin = Infinity, lngMax = -Infinity;
+            
+            establecimientos.forEach(est => {
+                const lat = parseFloat(est.latitud);
+                const lng = parseFloat(est.longitud);
+                
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    coordenadas.push([lat, lng]);
+                    latMin = Math.min(latMin, lat);
+                    latMax = Math.max(latMax, lat);
+                    lngMin = Math.min(lngMin, lng);
+                    lngMax = Math.max(lngMax, lng);
+                }
+            });
+
+            if (coordenadas.length > 0) {
+                const deltaLat = latMax - latMin;
+                const deltaLng = lngMax - lngMin;
+                
+                // Calcular distancia máxima entre puntos
+                const distanciaMaxima = Math.sqrt(deltaLat * deltaLat + deltaLng * deltaLng);
+                
+                console.log(`📏 Análisis de dispersión:`, {
+                    establecimientos: coordenadas.length,
+                    deltaLat: deltaLat.toFixed(6),
+                    deltaLng: deltaLng.toFixed(6),
+                    distanciaMaxima: distanciaMaxima.toFixed(6)
+                });
+                
+                if (distanciaMaxima < 0.01) {
+                    // Establecimientos muy cercanos (< 1km aprox)
+                    console.log('🔍 Establecimientos muy cercanos detectados, aplicando zoom especial');
+                    
+                    // Calcular centro y aplicar zoom alto
+                    const centroLat = (latMin + latMax) / 2;
+                    const centroLng = (lngMin + lngMax) / 2;
+                    
+                    // Crear bounds mínimos para asegurar que ambos marcadores sean visibles
+                    const paddingMinimo = 0.005; // Aproximadamente 500m de padding
+                    const boundsExtendidos = [
+                        [latMin - paddingMinimo, lngMin - paddingMinimo],
+                        [latMax + paddingMinimo, lngMax + paddingMinimo]
+                    ];
+                    
+                    mapEstablecimientos.fitBounds(boundsExtendidos, {
+                        padding: [30, 30],
+                        maxZoom: 16 // Zoom alto para establecimientos cercanos
+                    });
+                    
+                    console.log(`✅ Zoom inteligente aplicado para establecimientos cercanos en [${centroLat.toFixed(6)}, ${centroLng.toFixed(6)}]`);
+                    
+                } else {
+                    // Establecimientos dispersos, usar fitBounds normal
+                    const group = new L.featureGroup(marcadoresEstablecimientos);
+                    
+                    if (marcadoresEstablecimientos.length > 0) {
+                        mapEstablecimientos.fitBounds(group.getBounds(), {
+                            padding: [20, 20],
+                            maxZoom: 15
+                        });
+                        
+                        console.log(`✅ Vista normal ajustada para ${coordenadas.length} establecimientos dispersos`);
+                    } else {
+                        // Fallback si no hay marcadores en el grupo
+                        const bounds = coordenadas.map(coord => coord);
+                        mapEstablecimientos.fitBounds(bounds, {
+                            padding: [20, 20],
+                            maxZoom: 15
+                        });
+                        
+                        console.log(`✅ Vista ajustada usando coordenadas directas`);
+                    }
+                }
+                
+                // Verificación post-ajuste
+                setTimeout(() => {
+                    const centroFinal = mapEstablecimientos.getCenter();
+                    const zoomFinal = mapEstablecimientos.getZoom();
+                    console.log(`🎯 Estado final del mapa: Centro=[${centroFinal.lat.toFixed(6)}, ${centroFinal.lng.toFixed(6)}], Zoom=${zoomFinal}`);
+                }, 100);
+            }
+        }
+
+    } catch (error) {
+        console.error('❌ Error ajustando vista del mapa:', error);
+    }
+}
+
+/**
+ * Función de debugging para inspeccionar el estado del mapa
+ */
+window.debugMapa = function() {
+    console.log('🔍 === DEBUG MAPA ESTABLECIMIENTOS ===');
+    console.log('📊 Estado del mapa:', {
+        mapaInicializado: !!mapEstablecimientos,
+        numeroMarcadores: marcadoresEstablecimientos.length,
+        marcadores: marcadoresEstablecimientos.map(m => ({
+            posicion: m.getLatLng(),
+            popup: m.getPopup() ? m.getPopup().getContent() : 'Sin popup'
+        }))
+    });
+    
+    if (mapEstablecimientos) {
+        console.log('🗺️ Centro del mapa:', mapEstablecimientos.getCenter());
+        console.log('🔍 Zoom actual:', mapEstablecimientos.getZoom());
+        console.log('📐 Bounds del mapa:', mapEstablecimientos.getBounds());
+    }
+    
+    // Recargar establecimientos para debugging
+    cargarEstablecimientosParaMapa().then(establecimientos => {
+        console.log('🔄 Establecimientos recargados para debug:', establecimientos);
+    }).catch(error => {
+        console.error('❌ Error recargando establecimientos:', error);
+    });
+};
+
+/**
+ * 🔍 FUNCIÓN DE VERIFICACIÓN POST-RENDERIZADO
+ * Verifica que todos los marcadores esperados estén visibles en el mapa
+ * Utilizar en consola: verificarMarcadoresEnMapa()
+ */
+window.verificarMarcadoresEnMapa = async function() {
+    console.log('🔍 INICIANDO VERIFICACIÓN POST-RENDERIZADO...');
+    console.log('='.repeat(50));
+    
+    try {
+        // 1. Obtener datos esperados del endpoint
+        console.log('📡 PASO 1: Obteniendo datos del endpoint...');
+        const url = buildURL(BACKEND_CONFIG.ENDPOINTS.GET_ESTABLECIMIENTOS);
+        const response = await fetchWithAuth(url);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const datosOriginales = await response.json();
+        console.log(`📊 Total de establecimientos en endpoint: ${datosOriginales.length}`);
+        
+        // 2. Filtrar establecimientos válidos (misma lógica que cargarEstablecimientosParaMapa)
+        const establecimientosValidos = datosOriginales.filter(est => {
+            const lat = parseFloat(est.latitud);
+            const lng = parseFloat(est.longitud);
+            
+            const latValida = est.latitud !== null && est.latitud !== undefined && 
+                             est.latitud !== '' && !isNaN(lat) && 
+                             lat >= -55 && lat <= -21;
+            
+            const lngValida = est.longitud !== null && est.longitud !== undefined && 
+                             est.longitud !== '' && !isNaN(lng) && 
+                             lng >= -73 && lng <= -53;
+            
+            return latValida && lngValida;
+        });
+        
+        console.log(`✅ Establecimientos con coordenadas válidas: ${establecimientosValidos.length}`);
+        
+        // 3. Contar marcadores en el DOM
+        console.log('\n🗺️  PASO 2: Contando marcadores en el DOM...');
+        const marcadoresEnDOM = document.querySelectorAll('.leaflet-marker-icon').length;
+        const marcadoresNormales = document.querySelectorAll('.marcador-normal').length;
+        const marcadoresOffset = document.querySelectorAll('.marcador-offset').length;
+        
+        console.log(`🎯 Marcadores totales en DOM: ${marcadoresEnDOM}`);
+        console.log(`🔵 Marcadores normales: ${marcadoresNormales}`);
+        console.log(`🔴 Marcadores con offset: ${marcadoresOffset}`);
+        
+        // 4. Verificar estado del array de marcadores en JavaScript
+        console.log('\n📝 PASO 3: Verificando array JavaScript...');
+        const marcadoresEnArray = window.marcadoresEstablecimientos ? window.marcadoresEstablecimientos.length : 0;
+        console.log(`📊 Marcadores en array JS: ${marcadoresEnArray}`);
+        
+        // 5. Verificar estado del mapa Leaflet
+        console.log('\n🗺️  PASO 4: Verificando layers del mapa...');
+        let marcadoresEnLeaflet = 0;
+        if (window.mapEstablecimientos) {
+            window.mapEstablecimientos.eachLayer(function(layer) {
+                if (layer instanceof L.Marker) {
+                    marcadoresEnLeaflet++;
+                }
+            });
+            console.log(`🍃 Marcadores en layers Leaflet: ${marcadoresEnLeaflet}`);
+        } else {
+            console.log('❌ El mapa no está inicializado');
+        }
+        
+        // 6. Análisis de discrepancias
+        console.log('\n📋 PASO 5: Análisis de consistencia...');
+        console.log('-'.repeat(40));
+        
+        const resumen = {
+            datosOriginales: datosOriginales.length,
+            establecimientosValidos: establecimientosValidos.length,
+            marcadoresDOM: marcadoresEnDOM,
+            marcadoresArray: marcadoresEnArray,
+            marcadoresLeaflet: marcadoresEnLeaflet
+        };
+        
+        console.table(resumen);
+        
+        // 7. Detectar problemas
+        const problemas = [];
+        
+        if (establecimientosValidos.length !== marcadoresDOM) {
+            problemas.push(`Discrepancia DOM: ${establecimientosValidos.length} válidos vs ${marcadoresDOM} en DOM`);
+        }
+        
+        if (marcadoresArray !== marcadoresDOM) {
+            problemas.push(`Discrepancia Array: ${marcadoresArray} en array vs ${marcadoresDOM} en DOM`);
+        }
+        
+        if (marcadoresLeaflet !== marcadoresDOM) {
+            problemas.push(`Discrepancia Leaflet: ${marcadoresLeaflet} en layers vs ${marcadoresDOM} en DOM`);
+        }
+        
+        if (establecimientosValidos.length > marcadoresDOM) {
+            problemas.push(`MARCADORES FALTANTES: ${establecimientosValidos.length - marcadoresDOM} marcadores no se renderizaron`);
+        }
+        
+        // 8. Reporte final
+        console.log('\n🎯 PASO 6: Reporte final...');
+        console.log('='.repeat(50));
+        
+        if (problemas.length === 0) {
+            console.log('✅ PERFECTO: Todos los marcadores están correctamente renderizados');
+            console.log(`🎉 ${establecimientosValidos.length} establecimientos → ${marcadoresDOM} marcadores visibles`);
+        } else {
+            console.log('⚠️  PROBLEMAS DETECTADOS:');
+            problemas.forEach((problema, index) => {
+                console.log(`   ${index + 1}. ${problema}`);
+            });
+            
+            console.log('\n💡 SUGERENCIAS:');
+            if (establecimientosValidos.length > marcadoresDOM) {
+                console.log('   🔧 Revisar función agregarMarcadoresEstablecimientos()');
+                console.log('   🔧 Verificar que no haya errores en el forEach');
+                console.log('   🔧 Comprobar si hay coordenadas duplicadas que se superponen');
+            }
+        }
+        
+        // 9. Información detallada por establecimiento
+        if (establecimientosValidos.length <= 5) {
+            console.log('\n📍 DETALLE POR ESTABLECIMIENTO:');
+            establecimientosValidos.forEach((est, index) => {
+                console.log(`${index + 1}. ${est.nombreEstablecimiento}:`);
+                console.log(`   📍 Coordenadas: [${est.latitud}, ${est.longitud}]`);
+                console.log(`   🆔 ID: ${est.idEstablecimiento}`);
+            });
+        }
+        
+        console.log('\n' + '='.repeat(50));
+        console.log('🎯 VERIFICACIÓN POST-RENDERIZADO FINALIZADA');
+        
+        return {
+            datosOriginales: datosOriginales.length,
+            establecimientosValidos: establecimientosValidos.length,
+            marcadoresVisibles: marcadoresDOM,
+            problemas: problemas,
+            estado: problemas.length === 0 ? 'CORRECTO' : 'CON_PROBLEMAS'
+        };
+        
+    } catch (error) {
+        console.error('❌ Error en verificación post-renderizado:', error);
+        return null;
+    }
+};
+
+/**
+ * Función para obtener TODAS las coordenadas de establecimientos del endpoint
+ */
+window.obtenerTodasLasCoordenadas = async function() {
+    console.log('🌐 === OBTENIENDO TODAS LAS COORDENADAS ===');
+    
+    try {
+        const url = buildURL(BACKEND_CONFIG.ENDPOINTS.GET_ESTABLECIMIENTOS);
+        console.log('📡 Consultando endpoint:', url);
+        
+        const response = await fetchWithAuth(url);
+        
+        if (!response.ok) {
+            console.error(`❌ Error HTTP ${response.status}`);
+            return;
+        }
+        
+        const establecimientos = await response.json();
+        console.log('📋 DATOS COMPLETOS DEL ENDPOINT:', establecimientos);
+        console.log('📊 TOTAL DE ESTABLECIMIENTOS:', establecimientos.length);
+        
+        console.log('\n🗺️ === TODAS LAS COORDENADAS ===');
+        
+        const coordenadasTabla = [];
+        
+        establecimientos.forEach((est, index) => {
+            const coordenada = {
+                'Nº': index + 1,
+                'ID': est.idEstablecimiento,
+                'Nombre': est.nombreEstablecimiento,
+                'Latitud': est.latitud,
+                'Longitud': est.longitud,
+                'Lat Tipo': typeof est.latitud,
+                'Lng Tipo': typeof est.longitud,
+                'Lat Válida': !isNaN(parseFloat(est.latitud)),
+                'Lng Válida': !isNaN(parseFloat(est.longitud)),
+                'Coordenadas Válidas': est.latitud && est.longitud && !isNaN(parseFloat(est.latitud)) && !isNaN(parseFloat(est.longitud))
+            };
+            
+            coordenadasTabla.push(coordenada);
+            
+            console.log(`📍 ${index + 1}. ${est.nombreEstablecimiento}:`);
+            console.log(`   🆔 ID: ${est.idEstablecimiento}`);
+            console.log(`   📐 Latitud: ${est.latitud} (${typeof est.latitud})`);
+            console.log(`   📐 Longitud: ${est.longitud} (${typeof est.longitud})`);
+            console.log(`   ✅ Válidas: ${coordenada['Coordenadas Válidas']}`);
+            console.log(`   📍 Ubicación: ${est.nombreDistrito}, ${est.nombreDepartamento}`);
+            console.log('   ─────────────────────────────────────');
+        });
+        
+        console.log('\n📊 TABLA RESUMEN DE COORDENADAS:');
+        console.table(coordenadasTabla);
+        
+        // Análisis de coordenadas
+        const conCoordenadas = establecimientos.filter(est => 
+            est.latitud && est.longitud && 
+            !isNaN(parseFloat(est.latitud)) && !isNaN(parseFloat(est.longitud))
+        );
+        
+        const sinCoordenadas = establecimientos.filter(est => 
+            !est.latitud || !est.longitud || 
+            isNaN(parseFloat(est.latitud)) || isNaN(parseFloat(est.longitud))
+        );
+        
+        console.log('\n📈 ANÁLISIS:');
+        console.log(`✅ Con coordenadas válidas: ${conCoordenadas.length}`);
+        console.log(`❌ Sin coordenadas válidas: ${sinCoordenadas.length}`);
+        
+        if (sinCoordenadas.length > 0) {
+            console.log('\n⚠️ ESTABLECIMIENTOS SIN COORDENADAS VÁLIDAS:');
+            sinCoordenadas.forEach(est => {
+                console.log(`   - ${est.nombreEstablecimiento} (ID: ${est.idEstablecimiento})`);
+                console.log(`     Lat: ${est.latitud}, Lng: ${est.longitud}`);
+            });
+        }
+        
+        // Retornar datos para uso externo
+        return {
+            total: establecimientos.length,
+            conCoordenadas: conCoordenadas.length,
+            sinCoordenadas: sinCoordenadas.length,
+            establecimientos: establecimientos,
+            coordenadas: coordenadasTabla
+        };
+        
+    } catch (error) {
+        console.error('❌ Error obteniendo coordenadas:', error);
+        return null;
+    }
+};
+
+/**
+ * Función principal para cargar el mapa de establecimientos
+ */
+async function cargarMapaEstablecimientos() {
+    console.log('🗺️ Iniciando carga completa del mapa de establecimientos...');
+    
+    const loadingElement = document.getElementById('mapa-loading');
+    const mapaElement = document.getElementById('mapa-establecimientos');
+    const errorElement = document.getElementById('mapa-error');
+    
+    try {
+        // Mostrar loading y ocultar otros estados
+        if (loadingElement) loadingElement.style.display = 'flex';
+        if (mapaElement) mapaElement.style.display = 'none';
+        if (errorElement) errorElement.style.display = 'none';
+        
+        // Cargar datos de establecimientos
+        const establecimientos = await cargarEstablecimientosParaMapa();
+        
+        // Inicializar mapa
+        inicializarMapaEstablecimientos();
+        
+        // Agregar marcadores
+        agregarMarcadoresEstablecimientos(establecimientos);
+        
+        // Mostrar mapa y ocultar loading
+        if (loadingElement) loadingElement.style.display = 'none';
+        if (mapaElement) mapaElement.style.display = 'block';
+        
+        console.log('✅ Mapa de establecimientos cargado exitosamente');
+        
+    } catch (error) {
+        console.error('❌ Error cargando mapa de establecimientos:', error);
+        
+        // Mostrar error y ocultar otros estados
+        if (loadingElement) loadingElement.style.display = 'none';
+        if (mapaElement) mapaElement.style.display = 'none';
+        if (errorElement) errorElement.style.display = 'flex';
+    }
+}
+
+/**
+ * 🔍 FUNCIÓN DE DEBUG COMPLETA: Diagnóstico exhaustivo del mapa
+ * Utilizar en consola: diagnosticoCompletoMapa()
+ */
+window.diagnosticoCompletoMapa = async function() {
+    console.log('🔍 INICIANDO DIAGNÓSTICO COMPLETO DEL MAPA...');
+    console.log('='.repeat(60));
+    
+    try {
+        // 1. Obtener datos del endpoint
+        console.log('📡 PASO 1: Obteniendo datos del endpoint...');
+        const url = buildURL(BACKEND_CONFIG.ENDPOINTS.GET_ESTABLECIMIENTOS);
+        const response = await fetchWithAuth(url);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('✅ Datos recibidos exitosamente');
+        console.log(`📊 Total de establecimientos recibidos: ${data.length}`);
+        
+        // 2. Análisis detallado de cada establecimiento
+        console.log('\n📍 PASO 2: Análisis de coordenadas por establecimiento:');
+        console.log('-'.repeat(50));
+        
+        let validCount = 0;
+        let invalidCount = 0;
+        let duplicateCoords = [];
+        let coordenadas = [];
+        
+        data.forEach((est, index) => {
+            const latitud = parseFloat(est.latitud);
+            const longitud = parseFloat(est.longitud);
+            const esValido = est.latitud && est.longitud && !isNaN(latitud) && !isNaN(longitud);
+            
+            console.log(`\n📍 Establecimiento ${index + 1}:`);
+            console.log(`   ID: ${est.idEstablecimiento}`);
+            console.log(`   Nombre: ${est.nombreEstablecimiento}`);
+            console.log(`   Dirección: ${est.direccion || 'No especificada'}`);
+            console.log(`   Latitud: ${est.latitud} (${typeof est.latitud}) → ${latitud}`);
+            console.log(`   Longitud: ${est.longitud} (${typeof est.longitud}) → ${longitud}`);
+            console.log(`   Estado: ${esValido ? '✅ VÁLIDO' : '❌ INVÁLIDO'}`);
+            
+            if (esValido) {
+                validCount++;
+                const coord = `${latitud.toFixed(6)},${longitud.toFixed(6)}`;
+                
+                // Buscar coordenadas muy cercanas (< 100 metros aprox)
+                const existeCoordCercana = coordenadas.find(c => {
+                    const [existLat, existLng] = c.split(',').map(parseFloat);
+                    const distancia = Math.sqrt(
+                        Math.pow((latitud - existLat) * 111000, 2) + 
+                        Math.pow((longitud - existLng) * 111000 * Math.cos(latitud * Math.PI / 180), 2)
+                    );
+                    return distancia < 100; // Menos de 100 metros
+                });
+                
+                if (existeCoordCercana) {
+                    duplicateCoords.push({
+                        coordenada: coord,
+                        establecimiento: est.nombreEstablecimiento,
+                        cercana: existeCoordCercana
+                    });
+                    console.log(`   ⚠️  COORDENADA MUY CERCANA A: ${existeCoordCercana}`);
+                }
+                
+                coordenadas.push(coord);
+            } else {
+                invalidCount++;
+                console.log(`   🔍 Razón: lat=${est.latitud}, lng=${est.longitud}, NaN lat=${isNaN(latitud)}, NaN lng=${isNaN(longitud)}`);
+            }
+        });
+        
+        // 3. Resumen del análisis
+        console.log('\n📋 PASO 3: Resumen del diagnóstico:');
+        console.log('-'.repeat(50));
+        console.log(`✅ Establecimientos con coordenadas válidas: ${validCount}`);
+        console.log(`❌ Establecimientos con coordenadas inválidas: ${invalidCount}`);
+        console.log(`🔄 Coordenadas muy cercanas encontradas: ${duplicateCoords.length}`);
+        
+        if (duplicateCoords.length > 0) {
+            console.log('\n⚠️  COORDENADAS MUY CERCANAS DETECTADAS (< 100m):');
+            duplicateCoords.forEach((dup, index) => {
+                console.log(`   ${index + 1}. ${dup.establecimiento} - ${dup.coordenada}`);
+                console.log(`      Cercana a: ${dup.cercana}`);
+            });
+        }
+        
+        // 4. Verificar marcadores en el DOM
+        console.log('\n🗺️  PASO 4: Verificando marcadores en el DOM:');
+        console.log('-'.repeat(50));
+        
+        const marcadoresEnDOM = document.querySelectorAll('.leaflet-marker-icon').length;
+        console.log(`🎯 Marcadores visibles en el mapa: ${marcadoresEnDOM}`);
+        console.log(`📊 Esperados vs Reales: ${validCount} esperados / ${marcadoresEnDOM} visibles`);
+        
+        if (validCount !== marcadoresEnDOM) {
+            console.log(`⚠️  DISCREPANCIA DETECTADA: Faltan ${validCount - marcadoresEnDOM} marcadores`);
+            
+            // Verificar si el problema es de superposición
+            if (duplicateCoords.length > 0) {
+                console.log('💡 Posible causa: Marcadores superpuestos por coordenadas muy cercanas');
+            }
+        } else {
+            console.log('✅ PERFECTO: Todos los marcadores están visibles');
+        }
+        
+        // 5. Verificar el estado del mapa
+        console.log('\n🗺️  PASO 5: Estado del mapa Leaflet:');
+        console.log('-'.repeat(50));
+        
+        if (window.mapaEstablecimientos) {
+            const centro = window.mapaEstablecimientos.getCenter();
+            const zoom = window.mapaEstablecimientos.getZoom();
+            console.log(`📍 Centro del mapa: ${centro.lat.toFixed(6)}, ${centro.lng.toFixed(6)}`);
+            console.log(`🔍 Nivel de zoom: ${zoom}`);
+            
+            // Contar layers de marcadores
+            let contadorMarcadores = 0;
+            window.mapaEstablecimientos.eachLayer(function(layer) {
+                if (layer instanceof L.Marker) {
+                    contadorMarcadores++;
+                }
+            });
+            console.log(`🎯 Marcadores en layers de Leaflet: ${contadorMarcadores}`);
+        } else {
+            console.log('❌ El mapa no está inicializado');
+        }
+        
+        // 6. Recomendaciones
+        console.log('\n💡 PASO 6: Recomendaciones:');
+        console.log('-'.repeat(50));
+        
+        if (duplicateCoords.length > 0) {
+            console.log('🔧 SOLUCIÓN 1: Aplicar offset a coordenadas muy cercanas');
+            console.log('   Código sugerido: offset de ±0.001° para separar marcadores');
+        }
+        
+        if (invalidCount > 0) {
+            console.log('🔧 SOLUCIÓN 2: Revisar y corregir coordenadas inválidas en BD');
+        }
+        
+        if (validCount !== marcadoresEnDOM) {
+            console.log('🔧 SOLUCIÓN 3: Investigar función agregarMarcadoresEstablecimientos()');
+            console.log('   Verificar que el forEach procese todos los elementos');
+        }
+        
+        console.log('\n' + '='.repeat(60));
+        console.log('🎯 DIAGNÓSTICO COMPLETO FINALIZADO');
+        console.log('💬 Para ejecutar debug simple: obtenerTodasLasCoordenadas()');
+        console.log('💬 Para ver solo marcadores: document.querySelectorAll(".leaflet-marker-icon")');
+        
+        return {
+            totalRecibidos: data.length,
+            validos: validCount,
+            invalidos: invalidCount,
+            coordenadasCercanas: duplicateCoords.length,
+            marcadoresVisibles: marcadoresEnDOM,
+            mapaInicializado: !!window.mapaEstablecimientos,
+            data: data
+        };
+        
+    } catch (error) {
+        console.error('❌ Error en diagnóstico completo:', error);
+        return null;
+    }
+};
