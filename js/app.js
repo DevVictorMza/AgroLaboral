@@ -11,6 +11,7 @@ const BACKEND_CONFIG = {
         PROFILE: '/privado/empresas/perfil',
         // Endpoints para fincas/establecimientos
         REGISTER_FINCA: '/privado/establecimientos/registro',
+        GET_ESTABLECIMIENTOS: '/privado/establecimientos',
         DEPARTAMENTOS: '/publico/departamentos',
         DISTRITOS: '/publico/distritos',
         ESPECIES: '/privado/especies',
@@ -397,6 +398,11 @@ function generarDashboard(perfil) {
             </div>
         </div>
     `;
+    
+    // Inicializar la carga de establecimientos después de generar el dashboard
+    setTimeout(() => {
+        inicializarEstablecimientos();
+    }, 100);
 }
 
 // ===========================
@@ -1303,6 +1309,580 @@ function volverPaso1() {
 }
 
 // ===========================
+// GESTIÓN DE ESTABLECIMIENTOS
+// ===========================
+
+/**
+ * Carga la lista de establecimientos desde el backend
+ * @returns {Promise<Array>} Array de establecimientos o array vacío si no hay datos
+ */
+async function cargarEstablecimientos() {
+    console.log('🏢 Iniciando carga de establecimientos...');
+    
+    try {
+        // Verificar autenticación antes de la petición
+        const tokenStatus = await validateCurrentToken();
+        if (!tokenStatus.valid) {
+            console.warn('🔒 Token inválido, no se pueden cargar establecimientos');
+            return [];
+        }
+
+        // Realizar petición autenticada
+        const url = buildURL(BACKEND_CONFIG.ENDPOINTS.GET_ESTABLECIMIENTOS);
+        console.log('📡 Solicitando establecimientos desde:', url);
+
+        const response = await fetchWithAuth(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        // Verificar respuesta exitosa
+        if (!response.ok) {
+            if (response.status === 401 || response.status === 403) {
+                console.warn('🔒 Sin autorización para cargar establecimientos');
+                return [];
+            }
+            throw new Error(`Error HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        // Procesar datos
+        const establecimientos = await response.json();
+        console.log(`✅ Establecimientos cargados: ${establecimientos.length} encontrados`);
+        console.log('📋 Datos recibidos:', establecimientos);
+
+        // Validar estructura de datos
+        if (!Array.isArray(establecimientos)) {
+            console.warn('⚠️ Respuesta no es un array, devolviendo array vacío');
+            return [];
+        }
+
+        return establecimientos;
+
+    } catch (error) {
+        console.error('❌ Error cargando establecimientos:', error);
+        
+        // Manejo específico de errores de red
+        if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+            console.error('🌐 Error de conexión con el servidor');
+        }
+        
+        return [];
+    }
+}
+
+/**
+ * Renderiza los establecimientos en el dashboard
+ * @param {Array} establecimientos - Array de establecimientos
+ */
+function renderizarEstablecimientos(establecimientos) {
+    const containerFincas = document.getElementById('empty-fincas');
+    if (!containerFincas) {
+        console.error('❌ Contenedor #empty-fincas no encontrado');
+        return;
+    }
+
+    console.log(`🎨 Renderizando ${establecimientos.length} establecimientos`);
+
+    // Si no hay establecimientos, mostrar estado vacío
+    if (!establecimientos || establecimientos.length === 0) {
+        mostrarEstadoVacio(containerFincas);
+        return;
+    }
+
+    // Renderizar establecimientos
+    const html = generarHtmlEstablecimientos(establecimientos);
+    containerFincas.innerHTML = html;
+
+    // Actualizar contador en stats si existe
+    actualizarContadorEstablecimientos(establecimientos.length);
+}
+
+/**
+ * Muestra el estado vacío cuando no hay establecimientos
+ * @param {HTMLElement} container - Contenedor donde mostrar el estado
+ */
+function mostrarEstadoVacio(container) {
+    container.innerHTML = `
+        <div class="empty-state text-center py-5">
+            <i class="fas fa-plus-circle text-primary mb-3" style="font-size: 3rem;"></i>
+            <h6 class="text-muted-custom mb-3">No hay fincas registradas</h6>
+            <p class="text-muted-custom mb-4">Comienza agregando tu primera propiedad agrícola</p>
+            <button class="btn btn-primary-custom" onclick="abrirWizardFinca()">
+                <i class="fas fa-plus me-2"></i>Agregar Primera Finca
+            </button>
+        </div>
+    `;
+}
+
+/**
+ * Muestra el estado de carga
+ * @param {HTMLElement} container - Contenedor donde mostrar el estado
+ */
+function mostrarEstadoCargando(container) {
+    container.innerHTML = `
+        <div class="loading-state text-center py-5">
+            <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <h6 class="text-muted-custom">Cargando establecimientos...</h6>
+        </div>
+    `;
+}
+
+/**
+ * Genera el HTML para mostrar los establecimientos
+ * @param {Array} establecimientos - Array de establecimientos
+ * @returns {string} HTML generado
+ */
+function generarHtmlEstablecimientos(establecimientos) {
+    const establecimientosHtml = establecimientos.map(est => `
+        <div class="col-lg-6 col-xl-4 mb-4">
+            <div class="establecimiento-card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 text-success">
+                        <i class="fas fa-seedling me-2"></i>
+                        ${est.nombreEstablecimiento}
+                    </h6>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-light" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="#" onclick="verDetalleEstablecimiento(${est.idEstablecimiento})">
+                                <i class="fas fa-eye me-2"></i>Ver Detalles
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="editarEstablecimiento(${est.idEstablecimiento})">
+                                <i class="fas fa-edit me-2"></i>Editar
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#" onclick="eliminarEstablecimiento(${est.idEstablecimiento}, '${est.nombreEstablecimiento.replace(/'/g, "\\'")}')">
+                                <i class="fas fa-trash me-2"></i>Eliminar
+                            </a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="establecimiento-info">
+                        <div class="info-item mb-2">
+                            <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                            <span class="text-light">${est.calle} ${est.numeracion}, CP ${est.codigoPostal}</span>
+                        </div>
+                        <div class="info-item mb-2">
+                            <i class="fas fa-map text-info me-2"></i>
+                            <span class="text-muted">${est.nombreDistrito}, ${est.nombreDepartamento}</span>
+                        </div>
+                        <div class="info-item mb-3">
+                            <i class="fas fa-leaf text-success me-2"></i>
+                            <span class="text-light">${est.especies.length} especie(s): ${est.especies.slice(0, 3).join(', ')}${est.especies.length > 3 ? '...' : ''}</span>
+                        </div>
+                        <div class="coordinates-info">
+                            <small class="text-muted">
+                                <i class="fas fa-globe me-1"></i>
+                                Lat: ${est.latitud.toFixed(5)}, Lng: ${est.longitud.toFixed(5)}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-success">
+                            <i class="fas fa-check-circle me-1"></i>Activo
+                        </span>
+                        <button class="btn btn-sm btn-outline-primary" onclick="verEnMapa(${est.latitud}, ${est.longitud})">
+                            <i class="fas fa-map-marked-alt me-1"></i>Ver en Mapa
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    return `
+        <div class="establecimientos-container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h6 class="text-light mb-0">
+                    <i class="fas fa-clipboard-list me-2 text-primary"></i>
+                    Mis Establecimientos (${establecimientos.length})
+                </h6>
+                <button class="btn btn-primary btn-sm" onclick="abrirWizardFinca()">
+                    <i class="fas fa-plus me-2"></i>Agregar Nuevo
+                </button>
+            </div>
+            <div class="row">
+                ${establecimientosHtml}
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Actualiza el contador de establecimientos en las estadísticas
+ * @param {number} cantidad - Cantidad de establecimientos
+ */
+function actualizarContadorEstablecimientos(cantidad) {
+    const statsNumbers = document.querySelectorAll('.stats-card .stats-number');
+    if (statsNumbers.length > 0) {
+        statsNumbers[0].textContent = cantidad.toString();
+        console.log(`📊 Contador actualizado: ${cantidad} establecimientos`);
+    }
+}
+
+// ===========================
+// FUNCIONES DE ACCIÓN DE ESTABLECIMIENTOS
+// ===========================
+
+/**
+ * Ver detalles de un establecimiento
+ * @param {number} idEstablecimiento - ID del establecimiento
+ */
+function verDetalleEstablecimiento(idEstablecimiento) {
+    console.log(`👁️ Ver detalles del establecimiento: ${idEstablecimiento}`);
+    // TODO: Implementar modal de detalles
+    alert(`Ver detalles del establecimiento ID: ${idEstablecimiento}`);
+}
+
+/**
+ * Editar un establecimiento
+ * @param {number} idEstablecimiento - ID del establecimiento
+ */
+function editarEstablecimiento(idEstablecimiento) {
+    console.log(`✏️ Editar establecimiento: ${idEstablecimiento}`);
+    // TODO: Implementar modal de edición
+    alert(`Editar establecimiento ID: ${idEstablecimiento}`);
+}
+
+/**
+ * Eliminar un establecimiento
+ * @param {number} idEstablecimiento - ID del establecimiento
+ */
+function eliminarEstablecimiento(idEstablecimiento) {
+    console.log(`🗑️ Eliminar establecimiento: ${idEstablecimiento}`);
+    if (confirm('¿Está seguro que desea eliminar este establecimiento?')) {
+        // TODO: Implementar eliminación
+        alert(`Eliminar establecimiento ID: ${idEstablecimiento}`);
+    }
+}
+
+/**
+ * Ver establecimiento en el mapa
+ * @param {number} latitud - Latitud del establecimiento
+ * @param {number} longitud - Longitud del establecimiento
+ */
+function verEnMapa(latitud, longitud) {
+    console.log(`🗺️ Ver en mapa: ${latitud}, ${longitud}`);
+    // TODO: Implementar vista de mapa
+    window.open(`https://www.google.com/maps?q=${latitud},${longitud}`, '_blank');
+}
+
+// ===========================
+// INTEGRACIÓN CON DASHBOARD
+// ===========================
+
+/**
+ * Inicializa la carga de establecimientos en el dashboard
+ */
+async function inicializarEstablecimientos() {
+    console.log('🚀 Inicializando gestión de establecimientos...');
+    
+    const containerFincas = document.getElementById('empty-fincas');
+    if (!containerFincas) {
+        console.warn('⚠️ Contenedor de fincas no encontrado');
+        return;
+    }
+
+    // Mostrar estado de carga
+    mostrarEstadoCargando(containerFincas);
+
+    try {
+        // Cargar establecimientos
+        const establecimientos = await cargarEstablecimientos();
+        
+        // Renderizar en la UI
+        renderizarEstablecimientos(establecimientos);
+        
+        console.log('✅ Gestión de establecimientos inicializada correctamente');
+        
+    } catch (error) {
+        console.error('❌ Error inicializando establecimientos:', error);
+        
+        // Mostrar estado de error
+        containerFincas.innerHTML = `
+            <div class="error-state text-center py-5">
+                <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 3rem;"></i>
+                <h6 class="text-muted-custom mb-3">Error cargando establecimientos</h6>
+                <p class="text-muted-custom mb-4">No se pudieron cargar los datos. Verifique su conexión.</p>
+                <button class="btn btn-outline-primary" onclick="inicializarEstablecimientos()">
+                    <i class="fas fa-redo me-2"></i>Reintentar
+                </button>
+            </div>
+        `;
+    }
+}
+
+// ===========================
+// ACCIONES DE ESTABLECIMIENTOS
+// ===========================
+
+/**
+ * Ver detalles de un establecimiento
+ */
+async function verDetalleEstablecimiento(idEstablecimiento) {
+    console.log('👁️ Mostrando detalles del establecimiento:', idEstablecimiento);
+    
+    try {
+        // Obtener datos del establecimiento
+        const establecimiento = await obtenerEstablecimientoPorId(idEstablecimiento);
+        
+        if (!establecimiento) {
+            showMessage('No se pudo cargar la información del establecimiento', 'error');
+            return;
+        }
+
+        // Crear modal con detalles
+        const modalHtml = `
+            <div class="modal fade" id="detalleEstablecimientoModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content bg-dark">
+                        <div class="modal-header border-secondary">
+                            <h5 class="modal-title text-white">
+                                <i class="fas fa-building me-2"></i>
+                                ${establecimiento.nombreEstablecimiento}
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="fas fa-info-circle me-2"></i>Información General
+                                    </h6>
+                                    <div class="mb-3">
+                                        <small class="text-muted">ID Establecimiento</small>
+                                        <p class="text-white mb-0">${establecimiento.idEstablecimiento}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <small class="text-muted">Nombre</small>
+                                        <p class="text-white mb-0">${establecimiento.nombreEstablecimiento}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="fas fa-map-marker-alt me-2"></i>Ubicación
+                                    </h6>
+                                    <div class="mb-3">
+                                        <small class="text-muted">Dirección</small>
+                                        <p class="text-white mb-0">${establecimiento.calle} ${establecimiento.numeracion}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <small class="text-muted">Código Postal</small>
+                                        <p class="text-white mb-0">${establecimiento.codigoPostal}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <small class="text-muted">Distrito</small>
+                                        <p class="text-white mb-0">${establecimiento.nombreDistrito}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <small class="text-muted">Departamento</small>
+                                        <p class="text-white mb-0">${establecimiento.nombreDepartamento}</p>
+                                    </div>
+                                    ${establecimiento.latitud && establecimiento.longitud ? `
+                                    <div class="mb-3">
+                                        <small class="text-muted">Coordenadas</small>
+                                        <p class="text-white mb-0">${establecimiento.latitud}, ${establecimiento.longitud}</p>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                            ${establecimiento.especies && establecimiento.especies.length > 0 ? `
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="fas fa-seedling me-2"></i>Especies Cultivadas
+                                    </h6>
+                                    <div class="row">
+                                        ${establecimiento.especies.map(especie => `
+                                            <div class="col-md-4 mb-2">
+                                                <span class="badge bg-success">${especie.nombre || especie}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                            ` : ''}
+                        </div>
+                        <div class="modal-footer border-secondary">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="button" class="btn btn-primary" onclick="editarEstablecimiento(${establecimiento.idEstablecimiento})">
+                                <i class="fas fa-edit me-2"></i>Editar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Eliminar modal existente si hay uno
+        const existingModal = document.getElementById('detalleEstablecimientoModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+
+        // Agregar modal al DOM
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        // Mostrar modal
+        const modal = new bootstrap.Modal(document.getElementById('detalleEstablecimientoModal'));
+        modal.show();
+
+        // Limpiar modal después de cerrar
+        document.getElementById('detalleEstablecimientoModal').addEventListener('hidden.bs.modal', function() {
+            this.remove();
+        });
+
+    } catch (error) {
+        console.error('❌ Error mostrando detalles:', error);
+        showMessage('Error al cargar los detalles del establecimiento', 'error');
+    }
+}
+
+/**
+ * Obtener establecimiento por ID
+ */
+async function obtenerEstablecimientoPorId(idEstablecimiento) {
+    return await executeWithTokenRetry(async () => {
+        const response = await fetch(`${BACKEND_CONFIG.GET_ESTABLECIMIENTOS}/${idEstablecimiento}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+
+        return await response.json();
+    }, 'Obtener establecimiento');
+}
+
+/**
+ * Editar establecimiento
+ */
+function editarEstablecimiento(idEstablecimiento) {
+    console.log('✏️ Editando establecimiento:', idEstablecimiento);
+    // Por ahora, mostrar mensaje de funcionalidad en desarrollo
+    showMessage('Funcionalidad de edición en desarrollo. Próximamente disponible.', 'info');
+}
+
+/**
+ * Eliminar establecimiento con confirmación
+ */
+function eliminarEstablecimiento(idEstablecimiento, nombreEstablecimiento) {
+    console.log('🗑️ Eliminando establecimiento:', idEstablecimiento, nombreEstablecimiento);
+    
+    // Mostrar modal de confirmación
+    const confirmationHtml = `
+        <div class="modal fade" id="confirmarEliminacionModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content bg-dark">
+                    <div class="modal-header border-secondary">
+                        <h5 class="modal-title text-white">
+                            <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                            Confirmar Eliminación
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body text-white">
+                        <p>¿Está seguro que desea eliminar el establecimiento?</p>
+                        <div class="alert alert-warning">
+                            <strong>${nombreEstablecimiento}</strong><br>
+                            <small>ID: ${idEstablecimiento}</small>
+                        </div>
+                        <p class="text-danger">
+                            <strong>⚠️ Esta acción no se puede deshacer.</strong>
+                        </p>
+                    </div>
+                    <div class="modal-footer border-secondary">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger" onclick="confirmarEliminacionEstablecimiento(${idEstablecimiento}, '${nombreEstablecimiento.replace(/'/g, "\\'")}')">
+                            <i class="fas fa-trash me-2"></i>Eliminar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Eliminar modal existente si hay uno
+    const existingModal = document.getElementById('confirmarEliminacionModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    // Agregar modal al DOM
+    document.body.insertAdjacentHTML('beforeend', confirmationHtml);
+
+    // Mostrar modal
+    const modal = new bootstrap.Modal(document.getElementById('confirmarEliminacionModal'));
+    modal.show();
+
+    // Limpiar modal después de cerrar
+    document.getElementById('confirmarEliminacionModal').addEventListener('hidden.bs.modal', function() {
+        this.remove();
+    });
+}
+
+/**
+ * Confirmar eliminación definitiva
+ */
+async function confirmarEliminacionEstablecimiento(idEstablecimiento, nombreEstablecimiento) {
+    console.log('🗑️ Confirmando eliminación del establecimiento:', idEstablecimiento);
+    
+    try {
+        // Cerrar modal de confirmación
+        const modal = bootstrap.Modal.getInstance(document.getElementById('confirmarEliminacionModal'));
+        if (modal) {
+            modal.hide();
+        }
+
+        // Mostrar loading
+        showMessage('Eliminando establecimiento...', 'info');
+
+        // Realizar eliminación
+        await executeWithTokenRetry(async () => {
+            const response = await fetch(`${BACKEND_CONFIG.GET_ESTABLECIMIENTOS}/${idEstablecimiento}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
+            }
+
+            return response.json();
+        }, 'Eliminar establecimiento');
+
+        // Mostrar éxito
+        showMessage(`Establecimiento "${nombreEstablecimiento}" eliminado exitosamente`, 'success');
+
+        // Recargar lista de establecimientos
+        setTimeout(async () => {
+            await inicializarEstablecimientos();
+        }, 1000);
+
+    } catch (error) {
+        console.error('❌ Error eliminando establecimiento:', error);
+        showMessage('Error al eliminar el establecimiento. Inténtelo nuevamente.', 'error');
+    }
+}
+
+// ===========================
 // REGISTRO DE FINCA
 // ===========================
 // REGISTRO DE ESTABLECIMIENTO
@@ -1679,46 +2259,18 @@ function actualizarDashboardConFinca(finca) {
 function actualizarDashboardConEstablecimiento(establecimiento) {
     console.log('📊 Actualizando dashboard con establecimiento:', establecimiento);
     
-    // Actualizar la sección de establecimientos en el dashboard
-    const emptyFincas = document.getElementById('empty-fincas');
-    if (emptyFincas) {
-        emptyFincas.innerHTML = `
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <div class="establecimiento-card p-3 border border-success rounded">
-                        <h6 class="text-success mb-2">
-                            <i class="fas fa-check-circle me-2"></i>
-                            ${establecimiento.nombreEstablecimiento || establecimiento.nombre}
-                        </h6>
-                        <p class="text-muted small mb-2">
-                            <i class="fas fa-map-marker-alt me-1"></i>
-                            ${wizardData.datosDisplay?.direccion || 'Dirección no disponible'}
-                        </p>
-                        <p class="text-muted small mb-2">
-                            <i class="fas fa-seedling me-1"></i>
-                            ${wizardData.datosDisplay?.especies?.length || 0} especie(s) cultivada(s)
-                        </p>
-                        <p class="text-muted small mb-0">
-                            <i class="fas fa-id-badge me-1"></i>
-                            ID: ${establecimiento.idEstablecimiento || establecimiento.id}
-                        </p>
-                        <span class="badge bg-success mt-2">Registrado recientemente</span>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3 d-flex align-items-center justify-content-center">
-                    <button class="btn btn-outline-primary" onclick="abrirWizardFinca()">
-                        <i class="fas fa-plus me-2"></i>Agregar Otro Establecimiento
-                    </button>
-                </div>
-            </div>
-        `;
-    }
-
-    // Actualizar contador de establecimientos (buscar el primer stats-card)
-    const statsNumbers = document.querySelectorAll('.stats-card .stats-number');
-    if (statsNumbers.length > 0 && statsNumbers[0].textContent === '0') {
-        statsNumbers[0].textContent = '1';
-    }
+    // Recargar todos los establecimientos para mostrar el estado actualizado
+    setTimeout(async () => {
+        try {
+            console.log('🔄 Recargando lista de establecimientos...');
+            await inicializarEstablecimientos();
+            console.log('✅ Lista de establecimientos recargada exitosamente');
+        } catch (error) {
+            console.error('❌ Error recargando establecimientos:', error);
+            // En caso de error, mostrar feedback básico
+            showMessage('Establecimiento registrado, pero la lista podría no estar actualizada. Recargue la página.', 'warning');
+        }
+    }, 1000);
 
     // Mostrar toast de éxito mejorado
     const toast = document.createElement('div');
@@ -5105,7 +5657,7 @@ async function buscarUbicacion() {
 
 // Función para detectar servidor correcto con proxy
 async function detectarServidorProxy() {
-    // Usar puerto 3000 fijo para el proxy
+    // Usar puerto 3000 para el proxy/servidor combinado
     const PROXY_PORT = 3000;
     
     try {
@@ -5125,21 +5677,6 @@ async function detectarServidorProxy() {
     
     // Si no encuentra servidor proxy, mostrar instrucciones
     throw new Error('No se encontró servidor proxy. Ejecute "python server.py" desde la terminal.');
-}
-
-// Función para probar la geocodificación
-async function probarGeocoding() {
-    console.log('🔍 Probando servicio de geocodificación...');
-    try {
-        const direccion = 'Avenida San Martín 100, Mendoza';
-        console.log('📍 Dirección de prueba:', direccion);
-        const resultado = await geocodificarDireccion(direccion);
-        console.log('✅ Geocodificación exitosa:', resultado);
-        return resultado;
-    } catch (error) {
-        console.error('❌ Error en prueba de geocodificación:', error);
-        throw error;
-    }
 }
 
 // Función para geocodificar usando API de Nominatim a través de proxy local
