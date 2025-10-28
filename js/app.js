@@ -109,6 +109,165 @@ async function fetchWithAuth(url, options = {}) {
 }
 
 // ===========================
+// FUNCIONES DE NOTIFICACIONES
+// ===========================
+
+/**
+ * Muestra un mensaje toast al usuario
+ * @param {string} message - Mensaje a mostrar
+ * @param {string} type - Tipo de mensaje: 'success', 'error', 'warning', 'info'
+ */
+function showMessage(message, type = 'info') {
+    const toastTypes = {
+        success: { class: 'bg-success', icon: 'fas fa-check-circle' },
+        error: { class: 'bg-danger', icon: 'fas fa-exclamation-circle' },
+        warning: { class: 'bg-warning text-dark', icon: 'fas fa-exclamation-triangle' },
+        info: { class: 'bg-primary', icon: 'fas fa-info-circle' }
+    };
+
+    const toastConfig = toastTypes[type] || toastTypes.info;
+
+    const toastHtml = `
+        <div class="toast align-items-center text-white ${toastConfig.class} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="${toastConfig.icon} me-2"></i>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    `;
+
+    // Crear o obtener contenedor de toasts
+    let toastContainer = document.querySelector('.toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+        toastContainer.style.zIndex = '9999';
+        document.body.appendChild(toastContainer);
+    }
+
+    // Crear elemento toast
+    const toastElement = document.createElement('div');
+    toastElement.innerHTML = toastHtml;
+    const toast = toastElement.firstElementChild;
+    
+    toastContainer.appendChild(toast);
+
+    // Inicializar y mostrar toast
+    const bsToast = new bootstrap.Toast(toast, { delay: 5000 });
+    bsToast.show();
+
+    // Limpiar después de ocultar
+    toast.addEventListener('hidden.bs.toast', function() {
+        toast.remove();
+    });
+}
+
+// ===========================
+// NAVEGACIÓN AL DASHBOARD
+// ===========================
+
+/**
+ * Abre el dashboard del usuario con todos sus datos
+ */
+async function abrirDashboardUsuario() {
+    console.log('🎯 Abriendo dashboard del usuario...');
+    
+    try {
+        // Verificar autenticación
+        const tokenValid = validateCurrentToken();
+        if (!tokenValid) {
+            console.error('❌ Token inválido al abrir dashboard');
+            mostrarErrorLogin('Su sesión ha expirado. Por favor, inicie sesión nuevamente.');
+            cerrarSesion();
+            return;
+        }
+
+        // Mostrar estado de carga en el offcanvas
+        const dashboardOffcanvas = document.getElementById('dashboardOffcanvas');
+        const dashboardContent = document.getElementById('dashboard-content');
+        
+        if (!dashboardOffcanvas || !dashboardContent) {
+            console.error('❌ Elementos del dashboard no encontrados');
+            return;
+        }
+
+        // Mostrar loading en el dashboard
+        dashboardContent.innerHTML = `
+            <div class="loading-container d-flex justify-content-center align-items-center" style="min-height: 400px;">
+                <div class="text-center">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <h6 class="text-white">Cargando su perfil...</h6>
+                </div>
+            </div>
+        `;
+
+        // Abrir el offcanvas
+        const bsOffcanvas = new bootstrap.Offcanvas(dashboardOffcanvas);
+        bsOffcanvas.show();
+
+        // Cargar datos del perfil
+        console.log('📊 Cargando datos del perfil...');
+        const perfil = await cargarPerfilEmpresa();
+        
+        console.log('🔍 Verificando datos del perfil recibidos:', {
+            existe: !!perfil,
+            tipo: typeof perfil,
+            propiedades: perfil ? Object.keys(perfil) : 'N/A'
+        });
+        
+        if (!perfil) {
+            console.error('❌ No se pudo cargar el perfil de la empresa');
+            dashboardContent.innerHTML = `
+                <div class="error-state text-center py-5">
+                    <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 3rem;"></i>
+                    <h6 class="text-white mb-3">Error cargando perfil</h6>
+                    <p class="text-muted mb-4">No se pudieron cargar los datos de su perfil.</p>
+                    <button class="btn btn-outline-primary" onclick="abrirDashboardUsuario()">
+                        <i class="fas fa-redo me-2"></i>Reintentar
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        // Generar contenido del dashboard
+        console.log('🎨 Generando dashboard con datos del perfil...');
+        console.log('📋 Datos del perfil para dashboard:', {
+            idEmpresa: perfil.idEmpresa,
+            razonSocial: perfil.razonSocial,
+            cuit: perfil.cuit,
+            fechaAlta: perfil.fechaAlta
+        });
+        generarDashboard(perfil);
+
+        console.log('✅ Dashboard del usuario abierto correctamente');
+
+    } catch (error) {
+        console.error('❌ Error abriendo dashboard del usuario:', error);
+        
+        // Mostrar error en el dashboard
+        const dashboardContent = document.getElementById('dashboard-content');
+        if (dashboardContent) {
+            dashboardContent.innerHTML = `
+                <div class="error-state text-center py-5">
+                    <i class="fas fa-times-circle text-danger mb-3" style="font-size: 3rem;"></i>
+                    <h6 class="text-white mb-3">Error del sistema</h6>
+                    <p class="text-muted mb-4">${error.message || 'Error inesperado al cargar el dashboard'}</p>
+                    <button class="btn btn-outline-primary" onclick="abrirDashboardUsuario()">
+                        <i class="fas fa-redo me-2"></i>Reintentar
+                    </button>
+                </div>
+            `;
+        }
+    }
+}
+
+// ===========================
 // FUNCIONES DE PERFIL DE EMPRESA
 // ===========================
 
@@ -143,16 +302,38 @@ async function cargarPerfilEmpresa() {
         // Actualizar navbar con avatar
         actualizarInterfazLogin(true, perfil);
 
-        // Generar contenido del dashboard
-        generarDashboard(perfil);
-
-        // Abrir el offcanvas del dashboard automáticamente tras login
-        const dashboardOffcanvas = new bootstrap.Offcanvas(document.getElementById('dashboardOffcanvas'));
-        dashboardOffcanvas.show();
+        // Retornar el perfil para que pueda ser usado por abrirDashboardUsuario
+        return perfil;
 
     } catch (error) {
         console.error('❌ Error cargando perfil:', error);
-        mostrarErrorPerfil(error.message);
+        
+        // Manejo granular de errores
+        let tipoError = 'DESCONOCIDO';
+        let mensajeUsuario = 'Error inesperado al cargar el perfil';
+        
+        if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+            tipoError = 'CONEXION';
+            mensajeUsuario = 'No se pudo conectar con el servidor. Verifique su conexión a internet.';
+        } else if (error.message.includes('401')) {
+            tipoError = 'AUTENTICACION';
+            mensajeUsuario = 'Su sesión ha expirado. Por favor, inicie sesión nuevamente.';
+        } else if (error.message.includes('403')) {
+            tipoError = 'AUTORIZACION';
+            mensajeUsuario = 'No tiene permisos para acceder a esta información.';
+        } else if (error.message.includes('404')) {
+            tipoError = 'NO_ENCONTRADO';
+            mensajeUsuario = 'No se encontró información de perfil para su empresa.';
+        } else if (error.message.includes('500')) {
+            tipoError = 'SERVIDOR';
+            mensajeUsuario = 'Error interno del servidor. Inténtelo más tarde.';
+        }
+        
+        console.error(`🔍 Tipo de error identificado: ${tipoError}`);
+        mostrarErrorPerfil(mensajeUsuario);
+        
+        // No retornar nada en caso de error
+        return null;
     }
 }
 
@@ -400,9 +581,13 @@ function generarDashboard(perfil) {
     `;
     
     // Inicializar la carga de establecimientos después de generar el dashboard
-    setTimeout(() => {
-        inicializarEstablecimientos();
-    }, 100);
+    // Usar Promise.resolve() para permitir que el DOM se renderice antes
+    Promise.resolve().then(() => {
+        setTimeout(() => {
+            console.log('🔄 Iniciando carga de establecimientos tras renderizado...');
+            inicializarEstablecimientos();
+        }, 200);
+    });
 }
 
 // ===========================
@@ -1586,11 +1771,25 @@ function verEnMapa(latitud, longitud) {
 async function inicializarEstablecimientos() {
     console.log('🚀 Inicializando gestión de establecimientos...');
     
-    const containerFincas = document.getElementById('empty-fincas');
+    // Verificar que el dashboard esté completamente renderizado
+    let containerFincas = document.getElementById('empty-fincas');
+    let intentos = 0;
+    const maxIntentos = 10;
+    
+    // Esperar hasta que el elemento esté disponible
+    while (!containerFincas && intentos < maxIntentos) {
+        console.log(`⏳ Esperando renderizado del DOM... Intento ${intentos + 1}/${maxIntentos}`);
+        await new Promise(resolve => setTimeout(resolve, 100));
+        containerFincas = document.getElementById('empty-fincas');
+        intentos++;
+    }
+    
     if (!containerFincas) {
-        console.warn('⚠️ Contenedor de fincas no encontrado');
+        console.warn('⚠️ Contenedor de fincas no encontrado después de 10 intentos');
         return;
     }
+    
+    console.log('✅ Contenedor de fincas encontrado, procediendo con inicialización...');
 
     // Mostrar estado de carga
     mostrarEstadoCargando(containerFincas);
@@ -4436,10 +4635,21 @@ function actualizarInterfazLogin(autenticado) {
 				</li>
 			`;
 			
-			// Agregar event listener para continuar registro
+			// Agregar event listener para abrir dashboard (Mi perfil)
 			document.getElementById('btn-continuar-registro').addEventListener('click', function(e) {
 				e.preventDefault();
-				abrirWizardRegistro();
+				
+				// Verificar autenticación antes de abrir dashboard
+				const isAuthenticated = validateCurrentToken();
+				if (!isAuthenticated) {
+					console.warn('Usuario no autenticado para acceder al dashboard');
+					mostrarErrorLogin('Su sesión ha expirado. Por favor, inicie sesión nuevamente.');
+					cerrarSesion();
+					return;
+				}
+				
+				// Abrir dashboard del usuario
+				abrirDashboardUsuario();
 			});
 			
 			// Agregar event listener para logout
