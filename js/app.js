@@ -1773,9 +1773,14 @@ function generarHtmlEstablecimientos(establecimientos) {
                         <span class="badge bg-success">
                             <i class="fas fa-check-circle me-1"></i>Activo
                         </span>
-                        <button class="btn btn-sm btn-outline-primary" onclick="verEnMapa(${est.latitud}, ${est.longitud})">
-                            <i class="fas fa-map-marked-alt me-1"></i>Ver en Mapa
-                        </button>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary" onclick="verEnMapa(${est.latitud}, ${est.longitud})">
+                                <i class="fas fa-map-marked-alt me-1"></i>Ver en Mapa
+                            </button>
+                            <button class="btn btn-sm btn-success" onclick="crearOfertaLaboral(${est.idEstablecimiento}, '${est.nombreEstablecimiento}')">
+                                <i class="fas fa-briefcase me-1"></i>Crear Oferta Laboral
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1857,6 +1862,223 @@ function verEnMapa(latitud, longitud) {
     console.log(`🗺️ Ver en mapa: ${latitud}, ${longitud}`);
     // TODO: Implementar vista de mapa
     window.open(`https://www.google.com/maps?q=${latitud},${longitud}`, '_blank');
+}
+
+/**
+ * Crear oferta laboral para un establecimiento
+ * @param {number} idEstablecimiento - ID del establecimiento
+ * @param {string} nombreEstablecimiento - Nombre del establecimiento
+ */
+function crearOfertaLaboral(idEstablecimiento, nombreEstablecimiento) {
+    console.log(`💼 Crear oferta laboral para establecimiento: ${idEstablecimiento} - ${nombreEstablecimiento}`);
+    
+    // Mostrar modal o formulario para crear oferta laboral
+    const modalHtml = `
+        <div class="modal fade" id="modalCrearOferta" tabindex="-1">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content bg-dark border-primary">
+                    <div class="modal-header border-secondary bg-gradient" style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);">
+                        <h4 class="modal-title text-white fw-bold">
+                            <i class="fas fa-briefcase me-3 text-success fs-4"></i>
+                            Crear Nueva Oferta Laboral
+                        </h4>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4" style="background: #1e1e1e;">
+                        <div class="mb-4 p-4 bg-gradient rounded-3 border border-primary" style="background: linear-gradient(135deg, #0d4377 0%, #14547a 100%);">
+                            <h5 class="text-white mb-2">
+                                <i class="fas fa-building me-3 text-info fs-5"></i>
+                                Establecimiento: <span class="text-warning">${nombreEstablecimiento}</span>
+                            </h5>
+                            <p class="text-light mb-0"><small><i class="fas fa-id-card me-2"></i>ID: ${idEstablecimiento}</small></p>
+                        </div>
+                        
+                        <form id="formCrearOferta">
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <label class="form-label text-light fw-semibold fs-6">
+                                        <i class="fas fa-tag me-2 text-primary"></i>Título del Puesto
+                                    </label>
+                                    <input type="text" class="form-control form-control-lg bg-dark text-light border-secondary" 
+                                           id="tituloPuesto" placeholder="Ej: Trabajador Rural" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-light fw-semibold fs-6">
+                                        <i class="fas fa-clock me-2 text-info"></i>Tipo de Empleo
+                                    </label>
+                                    <select class="form-select form-select-lg bg-dark text-light border-secondary" id="tipoEmpleo" required>
+                                        <option value="">Seleccionar tipo...</option>
+                                        <option value="temporal">🔄 Temporal</option>
+                                        <option value="permanente">📋 Permanente</option>
+                                        <option value="estacional">🌾 Estacional</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="row g-4 mt-2">
+                                <div class="col-md-6">
+                                    <label class="form-label text-light fw-semibold fs-6">
+                                        <i class="fas fa-dollar-sign me-2 text-success"></i>Salario Ofrecido (ARS)
+                                    </label>
+                                    <input type="number" class="form-control form-control-lg bg-dark text-light border-secondary" 
+                                           id="salario" placeholder="Monto en pesos argentinos" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-light fw-semibold fs-6">
+                                        <i class="fas fa-users me-2 text-warning"></i>Vacantes Disponibles
+                                    </label>
+                                    <input type="number" class="form-control form-control-lg bg-dark text-light border-secondary" 
+                                           id="vacantes" min="1" value="1" required>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <label class="form-label text-light fw-semibold fs-6">
+                                    <i class="fas fa-file-alt me-2 text-primary"></i>Descripción del Trabajo
+                                </label>
+                                <textarea class="form-control bg-dark text-light border-secondary" 
+                                          id="descripcion" rows="5" 
+                                          placeholder="Describe las tareas, responsabilidades y condiciones del puesto de trabajo..." required></textarea>
+                            </div>
+                            
+                            <div class="row g-4 mt-2">
+                                <div class="col-md-6">
+                                    <label class="form-label text-light fw-semibold fs-6">
+                                        <i class="fas fa-calendar-alt me-2 text-info"></i>Fecha de Inicio
+                                    </label>
+                                    <input type="date" class="form-control form-control-lg bg-dark text-light border-secondary" 
+                                           id="fechaInicio" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-light fw-semibold fs-6">
+                                        <i class="fas fa-calendar-check me-2 text-secondary"></i>Fecha de Fin (Opcional)
+                                    </label>
+                                    <input type="date" class="form-control form-control-lg bg-dark text-light border-secondary" 
+                                           id="fechaFin">
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <label class="form-label text-light fw-semibold fs-6">
+                                    <i class="fas fa-list-check me-2 text-warning"></i>Requisitos y Habilidades
+                                </label>
+                                <textarea class="form-control bg-dark text-light border-secondary" 
+                                          id="requisitos" rows="4" 
+                                          placeholder="Experiencia previa, habilidades específicas, certificaciones requeridas, condiciones físicas, etc..."></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer border-secondary p-4" style="background: #1a1a1a;">
+                        <button type="button" class="btn btn-secondary btn-lg px-4" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </button>
+                        <button type="button" class="btn btn-success btn-lg px-4 ms-3" onclick="guardarOfertaLaboral(${idEstablecimiento})">
+                            <i class="fas fa-save me-2"></i>Crear Oferta Laboral
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Eliminar modal existente si existe
+    const existingModal = document.getElementById('modalCrearOferta');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Agregar modal al DOM
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Mostrar modal
+    const modal = new bootstrap.Modal(document.getElementById('modalCrearOferta'));
+    modal.show();
+    
+    // Establecer fecha mínima como hoy
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('fechaInicio').min = today;
+    document.getElementById('fechaFin').min = today;
+}
+
+/**
+ * Guardar oferta laboral
+ * @param {number} idEstablecimiento - ID del establecimiento
+ */
+async function guardarOfertaLaboral(idEstablecimiento) {
+    console.log('💾 Guardando oferta laboral...');
+    
+    try {
+        // Recopilar datos del formulario
+        const formData = {
+            idEstablecimiento: idEstablecimiento,
+            titulo: document.getElementById('tituloPuesto').value.trim(),
+            tipoEmpleo: document.getElementById('tipoEmpleo').value,
+            salario: parseFloat(document.getElementById('salario').value),
+            vacantes: parseInt(document.getElementById('vacantes').value),
+            descripcion: document.getElementById('descripcion').value.trim(),
+            fechaInicio: document.getElementById('fechaInicio').value,
+            fechaFin: document.getElementById('fechaFin').value || null,
+            requisitos: document.getElementById('requisitos').value.trim()
+        };
+        
+        // Validar datos
+        if (!formData.titulo || !formData.tipoEmpleo || !formData.salario || 
+            !formData.vacantes || !formData.descripcion || !formData.fechaInicio) {
+            throw new Error('Por favor complete todos los campos obligatorios');
+        }
+        
+        if (formData.salario <= 0) {
+            throw new Error('El salario debe ser mayor a cero');
+        }
+        
+        if (formData.vacantes <= 0) {
+            throw new Error('El número de vacantes debe ser mayor a cero');
+        }
+        
+        // Validar fechas
+        const fechaInicio = new Date(formData.fechaInicio);
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        
+        if (fechaInicio < hoy) {
+            throw new Error('La fecha de inicio no puede ser anterior a hoy');
+        }
+        
+        if (formData.fechaFin) {
+            const fechaFin = new Date(formData.fechaFin);
+            if (fechaFin <= fechaInicio) {
+                throw new Error('La fecha de fin debe ser posterior a la fecha de inicio');
+            }
+        }
+        
+        console.log('📋 Datos de la oferta laboral:', formData);
+        
+        // TODO: Enviar datos al backend
+        // const response = await fetchWithAuth('/privado/ofertas-laborales', {
+        //     method: 'POST',
+        //     headers: { 'Content-Type': 'application/json' },
+        //     body: JSON.stringify(formData)
+        // });
+        
+        // Simular guardado exitoso por ahora
+        showMessage('Oferta laboral creada exitosamente', 'success');
+        
+        // Cerrar modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalCrearOferta'));
+        modal.hide();
+        
+        // Limpiar modal del DOM después de un breve delay
+        setTimeout(() => {
+            const modalElement = document.getElementById('modalCrearOferta');
+            if (modalElement) {
+                modalElement.remove();
+            }
+        }, 500);
+        
+    } catch (error) {
+        console.error('❌ Error guardando oferta laboral:', error);
+        showMessage(error.message, 'error');
+    }
 }
 
 // ===========================
@@ -5970,18 +6192,33 @@ async function detectarServidorProxy() {
     const PROXY_PORT = 3000;
     
     try {
-        const response = await fetch(`http://localhost:${PROXY_PORT}/api/geocoding?q=test`, {
-            method: 'GET',
-            timeout: 2000,
+        // Primero verificar que el servidor responda
+        const testResponse = await fetch(`http://localhost:${PROXY_PORT}/`, {
+            method: 'HEAD',
             signal: AbortSignal.timeout(2000)
         });
         
-        if (response.ok || response.status === 400) { // 400 es OK, significa que el endpoint existe
-            console.log(`✅ Servidor proxy encontrado en puerto ${PROXY_PORT}`);
-            return `http://localhost:${PROXY_PORT}`;
+        if (testResponse.ok) {
+            console.log(`✅ Servidor encontrado en puerto ${PROXY_PORT}`);
+            // Ahora verificar que el endpoint de API existe
+            try {
+                const apiResponse = await fetch(`http://localhost:${PROXY_PORT}/api/geocoding?q=test`, {
+                    method: 'GET',
+                    signal: AbortSignal.timeout(5000)
+                });
+                
+                if (apiResponse.ok || apiResponse.status === 400) {
+                    console.log(`✅ API de geocodificación disponible en puerto ${PROXY_PORT}`);
+                    return `http://localhost:${PROXY_PORT}`;
+                }
+            } catch (apiError) {
+                console.log(`⚠️ Servidor encontrado pero API no disponible:`, apiError.message);
+                // Aún así devolvemos la URL del servidor
+                return `http://localhost:${PROXY_PORT}`;
+            }
         }
     } catch (error) {
-        console.log(`❌ Servidor proxy no disponible:`, error.message);
+        console.log(`❌ Servidor no disponible en puerto ${PROXY_PORT}:`, error.message);
     }
     
     // Si no encuentra servidor proxy, mostrar instrucciones

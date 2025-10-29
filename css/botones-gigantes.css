@@ -1,0 +1,100 @@
+/* BOTONES GIGANTES - CSS ESPECÍFICO PARA BOTONES GRANDES */
+
+/* TODOS LOS BOTONES PEQUEÑOS AHORA SON GIGANTES */
+.btn-sm {
+    font-size: 1.8rem !important;
+    padding: 1.5rem 3rem !important;
+    min-width: 280px !important;
+    min-height: 70px !important;
+    font-weight: 900 !important;
+    border-radius: 12px !important;
+    line-height: 1.1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.5) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* BOTONES EN FOOTER DE ESTABLECIMIENTO - SUPER GIGANTES */
+.establecimiento-card .card-footer .btn-sm {
+    font-size: 2rem !important;
+    padding: 2rem 3.5rem !important;
+    min-width: 320px !important;
+    min-height: 80px !important;
+    font-weight: 900 !important;
+    margin: 0.5rem 0 !important;
+}
+
+/* HOVER EFFECT PARA BOTONES GIGANTES */
+.btn-sm:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 12px 24px rgba(0,0,0,0.7) !important;
+}
+
+/* FOOTER MÁS GRANDE PARA ACOMODAR BOTONES GIGANTES */
+.establecimiento-card .card-footer {
+    padding: 2.5rem !important;
+    min-height: 180px !important;
+    background: #1a1a1a !important;
+}
+
+/* BOTONES EN COLUMNA (UNO ARRIBA DEL OTRO) */
+.establecimiento-card .card-footer .d-flex {
+    flex-direction: column !important;
+    gap: 2rem !important;
+    align-items: center !important;
+}
+
+/* HACER LAS CARDS MÁS ALTAS */
+.establecimiento-card {
+    min-height: 550px !important;
+}
+
+/* BOTÓN VER EN MAPA - AZUL BRILLANTE */
+.btn-outline-primary {
+    background: #007bff !important;
+    border: 3px solid #0056b3 !important;
+    color: white !important;
+}
+
+/* BOTÓN CREAR OFERTA - VERDE BRILLANTE */
+.btn-success {
+    background: #28a745 !important;
+    border: 3px solid #1e7e34 !important;
+    color: white !important;
+}
+
+/* RESPONSIVE - EN MÓVILES TAMBIÉN GIGANTES */
+@media (max-width: 768px) {
+    .btn-sm {
+        font-size: 1.6rem !important;
+        padding: 1.2rem 2rem !important;
+        min-width: 250px !important;
+        min-height: 60px !important;
+        width: 100% !important;
+    }
+    
+    .establecimiento-card .card-footer {
+        padding: 2rem 1rem !important;
+    }
+}
+
+/* FORZAR ESTILOS SOBRE CUALQUIER OTRO CSS */
+.establecimiento-card .card-footer .btn-sm.btn-outline-primary,
+.establecimiento-card .card-footer .btn-sm.btn-success {
+    font-size: 2rem !important;
+    padding: 2rem 3.5rem !important;
+    min-width: 320px !important;
+    min-height: 80px !important;
+    font-weight: 900 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    border-width: 3px !important;
+    border-radius: 12px !important;
+}
