@@ -166,6 +166,93 @@ function showMessage(message, type = 'info') {
 }
 
 // ===========================
+// FUNCIONES PARA OFERTAS LABORALES
+// ===========================
+
+/**
+ * Cargar puestos de trabajo desde la API
+ * @returns {Promise<Array>} Lista de puestos de trabajo
+ */
+async function cargarPuestosTrabajo() {
+    try {
+        console.log('🔄 Cargando puestos de trabajo...');
+        const response = await fetchWithAuth('http://localhost:8080/privado/puestos-trabajo');
+        
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error('Token expirado. Por favor, inicie sesión nuevamente.');
+            }
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const puestos = await response.json();
+        console.log('✅ Puestos de trabajo cargados:', puestos);
+        return puestos || [];
+    } catch (error) {
+        console.error('❌ Error al cargar puestos de trabajo:', error);
+        showMessage('Error al cargar puestos de trabajo: ' + error.message, 'error');
+        return [];
+    }
+}
+
+/**
+ * Cargar especies desde la API para ofertas laborales
+ * @returns {Promise<Array>} Lista de especies
+ */
+async function cargarEspeciesParaOfertas() {
+    try {
+        console.log('🔄 Cargando especies para ofertas...');
+        const response = await fetchWithAuth('http://localhost:8080/privado/especies');
+        
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error('Token expirado. Por favor, inicie sesión nuevamente.');
+            }
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const especies = await response.json();
+        console.log('✅ Especies cargadas para ofertas:', especies);
+        return especies || [];
+    } catch (error) {
+        console.error('❌ Error al cargar especies para ofertas:', error);
+        showMessage('Error al cargar especies: ' + error.message, 'error');
+        return [];
+    }
+}
+
+/**
+ * Enviar nueva oferta laboral a la API
+ * @param {Object} ofertaData - Datos de la oferta laboral
+ * @returns {Promise<Object>} Respuesta del servidor
+ */
+async function enviarOfertaLaboral(ofertaData) {
+    try {
+        console.log('🚀 Enviando oferta laboral:', ofertaData);
+        
+        const response = await fetchWithAuth('http://localhost:8080/privado/ofertas-empleo/registro', {
+            method: 'POST',
+            body: JSON.stringify(ofertaData)
+        });
+        
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error('Token expirado. Por favor, inicie sesión nuevamente.');
+            }
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || `Error HTTP: ${response.status}`);
+        }
+        
+        const resultado = await response.json();
+        console.log('✅ Oferta laboral creada exitosamente:', resultado);
+        return resultado;
+    } catch (error) {
+        console.error('❌ Error al enviar oferta laboral:', error);
+        throw error;
+    }
+}
+
+// ===========================
 // NAVEGACIÓN AL DASHBOARD
 // ===========================
 
@@ -1869,10 +1956,10 @@ function verEnMapa(latitud, longitud) {
  * @param {number} idEstablecimiento - ID del establecimiento
  * @param {string} nombreEstablecimiento - Nombre del establecimiento
  */
-function crearOfertaLaboral(idEstablecimiento, nombreEstablecimiento) {
+async function crearOfertaLaboral(idEstablecimiento, nombreEstablecimiento) {
     console.log(`💼 Crear oferta laboral para establecimiento: ${idEstablecimiento} - ${nombreEstablecimiento}`);
     
-    // Mostrar modal o formulario para crear oferta laboral
+    // Mostrar modal con loading inicial
     const modalHtml = `
         <div class="modal fade" id="modalCrearOferta" tabindex="-1">
             <div class="modal-dialog modal-xl">
@@ -1893,24 +1980,31 @@ function crearOfertaLaboral(idEstablecimiento, nombreEstablecimiento) {
                             <p class="text-light mb-0"><small><i class="fas fa-id-card me-2"></i>ID: ${idEstablecimiento}</small></p>
                         </div>
                         
-                        <form id="formCrearOferta">
+                        <div id="loadingContent" class="text-center py-5">
+                            <div class="spinner-border text-primary mb-3" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            <p class="text-light">Cargando datos para el formulario...</p>
+                        </div>
+                        
+                        <form id="formCrearOferta" style="display: none;">
                             <div class="row g-4">
                                 <div class="col-md-6">
                                     <label class="form-label text-light fw-semibold fs-6">
-                                        <i class="fas fa-tag me-2 text-primary"></i>Título del Puesto
+                                        <i class="fas fa-briefcase me-2 text-primary"></i>Puesto de Trabajo
                                     </label>
-                                    <input type="text" class="form-control form-control-lg bg-dark text-light border-secondary" 
-                                           id="tituloPuesto" placeholder="Ej: Trabajador Rural" required>
+                                    <select class="form-select form-select-lg bg-dark text-light border-secondary" 
+                                            id="idPuestoTrabajo" required>
+                                        <option value="">Seleccionar puesto...</option>
+                                    </select>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label text-light fw-semibold fs-6">
-                                        <i class="fas fa-clock me-2 text-info"></i>Tipo de Empleo
+                                        <i class="fas fa-leaf me-2 text-success"></i>Especie (Opcional)
                                     </label>
-                                    <select class="form-select form-select-lg bg-dark text-light border-secondary" id="tipoEmpleo" required>
-                                        <option value="">Seleccionar tipo...</option>
-                                        <option value="temporal">🔄 Temporal</option>
-                                        <option value="permanente">📋 Permanente</option>
-                                        <option value="estacional">🌾 Estacional</option>
+                                    <select class="form-select form-select-lg bg-dark text-light border-secondary" 
+                                            id="idEspecie">
+                                        <option value="">Sin especie específica</option>
                                     </select>
                                 </div>
                             </div>
@@ -1918,53 +2012,18 @@ function crearOfertaLaboral(idEstablecimiento, nombreEstablecimiento) {
                             <div class="row g-4 mt-2">
                                 <div class="col-md-6">
                                     <label class="form-label text-light fw-semibold fs-6">
-                                        <i class="fas fa-dollar-sign me-2 text-success"></i>Salario Ofrecido (ARS)
-                                    </label>
-                                    <input type="number" class="form-control form-control-lg bg-dark text-light border-secondary" 
-                                           id="salario" placeholder="Monto en pesos argentinos" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label text-light fw-semibold fs-6">
                                         <i class="fas fa-users me-2 text-warning"></i>Vacantes Disponibles
                                     </label>
                                     <input type="number" class="form-control form-control-lg bg-dark text-light border-secondary" 
                                            id="vacantes" min="1" value="1" required>
                                 </div>
-                            </div>
-                            
-                            <div class="mt-4">
-                                <label class="form-label text-light fw-semibold fs-6">
-                                    <i class="fas fa-file-alt me-2 text-primary"></i>Descripción del Trabajo
-                                </label>
-                                <textarea class="form-control bg-dark text-light border-secondary" 
-                                          id="descripcion" rows="5" 
-                                          placeholder="Describe las tareas, responsabilidades y condiciones del puesto de trabajo..." required></textarea>
-                            </div>
-                            
-                            <div class="row g-4 mt-2">
                                 <div class="col-md-6">
                                     <label class="form-label text-light fw-semibold fs-6">
-                                        <i class="fas fa-calendar-alt me-2 text-info"></i>Fecha de Inicio
+                                        <i class="fas fa-calendar-times me-2 text-danger"></i>Fecha de Cierre
                                     </label>
                                     <input type="date" class="form-control form-control-lg bg-dark text-light border-secondary" 
-                                           id="fechaInicio" required>
+                                           id="fechaCierre" required>
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label text-light fw-semibold fs-6">
-                                        <i class="fas fa-calendar-check me-2 text-secondary"></i>Fecha de Fin (Opcional)
-                                    </label>
-                                    <input type="date" class="form-control form-control-lg bg-dark text-light border-secondary" 
-                                           id="fechaFin">
-                                </div>
-                            </div>
-                            
-                            <div class="mt-4">
-                                <label class="form-label text-light fw-semibold fs-6">
-                                    <i class="fas fa-list-check me-2 text-warning"></i>Requisitos y Habilidades
-                                </label>
-                                <textarea class="form-control bg-dark text-light border-secondary" 
-                                          id="requisitos" rows="4" 
-                                          placeholder="Experiencia previa, habilidades específicas, certificaciones requeridas, condiciones físicas, etc..."></textarea>
                             </div>
                         </form>
                     </div>
@@ -1972,7 +2031,9 @@ function crearOfertaLaboral(idEstablecimiento, nombreEstablecimiento) {
                         <button type="button" class="btn btn-secondary btn-lg px-4" data-bs-dismiss="modal">
                             <i class="fas fa-times me-2"></i>Cancelar
                         </button>
-                        <button type="button" class="btn btn-success btn-lg px-4 ms-3" onclick="guardarOfertaLaboral(${idEstablecimiento})">
+                        <button type="button" class="btn btn-success btn-lg px-4 ms-3" 
+                                onclick="guardarOfertaLaboral(${idEstablecimiento})" 
+                                id="btnGuardarOferta" disabled>
                             <i class="fas fa-save me-2"></i>Crear Oferta Laboral
                         </button>
                     </div>
@@ -1994,74 +2055,334 @@ function crearOfertaLaboral(idEstablecimiento, nombreEstablecimiento) {
     const modal = new bootstrap.Modal(document.getElementById('modalCrearOferta'));
     modal.show();
     
-    // Establecer fecha mínima como hoy
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('fechaInicio').min = today;
-    document.getElementById('fechaFin').min = today;
+    // Cargar datos de forma asíncrona
+    try {
+        console.log('🔄 Cargando datos para el formulario...');
+        
+        // Cargar puestos de trabajo y especies en paralelo
+        const [puestos, especies] = await Promise.all([
+            cargarPuestosTrabajo(),
+            cargarEspeciesParaOfertas()
+        ]);
+        
+        // Llenar dropdown de puestos de trabajo
+        const selectPuestos = document.getElementById('idPuestoTrabajo');
+        if (selectPuestos) {
+            puestos.forEach(puesto => {
+                const option = document.createElement('option');
+                option.value = puesto.id || puesto.idPuestoTrabajo;
+                option.textContent = puesto.nombre || puesto.descripcion;
+                selectPuestos.appendChild(option);
+            });
+        }
+        
+        // Llenar dropdown de especies
+        const selectEspecies = document.getElementById('idEspecie');
+        if (selectEspecies && especies.length > 0) {
+            especies.forEach(especie => {
+                const option = document.createElement('option');
+                option.value = especie.id || especie.idEspecie;
+                option.textContent = especie.nombre;
+                selectEspecies.appendChild(option);
+            });
+        }
+        
+        // Establecer fecha mínima (mañana)
+        const fechaCierre = document.getElementById('fechaCierre');
+        if (fechaCierre) {
+            const mañana = new Date();
+            mañana.setDate(mañana.getDate() + 1);
+            fechaCierre.min = mañana.toISOString().split('T')[0];
+        }
+        
+        // Ocultar loading y mostrar formulario
+        document.getElementById('loadingContent').style.display = 'none';
+        document.getElementById('formCrearOferta').style.display = 'block';
+        document.getElementById('btnGuardarOferta').disabled = false;
+        
+        console.log('✅ Formulario de oferta laboral listo');
+        
+    } catch (error) {
+        console.error('❌ Error al cargar datos del formulario:', error);
+        
+        // Mostrar error en el modal
+        document.getElementById('loadingContent').innerHTML = `
+            <div class="text-center py-5">
+                <i class="fas fa-exclamation-triangle text-warning fs-1 mb-3"></i>
+                <h5 class="text-warning">Error al cargar datos</h5>
+                <p class="text-light">${error.message}</p>
+                <button class="btn btn-primary" onclick="location.reload()">
+                    <i class="fas fa-refresh me-2"></i>Recargar página
+                </button>
+            </div>
+        `;
+        
+        showMessage('Error al cargar datos del formulario: ' + error.message, 'error');
+    }
 }
 
 /**
- * Guardar oferta laboral
+ * Crear oferta laboral con API integrada
+ * @param {number} idEstablecimiento - ID del establecimiento
+ */
+async function crearOfertaLaboral(idEstablecimiento) {
+    console.log('🏢 Creando oferta laboral para establecimiento:', idEstablecimiento);
+    
+    try {
+        showMessage('Cargando datos del formulario...', 'info');
+        
+        // Cargar datos necesarios
+        await Promise.all([
+            cargarPuestosTrabajo(),
+            cargarEspeciesParaOfertas()
+        ]);
+        
+        // Crear HTML del modal con dropdowns dinámicos
+        const modalHtml = `
+        <div class="modal fade" id="modalCrearOferta" tabindex="-1" aria-labelledby="modalCrearOfertaLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content bg-dark border-secondary">
+                    <div class="modal-header border-secondary" style="background: #2c2c2c;">
+                        <h5 class="modal-title text-light fw-bold" id="modalCrearOfertaLabel">
+                            <i class="fas fa-briefcase me-2 text-warning"></i>
+                            Nueva Oferta Laboral
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4" style="background: #1e1e1e;">
+                        <form id="formOfertaLaboral">
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <label class="form-label text-light fw-semibold fs-6">
+                                        <i class="fas fa-hammer me-2 text-primary"></i>Puesto de Trabajo *
+                                    </label>
+                                    <select class="form-select form-select-lg bg-dark text-light border-secondary" 
+                                            id="idPuestoTrabajo" required>
+                                        <option value="">Seleccionar puesto...</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-light fw-semibold fs-6">
+                                        <i class="fas fa-seedling me-2 text-success"></i>Especie (Opcional)
+                                    </label>
+                                    <select class="form-select form-select-lg bg-dark text-light border-secondary" 
+                                            id="idEspecie">
+                                        <option value="">No especifica especie</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="row g-4 mt-2">
+                                <div class="col-md-6">
+                                    <label class="form-label text-light fw-semibold fs-6">
+                                        <i class="fas fa-calendar-times me-2 text-danger"></i>Fecha de Cierre *
+                                    </label>
+                                    <input type="date" class="form-control form-control-lg bg-dark text-light border-secondary" 
+                                           id="fechaCierre" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-light fw-semibold fs-6">
+                                        <i class="fas fa-users me-2 text-warning"></i>Vacantes Disponibles *
+                                    </label>
+                                    <input type="number" class="form-control form-control-lg bg-dark text-light border-secondary" 
+                                           id="vacantes" min="1" value="1" required>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer border-secondary p-4" style="background: #1a1a1a;">
+                        <button type="button" class="btn btn-secondary btn-lg px-4" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </button>
+                        <button type="button" class="btn btn-success btn-lg px-4 ms-3" id="btnGuardarOferta" onclick="guardarOfertaLaboral(${idEstablecimiento})">
+                            <i class="fas fa-save me-2"></i>Crear Oferta Laboral
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+        
+        // Eliminar modal existente si existe
+        const existingModal = document.getElementById('modalCrearOferta');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        // Agregar modal al DOM
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        // Mostrar modal
+        const modal = new bootstrap.Modal(document.getElementById('modalCrearOferta'));
+        modal.show();
+        
+        // Establecer fecha mínima como mañana
+        const mañana = new Date();
+        mañana.setDate(mañana.getDate() + 1);
+        document.getElementById('fechaCierre').min = mañana.toISOString().split('T')[0];
+        
+        // Cargar y poblar dropdowns después de mostrar el modal
+        await poblarDropdowns();
+        
+        showMessage('Formulario listo para completar', 'success');
+        
+    } catch (error) {
+        console.error('❌ Error cargando formulario:', error);
+        showMessage('Error al cargar datos del formulario: ' + error.message, 'error');
+    }
+}
+
+/**
+ * Poblar dropdowns del modal de ofertas laborales
+ */
+async function poblarDropdowns() {
+    try {
+        console.log('🔄 Poblando dropdowns del formulario...');
+        
+        // Cargar datos en paralelo
+        const [puestos, especies] = await Promise.all([
+            cargarPuestosTrabajo(),
+            cargarEspeciesParaOfertas()
+        ]);
+        
+        console.log('📋 Datos de puestos recibidos:', puestos);
+        console.log('📋 Datos de especies recibidos:', especies);
+        
+        // Mostrar estructura detallada del primer puesto para debugging
+        if (Array.isArray(puestos) && puestos.length > 0) {
+            console.log('🔍 Estructura del primer puesto:', JSON.stringify(puestos[0], null, 2));
+            console.log('🔍 Campos disponibles en puesto:', Object.keys(puestos[0]));
+        }
+        
+        // Mostrar estructura detallada de la primera especie para debugging
+        if (Array.isArray(especies) && especies.length > 0) {
+            console.log('🔍 Estructura de la primera especie:', JSON.stringify(especies[0], null, 2));
+            console.log('🔍 Campos disponibles en especie:', Object.keys(especies[0]));
+        }
+        
+        // Poblar dropdown de puestos de trabajo
+        const selectPuestos = document.getElementById('idPuestoTrabajo');
+        if (selectPuestos && Array.isArray(puestos) && puestos.length > 0) {
+            // Limpiar opciones existentes (excepto la primera)
+            while (selectPuestos.children.length > 1) {
+                selectPuestos.removeChild(selectPuestos.lastChild);
+            }
+            
+            puestos.forEach(puesto => {
+                const option = document.createElement('option');
+                option.value = puesto.id || puesto.idPuestoTrabajo || puesto.codigo;
+                
+                // Usar nombrePuestoTrabajo como campo principal
+                const nombrePuesto = puesto.nombrePuestoTrabajo || 
+                                   puesto.nombrePuesto || 
+                                   puesto.nombre || 
+                                   puesto.descripcion || 
+                                   puesto.title || 
+                                   puesto.label || 
+                                   `Puesto ${option.value}`;
+                
+                option.textContent = nombrePuesto;
+                selectPuestos.appendChild(option);
+                console.log(`✅ Agregado puesto: ID=${option.value}, Nombre="${nombrePuesto}"`);
+            });
+            console.log(`✅ ${puestos.length} puestos de trabajo agregados al dropdown`);
+        } else {
+            console.warn('⚠️ No se encontraron puestos de trabajo válidos:', puestos);
+        }
+        
+        // Poblar dropdown de especies
+        const selectEspecies = document.getElementById('idEspecie');
+        if (selectEspecies && Array.isArray(especies) && especies.length > 0) {
+            // Limpiar opciones existentes (excepto la primera)
+            while (selectEspecies.children.length > 1) {
+                selectEspecies.removeChild(selectEspecies.lastChild);
+            }
+            
+            especies.forEach(especie => {
+                const option = document.createElement('option');
+                option.value = especie.id || especie.idEspecie || especie.codigo;
+                
+                // Intentar diferentes campos para el nombre
+                const nombreEspecie = especie.nombre || 
+                                     especie.descripcion || 
+                                     especie.nombreEspecie || 
+                                     especie.nombreComun || 
+                                     especie.nombreCientifico || 
+                                     especie.title || 
+                                     especie.label || 
+                                     `Especie ${option.value}`;
+                
+                option.textContent = nombreEspecie;
+                selectEspecies.appendChild(option);
+                console.log(`✅ Agregada especie: ID=${option.value}, Nombre="${nombreEspecie}"`);
+            });
+            console.log(`✅ ${especies.length} especies agregadas al dropdown`);
+        } else {
+            console.warn('⚠️ No se encontraron especies válidas o el endpoint devolvió vacío:', especies);
+        }
+        
+    } catch (error) {
+        console.error('❌ Error poblando dropdowns:', error);
+        showMessage('Error al cargar opciones del formulario: ' + error.message, 'error');
+    }
+}
+
+/**
+ * Guardar oferta laboral para el API
  * @param {number} idEstablecimiento - ID del establecimiento
  */
 async function guardarOfertaLaboral(idEstablecimiento) {
-    console.log('💾 Guardando oferta laboral...');
+    console.log('💾 Guardando oferta laboral para establecimiento:', idEstablecimiento);
     
     try {
-        // Recopilar datos del formulario
+        // Mostrar loading en el botón
+        const btnGuardar = document.getElementById('btnGuardarOferta');
+        const originalText = btnGuardar.innerHTML;
+        btnGuardar.disabled = true;
+        btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Guardando...';
+        
+        // Recopilar datos del formulario según el formato de la API
         const formData = {
-            idEstablecimiento: idEstablecimiento,
-            titulo: document.getElementById('tituloPuesto').value.trim(),
-            tipoEmpleo: document.getElementById('tipoEmpleo').value,
-            salario: parseFloat(document.getElementById('salario').value),
+            fechaCierre: document.getElementById('fechaCierre').value,
             vacantes: parseInt(document.getElementById('vacantes').value),
-            descripcion: document.getElementById('descripcion').value.trim(),
-            fechaInicio: document.getElementById('fechaInicio').value,
-            fechaFin: document.getElementById('fechaFin').value || null,
-            requisitos: document.getElementById('requisitos').value.trim()
+            idPuestoTrabajo: parseInt(document.getElementById('idPuestoTrabajo').value),
+            idEspecie: document.getElementById('idEspecie').value ? parseInt(document.getElementById('idEspecie').value) : null,
+            idEstablecimiento: parseInt(idEstablecimiento)
         };
         
-        // Validar datos
-        if (!formData.titulo || !formData.tipoEmpleo || !formData.salario || 
-            !formData.vacantes || !formData.descripcion || !formData.fechaInicio) {
-            throw new Error('Por favor complete todos los campos obligatorios');
+        console.log('📋 Datos a enviar:', formData);
+        
+        // Validar datos requeridos
+        if (!formData.fechaCierre) {
+            throw new Error('La fecha de cierre es obligatoria');
         }
         
-        if (formData.salario <= 0) {
-            throw new Error('El salario debe ser mayor a cero');
-        }
-        
-        if (formData.vacantes <= 0) {
+        if (!formData.vacantes || formData.vacantes <= 0) {
             throw new Error('El número de vacantes debe ser mayor a cero');
         }
         
-        // Validar fechas
-        const fechaInicio = new Date(formData.fechaInicio);
+        if (!formData.idPuestoTrabajo) {
+            throw new Error('Debe seleccionar un puesto de trabajo');
+        }
+        
+        if (!formData.idEstablecimiento) {
+            throw new Error('ID del establecimiento requerido');
+        }
+        
+        // Validar que la fecha de cierre sea futura
+        const fechaCierre = new Date(formData.fechaCierre);
         const hoy = new Date();
         hoy.setHours(0, 0, 0, 0);
         
-        if (fechaInicio < hoy) {
-            throw new Error('La fecha de inicio no puede ser anterior a hoy');
+        if (fechaCierre <= hoy) {
+            throw new Error('La fecha de cierre debe ser posterior a hoy');
         }
         
-        if (formData.fechaFin) {
-            const fechaFin = new Date(formData.fechaFin);
-            if (fechaFin <= fechaInicio) {
-                throw new Error('La fecha de fin debe ser posterior a la fecha de inicio');
-            }
-        }
+        // Enviar datos al backend
+        const resultado = await enviarOfertaLaboral(formData);
         
-        console.log('📋 Datos de la oferta laboral:', formData);
-        
-        // TODO: Enviar datos al backend
-        // const response = await fetchWithAuth('/privado/ofertas-laborales', {
-        //     method: 'POST',
-        //     headers: { 'Content-Type': 'application/json' },
-        //     body: JSON.stringify(formData)
-        // });
-        
-        // Simular guardado exitoso por ahora
-        showMessage('Oferta laboral creada exitosamente', 'success');
+        console.log('✅ Oferta laboral creada exitosamente:', resultado);
+        showMessage('¡Oferta laboral creada exitosamente!', 'success');
         
         // Cerrar modal
         const modal = bootstrap.Modal.getInstance(document.getElementById('modalCrearOferta'));
@@ -2077,7 +2398,14 @@ async function guardarOfertaLaboral(idEstablecimiento) {
         
     } catch (error) {
         console.error('❌ Error guardando oferta laboral:', error);
-        showMessage(error.message, 'error');
+        showMessage('Error al crear oferta laboral: ' + error.message, 'error');
+        
+        // Restaurar botón
+        const btnGuardar = document.getElementById('btnGuardarOferta');
+        if (btnGuardar) {
+            btnGuardar.disabled = false;
+            btnGuardar.innerHTML = '<i class="fas fa-save me-2"></i>Crear Oferta Laboral';
+        }
     }
 }
 
