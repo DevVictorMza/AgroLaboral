@@ -286,6 +286,7 @@
             </div>
         </div>
     </main>
+
     <!-- Servicios -->
     <section id="servicios" class="container py-5">
         <div class="row justify-content-center mb-4">
@@ -533,5 +534,206 @@
     <script src="js/especies-modal.js"></script>
     <!-- App JS -->
     <script src="js/app.js?v=ofertas-api-completa"></script>
+
+    <!-- Modal para Crear/Editar Oferta de Trabajo -->
+    <div class="modal fade" id="modalOfertaTrabajo" tabindex="-1" aria-labelledby="modalOfertaTrabajoLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content bg-dark border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title text-white" id="modalOfertaTrabajoLabel">
+                        <i class="fas fa-briefcase me-2 text-info"></i>
+                        <span id="modalOfertaTitulo">Nueva Oferta de Trabajo</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formOfertaTrabajo" novalidate>
+                        <!-- Información básica -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-info mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>Información Básica
+                                </h6>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="ofertaTitulo" class="form-label text-white">
+                                    <i class="fas fa-heading me-1"></i>Título de la Oferta *
+                                </label>
+                                <input type="text" class="form-control" id="ofertaTitulo" name="titulo" required
+                                       placeholder="Ej: Operario Agrícola - Cosecha de Uva" maxlength="100">
+                                <div class="invalid-feedback"></div>
+                                <small class="text-muted">Título claro y descriptivo (10-100 caracteres)</small>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="ofertaEstado" class="form-label text-white">
+                                    <i class="fas fa-flag me-1"></i>Estado
+                                </label>
+                                <select class="form-select" id="ofertaEstado" name="estado">
+                                    <option value="BORRADOR">📝 Borrador</option>
+                                    <option value="ACTIVA" selected>✅ Activa</option>
+                                    <option value="PAUSADA">⏸️ Pausada</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="ofertaDescripcion" class="form-label text-white">
+                                <i class="fas fa-align-left me-1"></i>Descripción del Trabajo *
+                            </label>
+                            <textarea class="form-control" id="ofertaDescripcion" name="descripcion" rows="4" required
+                                      placeholder="Describe las tareas, responsabilidades y lo que se busca en el candidato..." maxlength="2000"></textarea>
+                            <div class="invalid-feedback"></div>
+                            <small class="text-muted">Descripción detallada (50-2000 caracteres)</small>
+                        </div>
+
+                        <!-- Detalles laborales -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-info mb-3">
+                                    <i class="fas fa-briefcase me-2"></i>Detalles Laborales
+                                </h6>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="ofertaModalidad" class="form-label text-white">
+                                    <i class="fas fa-clock me-1"></i>Modalidad de Trabajo *
+                                </label>
+                                <select class="form-select" id="ofertaModalidad" name="modalidadTrabajo" required>
+                                    <option value="">Seleccionar modalidad</option>
+                                    <option value="TIEMPO_COMPLETO">🕐 Tiempo Completo</option>
+                                    <option value="MEDIO_TIEMPO">🕒 Medio Tiempo</option>
+                                    <option value="TEMPORAL">📅 Temporal/Estacional</option>
+                                    <option value="POR_HORAS">⏰ Por Horas</option>
+                                    <option value="COSECHA">🍇 Solo Cosecha</option>
+                                </select>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="ofertaSalario" class="form-label text-white">
+                                    <i class="fas fa-dollar-sign me-1"></i>Salario (ARS)
+                                </label>
+                                <input type="number" class="form-control" id="ofertaSalario" name="salario" 
+                                       placeholder="Ej: 150000" min="0" max="10000000" step="1000">
+                                <div class="invalid-feedback"></div>
+                                <small class="text-muted">Salario mensual aproximado (opcional)</small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="ofertaUbicacion" class="form-label text-white">
+                                    <i class="fas fa-map-marker-alt me-1"></i>Ubicación *
+                                </label>
+                                <input type="text" class="form-control" id="ofertaUbicacion" name="ubicacion" required
+                                       placeholder="Ej: Mendoza, Maipú - Finca Los Álamos" maxlength="100">
+                                <div class="invalid-feedback"></div>
+                                <small class="text-muted">Ciudad, departamento o zona específica</small>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="ofertaFechaLimite" class="form-label text-white">
+                                    <i class="fas fa-calendar-alt me-1"></i>Fecha Límite
+                                </label>
+                                <input type="date" class="form-control" id="ofertaFechaLimite" name="fechaLimite">
+                                <div class="invalid-feedback"></div>
+                                <small class="text-muted">Hasta cuándo postular</small>
+                            </div>
+                        </div>
+
+                        <!-- Requisitos y contacto -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-info mb-3">
+                                    <i class="fas fa-check-circle me-2"></i>Requisitos y Contacto
+                                </h6>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="ofertaRequisitos" class="form-label text-white">
+                                <i class="fas fa-list-check me-1"></i>Requisitos del Candidato
+                            </label>
+                            <textarea class="form-control" id="ofertaRequisitos" name="requisitos" rows="3"
+                                      placeholder="Ej: Experiencia previa en agricultura, disponibilidad de horarios, vehículo propio..." maxlength="1000"></textarea>
+                            <div class="invalid-feedback"></div>
+                            <small class="text-muted">Lista los requisitos más importantes (opcional)</small>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="ofertaContactoNombre" class="form-label text-white">
+                                    <i class="fas fa-user me-1"></i>Nombre de Contacto
+                                </label>
+                                <input type="text" class="form-control" id="ofertaContactoNombre" name="contactoNombre"
+                                       placeholder="Ej: Juan Pérez" maxlength="100">
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="ofertaContactoTelefono" class="form-label text-white">
+                                    <i class="fas fa-phone me-1"></i>Teléfono de Contacto
+                                </label>
+                                <input type="tel" class="form-control" id="ofertaContactoTelefono" name="contactoTelefono"
+                                       placeholder="Ej: 261-123-4567" maxlength="20">
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+
+                        <!-- Campo oculto para ID (en caso de edición) -->
+                        <input type="hidden" id="ofertaId" name="id">
+                    </form>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" onclick="guardarBorradorOferta()">
+                        <i class="fas fa-save me-2"></i>Guardar Borrador
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="publicarOferta()">
+                        <i class="fas fa-check me-2"></i>Publicar Oferta
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Ver Detalles de Oferta -->
+    <div class="modal fade" id="modalVerOferta" tabindex="-1" aria-labelledby="modalVerOfertaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content bg-dark border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title text-white" id="modalVerOfertaLabel">
+                        <i class="fas fa-eye me-2 text-info"></i>Detalles de la Oferta
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body" id="contenidoVerOferta">
+                    <!-- Contenido dinámico -->
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-info" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                        <p class="text-white mt-3">Cargando detalles de la oferta...</p>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cerrar
+                    </button>
+                    <button type="button" class="btn btn-warning" onclick="editarOfertaDesdeModal()">
+                        <i class="fas fa-edit me-2"></i>Editar
+                    </button>
+                    <button type="button" class="btn btn-info" onclick="verPostulacionesOferta()">
+                        <i class="fas fa-users me-2"></i>Ver Postulaciones
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>

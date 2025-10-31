@@ -1,5 +1,118 @@
 /* Estilos adicionales para el dashboard - Paleta Agrícola */
 
+/* Estilos específicos para la sección de ofertas de empleo */
+.servicio-card-ofertas {
+    background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%) !important;
+    color: white !important;
+}
+
+.servicio-icon-ofertas {
+    color: #ffffff !important;
+    font-size: 3rem !important;
+}
+
+/* Estados visuales de ofertas */
+.ofertas-loading,
+.ofertas-error {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ofertas-loading .spinner-border {
+    width: 3rem !important;
+    height: 3rem !important;
+}
+
+.ofertas-loading h5,
+.ofertas-error h5 {
+    color: #ffffff !important;
+}
+
+.ofertas-loading p,
+.ofertas-error p {
+    color: #cccccc !important;
+}
+
+/* Iconos grandes para estados */
+.ofertas-content .fas,
+.ofertas-error .fas {
+    font-size: 3rem !important;
+}
+
+/* Container principal de ofertas */
+.ofertas-content {
+    min-height: 300px;
+    position: relative;
+}
+
+/* Cards de ofertas */
+.oferta-card {
+    background: #2A2A2A !important;
+    border: 1px solid #444444 !important;
+    transition: all 0.3s ease;
+    color: #ffffff !important;
+}
+
+.oferta-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    border-color: #4A90E2 !important;
+}
+
+.oferta-card .card-title {
+    color: #ffffff !important;
+}
+
+.oferta-card .card-text {
+    color: #cccccc !important;
+}
+
+.oferta-card .badge {
+    font-size: 0.75rem;
+}
+
+/* Botones de acción en cards */
+.oferta-card .btn-group .btn {
+    flex: 1;
+    border-radius: 0;
+}
+
+.oferta-card .btn-group .btn:first-child {
+    border-radius: 0.375rem 0 0 0.375rem;
+}
+
+.oferta-card .btn-group .btn:last-child {
+    border-radius: 0 0.375rem 0.375rem 0;
+}
+
+/* Animaciones suaves */
+.oferta-card,
+.dashboard-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Responsive para ofertas */
+@media (max-width: 768px) {
+    .ofertas-content .col-md-6 {
+        margin-bottom: 1rem;
+    }
+    
+    .oferta-card .btn-group {
+        flex-direction: column;
+    }
+    
+    .oferta-card .btn-group .btn {
+        border-radius: 0.375rem !important;
+        margin-bottom: 0.25rem;
+    }
+    
+    .oferta-card .btn-group .btn:last-child {
+        margin-bottom: 0;
+    }
+}
+
 /* Cards con gradientes específicos inspirados en la agricultura */
 .stat-card-earth {
     background: linear-gradient(135deg, #5D4037, #8D6E63) !important;
@@ -58,5 +171,294 @@
 
     .brand h4 {
         font-size: 1.1rem;
+    }
+}
+
+/* Estilos para la sección de ofertas de empleo */
+.ofertas-container {
+    min-height: 300px;
+    position: relative;
+}
+
+.ofertas-loading,
+.ofertas-error {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    z-index: 10;
+}
+
+.ofertas-loading {
+    display: none;
+}
+
+.ofertas-error {
+    display: none;
+}
+
+.text-muted-custom {
+    color: #CCCCCC !important;
+}
+
+/* Estilos para las cards de ofertas */
+.ofertas-container .card {
+    transition: all 0.3s ease;
+    border: 1px solid #444444 !important;
+    background: #2A2A2A !important;
+}
+
+.ofertas-container .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+    border-color: #007bff !important;
+}
+
+.ofertas-container .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.ofertas-container .badge {
+    font-size: 0.75rem;
+    padding: 0.4em 0.8em;
+}
+
+/* Estilos para botones en las cards de ofertas */
+.ofertas-container .btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8rem;
+}
+
+.ofertas-container .btn-outline-primary {
+    border-color: #007bff;
+    color: #007bff;
+}
+
+.ofertas-container .btn-outline-primary:hover {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+
+.ofertas-container .btn-outline-warning {
+    border-color: #ffc107;
+    color: #ffc107;
+}
+
+.ofertas-container .btn-outline-warning:hover {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #000;
+}
+
+.ofertas-container .btn-outline-danger {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.ofertas-container .btn-outline-danger:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+/* Responsive para ofertas */
+@media (max-width: 768px) {
+    .ofertas-container .col-md-6 {
+        margin-bottom: 1rem;
+    }
+    
+    .ofertas-container .btn-sm {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+    }
+}
+
+/* Animación para el loading de ofertas */
+.ofertas-loading .spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Estilos para el estado vacío */
+.ofertas-container .fa-3x {
+    font-size: 3rem !important;
+}
+
+/* Estilos para el modal de nueva oferta */
+.modal-content.bg-dark {
+    background-color: #1a1a1a !important;
+    border: 1px solid #444444 !important;
+}
+
+.modal-header.border-secondary {
+    border-bottom: 1px solid #444444 !important;
+}
+
+.modal-footer.border-secondary {
+    border-top: 1px solid #444444 !important;
+}
+
+/* Estilos para form controls en tema oscuro */
+.form-control.bg-dark {
+    background-color: #2A2A2A !important;
+    border: 1px solid #444444 !important;
+    color: #FFFFFF !important;
+}
+
+.form-control.bg-dark:focus {
+    background-color: #2A2A2A !important;
+    border-color: #007bff !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+    color: #FFFFFF !important;
+}
+
+.form-control.bg-dark::placeholder {
+    color: #CCCCCC !important;
+    opacity: 0.7;
+}
+
+.form-select.bg-dark {
+    background-color: #2A2A2A !important;
+    border: 1px solid #444444 !important;
+    color: #FFFFFF !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e") !important;
+}
+
+.form-select.bg-dark:focus {
+    background-color: #2A2A2A !important;
+    border-color: #007bff !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+}
+
+.form-select.bg-dark option {
+    background-color: #2A2A2A !important;
+    color: #FFFFFF !important;
+}
+
+/* Estilos para input group */
+.input-group-text.bg-secondary {
+    background-color: #444444 !important;
+    border: 1px solid #444444 !important;
+}
+
+/* Estilos para campos inválidos */
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+.invalid-feedback {
+    display: block !important;
+    color: #dc3545 !important;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Estilos para labels en el modal */
+.modal .form-label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.modal .form-label i {
+    color: #007bff;
+}
+
+/* Estilos para botones en el modal */
+.modal-footer .btn {
+    min-width: 130px;
+}
+
+/* Responsive para el modal */
+@media (max-width: 768px) {
+    .modal-dialog.modal-lg {
+        margin: 0.5rem;
+        max-width: calc(100% - 1rem);
+    }
+    
+    .modal-footer .btn {
+        min-width: 100px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+/* Estilos para toasts */
+.toast-container {
+    z-index: 9999 !important;
+}
+
+.toast {
+    border: none !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+}
+
+.toast.bg-success {
+    background-color: #198754 !important;
+}
+
+.toast.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+/* Estilos para el modal de ver oferta */
+.modal-xl .modal-dialog {
+    max-width: 1200px;
+}
+
+.modal .info-item label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.modal .stat-item {
+    padding: 1rem 0;
+}
+
+.modal .stat-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    display: block;
+    line-height: 1.2;
+}
+
+.modal .bg-secondary.bg-opacity-25 {
+    background-color: rgba(108, 117, 125, 0.25) !important;
+    border-left: 3px solid #007bff;
+}
+
+/* Responsive para modal extra large */
+@media (max-width: 1200px) {
+    .modal-xl .modal-dialog {
+        max-width: 95%;
+        margin: 1rem auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-xl .modal-dialog {
+        margin: 0.5rem;
+        max-width: calc(100% - 1rem);
+    }
+    
+    .modal .stat-item {
+        padding: 0.5rem 0;
+    }
+    
+    .modal .stat-number {
+        font-size: 1.25rem;
     }
 }

@@ -480,7 +480,9 @@ function mostrarErrorPerfil(mensaje) {
 
 // Función para generar el contenido completo del dashboard
 function generarDashboard(perfil) {
+    console.log('🔄 Iniciando generación del dashboard...', perfil);
     const dashboardContent = document.getElementById('dashboard-content');
+    console.log('📍 Dashboard content element:', dashboardContent);
     
     dashboardContent.innerHTML = `
         <style>
@@ -738,6 +740,54 @@ function generarDashboard(perfil) {
                     </div>
                 </div>
             </div>
+
+            <!-- Ofertas de Trabajo Disponibles -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="dashboard-card p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="mb-0">
+                                <i class="fas fa-briefcase me-2 text-info"></i>
+                                Ofertas de Trabajo Disponibles
+                            </h5>
+                            <button class="btn btn-success" onclick="crearNuevaOferta()" id="btnCrearOferta">
+                                <i class="fas fa-plus me-2"></i>Nueva Oferta
+                            </button>
+                        </div>
+                        
+                        <!-- Estados visuales de la sección -->
+                        <div id="ofertas-loading" class="ofertas-loading d-none">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-info mb-3" role="status">
+                                    <span class="visually-hidden">Cargando...</span>
+                                </div>
+                                <h6 class="text-white">Cargando ofertas de trabajo...</h6>
+                                <p class="text-muted-custom">Obteniendo ofertas disponibles</p>
+                            </div>
+                        </div>
+                        
+                        <div id="ofertas-content" class="ofertas-content">
+                            <!-- Contenido dinámico se cargará aquí -->
+                            <div class="text-center py-4">
+                                <i class="fas fa-briefcase text-muted mb-3"></i>
+                                <h6 class="text-white mb-3">Cargando ofertas...</h6>
+                                <p class="text-muted-custom">Iniciando sistema de gestión de ofertas</p>
+                            </div>
+                        </div>
+                        
+                        <div id="ofertas-error" class="ofertas-error d-none">
+                            <div class="text-center py-4">
+                                <i class="fas fa-exclamation-triangle text-warning mb-3"></i>
+                                <h6 class="text-white mb-3">Error cargando ofertas</h6>
+                                <p class="text-muted-custom mb-4">No se pudieron cargar las ofertas de trabajo.</p>
+                                <button class="btn btn-outline-info" onclick="cargarOfertasEmpleo()">
+                                    <i class="fas fa-redo me-2"></i>Reintentar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Modal Wizard Agregar Finca -->
@@ -771,8 +821,16 @@ function generarDashboard(perfil) {
                 console.log('🗺️ Iniciando carga del mapa de establecimientos...');
                 cargarMapaEstablecimientos();
             }, 500);
+
+            // Cargar ofertas de empleo después del mapa
+            setTimeout(() => {
+                console.log('💼 Iniciando carga de ofertas de empleo...');
+                cargarOfertasEmpleo();
+            }, 800);
         }, 200);
     });
+    
+    console.log('✅ Dashboard generado completamente');
 }
 
 // ===========================
@@ -7801,3 +7859,473 @@ window.diagnosticoCompletoMapa = async function() {
         return null;
     }
 };
+
+// ===========================
+// SISTEMA DE OFERTAS DE TRABAJO
+// ===========================
+
+// Configuración para ofertas
+const OFERTAS_CONFIG = {
+    ENDPOINT: '/privado/ofertas-empleo',
+    ESTADOS: {
+        BORRADOR: { label: 'Borrador', color: 'secondary', icon: 'fas fa-edit' },
+        ACTIVA: { label: 'Activa', color: 'success', icon: 'fas fa-check-circle' },
+        PAUSADA: { label: 'Pausada', color: 'warning', icon: 'fas fa-pause-circle' },
+        CERRADA: { label: 'Cerrada', color: 'danger', icon: 'fas fa-times-circle' }
+    },
+    MODALIDADES: {
+        TIEMPO_COMPLETO: 'Tiempo Completo',
+        MEDIO_TIEMPO: 'Medio Tiempo',
+        TEMPORAL: 'Temporal/Estacional',
+        POR_HORAS: 'Por Horas',
+        COSECHA: 'Solo Cosecha'
+    }
+};
+
+// Variable global para ofertas
+let ofertasCache = [];
+
+/**
+ * Función principal para cargar ofertas de empleo
+ */
+async function cargarOfertasEmpleo() {
+    const loadingDiv = document.getElementById('ofertas-loading');
+    const contentDiv = document.getElementById('ofertas-content');
+    const errorDiv = document.getElementById('ofertas-error');
+
+    try {
+        // Mostrar estado de carga
+        mostrarEstadoOfertas('loading');
+
+        // Verificar autenticación usando la función existente
+        const tokenValidation = validateCurrentToken();
+        if (!tokenValidation.valid) {
+            if (tokenValidation.reason === 'NO_TOKEN') {
+                throw new Error('AUTH_TOKEN_MISSING');
+            } else if (tokenValidation.reason === 'EXPIRED') {
+                throw new Error('TOKEN_EXPIRED');
+            } else {
+                throw new Error('INVALID_TOKEN');
+            }
+        }
+
+        console.log('🔄 Cargando ofertas de empleo...');
+
+        // Usar fetchWithAuth que ya maneja la autenticación
+        const response = await fetchWithAuth(buildURL(OFERTAS_CONFIG.ENDPOINT), {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        // Manejo específico de códigos de estado HTTP
+        if (!response.ok) {
+            switch (response.status) {
+                case 401:
+                    throw new Error('UNAUTHORIZED');
+                case 403:
+                    throw new Error('FORBIDDEN');
+                case 404:
+                    throw new Error('ENDPOINT_NOT_FOUND');
+                case 500:
+                    throw new Error('SERVER_ERROR');
+                case 503:
+                    throw new Error('SERVICE_UNAVAILABLE');
+                default:
+                    throw new Error(`HTTP_ERROR_${response.status}`);
+            }
+        }
+
+        const responseText = await response.text();
+
+        // Verificar si la respuesta está vacía
+        if (!responseText || responseText.trim() === '') {
+            throw new Error('EMPTY_RESPONSE');
+        }
+
+        let ofertas;
+        try {
+            ofertas = JSON.parse(responseText);
+        } catch (parseError) {
+            console.error('❌ Error parseando JSON:', parseError);
+            throw new Error('INVALID_JSON');
+        }
+
+        // Verificar que las ofertas sean un array
+        if (!Array.isArray(ofertas)) {
+            console.error('❌ Formato de datos inválido:', ofertas);
+            throw new Error('INVALID_DATA_FORMAT');
+        }
+
+        // Guardar en cache
+        ofertasCache = ofertas;
+
+        console.log(`✅ ${ofertas.length} ofertas cargadas exitosamente`);
+
+        // Mostrar contenido y renderizar ofertas
+        mostrarEstadoOfertas('content');
+        renderizarOfertas(ofertas);
+
+    } catch (error) {
+        console.error('❌ Error cargando ofertas:', error);
+        mostrarEstadoOfertas('error');
+        mostrarErrorEspecificoOfertas(error.message);
+    }
+}
+
+/**
+ * Función para mostrar diferentes estados de la sección ofertas
+ */
+function mostrarEstadoOfertas(estado) {
+    const loadingDiv = document.getElementById('ofertas-loading');
+    const contentDiv = document.getElementById('ofertas-content');
+    const errorDiv = document.getElementById('ofertas-error');
+
+    // Ocultar todos los estados
+    loadingDiv.classList.add('d-none');
+    contentDiv.classList.add('d-none');
+    errorDiv.classList.add('d-none');
+
+    // Mostrar el estado solicitado
+    switch (estado) {
+        case 'loading':
+            loadingDiv.classList.remove('d-none');
+            break;
+        case 'content':
+            contentDiv.classList.remove('d-none');
+            break;
+        case 'error':
+            errorDiv.classList.remove('d-none');
+            break;
+    }
+}
+
+/**
+ * Función para renderizar ofertas en cards
+ */
+function renderizarOfertas(ofertas) {
+    const contentDiv = document.getElementById('ofertas-content');
+    
+    if (!ofertas || ofertas.length === 0) {
+        contentDiv.innerHTML = `
+            <div class="text-center py-5">
+                <i class="fas fa-briefcase text-muted mb-3"></i>
+                <h5 class="text-white mb-3">No hay ofertas disponibles</h5>
+                <p class="text-muted mb-4">Aún no has creado ninguna oferta de trabajo.</p>
+                <button class="btn btn-success" onclick="crearNuevaOferta()">
+                    <i class="fas fa-plus me-2"></i>Crear Primera Oferta
+                </button>
+            </div>
+        `;
+        return;
+    }
+
+    // Encabezado con estadísticas
+    const estadisticas = calcularEstadisticasOfertasReales(ofertas);
+    let html = `
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h6 class="text-white mb-0">
+                    <i class="fas fa-chart-bar me-2 text-info"></i>
+                    ${ofertas.length} Oferta${ofertas.length !== 1 ? 's' : ''} Total${ofertas.length !== 1 ? 'es' : ''}
+                </h6>
+                <small class="text-muted">
+                    ${estadisticas.vigentes} vigente${estadisticas.vigentes !== 1 ? 's' : ''} • 
+                    ${estadisticas.noVigentes} cerrada${estadisticas.noVigentes !== 1 ? 's' : ''}
+                </small>
+            </div>
+            <div class="btn-group" role="group">
+                <button class="btn btn-outline-info btn-sm" onclick="filtrarOfertas('TODAS')" title="Ver todas">
+                    <i class="fas fa-list"></i>
+                </button>
+                <button class="btn btn-outline-success btn-sm" onclick="filtrarOfertas('VIGENTES')" title="Solo vigentes">
+                    <i class="fas fa-check-circle"></i>
+                </button>
+                <button class="btn btn-outline-secondary btn-sm" onclick="filtrarOfertas('CERRADAS')" title="Solo cerradas">
+                    <i class="fas fa-times-circle"></i>
+                </button>
+            </div>
+        </div>
+        <div class="row" id="ofertas-grid">
+    `;
+
+    // Generar cards de ofertas adaptadas a la estructura real del backend
+    ofertas.forEach(oferta => {
+        // Determinar estado basado en vigente y fecha de cierre
+        const esVigente = oferta.vigente && new Date(oferta.fechaCierre) > new Date();
+        const estadoBadge = esVigente ? 
+            { color: 'success', icon: 'fas fa-check-circle', label: 'Vigente' } :
+            { color: 'secondary', icon: 'fas fa-times-circle', label: 'Cerrada' };
+        
+        // Formatear fechas
+        const fechaAlta = new Date(oferta.fechaAlta).toLocaleDateString('es-AR');
+        const fechaCierre = new Date(oferta.fechaCierre).toLocaleDateString('es-AR');
+        
+        html += `
+            <div class="col-md-6 col-lg-4 mb-4" data-vigente="${oferta.vigente}">
+                <div class="card bg-dark border-secondary h-100 oferta-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5 class="card-title text-white mb-0" title="${escapeHtml(oferta.nombrePuesto)}">
+                                ${truncarTexto(escapeHtml(oferta.nombrePuesto), 40)}
+                            </h5>
+                            <span class="badge bg-${estadoBadge.color} ms-2">
+                                <i class="${estadoBadge.icon} me-1"></i>${estadoBadge.label}
+                            </span>
+                        </div>
+                        
+                        <h6 class="text-info mb-2">
+                            <i class="fas fa-building me-1"></i>
+                            ${escapeHtml(oferta.nombreEstablecimiento)}
+                        </h6>
+                        
+                        <div class="mb-3">
+                            ${oferta.nombreEspecie ? `
+                                <span class="badge bg-info text-dark">
+                                    <i class="fas fa-seedling me-1"></i>${escapeHtml(oferta.nombreEspecie)}
+                                </span>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="row text-center mb-3">
+                            <div class="col-6">
+                                <small class="text-muted">� Vacantes</small>
+                                <div class="text-white fw-bold">
+                                    ${oferta.vacantes} puesto${oferta.vacantes !== 1 ? 's' : ''}
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">� Cierre</small>
+                                <div class="text-white" title="Fecha límite de aplicación">
+                                    ${fechaCierre}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row text-center mb-3">
+                            <div class="col-12">
+                                <small class="text-muted">📅 Publicada</small>
+                                <div class="text-white-50 small">
+                                    ${fechaAlta}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-transparent border-secondary">
+                        <div class="btn-group w-100" role="group">
+                            <button class="btn btn-outline-info btn-sm" onclick="verDetallesOferta(${oferta.idOfertaEmpleo})" title="Ver detalles">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-outline-warning btn-sm" onclick="editarOferta(${oferta.idOfertaEmpleo})" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="eliminarOferta(${oferta.idOfertaEmpleo})" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    html += '</div>';
+    contentDiv.innerHTML = html;
+}
+
+/**
+ * Función para calcular estadísticas de ofertas basada en la estructura real del backend
+ */
+function calcularEstadisticasOfertasReales(ofertas) {
+    const ahora = new Date();
+    const vigentes = ofertas.filter(o => o.vigente && new Date(o.fechaCierre) > ahora).length;
+    const noVigentes = ofertas.length - vigentes;
+    
+    return {
+        vigentes,
+        noVigentes,
+        total: ofertas.length
+    };
+}
+function calcularEstadisticasOfertas(ofertas) {
+    return ofertas.reduce((stats, oferta) => {
+        switch (oferta.estado) {
+            case 'ACTIVA':
+                stats.activas++;
+                break;
+            case 'BORRADOR':
+                stats.borradores++;
+                break;
+            case 'PAUSADA':
+                stats.pausadas++;
+                break;
+            case 'CERRADA':
+                stats.cerradas++;
+                break;
+        }
+        return stats;
+    }, { activas: 0, borradores: 0, pausadas: 0, cerradas: 0 });
+}
+
+/**
+ * Función para mostrar errores específicos de ofertas
+ */
+function mostrarErrorEspecificoOfertas(errorType) {
+    const errorDiv = document.getElementById('ofertas-error');
+    let iconClass = 'fas fa-exclamation-triangle';
+    let title = 'Error cargando ofertas';
+    let message = 'No se pudieron cargar las ofertas de trabajo.';
+    let buttonText = 'Reintentar';
+    let buttonAction = 'cargarOfertasEmpleo()';
+
+    switch (errorType) {
+        case 'AUTH_TOKEN_MISSING':
+            iconClass = 'fas fa-lock';
+            title = 'Sesión no válida';
+            message = 'No se encontró el token de autenticación. Por favor, inicia sesión nuevamente.';
+            buttonText = 'Ir al Login';
+            buttonAction = 'window.location.href = "index.html"';
+            break;
+
+        case 'TOKEN_EXPIRED':
+            iconClass = 'fas fa-clock';
+            title = 'Sesión expirada';
+            message = 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.';
+            buttonText = 'Renovar Sesión';
+            buttonAction = 'renovarSesion()';
+            break;
+
+        case 'UNAUTHORIZED':
+            iconClass = 'fas fa-user-slash';
+            title = 'Acceso no autorizado';
+            message = 'No tienes permisos para acceder a esta información.';
+            buttonText = 'Verificar Sesión';
+            buttonAction = 'verificarSesionOfertas()';
+            break;
+
+        case 'FORBIDDEN':
+            iconClass = 'fas fa-ban';
+            title = 'Acceso prohibido';
+            message = 'Tu cuenta no tiene permisos para gestionar ofertas de empleo.';
+            buttonText = 'Contactar Soporte';
+            buttonAction = 'contactarSoporte()';
+            break;
+
+        case 'ENDPOINT_NOT_FOUND':
+            iconClass = 'fas fa-search';
+            title = 'Servicio no disponible';
+            message = 'El servicio de ofertas no está disponible en este momento.';
+            buttonText = 'Reportar Problema';
+            buttonAction = 'reportarProblema("ofertas")';
+            break;
+
+        case 'SERVER_ERROR':
+            iconClass = 'fas fa-server';
+            title = 'Error del servidor';
+            message = 'Hay un problema en el servidor. Por favor, intenta nuevamente.';
+            buttonText = 'Reintentar';
+            buttonAction = 'setTimeout(cargarOfertasEmpleo, 3000)';
+            break;
+
+        case 'EMPTY_RESPONSE':
+            iconClass = 'fas fa-inbox';
+            title = 'Respuesta vacía';
+            message = 'El servidor devolvió una respuesta vacía.';
+            break;
+
+        case 'INVALID_JSON':
+            iconClass = 'fas fa-code';
+            title = 'Error de formato';
+            message = 'Los datos recibidos tienen un formato incorrecto.';
+            break;
+
+        default:
+            if (errorType.includes('Network')) {
+                iconClass = 'fas fa-wifi';
+                title = 'Sin conexión';
+                message = 'No se pudo conectar con el servidor. Verifica tu conexión a internet.';
+                buttonText = 'Verificar Conexión';
+                buttonAction = 'verificarConexion()';
+            }
+            break;
+    }
+
+    errorDiv.innerHTML = `
+        <div class="text-center py-5">
+            <i class="${iconClass} text-warning mb-3"></i>
+            <h5 class="text-white mb-3">${title}</h5>
+            <p class="text-muted mb-4">${message}</p>
+            <button class="btn btn-outline-info" onclick="${buttonAction}">
+                <i class="fas fa-redo me-2"></i>${buttonText}
+            </button>
+        </div>
+    `;
+}
+
+/**
+ * Función para crear nueva oferta (abrir modal)
+ */
+function crearNuevaOferta() {
+    // Limpiar formulario
+    const form = document.getElementById('formOfertaTrabajo');
+    if (form) {
+        form.reset();
+        form.classList.remove('was-validated');
+        
+        // Limpiar validaciones
+        form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        form.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+    }
+
+    // Configurar modal para nueva oferta
+    document.getElementById('modalOfertaTitulo').textContent = 'Nueva Oferta de Trabajo';
+    document.getElementById('ofertaId').value = '';
+
+    // Configurar fecha mínima
+    const fechaLimiteInput = document.getElementById('ofertaFechaLimite');
+    if (fechaLimiteInput) {
+        const mañana = new Date();
+        mañana.setDate(mañana.getDate() + 1);
+        fechaLimiteInput.min = mañana.toISOString().split('T')[0];
+    }
+
+    // Mostrar modal
+    const modal = new bootstrap.Modal(document.getElementById('modalOfertaTrabajo'));
+    modal.show();
+}
+
+// Funciones auxiliares
+function truncarTexto(texto, maxLength) {
+    if (!texto) return '';
+    return texto.length > maxLength ? texto.substring(0, maxLength) + '...' : texto;
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function formatearSalario(salario) {
+    if (!salario || salario === 0) return 'A convenir';
+    return new Intl.NumberFormat('es-AR', {
+        style: 'currency',
+        currency: 'ARS',
+        minimumFractionDigits: 0
+    }).format(salario);
+}
+
+function formatearFecha(fecha) {
+    if (!fecha) return 'No disponible';
+    const date = new Date(fecha);
+    return date.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+}
+
+// Las ofertas se inicializan desde el dashboard cuando se abre
