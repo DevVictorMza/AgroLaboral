@@ -15,6 +15,8 @@ const BACKEND_CONFIG = {
         DEPARTAMENTOS: '/publico/departamentos',
         DISTRITOS: '/publico/distritos',
         ESPECIES: '/privado/especies',
+        // Endpoints públicos para ofertas de empleo
+        OFERTAS_PUBLICAS: '/publico/ofertas-empleo/vigentes',
         // Endpoints para manejo de tokens JWT
         REFRESH_TOKEN: '/publico/refresh',
         VALIDATE_TOKEN: '/privado/auth/validate',
@@ -106,6 +108,50 @@ async function fetchWithAuth(url, options = {}) {
     
     // Usar directamente la URL que se pasa, no construirla de nuevo
     return fetchWithConfig(url, mergedOptions);
+}
+
+// ===========================
+// UTILIDADES DE FECHA
+// ===========================
+
+/**
+ * Parsea una fecha de forma segura evitando problemas de zona horaria
+ * @param {string|Date} fechaInput - Fecha en formato string "YYYY-MM-DD" o objeto Date
+ * @returns {Date|null} Objeto Date parseado o null si es inválido
+ */
+function parsearFechaSegura(fechaInput) {
+    if (!fechaInput) return null;
+    
+    // Si ya es un objeto Date válido, devolverlo
+    if (fechaInput instanceof Date && !isNaN(fechaInput.getTime())) {
+        return fechaInput;
+    }
+    
+    // Si es string en formato ISO "YYYY-MM-DD", parsear manualmente
+    if (typeof fechaInput === 'string' && fechaInput.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const [year, month, day] = fechaInput.split('-');
+        return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    }
+    
+    // Para otros formatos, usar el constructor Date normal
+    const fecha = new Date(fechaInput);
+    return isNaN(fecha.getTime()) ? null : fecha;
+}
+
+/**
+ * Formatea una fecha en formato argentino DD/MM/YYYY
+ * @param {string|Date} fechaInput - Fecha a formatear
+ * @returns {string} Fecha formateada o 'No especificada'
+ */
+function formatearFechaArgentina(fechaInput) {
+    const fecha = parsearFechaSegura(fechaInput);
+    if (!fecha) return 'No especificada';
+    
+    return fecha.toLocaleDateString('es-AR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    });
 }
 
 // ===========================
@@ -8130,9 +8176,10 @@ function renderizarOfertas(ofertas) {
                 <h5 class="text-white mb-3">No hay ofertas disponibles</h5>
                 <p class="text-muted mb-4">No se encontraron ofertas para el filtro "${tipoFiltro}".</p>
                 ${estadoFiltroOfertas.actual === null ? `
-                    <button class="btn btn-success" onclick="crearNuevaOferta()">
-                        <i class="fas fa-plus me-2"></i>Crear Primera Oferta
-                    </button>
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle me-2"></i>
+                        No hay ofertas de empleo creadas aún.
+                    </div>
                 ` : `
                     <button class="btn btn-outline-info" onclick="aplicarFiltroOfertas(null)">
                         <i class="fas fa-list me-2"></i>Ver Todas las Ofertas
@@ -8167,14 +8214,15 @@ function renderizarOfertas(ofertas) {
     // Generar cards de ofertas adaptadas a la estructura real del backend
     ofertas.forEach(oferta => {
         // Determinar estado basado en vigente y fecha de cierre
-        const esVigente = oferta.vigente && new Date(oferta.fechaCierre) > new Date();
+        const fechaCierreDate = parsearFechaSegura(oferta.fechaCierre);
+        const esVigente = oferta.vigente && fechaCierreDate && fechaCierreDate > new Date();
         const estadoBadge = esVigente ? 
             { color: 'success', icon: 'fas fa-check-circle', label: 'Vigente' } :
             { color: 'secondary', icon: 'fas fa-times-circle', label: 'Cerrada' };
         
-        // Formatear fechas
-        const fechaAlta = new Date(oferta.fechaAlta).toLocaleDateString('es-AR');
-        const fechaCierre = new Date(oferta.fechaCierre).toLocaleDateString('es-AR');
+        // Formatear fechas usando función segura
+        const fechaAlta = formatearFechaArgentina(oferta.fechaAlta);
+        const fechaCierre = formatearFechaArgentina(oferta.fechaCierre);
         
         html += `
             <div class="col-md-6 col-lg-4 mb-4" data-vigente="${oferta.vigente}">
@@ -8254,7 +8302,10 @@ function renderizarOfertas(ofertas) {
  */
 function calcularEstadisticasOfertasReales(ofertas) {
     const ahora = new Date();
-    const vigentes = ofertas.filter(o => o.vigente && new Date(o.fechaCierre) > ahora).length;
+    const vigentes = ofertas.filter(o => {
+        const fechaCierre = parsearFechaSegura(o.fechaCierre);
+        return o.vigente && fechaCierre && fechaCierre > ahora;
+    }).length;
     const noVigentes = ofertas.length - vigentes;
     
     return {
@@ -8376,38 +8427,6 @@ function mostrarErrorEspecificoOfertas(errorType) {
             </button>
         </div>
     `;
-}
-
-/**
- * Función para crear nueva oferta (abrir modal)
- */
-function crearNuevaOferta() {
-    // Limpiar formulario
-    const form = document.getElementById('formOfertaTrabajo');
-    if (form) {
-        form.reset();
-        form.classList.remove('was-validated');
-        
-        // Limpiar validaciones
-        form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-        form.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
-    }
-
-    // Configurar modal para nueva oferta
-    document.getElementById('modalOfertaTitulo').textContent = 'Nueva Oferta de Trabajo';
-    document.getElementById('ofertaId').value = '';
-
-    // Configurar fecha mínima
-    const fechaLimiteInput = document.getElementById('ofertaFechaLimite');
-    if (fechaLimiteInput) {
-        const mañana = new Date();
-        mañana.setDate(mañana.getDate() + 1);
-        fechaLimiteInput.min = mañana.toISOString().split('T')[0];
-    }
-
-    // Mostrar modal
-    const modal = new bootstrap.Modal(document.getElementById('modalOfertaTrabajo'));
-    modal.show();
 }
 
 // Funciones auxiliares
@@ -8557,3 +8576,1106 @@ function obtenerDescripcionFiltroActual() {
     if (filtro === false) return 'ofertas cerradas';
     return 'filtro desconocido';
 }
+
+// ===========================
+// SISTEMA DE OFERTAS PÚBLICAS
+// ===========================
+
+/**
+ * Estado global para ofertas públicas
+ */
+const estadoOfertasPublicas = {
+    ofertas: [],
+    filtros: {
+        puesto: '',
+        orden: 'fecha'
+    },
+    ubicacion: {
+        lat: null,
+        lon: null,
+        disponible: false
+    },
+    cargando: false,
+    puestosCargados: false
+};
+
+/**
+ * Construye parámetros de consulta para el endpoint público
+ * @param {Object} filtros - Filtros a aplicar
+ * @returns {string} Query string construido
+ */
+function buildQueryParamsPublico(filtros = {}) {
+    const params = new URLSearchParams();
+    
+    if (filtros.puesto && filtros.puesto.trim()) {
+        params.append('puesto', filtros.puesto.trim());
+    }
+    
+    if (filtros.orden) {
+        params.append('orden', filtros.orden);
+    }
+    
+    if (filtros.orden === 'distancia' && estadoOfertasPublicas.ubicacion.lat && estadoOfertasPublicas.ubicacion.lon) {
+        params.append('lat', estadoOfertasPublicas.ubicacion.lat.toString());
+        params.append('lon', estadoOfertasPublicas.ubicacion.lon.toString());
+    }
+    
+    return params.toString();
+}
+
+/**
+ * Obtiene la ubicación del usuario usando Geolocation API
+ * @returns {Promise<Object>} Coordenadas del usuario
+ */
+function getUbicacionUsuario() {
+    return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+            reject(new Error('Geolocalización no soportada por este navegador'));
+            return;
+        }
+        
+        const opciones = {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 300000 // 5 minutos
+        };
+        
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const coords = {
+                    lat: position.coords.latitude,
+                    lon: position.coords.longitude
+                };
+                estadoOfertasPublicas.ubicacion = {
+                    ...coords,
+                    disponible: true
+                };
+                resolve(coords);
+            },
+            (error) => {
+                console.error('Error obteniendo ubicación:', error);
+                estadoOfertasPublicas.ubicacion.disponible = false;
+                reject(error);
+            },
+            opciones
+        );
+    });
+}
+
+/**
+ * Carga ofertas públicas desde el endpoint sin autenticación
+ * @param {Object} filtros - Filtros a aplicar
+ * @returns {Promise<Array>} Lista de ofertas públicas
+ */
+async function cargarOfertasPublicas(filtros = {}) {
+    try {
+        estadoOfertasPublicas.cargando = true;
+        mostrarEstadoCargaPublicas(true);
+        
+        // Construir URL con parámetros
+        const queryString = buildQueryParamsPublico(filtros);
+        const url = `${BACKEND_CONFIG.BASE_URL}${BACKEND_CONFIG.ENDPOINTS.OFERTAS_PUBLICAS}${queryString ? '?' + queryString : ''}`;
+        
+        console.log('🌐 Cargando ofertas públicas desde:', url);
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
+        }
+        
+        const ofertas = await response.json();
+        console.log('✅ Ofertas públicas cargadas:', ofertas.length);
+        
+        estadoOfertasPublicas.ofertas = ofertas;
+        estadoOfertasPublicas.filtros = { ...filtros };
+        
+        renderizarOfertasPublicas(ofertas);
+        actualizarContadorOfertasPublicas(ofertas.length);
+        
+        // Actualizar mapa si está disponible
+        if (mapaOfertasPublicas.instancia) {
+            agregarOfertasAlMapa(ofertas);
+        }
+        
+        // Actualizar filtros dinámicos si es la primera carga
+        if (!estadoOfertasPublicas.puestosCargados) {
+            actualizarFiltrosPuestos(ofertas);
+            estadoOfertasPublicas.puestosCargados = true;
+        }
+        
+        return ofertas;
+        
+    } catch (error) {
+        console.error('❌ Error cargando ofertas públicas:', error);
+        mostrarErrorOfertasPublicas(error);
+        return [];
+    } finally {
+        estadoOfertasPublicas.cargando = false;
+        mostrarEstadoCargaPublicas(false);
+    }
+}
+
+/**
+ * Actualiza el selector de puestos con los datos reales del backend
+ * @param {Array} ofertas - Lista de ofertas para extraer puestos únicos
+ */
+function actualizarFiltrosPuestos(ofertas) {
+    const selector = document.getElementById('filtro-puesto-publico');
+    if (!selector) return;
+    
+    // Extraer puestos únicos
+    const puestosUnicos = [...new Set(ofertas
+        .map(oferta => oferta.nombrePuestoTrabajo)
+        .filter(puesto => puesto && puesto.trim())
+    )].sort();
+    
+    // Guardar el valor actual
+    const valorActual = selector.value;
+    
+    // Limpiar opciones existentes (excepto "Todos los puestos")
+    selector.innerHTML = '<option value="">Todos los puestos</option>';
+    
+    // Agregar opciones dinámicas
+    puestosUnicos.forEach(puesto => {
+        const option = document.createElement('option');
+        option.value = puesto;
+        option.textContent = puesto;
+        selector.appendChild(option);
+    });
+    
+    // Restaurar valor si aún existe
+    if (valorActual && puestosUnicos.includes(valorActual)) {
+        selector.value = valorActual;
+    }
+    
+    console.log('📋 Filtros de puestos actualizados:', puestosUnicos.length, 'puestos únicos');
+}
+
+// ===========================
+// SISTEMA DE MAPA OFERTAS PÚBLICAS
+// ===========================
+
+/**
+ * Estado global del mapa de ofertas públicas
+ */
+const mapaOfertasPublicas = {
+    instancia: null,
+    marcadores: [],
+    clusters: null,
+    capas: {
+        clasica: null,
+        satelital: null
+    },
+    configuracion: {
+        centro: [-32.8908, -68.8272], // Mendoza, Argentina
+        zoom: 10,
+        maxZoom: 18
+    }
+};
+
+/**
+ * Inicializa el mapa de ofertas públicas
+ */
+function inicializarMapaOfertasPublicas() {
+    const mapContainer = document.getElementById('map');
+    if (!mapContainer) {
+        console.warn('⚠️ Container del mapa no encontrado');
+        return;
+    }
+    
+    console.log('🗺️ Inicializando mapa de ofertas públicas...');
+    
+    // Crear instancia del mapa
+    mapaOfertasPublicas.instancia = L.map('map', {
+        center: mapaOfertasPublicas.configuracion.centro,
+        zoom: mapaOfertasPublicas.configuracion.zoom,
+        maxZoom: mapaOfertasPublicas.configuracion.maxZoom,
+        zoomControl: true
+    });
+    
+    // Configurar capas de mapa
+    configurarCapasMapaPublico();
+    
+    // Agregar controles personalizados
+    agregarControlesMapaPublico();
+    
+    // Configurar eventos del mapa
+    configurarEventosMapaPublico();
+    
+    console.log('✅ Mapa de ofertas públicas inicializado');
+}
+
+/**
+ * Configura las capas del mapa (clásica y satelital)
+ */
+function configurarCapasMapaPublico() {
+    // Capa clásica (OpenStreetMap)
+    mapaOfertasPublicas.capas.clasica = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 18
+    });
+    
+    // Capa satelital (Esri World Imagery)
+    mapaOfertasPublicas.capas.satelital = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: '© Esri © DigitalGlobe © GeoEye © Earthstar Geographics © CNES/Airbus DS © USDA © USGS © AeroGRID © IGN',
+        maxZoom: 18
+    });
+    
+    // Agregar capa clásica por defecto
+    mapaOfertasPublicas.capas.clasica.addTo(mapaOfertasPublicas.instancia);
+}
+
+/**
+ * Agrega controles personalizados al mapa
+ */
+function agregarControlesMapaPublico() {
+    // Control para cambiar entre capas
+    const controlCapas = L.control.layers({
+        'Vista Clásica': mapaOfertasPublicas.capas.clasica,
+        'Vista Satelital': mapaOfertasPublicas.capas.satelital
+    }, {}, {
+        position: 'topright'
+    });
+    
+    controlCapas.addTo(mapaOfertasPublicas.instancia);
+    
+    // Control de escala
+    L.control.scale({
+        position: 'bottomleft',
+        metric: true,
+        imperial: false
+    }).addTo(mapaOfertasPublicas.instancia);
+}
+
+/**
+ * Configura eventos del mapa
+ */
+function configurarEventosMapaPublico() {
+    // Evento de clic en el mapa (para futuras funcionalidades)
+    mapaOfertasPublicas.instancia.on('click', function(e) {
+        console.log('🗺️ Click en mapa:', e.latlng);
+    });
+    
+    // Evento de cambio de zoom
+    mapaOfertasPublicas.instancia.on('zoomend', function() {
+        console.log('🔍 Zoom actual:', mapaOfertasPublicas.instancia.getZoom());
+    });
+}
+
+/**
+ * Agrega ofertas al mapa como marcadores
+ * @param {Array} ofertas - Lista de ofertas a mostrar
+ */
+function agregarOfertasAlMapa(ofertas) {
+    if (!mapaOfertasPublicas.instancia) {
+        console.warn('⚠️ Mapa no inicializado');
+        return;
+    }
+    
+    // Limpiar marcadores existentes
+    limpiarMarcadoresMapaPublico();
+    
+    console.log('📍 Agregando', ofertas.length, 'ofertas al mapa...');
+    
+    ofertas.forEach(oferta => {
+        // Validar coordenadas
+        if (!oferta.latitud || !oferta.longitud) {
+            console.warn('⚠️ Oferta sin coordenadas:', oferta.idOfertaEmpleo);
+            return;
+        }
+        
+        // Crear marcador
+        const marcador = crearMarcadorOferta(oferta);
+        
+        // Agregar al mapa y al array de marcadores
+        marcador.addTo(mapaOfertasPublicas.instancia);
+        mapaOfertasPublicas.marcadores.push({
+            marcador: marcador,
+            oferta: oferta
+        });
+    });
+    
+    // Ajustar vista para mostrar todas las ofertas
+    if (mapaOfertasPublicas.marcadores.length > 0) {
+        ajustarVistaMapaOfertas();
+    }
+}
+
+/**
+ * Crea un marcador para una oferta específica
+ * @param {Object} oferta - Datos de la oferta
+ * @returns {L.Marker} Marcador de Leaflet
+ */
+function crearMarcadorOferta(oferta) {
+    // Determinar icono según el puesto de trabajo
+    const icono = obtenerIconoPorPuesto(oferta.nombrePuestoTrabajo);
+    
+    // Crear popup con información de la oferta
+    const popupContent = crearPopupOferta(oferta);
+    
+    // Crear marcador
+    const marcador = L.marker([oferta.latitud, oferta.longitud], { 
+        icon: icono,
+        title: `${oferta.nombrePuestoTrabajo} - ${oferta.nombreEstablecimiento}`
+    });
+    
+    // Configurar popup
+    marcador.bindPopup(popupContent, {
+        maxWidth: 300,
+        className: 'popup-oferta-publica'
+    });
+    
+    // Agregar evento de clic
+    marcador.on('click', function() {
+        resaltarTarjetaOferta(oferta.idOfertaEmpleo);
+    });
+    
+    // Agregar ID para referencia
+    marcador._ofertaId = oferta.idOfertaEmpleo;
+    
+    return marcador;
+}
+
+/**
+ * Limpia todos los marcadores del mapa
+ */
+function limpiarMarcadoresMapaPublico() {
+    mapaOfertasPublicas.marcadores.forEach(item => {
+        mapaOfertasPublicas.instancia.removeLayer(item.marcador);
+    });
+    mapaOfertasPublicas.marcadores = [];
+}
+
+/**
+ * Ajusta la vista del mapa para mostrar todas las ofertas
+ */
+function ajustarVistaMapaOfertas() {
+    if (mapaOfertasPublicas.marcadores.length === 0) return;
+    
+    // Crear grupo de marcadores para obtener bounds
+    const grupo = new L.featureGroup(mapaOfertasPublicas.marcadores.map(item => item.marcador));
+    
+    // Ajustar vista con padding
+    mapaOfertasPublicas.instancia.fitBounds(grupo.getBounds(), {
+        padding: [20, 20]
+    });
+}
+
+/**
+ * Obtiene el icono apropiado según el tipo de puesto
+ * @param {string} puesto - Nombre del puesto de trabajo
+ * @returns {L.Icon} Icono de Leaflet
+ */
+function obtenerIconoPorPuesto(puesto) {
+    // Definir iconos según el tipo de trabajo
+    const iconos = {
+        'operario': { icon: 'fa-wrench', color: '#2E8B57' },
+        'supervisor': { icon: 'fa-user-tie', color: '#4169E1' },
+        'tecnico': { icon: 'fa-cog', color: '#FF8C00' },
+        'administrativo': { icon: 'fa-file-alt', color: '#9932CC' },
+        'contador': { icon: 'fa-calculator', color: '#8B4513' },
+        'ventas': { icon: 'fa-handshake', color: '#DC143C' },
+        'marketing': { icon: 'fa-bullhorn', color: '#FF1493' },
+        'gerente': { icon: 'fa-crown', color: '#DAA520' },
+        'chofer': { icon: 'fa-truck', color: '#708090' },
+        'seguridad': { icon: 'fa-shield-alt', color: '#556B2F' },
+        'limpieza': { icon: 'fa-broom', color: '#20B2AA' },
+        'cocina': { icon: 'fa-utensils', color: '#FF6347' },
+        'mozo': { icon: 'fa-concierge-bell', color: '#4682B4' },
+        'default': { icon: 'fa-briefcase', color: '#696969' }
+    };
+    
+    // Buscar icono por palabra clave en el puesto
+    let iconConfig = iconos.default;
+    const puestoLower = puesto.toLowerCase();
+    
+    for (const [key, config] of Object.entries(iconos)) {
+        if (puestoLower.includes(key)) {
+            iconConfig = config;
+            break;
+        }
+    }
+    
+    // Crear HTML del icono
+    const iconHtml = `
+        <div class="marker-oferta-publica" style="background-color: ${iconConfig.color}">
+            <i class="fas ${iconConfig.icon}"></i>
+        </div>
+    `;
+    
+    return L.divIcon({
+        html: iconHtml,
+        className: 'custom-marker-oferta',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32]
+    });
+}
+
+/**
+ * Crea el contenido HTML del popup para una oferta
+ * @param {Object} oferta - Datos de la oferta
+ * @returns {string} HTML del popup
+ */
+function crearPopupOferta(oferta) {
+    // Parsear fecha de cierre de forma segura
+    const fechaCierre = parsearFechaSegura(oferta.fechaCierre);
+    const fechaCierreFormateada = formatearFechaArgentina(oferta.fechaCierre);
+    
+    // Calcular días hasta el cierre
+    const hoy = new Date();
+    const diasRestantes = fechaCierre ? Math.ceil((fechaCierre - hoy) / (1000 * 60 * 60 * 24)) : 0;
+    
+    // Determinar clase de urgencia
+    let claseUrgencia = 'text-success';
+    let textoUrgencia = 'Tiempo suficiente';
+    
+    if (diasRestantes <= 7) {
+        claseUrgencia = 'text-danger';
+        textoUrgencia = '¡Cierra pronto!';
+    } else if (diasRestantes <= 15) {
+        claseUrgencia = 'text-warning';
+        textoUrgencia = 'Cierre próximo';
+    }
+    
+    return `
+        <div class="popup-oferta-content">
+            <div class="popup-header">
+                <h6 class="mb-1 text-primary">
+                    <i class="fas fa-building me-1"></i>
+                    ${oferta.nombreEstablecimiento}
+                </h6>
+                <span class="badge bg-primary">${oferta.nombreEspecie}</span>
+            </div>
+            
+            <div class="popup-body mt-2">
+                <div class="row g-2">
+                    <div class="col-12">
+                        <strong class="text-dark">
+                            <i class="fas fa-briefcase me-1"></i>
+                            ${oferta.nombrePuestoTrabajo}
+                        </strong>
+                    </div>
+                    
+                    <div class="col-6">
+                        <small class="text-muted">
+                            <i class="fas fa-users me-1"></i>
+                            ${oferta.vacantes} vacante${oferta.vacantes !== 1 ? 's' : ''}
+                        </small>
+                    </div>
+                    
+                    <div class="col-6">
+                        <small class="${claseUrgencia}">
+                            <i class="fas fa-clock me-1"></i>
+                            ${diasRestantes} días
+                        </small>
+                    </div>
+                    
+                    <div class="col-12 mt-2">
+                        <small class="text-muted">
+                            <i class="fas fa-calendar me-1"></i>
+                            Cierra: ${fechaCierreFormateada}
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="popup-footer mt-3">
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-primary flex-fill" 
+                            onclick="scrollToOferta('${oferta.idOfertaEmpleo}')">
+                        <i class="fas fa-eye me-1"></i>
+                        Ver Detalles
+                    </button>
+                    <button class="btn btn-sm btn-success flex-fill" 
+                            onclick="contactarEmpresa('${oferta.idOfertaEmpleo}')">
+                        <i class="fas fa-envelope me-1"></i>
+                        Contactar
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Resalta la tarjeta de oferta correspondiente cuando se hace clic en un marcador
+ * @param {string} idOferta - ID de la oferta a resaltar
+ */
+function resaltarTarjetaOferta(idOferta) {
+    // Remover resaltado previo
+    document.querySelectorAll('.card-oferta-destacada').forEach(card => {
+        card.classList.remove('card-oferta-destacada');
+    });
+    
+    // Encontrar y resaltar la tarjeta
+    const tarjeta = document.querySelector(`[data-oferta-id="${idOferta}"]`);
+    if (tarjeta) {
+        tarjeta.classList.add('card-oferta-destacada');
+        tarjeta.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Remover resaltado después de 3 segundos
+        setTimeout(() => {
+            tarjeta.classList.remove('card-oferta-destacada');
+        }, 3000);
+    }
+}
+
+/**
+ * Hace scroll hasta una oferta específica desde el mapa
+ * @param {string} idOferta - ID de la oferta
+ */
+function scrollToOferta(idOferta) {
+    const tarjeta = document.querySelector(`[data-oferta-id="${idOferta}"]`);
+    if (tarjeta) {
+        tarjeta.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        resaltarTarjetaOferta(idOferta);
+    }
+}
+
+// ===========================
+// SISTEMA DE CAMBIO DE VISTA (LISTA/MAPA)
+// ===========================
+
+/**
+ * Estado actual de la vista
+ */
+let vistaActual = 'lista'; // 'lista' o 'mapa'
+
+/**
+ * Cambia entre vista de lista y mapa
+ * @param {string} vista - 'lista' o 'mapa'
+ */
+function cambiarVista(vista) {
+    vistaActual = vista;
+    
+    const btnLista = document.getElementById('btn-vista-lista');
+    const btnMapa = document.getElementById('btn-vista-mapa');
+    const containerOfertas = document.getElementById('ofertas-publicas-container');
+    const containerMapa = document.getElementById('mapa-container');
+    const tituloVista = document.getElementById('vista-actual-titulo');
+    
+    if (!btnLista || !btnMapa || !containerOfertas || !containerMapa || !tituloVista) {
+        console.warn('⚠️ Elementos de vista no encontrados');
+        return;
+    }
+    
+    console.log('🔄 Cambiando vista a:', vista);
+    
+    if (vista === 'mapa') {
+        // Activar vista mapa
+        btnMapa.classList.remove('btn-outline-primary');
+        btnMapa.classList.add('btn-primary');
+        btnLista.classList.remove('btn-primary');
+        btnLista.classList.add('btn-outline-primary');
+        
+        containerOfertas.classList.add('d-none');
+        containerMapa.classList.remove('d-none');
+        tituloVista.textContent = 'Mapa de Ofertas';
+        
+        // Inicializar mapa si no existe
+        if (!mapaOfertasPublicas.instancia) {
+            setTimeout(() => {
+                inicializarMapaOfertasPublicas();
+                if (estadoOfertasPublicas.ofertas.length > 0) {
+                    agregarOfertasAlMapa(estadoOfertasPublicas.ofertas);
+                }
+            }, 100);
+        } else {
+            // Redimensionar mapa existente
+            setTimeout(() => {
+                mapaOfertasPublicas.instancia.invalidateSize();
+                if (estadoOfertasPublicas.ofertas.length > 0) {
+                    agregarOfertasAlMapa(estadoOfertasPublicas.ofertas);
+                }
+            }, 100);
+        }
+        
+    } else {
+        // Activar vista lista
+        btnLista.classList.remove('btn-outline-primary');
+        btnLista.classList.add('btn-primary');
+        btnMapa.classList.remove('btn-primary');
+        btnMapa.classList.add('btn-outline-primary');
+        
+        containerMapa.classList.add('d-none');
+        containerOfertas.classList.remove('d-none');
+        tituloVista.textContent = 'Lista de Ofertas';
+    }
+    
+    // Actualizar contador
+    actualizarContadorOfertas();
+}
+
+/**
+ * Actualiza el contador de ofertas según la vista
+ */
+function actualizarContadorOfertas() {
+    const badge = document.getElementById('total-ofertas-badge');
+    const contador = document.getElementById('contador-ofertas-publicas');
+    
+    if (!badge || !contador) return;
+    
+    const total = estadoOfertasPublicas.ofertas.length;
+    const filtradas = estadoOfertasPublicas.ofertasFiltradas.length;
+    
+    let texto = '';
+    if (total === filtradas) {
+        texto = `${total} ofertas`;
+    } else {
+        texto = `${filtradas} de ${total} ofertas`;
+    }
+    
+    badge.textContent = texto;
+    contador.textContent = texto;
+    
+    // Actualizar color del badge según disponibilidad
+    badge.className = 'badge ms-2';
+    contador.className = 'badge bg-success fs-6';
+    
+    if (filtradas === 0) {
+        badge.classList.add('bg-secondary');
+        contador.classList.remove('bg-success');
+        contador.classList.add('bg-secondary');
+    } else if (filtradas < total) {
+        badge.classList.add('bg-warning');
+    } else {
+        badge.classList.add('bg-info');
+    }
+}
+
+/**
+ * Renderiza las ofertas públicas en la interfaz
+ * @param {Array} ofertas - Lista de ofertas a mostrar
+ */
+function renderizarOfertasPublicas(ofertas) {
+    const container = document.getElementById('ofertas-publicas-container');
+    if (!container) {
+        console.error('Container de ofertas públicas no encontrado');
+        return;
+    }
+    
+    if (!ofertas || ofertas.length === 0) {
+        container.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No se encontraron ofertas disponibles con los filtros seleccionados.
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    const ofertasHTML = ofertas.map(oferta => {
+        // Parsear fecha de cierre de forma segura
+        const fechaCierreDate = parsearFechaSegura(oferta.fechaCierre);
+        const fechaCierre = formatearFechaArgentina(oferta.fechaCierre);
+        
+        // Determinar urgencia basada en fecha de cierre
+        const hoy = new Date();
+        const diasRestantes = fechaCierreDate ? Math.ceil((fechaCierreDate - hoy) / (1000 * 60 * 60 * 24)) : 0;
+        const urgenciaClase = diasRestantes <= 7 ? 'text-danger' : diasRestantes <= 15 ? 'text-warning' : 'text-success';
+        
+        // Determinar color del header según vacantes
+        const headerColor = oferta.vacantes >= 5 ? 'bg-success' : oferta.vacantes >= 3 ? 'bg-primary' : 'bg-warning';
+        
+        return `
+            <div class="col-lg-6 col-xl-4 mb-4">
+                <div class="card h-100 shadow-sm border-0 oferta-publica-card" data-oferta-id="${oferta.idOfertaEmpleo}" data-lat="${oferta.latitud}" data-lng="${oferta.longitud}">
+                    <div class="card-header ${headerColor} text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-briefcase me-2"></i>
+                            ${oferta.nombrePuestoTrabajo || 'Puesto no especificado'}
+                        </h5>
+                        <small class="opacity-75">
+                            <i class="fas fa-seedling me-1"></i>
+                            ${oferta.nombreEspecie || 'Especie no especificada'}
+                        </small>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <h6 class="fw-bold text-primary">
+                                <i class="fas fa-building me-1"></i>
+                                ${oferta.nombreEstablecimiento || 'Establecimiento no especificado'}
+                            </h6>
+                        </div>
+                        
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <small class="text-muted">
+                                    <i class="fas fa-users me-1"></i>
+                                    Vacantes
+                                </small>
+                                <div class="fw-bold ${oferta.vacantes >= 3 ? 'text-success' : 'text-warning'}">
+                                    ${oferta.vacantes || 1} ${oferta.vacantes === 1 ? 'puesto' : 'puestos'}
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">
+                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                    Ubicación
+                                </small>
+                                <div class="fw-bold small">
+                                    <span class="text-info" title="Latitud: ${oferta.latitud}, Longitud: ${oferta.longitud}">
+                                        Ver en mapa
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar-times me-1"></i>
+                                Fecha de cierre
+                            </small>
+                            <div class="fw-bold ${urgenciaClase}">
+                                ${fechaCierre}
+                                ${diasRestantes > 0 ? `<small class="ms-1">(${diasRestantes} días)</small>` : '<small class="ms-1">(Vencida)</small>'}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light d-flex gap-2">
+                        <button class="btn btn-primary btn-sm flex-fill" onclick="contactarEmpresa('${oferta.idOfertaEmpleo}')">
+                            <i class="fas fa-phone me-1"></i>
+                            Contactar
+                        </button>
+                        <button class="btn btn-outline-success btn-sm" onclick="verEnMapa('${oferta.idOfertaEmpleo}')" title="Ver en mapa">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    container.innerHTML = ofertasHTML;
+}
+
+/**
+ * Muestra estado de carga para ofertas públicas
+ * @param {boolean} cargando - Si está cargando o no
+ */
+function mostrarEstadoCargaPublicas(cargando) {
+    const container = document.getElementById('ofertas-publicas-container');
+    const spinner = document.getElementById('ofertas-publicas-spinner');
+    
+    if (cargando) {
+        if (container) {
+            container.innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando ofertas...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Cargando ofertas disponibles...</p>
+                </div>
+            `;
+        }
+    }
+    
+    if (spinner) {
+        spinner.style.display = cargando ? 'block' : 'none';
+    }
+}
+
+/**
+ * Muestra errores relacionados con ofertas públicas
+ * @param {Error} error - Error a mostrar
+ */
+function mostrarErrorOfertasPublicas(error) {
+    const container = document.getElementById('ofertas-publicas-container');
+    if (!container) return;
+    
+    let mensaje = 'Error desconocido';
+    let icono = 'exclamation-triangle';
+    
+    if (error.message.includes('HTTP')) {
+        mensaje = 'No se pudieron cargar las ofertas. Verifique su conexión.';
+        icono = 'wifi';
+    } else if (error.message.includes('Geolocalización')) {
+        mensaje = 'No se pudo obtener su ubicación. El ordenamiento por distancia no estará disponible.';
+        icono = 'map-marker-alt';
+    }
+    
+    container.innerHTML = `
+        <div class="col-12">
+            <div class="alert alert-warning text-center">
+                <i class="fas fa-${icono} me-2"></i>
+                ${mensaje}
+                <br>
+                <button class="btn btn-outline-primary btn-sm mt-2" onclick="cargarOfertasPublicas()">
+                    <i class="fas fa-refresh me-1"></i>
+                    Reintentar
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Actualiza el contador de ofertas públicas
+ * @param {number} cantidad - Número de ofertas
+ */
+function actualizarContadorOfertasPublicas(cantidad) {
+    const contador = document.getElementById('contador-ofertas-publicas');
+    if (contador) {
+        contador.textContent = `${cantidad} ofertas disponibles`;
+    }
+}
+
+/**
+ * Aplica filtros a las ofertas públicas
+ * @param {Object} nuevos_filtros - Filtros a aplicar
+ */
+async function aplicarFiltrosOfertasPublicas(nuevos_filtros = {}) {
+    const filtros = {
+        ...estadoOfertasPublicas.filtros,
+        ...nuevos_filtros
+    };
+    
+    // Si se requiere ordenamiento por distancia, obtener ubicación
+    if (filtros.orden === 'distancia' && !estadoOfertasPublicas.ubicacion.disponible) {
+        try {
+            await getUbicacionUsuario();
+            actualizarEstadoBotonGeolocalizacion(true);
+        } catch (error) {
+            console.warn('No se pudo obtener ubicación para ordenamiento por distancia');
+            mostrarNotificacionGeolocalizacion(false);
+            // Cambiar a ordenamiento por fecha si no hay ubicación
+            filtros.orden = 'fecha';
+        }
+    }
+    
+    await cargarOfertasPublicas(filtros);
+    actualizarInterfazFiltrosPublicos(filtros);
+}
+
+/**
+ * Maneja el cambio en el selector de puesto
+ */
+function onCambioPuestoPublico() {
+    const selector = document.getElementById('filtro-puesto-publico');
+    if (selector) {
+        aplicarFiltrosOfertasPublicas({ puesto: selector.value });
+    }
+}
+
+/**
+ * Maneja el cambio de ordenamiento
+ * @param {string} orden - Tipo de orden (fecha|distancia)
+ */
+async function onCambioOrdenPublico(orden) {
+    await aplicarFiltrosOfertasPublicas({ orden });
+}
+
+/**
+ * Solicita permisos de geolocalización y actualiza ofertas
+ */
+async function solicitarGeolocalizacion() {
+    try {
+        mostrarEstadoGeolocalizacion('cargando');
+        await getUbicacionUsuario();
+        mostrarEstadoGeolocalizacion('exito');
+        
+        // Si el orden actual es distancia, recargar ofertas
+        if (estadoOfertasPublicas.filtros.orden === 'distancia') {
+            await aplicarFiltrosOfertasPublicas();
+        }
+    } catch (error) {
+        mostrarEstadoGeolocalizacion('error');
+        console.error('Error obteniendo geolocalización:', error);
+    }
+}
+
+/**
+ * Actualiza la interfaz de filtros públicos
+ * @param {Object} filtros - Filtros activos
+ */
+function actualizarInterfazFiltrosPublicos(filtros) {
+    // Actualizar selector de puesto
+    const selectorPuesto = document.getElementById('filtro-puesto-publico');
+    if (selectorPuesto) {
+        selectorPuesto.value = filtros.puesto || '';
+    }
+    
+    // Actualizar botones de ordenamiento
+    document.querySelectorAll('.btn-orden-publico').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.orden === filtros.orden) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Actualizar estado de geolocalización
+    actualizarEstadoBotonGeolocalizacion(estadoOfertasPublicas.ubicacion.disponible);
+}
+
+/**
+ * Actualiza el estado visual del botón de geolocalización
+ * @param {boolean} disponible - Si la ubicación está disponible
+ */
+function actualizarEstadoBotonGeolocalizacion(disponible) {
+    const boton = document.getElementById('btn-geolocalizacion');
+    if (boton) {
+        if (disponible) {
+            boton.innerHTML = '<i class="fas fa-map-marker-alt text-success"></i> Ubicación activa';
+            boton.classList.remove('btn-outline-secondary');
+            boton.classList.add('btn-outline-success');
+        } else {
+            boton.innerHTML = '<i class="fas fa-map-marker-alt"></i> Activar ubicación';
+            boton.classList.remove('btn-outline-success');
+            boton.classList.add('btn-outline-secondary');
+        }
+    }
+}
+
+/**
+ * Muestra el estado de la geolocalización
+ * @param {string} estado - Estado (cargando|exito|error)
+ */
+function mostrarEstadoGeolocalizacion(estado) {
+    const boton = document.getElementById('btn-geolocalizacion');
+    if (!boton) return;
+    
+    switch (estado) {
+        case 'cargando':
+            boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Obteniendo ubicación...';
+            boton.disabled = true;
+            break;
+        case 'exito':
+            boton.innerHTML = '<i class="fas fa-map-marker-alt text-success"></i> Ubicación activa';
+            boton.disabled = false;
+            break;
+        case 'error':
+            boton.innerHTML = '<i class="fas fa-map-marker-alt text-danger"></i> Error de ubicación';
+            boton.disabled = false;
+            setTimeout(() => {
+                actualizarEstadoBotonGeolocalizacion(false);
+            }, 3000);
+            break;
+    }
+}
+
+/**
+ * Inicializa el sistema de ofertas públicas
+ */
+async function inicializarOfertasPublicas() {
+    console.log('🚀 Inicializando sistema de ofertas públicas');
+    
+    // Inicializar vista por defecto (lista)
+    vistaActual = 'lista';
+    
+    // Configurar botones de vista
+    const btnLista = document.getElementById('btn-vista-lista');
+    const btnMapa = document.getElementById('btn-vista-mapa');
+    
+    if (btnLista && btnMapa) {
+        btnLista.classList.add('btn-primary');
+        btnLista.classList.remove('btn-outline-primary');
+        btnMapa.classList.add('btn-outline-primary');
+        btnMapa.classList.remove('btn-primary');
+    }
+    
+    // Cargar ofertas por defecto (ordenadas por fecha)
+    await cargarOfertasPublicas({ orden: 'fecha' });
+    
+    // Configurar event listeners
+    configurarEventListenersOfertasPublicas();
+    
+    console.log('✅ Sistema de ofertas públicas inicializado');
+}
+
+/**
+ * Configura los event listeners para ofertas públicas
+ */
+function configurarEventListenersOfertasPublicas() {
+    // Selector de puesto
+    const selectorPuesto = document.getElementById('filtro-puesto-publico');
+    if (selectorPuesto) {
+        selectorPuesto.addEventListener('change', onCambioPuestoPublico);
+    }
+    
+    // Botones de ordenamiento
+    document.querySelectorAll('.btn-orden-publico').forEach(btn => {
+        btn.addEventListener('click', () => {
+            onCambioOrdenPublico(btn.dataset.orden);
+        });
+    });
+    
+    // Botón de geolocalización
+    const btnGeo = document.getElementById('btn-geolocalizacion');
+    if (btnGeo) {
+        btnGeo.addEventListener('click', solicitarGeolocalizacion);
+    }
+}
+
+/**
+ * Función placeholder para contactar empresa
+ * @param {string} ofertaId - ID de la oferta
+ */
+function contactarEmpresa(ofertaId) {
+    // Por ahora mostrar modal de información
+    alert(`Para contactar con esta empresa, debe registrarse como trabajador en la plataforma.\n\nOferta ID: ${ofertaId}`);
+}
+
+/**
+ * Función para mostrar oferta en el mapa
+ * @param {string} ofertaId - ID de la oferta
+ */
+function verEnMapa(ofertaId) {
+    console.log('🗺️ Mostrando oferta en mapa:', ofertaId);
+    
+    // Cambiar a vista mapa si no estamos en ella
+    if (vistaActual !== 'mapa') {
+        cambiarVista('mapa');
+    }
+    
+    // Esperar a que el mapa esté listo
+    setTimeout(() => {
+        const oferta = estadoOfertasPublicas.ofertas.find(o => o.idOfertaEmpleo.toString() === ofertaId);
+        if (oferta && mapaOfertasPublicas.instancia) {
+            // Centrar el mapa en la oferta
+            mapaOfertasPublicas.instancia.setView([oferta.latitud, oferta.longitud], 16);
+            
+            // Buscar y abrir popup del marcador
+            const marcadorItem = mapaOfertasPublicas.marcadores.find(item => 
+                item.marcador._ofertaId === ofertaId
+            );
+            
+            if (marcadorItem) {
+                marcadorItem.marcador.openPopup();
+                
+                // Animar el marcador
+                setTimeout(() => {
+                    const markerElement = marcadorItem.marcador._icon;
+                    if (markerElement) {
+                        markerElement.style.animation = 'bounce 0.6s ease-in-out 3';
+                    }
+                }, 300);
+            }
+        }
+    }, vistaActual === 'mapa' ? 100 : 600);
+}
+
+// ===========================
+// INICIALIZACIÓN OFERTAS PÚBLICAS
+// ===========================
+
+// Inicializar ofertas públicas cuando se carga la página
+document.addEventListener('DOMContentLoaded', function() {
+    // Solo inicializar ofertas públicas si estamos en index.html
+    if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
+        console.log('🏠 Página de inicio detectada, inicializando ofertas públicas...');
+        
+        // Esperar un poco para que la página se cargue completamente
+        setTimeout(() => {
+            inicializarOfertasPublicas();
+        }, 500);
+    }
+});

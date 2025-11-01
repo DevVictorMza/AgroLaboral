@@ -14,6 +14,7 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css?v=botones-grandes">
     <link rel="stylesheet" href="css/botones-gigantes.css?v=1">
+    <link rel="stylesheet" href="css/map-ofertas.css?v=1">
     
     <!-- Estilos adicionales para dashboard offcanvas -->
     <style>
@@ -286,6 +287,146 @@
             </div>
         </div>
     </main>
+
+    <!-- Ofertas Disponibles -->
+    <section id="ofertas-disponibles" class="container py-5">
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-10">
+                <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-ofertas">
+                    <div class="card-body text-center">
+                        <div class="mb-3 servicio-icon servicio-icon-ofertas"><i class="fas fa-briefcase"></i></div>
+                        <h2 class="fw-bold">Ofertas Disponibles</h2>
+                        <p class="mb-0">Descubre oportunidades laborales en el sector agrícola</p>
+                        <div class="mt-3">
+                            <span id="contador-ofertas-publicas" class="badge bg-success fs-6">Cargando ofertas...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filtros de Ofertas Públicas -->
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-10">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <div class="row g-3 align-items-center">
+                            <!-- Filtro por Puesto -->
+                            <div class="col-md-4">
+                                <label for="filtro-puesto-publico" class="form-label">
+                                    <i class="fas fa-briefcase me-1"></i>
+                                    Filtrar por puesto
+                                </label>
+                                <select class="form-select" id="filtro-puesto-publico">
+                                    <option value="">Todos los puestos</option>
+                                    <option value="PODADOR/ATADOR">Podador/Atador</option>
+                                    <option value="COSECHADOR">Cosechador</option>
+                                    <option value="TRACTORISTA">Tractorista</option>
+                                    <option value="CAPATAZ">Capataz</option>
+                                    <option value="VIÑATERO">Viñatero</option>
+                                    <option value="JORNALERO">Jornalero</option>
+                                    <option value="SUPERVISOR">Supervisor</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Ordenamiento -->
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    <i class="fas fa-sort me-1"></i>
+                                    Ordenar por
+                                </label>
+                                <div class="btn-group w-100" role="group">
+                                    <button type="button" class="btn btn-outline-primary btn-orden-publico active" data-orden="fecha">
+                                        <i class="fas fa-calendar-alt me-1"></i>
+                                        Fecha
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary btn-orden-publico" data-orden="distancia">
+                                        <i class="fas fa-map-marker-alt me-1"></i>
+                                        Distancia
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Geolocalización -->
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    <i class="fas fa-location-arrow me-1"></i>
+                                    Ubicación
+                                </label>
+                                <button type="button" class="btn btn-outline-secondary w-100" id="btn-geolocalizacion">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    Activar ubicación
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Toggle Vista Lista/Mapa -->
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-10">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0">
+                            <span id="vista-actual-titulo">Lista de Ofertas</span>
+                            <span class="badge bg-info ms-2" id="total-ofertas-badge">0 ofertas</span>
+                        </h4>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-primary" id="btn-vista-lista" onclick="cambiarVista('lista')">
+                            <i class="fas fa-list me-2"></i>Lista
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" id="btn-vista-mapa" onclick="cambiarVista('mapa')">
+                            <i class="fas fa-map me-2"></i>Mapa
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Container del Mapa (oculto por defecto) -->
+        <div class="row justify-content-center mb-4 d-none" id="mapa-container">
+            <div class="col-lg-10">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            Mapa de Ofertas Laborales
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="map"></div>
+                    </div>
+                    <div class="card-footer text-muted">
+                        <small>
+                            <i class="fas fa-info-circle me-1"></i>
+                            Haz clic en los marcadores para ver detalles de cada oferta
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Container de Ofertas -->
+        <div class="row g-4 justify-content-center" id="ofertas-publicas-container">
+            <!-- Las ofertas se cargarán aquí dinámicamente -->
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando ofertas...</span>
+                </div>
+                <p class="mt-3 text-muted">Cargando ofertas disponibles...</p>
+            </div>
+        </div>
+        
+        <!-- Spinner de carga -->
+        <div id="ofertas-publicas-spinner" class="text-center py-3 d-none">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Actualizando ofertas...</span>
+            </div>
+        </div>
+    </section>
 
     <!-- Servicios -->
     <section id="servicios" class="container py-5">

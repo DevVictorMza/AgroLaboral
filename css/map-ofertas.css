@@ -1,0 +1,240 @@
+/* ========================================
+   ESTILOS MAPA OFERTAS PÚBLICAS
+   ======================================== */
+
+/* Contenedor del mapa */
+#map {
+    height: 500px;
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 2px solid #e9ecef;
+    background: #f8f9fa;
+}
+
+/* Marcadores personalizados */
+.custom-marker-oferta {
+    background: transparent !important;
+    border: none !important;
+}
+
+.marker-oferta-publica {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.marker-oferta-publica:hover {
+    transform: scale(1.2);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* Estilos del popup */
+.leaflet-popup-content-wrapper {
+    border-radius: 12px;
+    padding: 0;
+    overflow: hidden;
+}
+
+.popup-oferta-content {
+    padding: 16px;
+    min-width: 280px;
+}
+
+.popup-header h6 {
+    font-weight: 600;
+    margin-bottom: 8px;
+    line-height: 1.3;
+}
+
+.popup-body {
+    border-top: 1px solid #e9ecef;
+    border-bottom: 1px solid #e9ecef;
+    padding: 12px 0;
+}
+
+.popup-footer {
+    padding-top: 12px;
+}
+
+.popup-footer .btn {
+    font-size: 0.85rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.popup-footer .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Tarjeta destacada por clic en mapa */
+.card-oferta-destacada {
+    border: 3px solid #007bff !important;
+    box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3) !important;
+    transform: scale(1.02);
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+}
+
+.card-oferta-destacada::before {
+    content: '📍';
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #007bff;
+    color: white;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    animation: pulse-marker 2s infinite;
+}
+
+@keyframes pulse-marker {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* Responsive del mapa */
+@media (max-width: 768px) {
+    #map {
+        height: 400px;
+        border-radius: 4px;
+    }
+    
+    .popup-oferta-content {
+        min-width: 250px;
+        padding: 12px;
+    }
+    
+    .popup-footer .btn {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.6rem;
+    }
+    
+    .marker-oferta-publica {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+}
+
+/* Controles del mapa */
+.leaflet-control-layers {
+    border-radius: 8px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+.leaflet-control-scale {
+    border-radius: 6px !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Cluster de marcadores (para futuro uso) */
+.marker-cluster {
+    background-color: rgba(74, 144, 226, 0.8);
+    border: 3px solid white;
+    border-radius: 50%;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.marker-cluster-small {
+    width: 40px;
+    height: 40px;
+    line-height: 34px;
+    font-size: 12px;
+}
+
+.marker-cluster-medium {
+    width: 50px;
+    height: 50px;
+    line-height: 44px;
+    font-size: 14px;
+}
+
+.marker-cluster-large {
+    width: 60px;
+    height: 60px;
+    line-height: 54px;
+    font-size: 16px;
+}
+
+/* Estados de carga del mapa */
+.map-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 500px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 2px dashed #dee2e6;
+    color: #6c757d;
+    font-size: 1.1rem;
+}
+
+.map-loading i {
+    margin-right: 8px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Animación bounce para marcadores */
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Botón toggle vista mapa/lista */
+.btn-toggle-mapa {
+    position: fixed;
+    top: 120px;
+    right: 20px;
+    z-index: 1000;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.btn-toggle-mapa:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.btn-toggle-mapa i {
+    margin-right: 8px;
+}
+
+/* Sincronización visual entre mapa y cards */
+.oferta-marcador-activo {
+    border-left: 4px solid #007bff;
+    background: linear-gradient(90deg, rgba(0, 123, 255, 0.05) 0%, transparent 100%);
+}
