@@ -599,6 +599,85 @@ function generarDashboard(perfil) {
                 text-align: center;
                 padding: 2rem;
             }
+            
+            /* Estilos para controles de filtrado de ofertas */
+            .ofertas-filter-controls {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .ofertas-filter-controls .btn-group .filter-btn {
+                transition: all 0.3s ease;
+                font-size: 0.875rem;
+                font-weight: 500;
+                padding: 0.375rem 0.75rem;
+                border-radius: 6px !important;
+                position: relative;
+            }
+            
+            .ofertas-filter-controls .filter-btn:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            }
+            
+            .ofertas-filter-controls .filter-btn.active {
+                font-weight: 600;
+                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+            }
+            
+            .ofertas-filter-controls .filter-btn[data-filter="todas"].active {
+                background-color: #4A90E2 !important;
+                border-color: #4A90E2 !important;
+                color: white !important;
+            }
+            
+            .ofertas-filter-controls .filter-btn[data-filter="vigentes"].active {
+                background-color: #27AE60 !important;
+                border-color: #27AE60 !important;
+                color: white !important;
+            }
+            
+            .ofertas-filter-controls .filter-btn[data-filter="cerradas"].active {
+                background-color: #6c757d !important;
+                border-color: #6c757d !important;
+                color: white !important;
+            }
+            
+            /* Badge de estado para ofertas */
+            .oferta-status-badge {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+                border-radius: 4px;
+                font-weight: 600;
+            }
+            
+            .oferta-status-badge.vigente {
+                background-color: rgba(39, 174, 96, 0.1);
+                color: #27AE60;
+                border: 1px solid #27AE60;
+            }
+            
+            .oferta-status-badge.cerrada {
+                background-color: rgba(108, 117, 125, 0.1);
+                color: #6c757d;
+                border: 1px solid #6c757d;
+            }
+            
+            /* Loading state para filtros */
+            .ofertas-filter-controls .filter-btn.loading {
+                opacity: 0.6;
+                pointer-events: none;
+            }
+            
+            .ofertas-filter-controls .filter-btn.loading i {
+                animation: spin 1s linear infinite;
+            }
+            
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
         </style>
         
         <div class="dashboard-container">
@@ -750,9 +829,33 @@ function generarDashboard(perfil) {
                                 <i class="fas fa-briefcase me-2 text-info"></i>
                                 Ofertas de Trabajo Disponibles
                             </h5>
-                            <button class="btn btn-success" onclick="crearNuevaOferta()" id="btnCrearOferta">
-                                <i class="fas fa-plus me-2"></i>Nueva Oferta
-                            </button>
+                            
+                            <!-- Controles de filtrado -->
+                            <div class="ofertas-filter-controls">
+                                <div class="btn-group" role="group" aria-label="Filtros de ofertas">
+                                    <button type="button" 
+                                            class="btn btn-outline-light btn-sm filter-btn" 
+                                            id="filtro-todas"
+                                            onclick="aplicarFiltroOfertas(null)"
+                                            data-filter="todas">
+                                        <i class="fas fa-list me-1"></i>Todas
+                                    </button>
+                                    <button type="button" 
+                                            class="btn btn-outline-success btn-sm filter-btn" 
+                                            id="filtro-vigentes"
+                                            onclick="aplicarFiltroOfertas(true)"
+                                            data-filter="vigentes">
+                                        <i class="fas fa-check-circle me-1"></i>Vigentes
+                                    </button>
+                                    <button type="button" 
+                                            class="btn btn-outline-secondary btn-sm filter-btn" 
+                                            id="filtro-cerradas"
+                                            onclick="aplicarFiltroOfertas(false)"
+                                            data-filter="cerradas">
+                                        <i class="fas fa-times-circle me-1"></i>Cerradas
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- Estados visuales de la sección -->
@@ -825,6 +928,7 @@ function generarDashboard(perfil) {
             // Cargar ofertas de empleo después del mapa
             setTimeout(() => {
                 console.log('💼 Iniciando carga de ofertas de empleo...');
+                inicializarFiltrosOfertas();
                 cargarOfertasEmpleo();
             }, 800);
         }, 200);
@@ -7884,11 +7988,13 @@ const OFERTAS_CONFIG = {
 
 // Variable global para ofertas
 let ofertasCache = [];
+let filtroActualOfertas = null; // null = todas, true = vigentes, false = no vigentes
 
 /**
- * Función principal para cargar ofertas de empleo
+ * Función principal para cargar ofertas de empleo con filtro opcional
+ * @param {boolean|null} vigente - null: todas las ofertas, true: solo vigentes, false: solo no vigentes  
  */
-async function cargarOfertasEmpleo() {
+async function cargarOfertasEmpleo(vigente = null) {
     const loadingDiv = document.getElementById('ofertas-loading');
     const contentDiv = document.getElementById('ofertas-content');
     const errorDiv = document.getElementById('ofertas-error');
@@ -7909,10 +8015,19 @@ async function cargarOfertasEmpleo() {
             }
         }
 
-        console.log('🔄 Cargando ofertas de empleo...');
+        // Guardar filtro actual
+        filtroActualOfertas = vigente;
+
+        // Construir URL con parámetro vigente si es necesario
+        let endpoint = buildURL(OFERTAS_CONFIG.ENDPOINT);
+        if (vigente !== null) {
+            endpoint += `?vigente=${vigente}`;
+        }
+
+        console.log(`🔄 Cargando ofertas de empleo... ${vigente !== null ? `(vigente=${vigente})` : '(todas)'}`);
 
         // Usar fetchWithAuth que ya maneja la autenticación
-        const response = await fetchWithAuth(buildURL(OFERTAS_CONFIG.ENDPOINT), {
+        const response = await fetchWithAuth(endpoint, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -8008,43 +8123,42 @@ function renderizarOfertas(ofertas) {
     const contentDiv = document.getElementById('ofertas-content');
     
     if (!ofertas || ofertas.length === 0) {
+        const tipoFiltro = obtenerDescripcionFiltroActual();
         contentDiv.innerHTML = `
             <div class="text-center py-5">
-                <i class="fas fa-briefcase text-muted mb-3"></i>
+                <i class="fas fa-briefcase text-muted mb-3" style="font-size: 3rem;"></i>
                 <h5 class="text-white mb-3">No hay ofertas disponibles</h5>
-                <p class="text-muted mb-4">Aún no has creado ninguna oferta de trabajo.</p>
-                <button class="btn btn-success" onclick="crearNuevaOferta()">
-                    <i class="fas fa-plus me-2"></i>Crear Primera Oferta
-                </button>
+                <p class="text-muted mb-4">No se encontraron ofertas para el filtro "${tipoFiltro}".</p>
+                ${estadoFiltroOfertas.actual === null ? `
+                    <button class="btn btn-success" onclick="crearNuevaOferta()">
+                        <i class="fas fa-plus me-2"></i>Crear Primera Oferta
+                    </button>
+                ` : `
+                    <button class="btn btn-outline-info" onclick="aplicarFiltroOfertas(null)">
+                        <i class="fas fa-list me-2"></i>Ver Todas las Ofertas
+                    </button>
+                `}
             </div>
         `;
         return;
     }
 
-    // Encabezado con estadísticas
+    // Estadísticas simplificadas
     const estadisticas = calcularEstadisticasOfertasReales(ofertas);
+    const tipoFiltro = obtenerDescripcionFiltroActual();
+    
     let html = `
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h6 class="text-white mb-0">
                     <i class="fas fa-chart-bar me-2 text-info"></i>
-                    ${ofertas.length} Oferta${ofertas.length !== 1 ? 's' : ''} Total${ofertas.length !== 1 ? 'es' : ''}
+                    ${ofertas.length} ${ofertas.length === 1 ? 'Oferta' : 'Ofertas'} - ${tipoFiltro}
                 </h6>
                 <small class="text-muted">
-                    ${estadisticas.vigentes} vigente${estadisticas.vigentes !== 1 ? 's' : ''} • 
+                    <i class="fas fa-info-circle me-1"></i>
+                    Total en sistema: ${estadisticas.vigentes} vigente${estadisticas.vigentes !== 1 ? 's' : ''} • 
                     ${estadisticas.noVigentes} cerrada${estadisticas.noVigentes !== 1 ? 's' : ''}
                 </small>
-            </div>
-            <div class="btn-group" role="group">
-                <button class="btn btn-outline-info btn-sm" onclick="filtrarOfertas('TODAS')" title="Ver todas">
-                    <i class="fas fa-list"></i>
-                </button>
-                <button class="btn btn-outline-success btn-sm" onclick="filtrarOfertas('VIGENTES')" title="Solo vigentes">
-                    <i class="fas fa-check-circle"></i>
-                </button>
-                <button class="btn btn-outline-secondary btn-sm" onclick="filtrarOfertas('CERRADAS')" title="Solo cerradas">
-                    <i class="fas fa-times-circle"></i>
-                </button>
             </div>
         </div>
         <div class="row" id="ofertas-grid">
@@ -8329,3 +8443,117 @@ function formatearFecha(fecha) {
 }
 
 // Las ofertas se inicializan desde el dashboard cuando se abre
+
+// ===========================
+// FUNCIONES DE FILTRADO DE OFERTAS
+// ===========================
+
+/**
+ * Estado global del filtro de ofertas
+ */
+let estadoFiltroOfertas = {
+    actual: null, // null = todas, true = vigentes, false = cerradas
+    loading: false
+};
+
+/**
+ * Aplica un filtro específico a las ofertas
+ * @param {boolean|null} filtro - null: todas, true: vigentes, false: cerradas
+ */
+async function aplicarFiltroOfertas(filtro) {
+    // Evitar múltiples clicks simultáneos
+    if (estadoFiltroOfertas.loading) {
+        console.log('⏳ Filtro ya en progreso, ignorando click');
+        return;
+    }
+
+    try {
+        // Marcar como loading
+        estadoFiltroOfertas.loading = true;
+        actualizarEstadoBotonesFiltro(filtro, true);
+
+        console.log(`🔄 Aplicando filtro de ofertas: ${filtro === null ? 'todas' : filtro ? 'vigentes' : 'cerradas'}`);
+
+        // Cargar ofertas con el filtro seleccionado
+        await cargarOfertasEmpleo(filtro);
+
+        // Actualizar estado
+        estadoFiltroOfertas.actual = filtro;
+        actualizarEstadoBotonesFiltro(filtro, false);
+
+        // Mostrar feedback al usuario
+        const tipoFiltro = filtro === null ? 'todas las ofertas' : filtro ? 'ofertas vigentes' : 'ofertas cerradas';
+        showMessage(`Mostrando ${tipoFiltro}`, 'info');
+
+    } catch (error) {
+        console.error('❌ Error aplicando filtro:', error);
+        showMessage('Error al aplicar filtro. Inténtelo nuevamente.', 'error');
+        
+        // Restaurar estado anterior
+        actualizarEstadoBotonesFiltro(estadoFiltroOfertas.actual, false);
+    } finally {
+        estadoFiltroOfertas.loading = false;
+    }
+}
+
+/**
+ * Actualiza el estado visual de los botones de filtro
+ * @param {boolean|null} filtroActivo - Filtro actualmente activo
+ * @param {boolean} loading - Si está en estado de carga
+ */
+function actualizarEstadoBotonesFiltro(filtroActivo, loading = false) {
+    const botones = {
+        todas: document.getElementById('filtro-todas'),
+        vigentes: document.getElementById('filtro-vigentes'),
+        cerradas: document.getElementById('filtro-cerradas')
+    };
+
+    // Verificar que los botones existan
+    if (!botones.todas || !botones.vigentes || !botones.cerradas) {
+        console.warn('⚠️ No se encontraron todos los botones de filtro');
+        return;
+    }
+
+    // Remover estados activos previos
+    Object.values(botones).forEach(btn => {
+        btn.classList.remove('active', 'loading');
+        btn.disabled = loading;
+    });
+
+    // Aplicar estado de loading si es necesario
+    if (loading) {
+        Object.values(botones).forEach(btn => {
+            btn.classList.add('loading');
+        });
+    }
+
+    // Activar el botón correspondiente
+    if (filtroActivo === null) {
+        botones.todas.classList.add('active');
+    } else if (filtroActivo === true) {
+        botones.vigentes.classList.add('active');
+    } else if (filtroActivo === false) {
+        botones.cerradas.classList.add('active');
+    }
+}
+
+/**
+ * Inicializa los controles de filtro con el estado por defecto
+ */
+function inicializarFiltrosOfertas() {
+    // Establecer "Todas" como filtro por defecto
+    estadoFiltroOfertas.actual = null;
+    actualizarEstadoBotonesFiltro(null, false);
+}
+
+/**
+ * Obtiene el texto descriptivo del filtro actual
+ * @returns {string} Descripción del filtro activo
+ */
+function obtenerDescripcionFiltroActual() {
+    const filtro = estadoFiltroOfertas.actual;
+    if (filtro === null) return 'todas las ofertas';
+    if (filtro === true) return 'ofertas vigentes';
+    if (filtro === false) return 'ofertas cerradas';
+    return 'filtro desconocido';
+}
