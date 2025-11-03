@@ -1245,6 +1245,9 @@ function cargarPaso1() {
                     </label>
                     <div class="map-container">
                         <div class="map-controls mb-2">
+                            <small class="text-muted d-block mb-2 text-center">
+                                <i class="fas fa-info-circle me-1"></i>Haga clic en el mapa para establecer la ubicación
+                            </small>
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="d-flex gap-2">
                                     <!-- Botón Buscar Ubicación -->
@@ -1271,7 +1274,6 @@ function cargarPaso1() {
                                         </button>
                                     </div>
                                 </div>
-                                <small class="text-muted">Haga clic en el mapa para establecer la ubicación</small>
                             </div>
                         </div>
                         <div id="mapFinca" style="height: 300px; border-radius: 8px; overflow: hidden; border: 1px solid #444444;"></div>
@@ -2125,44 +2127,257 @@ function mostrarEstadoCargando(container) {
  */
 function generarHtmlEstablecimientos(establecimientos) {
     const establecimientosHtml = establecimientos.map((est, index) => `
-        <div class="establecimiento-item" data-id="${est.idEstablecimiento}">
-            <div class="establecimiento-numero">
-                <span class="numero-badge">${index + 1}</span>
-            </div>
-            <div class="establecimiento-info">
-                <div class="establecimiento-nombre">
-                    <i class="fas fa-seedling text-success me-2"></i>
+        <div class="establecimiento-card" data-id="${est.idEstablecimiento}">
+            <div class="establecimiento-card-header">
+                <div class="establecimiento-numero-badge">#${index + 1}</div>
+                <div class="establecimiento-titulo">
+                    <i class="fas fa-warehouse me-2" style="font-size: 0.9rem; color: #27AE60;"></i>
                     <h6 class="mb-0">${est.nombreEstablecimiento}</h6>
                 </div>
-                <div class="establecimiento-detalles">
-                    <span class="detalle-item">
-                        <i class="fas fa-map-pin text-primary"></i>
-                        ${est.nombreDistrito}
-                    </span>
-                    <span class="detalle-item">
-                        <i class="fas fa-leaf text-success"></i>
-                        ${est.especies.length} especies
-                    </span>
-                    <span class="detalle-item">
-                        <i class="fas fa-check-circle text-success"></i>
-                        Activo
-                    </span>
+            </div>
+            
+            <div class="establecimiento-card-body">
+                <div class="establecimiento-info-grid">
+                    <div class="info-item">
+                        <i class="fas fa-map-marker-alt" style="font-size: 0.75rem; color: #3498DB;"></i>
+                        <span>${est.nombreDistrito}</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-leaf" style="font-size: 0.75rem; color: #27AE60;"></i>
+                        <span>${est.especies.length} ${est.especies.length === 1 ? 'especie' : 'especies'}</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-check-circle" style="font-size: 0.75rem; color: #27AE60;"></i>
+                        <span>Activo</span>
+                    </div>
                 </div>
             </div>
-            <div class="establecimiento-actions">
-                <button class="btn-accion btn-ubicacion" onclick="verEnMapa(${est.latitud}, ${est.longitud})" title="Ver ubicación en mapa">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span>Ver ubicación</span>
+            
+            <div class="establecimiento-card-footer">
+                <button class="btn-card-action btn-ubicacion" onclick="verEnMapa(${est.latitud}, ${est.longitud})" title="Ver en mapa">
+                    <i class="fas fa-map-marked-alt" style="font-size: 0.85rem;"></i>
+                    <span>Ubicación</span>
                 </button>
-                <button class="btn-accion btn-oferta" onclick="crearOfertaLaboral(${est.idEstablecimiento}, '${est.nombreEstablecimiento.replace(/'/g, "\\'")}')}" title="Crear nueva oferta laboral">
-                    <i class="fas fa-plus-circle"></i>
-                    <span>Crear oferta</span>
+                <button class="btn-card-action btn-oferta" onclick="crearOfertaLaboral(${est.idEstablecimiento})" title="Crear oferta">
+                    <i class="fas fa-briefcase" style="font-size: 0.85rem;"></i>
+                    <span>Nueva Oferta</span>
                 </button>
             </div>
         </div>
     `).join('');
 
     return `
+        <style>
+            .establecimientos-container {
+                padding: 1.5rem;
+            }
+            
+            .establecimientos-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+                border-bottom: 1px solid #444;
+            }
+            
+            .header-info {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+            
+            .header-info i {
+                font-size: 1.5rem;
+                color: #4A90E2;
+            }
+            
+            .header-text h5 {
+                margin: 0;
+                color: #fff;
+                font-weight: 600;
+            }
+            
+            .contador-badge {
+                display: inline-block;
+                background: linear-gradient(135deg, #4A90E2, #357ABD);
+                color: white;
+                padding: 0.25rem 0.75rem;
+                border-radius: 12px;
+                font-size: 0.8rem;
+                font-weight: 600;
+                margin-top: 0.25rem;
+            }
+            
+            .btn-agregar-establecimiento {
+                background: linear-gradient(135deg, #27AE60, #2ECC71);
+                border: none;
+                color: white;
+                padding: 0.6rem 1.2rem;
+                border-radius: 8px;
+                font-weight: 600;
+                font-size: 0.9rem;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+            }
+            
+            .btn-agregar-establecimiento:hover {
+                background: linear-gradient(135deg, #229954, #27AE60);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+            }
+            
+            .btn-agregar-establecimiento i {
+                font-size: 0.85rem;
+            }
+            
+            .establecimientos-lista {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+                gap: 1.25rem;
+            }
+            
+            .establecimiento-card {
+                background: linear-gradient(145deg, #2A2A2A, #252525);
+                border: 1px solid #3a3a3a;
+                border-radius: 12px;
+                overflow: hidden;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            }
+            
+            .establecimiento-card:hover {
+                border-color: #4A90E2;
+                transform: translateY(-4px);
+                box-shadow: 0 6px 20px rgba(74, 144, 226, 0.2);
+            }
+            
+            .establecimiento-card-header {
+                background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
+                padding: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                border-bottom: 1px solid #3a3a3a;
+            }
+            
+            .establecimiento-numero-badge {
+                background: linear-gradient(135deg, #4A90E2, #357ABD);
+                color: white;
+                width: 32px;
+                height: 32px;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
+                font-size: 0.85rem;
+                flex-shrink: 0;
+            }
+            
+            .establecimiento-titulo {
+                display: flex;
+                align-items: center;
+                flex: 1;
+                min-width: 0;
+            }
+            
+            .establecimiento-titulo h6 {
+                color: #fff;
+                font-weight: 600;
+                font-size: 1rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .establecimiento-card-body {
+                padding: 1rem;
+            }
+            
+            .establecimiento-info-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 0.75rem;
+            }
+            
+            .info-item {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                color: #CCCCCC;
+                font-size: 0.85rem;
+            }
+            
+            .info-item i {
+                flex-shrink: 0;
+            }
+            
+            .info-item span {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .establecimiento-card-footer {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1px;
+                background: #3a3a3a;
+                border-top: 1px solid #3a3a3a;
+            }
+            
+            .btn-card-action {
+                background: #2A2A2A;
+                border: none;
+                color: #CCCCCC;
+                padding: 0.75rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                font-size: 0.85rem;
+                font-weight: 500;
+                transition: all 0.2s ease;
+                cursor: pointer;
+            }
+            
+            .btn-card-action:hover {
+                background: #333;
+                color: #fff;
+            }
+            
+            .btn-ubicacion:hover {
+                background: linear-gradient(135deg, #3498DB, #2980B9);
+                color: white;
+            }
+            
+            .btn-oferta:hover {
+                background: linear-gradient(135deg, #27AE60, #229954);
+                color: white;
+            }
+            
+            .btn-card-action i {
+                flex-shrink: 0;
+            }
+            
+            @media (max-width: 768px) {
+                .establecimientos-lista {
+                    grid-template-columns: 1fr;
+                }
+                
+                .establecimientos-header {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 1rem;
+                }
+                
+                .btn-agregar-establecimiento {
+                    width: 100%;
+                }
+            }
+        </style>
+        
         <div class="establecimientos-container">
             <div class="establecimientos-header">
                 <div class="header-info">
@@ -2251,176 +2466,6 @@ function verEnMapa(latitud, longitud) {
     console.log(`🗺️ Ver en mapa: ${latitud}, ${longitud}`);
     // TODO: Implementar vista de mapa
     window.open(`https://www.google.com/maps?q=${latitud},${longitud}`, '_blank');
-}
-
-/**
- * Crear oferta laboral para un establecimiento
- * @param {number} idEstablecimiento - ID del establecimiento
- * @param {string} nombreEstablecimiento - Nombre del establecimiento
- */
-async function crearOfertaLaboral(idEstablecimiento, nombreEstablecimiento) {
-    console.log(`💼 Crear oferta laboral para establecimiento: ${idEstablecimiento} - ${nombreEstablecimiento}`);
-    
-    // Mostrar modal con loading inicial
-    const modalHtml = `
-        <div class="modal fade" id="modalCrearOferta" tabindex="-1">
-            <div class="modal-dialog modal-xl">
-                <div class="modal-content bg-dark border-primary">
-                    <div class="modal-header border-secondary bg-gradient" style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);">
-                        <h4 class="modal-title text-white fw-bold">
-                            <i class="fas fa-briefcase me-3 text-success fs-4"></i>
-                            Crear Nueva Oferta Laboral
-                        </h4>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body p-4" style="background: #1e1e1e;">
-                        <div class="mb-4 p-4 bg-gradient rounded-3 border border-primary" style="background: linear-gradient(135deg, #0d4377 0%, #14547a 100%);">
-                            <h5 class="text-white mb-2">
-                                <i class="fas fa-building me-3 text-info fs-5"></i>
-                                Establecimiento: <span class="text-warning">${nombreEstablecimiento}</span>
-                            </h5>
-                            <p class="text-light mb-0"><small><i class="fas fa-id-card me-2"></i>ID: ${idEstablecimiento}</small></p>
-                        </div>
-                        
-                        <div id="loadingContent" class="text-center py-5">
-                            <div class="spinner-border text-primary mb-3" role="status">
-                                <span class="visually-hidden">Cargando...</span>
-                            </div>
-                            <p class="text-light">Cargando datos para el formulario...</p>
-                        </div>
-                        
-                        <form id="formCrearOferta" style="display: none;">
-                            <div class="row g-4">
-                                <div class="col-md-6">
-                                    <label class="form-label text-light fw-semibold fs-6">
-                                        <i class="fas fa-briefcase me-2 text-primary"></i>Puesto de Trabajo
-                                    </label>
-                                    <select class="form-select form-select-lg bg-dark text-light border-secondary" 
-                                            id="idPuestoTrabajo" required>
-                                        <option value="">Seleccionar puesto...</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label text-light fw-semibold fs-6">
-                                        <i class="fas fa-leaf me-2 text-success"></i>Especie (Opcional)
-                                    </label>
-                                    <select class="form-select form-select-lg bg-dark text-light border-secondary" 
-                                            id="idEspecie">
-                                        <option value="">Sin especie específica</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="row g-4 mt-2">
-                                <div class="col-md-6">
-                                    <label class="form-label text-light fw-semibold fs-6">
-                                        <i class="fas fa-users me-2 text-warning"></i>Vacantes Disponibles
-                                    </label>
-                                    <input type="number" class="form-control form-control-lg bg-dark text-light border-secondary" 
-                                           id="vacantes" min="1" value="1" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label text-light fw-semibold fs-6">
-                                        <i class="fas fa-calendar-times me-2 text-danger"></i>Fecha de Cierre
-                                    </label>
-                                    <input type="date" class="form-control form-control-lg bg-dark text-light border-secondary" 
-                                           id="fechaCierre" required>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer border-secondary p-4" style="background: #1a1a1a;">
-                        <button type="button" class="btn btn-secondary btn-lg px-4" data-bs-dismiss="modal">
-                            <i class="fas fa-times me-2"></i>Cancelar
-                        </button>
-                        <button type="button" class="btn btn-success btn-lg px-4 ms-3" 
-                                onclick="guardarOfertaLaboral(${idEstablecimiento})" 
-                                id="btnGuardarOferta" disabled>
-                            <i class="fas fa-save me-2"></i>Crear Oferta Laboral
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // Eliminar modal existente si existe
-    const existingModal = document.getElementById('modalCrearOferta');
-    if (existingModal) {
-        existingModal.remove();
-    }
-    
-    // Agregar modal al DOM
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    
-    // Mostrar modal
-    const modal = new bootstrap.Modal(document.getElementById('modalCrearOferta'));
-    modal.show();
-    
-    // Cargar datos de forma asíncrona
-    try {
-        console.log('🔄 Cargando datos para el formulario...');
-        
-        // Cargar puestos de trabajo y especies en paralelo
-        const [puestos, especies] = await Promise.all([
-            cargarPuestosTrabajo(),
-            cargarEspeciesParaOfertas()
-        ]);
-        
-        // Llenar dropdown de puestos de trabajo
-        const selectPuestos = document.getElementById('idPuestoTrabajo');
-        if (selectPuestos) {
-            puestos.forEach(puesto => {
-                const option = document.createElement('option');
-                option.value = puesto.id || puesto.idPuestoTrabajo;
-                option.textContent = puesto.nombre || puesto.descripcion;
-                selectPuestos.appendChild(option);
-            });
-        }
-        
-        // Llenar dropdown de especies
-        const selectEspecies = document.getElementById('idEspecie');
-        if (selectEspecies && especies.length > 0) {
-            especies.forEach(especie => {
-                const option = document.createElement('option');
-                option.value = especie.id || especie.idEspecie;
-                option.textContent = especie.nombre;
-                selectEspecies.appendChild(option);
-            });
-        }
-        
-        // Establecer fecha mínima (mañana)
-        const fechaCierre = document.getElementById('fechaCierre');
-        if (fechaCierre) {
-            const mañana = new Date();
-            mañana.setDate(mañana.getDate() + 1);
-            fechaCierre.min = mañana.toISOString().split('T')[0];
-        }
-        
-        // Ocultar loading y mostrar formulario
-        document.getElementById('loadingContent').style.display = 'none';
-        document.getElementById('formCrearOferta').style.display = 'block';
-        document.getElementById('btnGuardarOferta').disabled = false;
-        
-        console.log('✅ Formulario de oferta laboral listo');
-        
-    } catch (error) {
-        console.error('❌ Error al cargar datos del formulario:', error);
-        
-        // Mostrar error en el modal
-        document.getElementById('loadingContent').innerHTML = `
-            <div class="text-center py-5">
-                <i class="fas fa-exclamation-triangle text-warning fs-1 mb-3"></i>
-                <h5 class="text-warning">Error al cargar datos</h5>
-                <p class="text-light">${error.message}</p>
-                <button class="btn btn-primary" onclick="location.reload()">
-                    <i class="fas fa-refresh me-2"></i>Recargar página
-                </button>
-            </div>
-        `;
-        
-        showMessage('Error al cargar datos del formulario: ' + error.message, 'error');
-    }
 }
 
 /**
@@ -4746,7 +4791,7 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 		// Crear control personalizado
 		const ControlGeolocalizacion = L.Control.extend({
 			options: {
-				position: 'topright'
+				position: 'topleft'
 			},
 
 			onAdd: function (map) {

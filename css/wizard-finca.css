@@ -36,9 +36,55 @@
 
 /* Body del modal */
 #wizardFincaModal .modal-body {
-    padding: 2rem;
+    padding: 2rem 1.5rem;
     max-height: calc(100vh - 200px);
     overflow-y: auto;
+    overflow-x: hidden;
+    color: #ffffff;
+}
+
+/* Contenedor del wizard con ancho limitado */
+#wizard-content {
+    max-width: 100%;
+    margin: 0 auto;
+    width: 100%;
+    color: #ffffff;
+}
+
+/* Asegurar que todos los elementos internos respeten el ancho */
+#wizard-content .form-control,
+#wizard-content .form-select,
+#wizard-content .btn,
+#wizard-content .wizard-progress,
+#wizard-content .wizard-step-content,
+#wizard-content .row {
+    max-width: 100%;
+}
+
+#wizard-content .row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+#wizard-content .col,
+#wizard-content [class*="col-"] {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+/* Labels y textos en blanco */
+#wizard-content label,
+#wizard-content .form-label,
+#wizard-content p,
+#wizard-content span,
+#wizard-content h1,
+#wizard-content h2,
+#wizard-content h3,
+#wizard-content h4,
+#wizard-content h5,
+#wizard-content h6,
+#wizard-content .text-muted {
+    color: #ffffff !important;
 }
 
 /* ===================================

@@ -281,6 +281,11 @@
     color: var(--ofertas-text-primary) !important;
 }
 
+/* Contenedor de botones de ordenamiento */
+.btn-group:has(.btn-orden-publico) {
+    gap: 0.75rem !important;
+}
+
 /* Botones de ordenamiento */
 .btn-orden-publico {
     border: 2px solid var(--ofertas-border) !important;
@@ -290,6 +295,7 @@
     border-radius: 12px !important;
     padding: 0.8rem 1.2rem !important;
     transition: all 0.3s ease;
+    flex: 1 !important;
 }
 
 .btn-orden-publico:hover,
@@ -436,11 +442,12 @@
 
 /* Header de la card */
 .oferta-publica-card .card-header {
-    background: linear-gradient(135deg, #F39C12 0%, #E67E22 100%) !important;
+    background: linear-gradient(135deg, #1e7e34 0%, #28a745 100%) !important;
     border-bottom: none !important;
     padding: 1.5rem !important;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 4px 15px rgba(30, 126, 52, 0.5) !important;
 }
 
 .oferta-publica-card .card-header::before {
@@ -450,8 +457,14 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+    background: linear-gradient(45deg, rgba(255,255,255,0.2) 0%, transparent 100%);
     pointer-events: none;
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
 }
 
 .oferta-publica-card .card-header h5 {
