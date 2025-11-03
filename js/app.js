@@ -4108,32 +4108,185 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 	}
 
 
-	// Inicializar mapa principal (requiere Leaflet.js incluido)
-	/*
-	var map = L.map('map').setView([-32.89, -68.83], 8); // Mendoza
+	// Inicializar mapa principal de establecimientos
+	function inicializarMapaPrincipal() {
+		const mainMapContainer = document.getElementById('main-map');
+		if (!mainMapContainer) {
+			console.warn('⚠️ Container del mapa principal no encontrado');
+			return;
+		}
 
-	// Capa estándar OSM
-	var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-		maxZoom: 18,
-		attribution: '© OpenStreetMap contributors'
-	});
+		console.log('🗺️ Inicializando mapa principal de establecimientos...');
 
-	// Capa satelital Esri World Imagery (gratuita)
-	// Capa satelital MapTiler (gratuita, sin API key para pruebas limitadas)
-	// Capa satelital Esri World Imagery (gratuita)
-	var esriSatLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-		maxZoom: 18,
-		attribution: 'Tiles © Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-	});
+		var mainMap = L.map('main-map').setView([-32.89, -68.83], 8); // Mendoza
 
-	// Control de capas
-	var baseMaps = {
-		"Mapa estándar": osmLayer,
-		"Vista satelital": esriSatLayer
-	};
-	osmLayer.addTo(map);
-	L.control.layers(baseMaps).addTo(map);
-	*/
+		// Capa estándar OSM
+		var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			maxZoom: 18,
+			attribution: '© OpenStreetMap contributors'
+		});
+
+		// Capa satelital Esri World Imagery (gratuita)
+		var esriSatLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+			maxZoom: 18,
+			attribution: 'Tiles © Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+		});
+
+		// Control de capas
+		var baseMaps = {
+			"Mapa estándar": osmLayer,
+			"Vista satelital": esriSatLayer
+		};
+		osmLayer.addTo(mainMap);
+		L.control.layers(baseMaps).addTo(mainMap);
+
+		// Cargar establecimientos desde el backend
+		cargarEstablecimientosEnMapa(mainMap);
+
+		console.log('✅ Mapa principal inicializado correctamente');
+		return mainMap;
+	}
+
+	// Función para cargar establecimientos desde las ofertas públicas
+	async function cargarEstablecimientosEnMapa(mapa) {
+		try {
+			console.log('📍 Cargando establecimientos desde ofertas públicas...');
+			
+			// Cargar ofertas públicas si no están ya cargadas
+			if (!estadoOfertasPublicas.ofertas || estadoOfertasPublicas.ofertas.length === 0) {
+				await cargarOfertasPublicas();
+			}
+
+			if (estadoOfertasPublicas.ofertas && estadoOfertasPublicas.ofertas.length > 0) {
+				console.log(`✅ Procesando ${estadoOfertasPublicas.ofertas.length} ofertas para extraer establecimientos`);
+				
+				// Crear un mapa de establecimientos únicos usando el nombre como clave
+				const establecimientosUnicos = new Map();
+				
+				estadoOfertasPublicas.ofertas.forEach(function(oferta) {
+					console.log('🔍 Procesando oferta:', oferta); // Debug log
+					
+					// Verificar que la oferta tenga coordenadas válidas y nombre de establecimiento
+					if (oferta.latitud && oferta.longitud && oferta.nombreEstablecimiento) {
+						const lat = parseFloat(oferta.latitud);
+						const lng = parseFloat(oferta.longitud);
+						const nombreEstablecimiento = oferta.nombreEstablecimiento.trim().toLowerCase();
+						
+						if (!isNaN(lat) && !isNaN(lng)) {
+							// Si el establecimiento no existe o esta oferta tiene más información, actualizar
+							if (!establecimientosUnicos.has(nombreEstablecimiento)) {
+								establecimientosUnicos.set(nombreEstablecimiento, {
+									nombre: oferta.nombreEstablecimiento,
+									latitud: lat,
+									longitud: lng,
+									especie_principal: oferta.nombreEspecie || 'No especificado',
+									ofertas: []
+								});
+							}
+							
+							// Agregar esta oferta a la lista de ofertas del establecimiento
+							establecimientosUnicos.get(nombreEstablecimiento).ofertas.push({
+								id: oferta.idOfertaEmpleo,
+								puesto: oferta.nombrePuestoTrabajo,
+								especie: oferta.nombreEspecie,
+								vacantes: oferta.vacantes,
+								fecha_cierre: oferta.fechaCierre
+							});
+						} else {
+							console.warn(`⚠️ Coordenadas inválidas para oferta ${oferta.idOfertaEmpleo}: lat=${oferta.latitud}, lng=${oferta.longitud}`);
+						}
+					} else {
+						console.warn(`⚠️ Oferta sin datos de establecimiento: ${oferta.idOfertaEmpleo}`);
+					}
+				});
+				
+				console.log(`✅ Se encontraron ${establecimientosUnicos.size} establecimientos únicos`);
+				
+				// Agregar marcadores para cada establecimiento único
+				establecimientosUnicos.forEach(function(establecimiento, key) {
+					// Crear contenido del popup con información del establecimiento y sus ofertas
+					const ofertasHtml = establecimiento.ofertas.map(oferta => {
+						// Formatear fecha de cierre
+						let fechaCierreFormateada = 'No especificada';
+						if (oferta.fecha_cierre) {
+							try {
+								const fecha = new Date(oferta.fecha_cierre);
+								fechaCierreFormateada = fecha.toLocaleDateString('es-ES', {
+									year: 'numeric',
+									month: 'short',
+									day: 'numeric'
+								});
+							} catch (e) {
+								fechaCierreFormateada = oferta.fecha_cierre;
+							}
+						}
+						
+						return `<div class="mb-2 p-2 bg-light rounded">
+							<strong>${oferta.puesto}</strong><br>
+							<small><i class="fas fa-seedling"></i> ${oferta.especie || 'No especificado'}</small><br>
+							<small><i class="fas fa-users"></i> ${oferta.vacantes} vacante(s)</small><br>
+							<small><i class="fas fa-calendar"></i> Cierre: ${fechaCierreFormateada}</small>
+						</div>`;
+					}).join('');
+					
+					const popupContent = `
+						<div class="establecimiento-popup">
+							<h6><strong>${establecimiento.nombre}</strong></h6>
+							<p><strong>Especie principal:</strong> ${establecimiento.especie_principal}</p>
+							<p><strong>Ofertas laborales activas:</strong></p>
+							<div class="ofertas-container">
+								${ofertasHtml}
+							</div>
+							<small class="text-muted">Total: ${establecimiento.ofertas.length} oferta(s) disponible(s)</small>
+						</div>
+					`;
+					
+					// Crear marcador con popup
+					L.marker([establecimiento.latitud, establecimiento.longitud])
+						.addTo(mapa)
+						.bindPopup(popupContent, {
+							maxWidth: 350,
+							className: 'establecimiento-popup-container'
+						});
+				});
+				
+				console.log('✅ Marcadores de establecimientos agregados al mapa');
+				
+				// Ajustar la vista del mapa para mostrar todos los marcadores
+				if (establecimientosUnicos.size > 0) {
+					const coordenadas = Array.from(establecimientosUnicos.values()).map(est => [est.latitud, est.longitud]);
+					const group = new L.featureGroup(coordenadas.map(coord => L.marker(coord)));
+					mapa.fitBounds(group.getBounds().pad(0.1));
+				}
+				
+			} else {
+				console.warn('⚠️ No se encontraron ofertas públicas');
+				// Mostrar mensaje en el mapa
+				mostrarMensajeEnMapa(mapa, 'No hay establecimientos con ofertas laborales activas');
+			}
+		} catch (error) {
+			console.error('❌ Error al cargar establecimientos:', error);
+			// Mostrar mensaje de error en el mapa
+			mostrarMensajeEnMapa(mapa, 'Error al cargar establecimientos');
+		}
+	}
+
+	// Función para mostrar mensaje informativo en el mapa
+	function mostrarMensajeEnMapa(mapa, mensaje) {
+		const center = mapa.getCenter();
+		L.popup()
+			.setLatLng(center)
+			.setContent(`<div class="alert alert-info">${mensaje}</div>`)
+			.openOn(mapa);
+	}
+
+	// Llamar a la función cuando el DOM esté listo
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', inicializarMapaPrincipal);
+	} else {
+		// DOM ya está listo
+		setTimeout(inicializarMapaPrincipal, 100);
+	}
 
 	// --- Lógica del wizard de registro de empleador ---
 	const paso1 = document.getElementById('form-registro-empleador-paso1');
@@ -8691,6 +8844,7 @@ async function cargarOfertasPublicas(filtros = {}) {
         
         const ofertas = await response.json();
         console.log('✅ Ofertas públicas cargadas:', ofertas.length);
+        console.log('🔍 Estructura de primera oferta:', ofertas.length > 0 ? ofertas[0] : 'No hay ofertas');
         
         estadoOfertasPublicas.ofertas = ofertas;
         estadoOfertasPublicas.filtros = { ...filtros };

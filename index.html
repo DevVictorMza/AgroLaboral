@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="css/style.css?v=botones-grandes">
     <link rel="stylesheet" href="css/botones-gigantes.css?v=1">
     <link rel="stylesheet" href="css/map-ofertas.css?v=1">
+    <link rel="stylesheet" href="css/map-establecimientos.css?v=1">
     
     <!-- Estilos adicionales para dashboard offcanvas -->
     <style>
@@ -281,9 +282,11 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Mapa Principal de Establecimientos -->
         <div class="row justify-content-center">
             <div class="col-lg-10">
-                <div id="map" class="my-3"></div>
+                <div id="main-map" class="my-3"></div>
             </div>
         </div>
     </main>
@@ -377,9 +380,6 @@
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-outline-primary" id="btn-vista-lista" onclick="cambiarVista('lista')">
                             <i class="fas fa-list me-2"></i>Lista
-                        </button>
-                        <button type="button" class="btn btn-outline-primary" id="btn-vista-mapa" onclick="cambiarVista('mapa')">
-                            <i class="fas fa-map me-2"></i>Mapa
                         </button>
                     </div>
                 </div>

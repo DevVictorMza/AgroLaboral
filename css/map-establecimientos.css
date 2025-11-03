@@ -1,0 +1,111 @@
+/* Estilos para popups de establecimientos en el mapa */
+.establecimiento-popup-container .leaflet-popup-content-wrapper {
+    background: white !important;
+    color: #333 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    min-width: 320px !important;
+}
+
+.establecimiento-popup {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.4;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.establecimiento-popup h6 {
+    margin: 0 0 10px 0;
+    color: #2c3e50 !important;
+    font-size: 1.1rem;
+    border-bottom: 2px solid #27ae60;
+    padding-bottom: 5px;
+}
+
+.establecimiento-popup p {
+    margin: 5px 0;
+    color: #555 !important;
+    font-size: 0.9rem;
+}
+
+.establecimiento-popup .text-muted {
+    color: #888 !important;
+    font-style: italic;
+    font-size: 0.8rem;
+    margin-top: 10px;
+    border-top: 1px solid #eee;
+    padding-top: 5px;
+}
+
+/* Contenedor de ofertas */
+.ofertas-container {
+    max-height: 200px;
+    overflow-y: auto;
+    margin: 10px 0;
+    border: 1px solid #e8e8e8;
+    border-radius: 5px;
+    padding: 5px;
+    background-color: #fafafa;
+}
+
+.ofertas-container .mb-2 {
+    margin-bottom: 8px !important;
+    border-left: 3px solid #27ae60 !important;
+    transition: all 0.2s ease;
+    background-color: white !important;
+}
+
+.ofertas-container .mb-2:hover {
+    border-left-color: #2ecc71 !important;
+    background-color: #f8f9fa !important;
+}
+
+.ofertas-container .fas {
+    color: #27ae60 !important;
+    margin-right: 5px;
+}
+
+.ofertas-container strong {
+    color: #2c3e50 !important;
+    font-size: 0.9rem;
+}
+
+.ofertas-container small {
+    color: #666 !important;
+    font-size: 0.8rem;
+}
+
+.establecimiento-popup-container .leaflet-popup-tip {
+    background: white !important;
+}
+
+/* Estilos adicionales para el mapa principal */
+#main-map .leaflet-popup-content {
+    margin: 8px 12px;
+    min-width: 300px;
+}
+
+/* Scrollbar personalizada para Firefox */
+.ofertas-container {
+    scrollbar-width: thin;
+    scrollbar-color: #27ae60 #f1f1f1;
+}
+
+/* Scrollbar personalizada para Webkit */
+.ofertas-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ofertas-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.ofertas-container::-webkit-scrollbar-thumb {
+    background: #27ae60;
+    border-radius: 3px;
+}
+
+.ofertas-container::-webkit-scrollbar-thumb:hover {
+    background: #2ecc71;
+}
