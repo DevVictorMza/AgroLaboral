@@ -74,3 +74,85 @@
     filter: drop-shadow(0 0 10px #ff6b6b);
     transform: scale(1.15);
 }
+
+/* Estilos para marcador de ubicación del usuario */
+.user-location-marker {
+    background: #dc3545;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 3px solid #ffffff;
+    box-shadow: 0 0 0 2px #dc3545, 0 2px 8px rgba(220, 53, 69, 0.4);
+    animation: userLocationPulse 2s infinite;
+}
+
+@keyframes userLocationPulse {
+    0% {
+        box-shadow: 0 0 0 2px #dc3545, 0 0 0 4px rgba(220, 53, 69, 0.5), 0 2px 8px rgba(220, 53, 69, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 2px #dc3545, 0 0 0 12px rgba(220, 53, 69, 0.1), 0 2px 8px rgba(220, 53, 69, 0.4);
+    }
+    100% {
+        box-shadow: 0 0 0 2px #dc3545, 0 0 0 4px rgba(220, 53, 69, 0.5), 0 2px 8px rgba(220, 53, 69, 0.4);
+    }
+}
+
+/* Círculo de precisión de geolocalización */
+.user-location-accuracy {
+    border: 2px solid #dc3545;
+    background: rgba(220, 53, 69, 0.1);
+}
+
+/* Botón de geolocalización personalizado */
+.leaflet-control-geolocate {
+    background: #fff;
+    border: 2px solid rgba(0,0,0,0.2);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 30px;
+    text-align: center;
+    width: 34px;
+    height: 34px;
+    color: #333;
+    text-decoration: none;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+}
+
+.leaflet-control-geolocate:hover {
+    background: #f4f4f4;
+    color: #dc3545;
+}
+
+.leaflet-control-geolocate.active {
+    background: #dc3545;
+    color: white;
+}
+
+.leaflet-control-geolocate.loading {
+    background: #ffc107;
+    color: white;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Animación de pulso adicional para marcador inline */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

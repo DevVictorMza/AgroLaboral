@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Simple - Geolocalización</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { margin: 20px; font-family: Arial, sans-serif; }
+        #map { height: 400px; width: 100%; border: 2px solid #ccc; }
+        .status { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .user-location-marker {
+            background: #dc3545 !important;
+            width: 20px !important;
+            height: 20px !important;
+            border-radius: 50% !important;
+            border: 3px solid white !important;
+            box-shadow: 0 0 0 2px #dc3545, 0 0 10px rgba(220, 53, 69, 0.6) !important;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Test Simple - Geolocalización</h1>
+    
+    <div id="status-container">
+        <div class="status info">Preparando sistema de geolocalización...</div>
+    </div>
+    
+    <button id="get-location" style="padding: 10px 20px; font-size: 16px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        📍 Obtener Mi Ubicación
+    </button>
+    
+    <div id="map"></div>
+    
+    <div id="debug-info">
+        <h3>Información de Debug:</h3>
+        <ul id="debug-list"></ul>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        let map;
+        let userMarker;
+        
+        function addStatus(message, type = 'info') {
+            const container = document.getElementById('status-container');
+            container.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+        
+        function addDebug(message) {
+            const list = document.getElementById('debug-list');
+            const li = document.createElement('li');
+            li.textContent = message;
+            list.appendChild(li);
+        }
+        
+        // Inicializar mapa
+        function initMap() {
+            addDebug('Inicializando mapa...');
+            map = L.map('map').setView([-32.89, -68.83], 10);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 18,
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            
+            addDebug('Mapa inicializado correctamente');
+            addStatus('Mapa listo. Haz clic en el botón para obtener tu ubicación.', 'success');
+        }
+        
+        // Función de geolocalización
+        function getUserLocation() {
+            addDebug('Solicitando ubicación del usuario...');
+            addStatus('Obteniendo tu ubicación...', 'info');
+            
+            if (!navigator.geolocation) {
+                addStatus('Tu navegador no soporta geolocalización', 'error');
+                addDebug('ERROR: Geolocalización no soportada');
+                return;
+            }
+            
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const accuracy = position.coords.accuracy;
+                    
+                    addDebug(`Ubicación obtenida: ${lat}, ${lng} (±${Math.round(accuracy)}m)`);
+                    
+                    // Crear marcador rojo
+                    if (userMarker) {
+                        map.removeLayer(userMarker);
+                    }
+                    
+                    const redIcon = L.divIcon({
+                        className: 'user-location-marker',
+                        html: '<div style="background: #dc3545; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 2px #dc3545, 0 0 10px rgba(220, 53, 69, 0.8);"></div>',
+                        iconSize: [26, 26],
+                        iconAnchor: [13, 13]
+                    });
+                    
+                    userMarker = L.marker([lat, lng], {
+                        icon: redIcon,
+                        zIndexOffset: 1000
+                    }).addTo(map);
+                    
+                    userMarker.bindPopup(`
+                        <strong>🎯 Tu Ubicación</strong><br>
+                        Lat: ${lat.toFixed(6)}<br>
+                        Lng: ${lng.toFixed(6)}<br>
+                        Precisión: ±${Math.round(accuracy)}m
+                    `).openPopup();
+                    
+                    // Centrar mapa
+                    map.flyTo([lat, lng], 15);
+                    
+                    // Círculo de precisión
+                    L.circle([lat, lng], {
+                        radius: accuracy,
+                        color: '#dc3545',
+                        fillColor: '#dc3545',
+                        fillOpacity: 0.1,
+                        weight: 2
+                    }).addTo(map);
+                    
+                    addStatus(`✅ ¡Ubicación encontrada! Marcador rojo mostrado en el mapa.`, 'success');
+                    addDebug('Marcador rojo creado y agregado al mapa');
+                },
+                function(error) {
+                    let message = 'Error desconocido';
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            message = 'Permisos denegados. Permite el acceso a tu ubicación.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            message = 'Ubicación no disponible. Verifica tu GPS/WiFi.';
+                            break;
+                        case error.TIMEOUT:
+                            message = 'Tiempo agotado. Intenta nuevamente.';
+                            break;
+                    }
+                    addStatus(message, 'error');
+                    addDebug(`ERROR: ${message}`);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 60000
+                }
+            );
+        }
+        
+        // Inicializar cuando la página esté lista
+        document.addEventListener('DOMContentLoaded', function() {
+            addDebug('Página cargada');
+            addDebug('Navegador: ' + navigator.userAgent.split(' ').pop());
+            addDebug('Geolocalización soportada: ' + ('geolocation' in navigator ? 'SÍ' : 'NO'));
+            addDebug('Protocolo: ' + location.protocol);
+            
+            initMap();
+            
+            document.getElementById('get-location').addEventListener('click', getUserLocation);
+        });
+    </script>
+</body>
+</html>

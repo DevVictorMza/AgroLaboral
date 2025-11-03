@@ -4110,6 +4110,8 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 
 	// Inicializar mapa principal de establecimientos
 	function inicializarMapaPrincipal() {
+		console.log('🗺️ === INICIALIZANDO MAPA PRINCIPAL ===');
+		
 		const mainMapContainer = document.getElementById('main-map');
 		if (!mainMapContainer) {
 			console.warn('⚠️ Container del mapa principal no encontrado');
@@ -4117,12 +4119,15 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 		}
 
 		console.log('🗺️ Inicializando mapa principal de establecimientos...');
+		console.log('📦 Container encontrado:', mainMapContainer);
 
 		// Crear instancia del mapa principal
 		mapaPrincipal.instancia = L.map('main-map').setView(
 			mapaPrincipal.configuracion.centro, 
 			mapaPrincipal.configuracion.zoom
 		);
+
+		console.log('✅ Instancia del mapa creada');
 
 		// Capa estándar OSM
 		mapaPrincipal.capas.clasica = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -4144,11 +4149,392 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 		mapaPrincipal.capas.clasica.addTo(mapaPrincipal.instancia);
 		L.control.layers(baseMaps).addTo(mapaPrincipal.instancia);
 
+		console.log('🗺️ Capas agregadas al mapa');
+
+		// Agregar control de geolocalización
+		console.log('📍 Agregando control de geolocalización...');
+		agregarControlGeolocalizacion();
+
 		// Cargar establecimientos desde el backend
 		cargarEstablecimientosEnMapa(mapaPrincipal.instancia);
 
 		console.log('✅ Mapa principal inicializado correctamente');
+		
+		// Agregar funcionalidad al botón de ubicación visible
+		const btnMiUbicacion = document.getElementById('btn-mi-ubicacion');
+		if (btnMiUbicacion) {
+			btnMiUbicacion.addEventListener('click', function() {
+				console.log('🖱️ Clic en botón "Mi Ubicación" visible');
+				btnMiUbicacion.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Obteniendo...';
+				btnMiUbicacion.disabled = true;
+				
+				obtenerUbicacionUsuario();
+				
+				// Restaurar botón después de un tiempo
+				setTimeout(() => {
+					if (!mapaPrincipal.ubicacionUsuario.activa) {
+						btnMiUbicacion.innerHTML = '<i class="fas fa-location-arrow"></i> Mi Ubicación';
+						btnMiUbicacion.disabled = false;
+					}
+				}, 15000);
+			});
+			
+			console.log('✅ Botón "Mi Ubicación" configurado');
+		}
+		
 		return mapaPrincipal.instancia;
+	}
+
+	// ===========================
+	// SISTEMA DE GEOLOCALIZACIÓN
+	// ===========================
+
+	/**
+	 * Función para obtener la ubicación actual del usuario
+	 */
+	function obtenerUbicacionUsuario() {
+		console.log('🌍 Solicitando ubicación del usuario...');
+
+		if (!navigator.geolocation) {
+			console.error('❌ Geolocalización no soportada por este navegador');
+			alert('Tu navegador no soporta geolocalización');
+			return;
+		}
+
+		// Cambiar estado del botón a "cargando"
+		const controlBtn = document.querySelector('.leaflet-control-geolocate');
+		if (controlBtn) {
+			controlBtn.classList.add('loading');
+			controlBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+		}
+
+		// Solicitar ubicación con configuración optimizada
+		navigator.geolocation.getCurrentPosition(
+			function(position) {
+				console.log('✅ UBICACIÓN OBTENIDA:', position.coords);
+				manejarUbicacionExitosa(position);
+			},
+			function(error) {
+				console.error('❌ ERROR DE GEOLOCALIZACIÓN:', error);
+				manejarErrorUbicacion(error);
+			},
+			{
+				enableHighAccuracy: true,
+				timeout: 15000,
+				maximumAge: 30000
+			}
+		);
+	}
+
+	/**
+	 * Maneja la respuesta exitosa de geolocalización
+	 */
+	function manejarUbicacionExitosa(position) {
+		console.log('✅ === UBICACIÓN OBTENIDA EXITOSAMENTE ===');
+		console.log('📊 Datos completos:', position);
+
+		const lat = position.coords.latitude;
+		const lng = position.coords.longitude;
+		const accuracy = position.coords.accuracy;
+
+		console.log('📍 Latitud:', lat);
+		console.log('📍 Longitud:', lng);
+		console.log('📍 Precisión:', accuracy, 'metros');
+
+		// Guardar coordenadas en el estado global
+		mapaPrincipal.ubicacionUsuario.coordenadas = { lat, lng, accuracy };
+		mapaPrincipal.ubicacionUsuario.activa = true;
+
+		console.log('💾 Coordenadas guardadas en mapaPrincipal');
+
+		// Mostrar marcador en el mapa
+		console.log('🎯 Llamando a mostrarMarcadorUbicacion...');
+		mostrarMarcadorUbicacion(lat, lng, accuracy);
+
+		// Cambiar estado del botón a "activo"
+		const controlBtn = document.querySelector('.leaflet-control-geolocate');
+		if (controlBtn) {
+			controlBtn.classList.remove('loading');
+			controlBtn.classList.add('active');
+			controlBtn.innerHTML = '<i class="fas fa-location-arrow"></i>';
+			controlBtn.style.backgroundColor = '#dc3545';
+			controlBtn.style.color = 'white';
+		}
+
+		console.log('✅ === GEOLOCALIZACIÓN COMPLETADA ===');
+		
+		// Actualizar botón visible
+		const btnMiUbicacion = document.getElementById('btn-mi-ubicacion');
+		if (btnMiUbicacion) {
+			btnMiUbicacion.innerHTML = '<i class="fas fa-check-circle"></i> Ubicación Encontrada';
+			btnMiUbicacion.disabled = false;
+			btnMiUbicacion.classList.remove('btn-danger');
+			btnMiUbicacion.classList.add('btn-success');
+		}
+		
+		// Mostrar información de ubicación
+		const ubicacionInfo = document.getElementById('ubicacion-info');
+		const ubicacionDetalles = document.getElementById('ubicacion-detalles');
+		if (ubicacionInfo && ubicacionDetalles) {
+			ubicacionDetalles.innerHTML = `
+				<strong>📍 Tu ubicación:</strong> ${lat.toFixed(6)}, ${lng.toFixed(6)} 
+				<strong>🎯 Precisión:</strong> ±${Math.round(accuracy)} metros
+			`;
+			ubicacionInfo.classList.remove('d-none');
+			ubicacionInfo.classList.remove('alert-info');
+			ubicacionInfo.classList.add('alert-success');
+		}
+		
+		// Mostrar notificación al usuario
+		console.log('🎉 Mostrando notificación de éxito...');
+		if (typeof bootstrap !== 'undefined') {
+			// Si Bootstrap está disponible, usar toast
+			const toastHtml = `
+				<div class="toast-container position-fixed top-0 end-0 p-3">
+					<div class="toast show" role="alert">
+						<div class="toast-header bg-success text-white">
+							<strong class="me-auto">📍 Ubicación encontrada</strong>
+						</div>
+						<div class="toast-body">
+							Tu marcador rojo está visible en el mapa
+						</div>
+					</div>
+				</div>
+			`;
+		} else {
+			// Fallback con alert
+			setTimeout(() => {
+				alert(`✅ ¡Ubicación encontrada!\n\nTu marcador rojo está visible en el mapa.\nPrecisión: ±${Math.round(accuracy)} metros`);
+			}, 1000);
+		}
+	}
+
+	/**
+	 * Maneja errores de geolocalización
+	 */
+	function manejarErrorUbicacion(error) {
+		console.error('❌ Error de geolocalización:', error);
+
+		let mensaje = 'No se pudo obtener tu ubicación';
+		
+		switch(error.code) {
+			case error.PERMISSION_DENIED:
+				mensaje = 'Permisos de ubicación denegados. Por favor, permite el acceso a tu ubicación en la configuración del navegador.';
+				break;
+			case error.POSITION_UNAVAILABLE:
+				mensaje = 'Información de ubicación no disponible. Verifica tu conexión GPS/WiFi.';
+				break;
+			case error.TIMEOUT:
+				mensaje = 'Tiempo de espera agotado. Intenta nuevamente.';
+				break;
+		}
+
+		alert(mensaje);
+
+		// Resetear estado del botón
+		const controlBtn = document.querySelector('.leaflet-control-geolocate');
+		if (controlBtn) {
+			controlBtn.classList.remove('loading', 'active');
+		}
+	}
+
+	/**
+	 * Muestra el marcador de ubicación del usuario en el mapa
+	 */
+	function mostrarMarcadorUbicacion(lat, lng, accuracy) {
+		console.log('📍 === MOSTRANDO MARCADOR DE UBICACIÓN ===');
+		console.log('📍 Coordenadas:', lat, lng);
+		console.log('📍 Precisión:', accuracy, 'm');
+		
+		if (!mapaPrincipal.instancia) {
+			console.error('❌ No hay instancia del mapa principal');
+			alert('Error: El mapa no está inicializado');
+			return;
+		}
+
+		// Limpiar marcador anterior si existe
+		if (mapaPrincipal.ubicacionUsuario.marcador) {
+			console.log('🧹 Limpiando marcador anterior');
+			mapaPrincipal.instancia.removeLayer(mapaPrincipal.ubicacionUsuario.marcador);
+		}
+		if (mapaPrincipal.ubicacionUsuario.circuloPrecision) {
+			console.log('🧹 Limpiando círculo de precisión anterior');
+			mapaPrincipal.instancia.removeLayer(mapaPrincipal.ubicacionUsuario.circuloPrecision);
+		}
+
+		// Crear marcador rojo super visible y simple
+		console.log('🎨 Creando marcador rojo...');
+		
+		const marcadorRojo = L.marker([lat, lng], {
+			icon: L.icon({
+				iconUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCAzMCAzMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTUiIGN5PSIxNSIgcj0iMTIiIGZpbGw9IiNEQzM1NDUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMyIvPgo8Y2lyY2xlIGN4PSIxNSIgY3k9IjE1IiByPSI2IiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K',
+				iconSize: [30, 30],
+				iconAnchor: [15, 15],
+				popupAnchor: [0, -15]
+			}),
+			zIndexOffset: 10000
+		});
+
+		// Agregar al mapa
+		mapaPrincipal.ubicacionUsuario.marcador = marcadorRojo.addTo(mapaPrincipal.instancia);
+		console.log('✅ Marcador agregado al mapa');
+
+		// Popup con información
+		mapaPrincipal.ubicacionUsuario.marcador.bindPopup(`
+			<div style="text-align: center; min-width: 200px;">
+				<h5 style="color: #dc3545; margin: 0;">🎯 Tu Ubicación</h5>
+				<hr style="margin: 10px 0;">
+				<p style="margin: 5px 0;"><strong>Latitud:</strong> ${lat.toFixed(6)}</p>
+				<p style="margin: 5px 0;"><strong>Longitud:</strong> ${lng.toFixed(6)}</p>
+				<p style="margin: 5px 0;"><strong>Precisión:</strong> ±${Math.round(accuracy)}m</p>
+			</div>
+		`).openPopup();
+
+		// Círculo de precisión
+		if (accuracy < 2000) {
+			mapaPrincipal.ubicacionUsuario.circuloPrecision = L.circle([lat, lng], {
+				radius: accuracy,
+				color: '#dc3545',
+				fillColor: '#dc3545',
+				fillOpacity: 0.15,
+				weight: 2,
+				interactive: false
+			}).addTo(mapaPrincipal.instancia);
+			console.log('🎯 Círculo de precisión agregado:', Math.round(accuracy), 'm');
+		}
+
+		// Centrar mapa en la ubicación
+		mapaPrincipal.instancia.flyTo([lat, lng], 16, {
+			animate: true,
+			duration: 2
+		});
+
+		console.log('✅ === MARCADOR ROJO MOSTRADO EXITOSAMENTE ===');
+	}
+
+	/**
+	 * Activa el seguimiento de ubicación en tiempo real
+	 */
+	function activarSeguimientoUbicacion() {
+		if (!navigator.geolocation) return;
+
+		mapaPrincipal.ubicacionUsuario.watchId = navigator.geolocation.watchPosition(
+			(position) => {
+				const lat = position.coords.latitude;
+				const lng = position.coords.longitude;
+				const accuracy = position.coords.accuracy;
+
+				// Actualizar coordenadas
+				mapaPrincipal.ubicacionUsuario.coordenadas = { lat, lng, accuracy };
+				
+				// Actualizar marcador
+				if (mapaPrincipal.ubicacionUsuario.marcador) {
+					mapaPrincipal.ubicacionUsuario.marcador.setLatLng([lat, lng]);
+				}
+
+				// Actualizar círculo de precisión
+				if (mapaPrincipal.ubicacionUsuario.circuloPrecision) {
+					mapaPrincipal.ubicacionUsuario.circuloPrecision.setLatLng([lat, lng]);
+					mapaPrincipal.ubicacionUsuario.circuloPrecision.setRadius(accuracy);
+				}
+
+				console.log('🔄 Ubicación actualizada:', lat, lng);
+			},
+			(error) => console.warn('⚠️ Error en seguimiento:', error),
+			{
+				enableHighAccuracy: true,
+				timeout: 5000,
+				maximumAge: 30000
+			}
+		);
+	}
+
+	/**
+	 * Desactiva el seguimiento de ubicación
+	 */
+	function desactivarSeguimientoUbicacion() {
+		if (mapaPrincipal.ubicacionUsuario.watchId) {
+			navigator.geolocation.clearWatch(mapaPrincipal.ubicacionUsuario.watchId);
+			mapaPrincipal.ubicacionUsuario.watchId = null;
+		}
+	}
+
+	/**
+	 * Centra el mapa en la ubicación actual del usuario
+	 */
+	function centrarEnMiUbicacion() {
+		if (mapaPrincipal.ubicacionUsuario.coordenadas && mapaPrincipal.instancia) {
+			const { lat, lng } = mapaPrincipal.ubicacionUsuario.coordenadas;
+			mapaPrincipal.instancia.flyTo([lat, lng], 16, {
+				animate: true,
+				duration: 1.5
+			});
+
+			// Abrir popup del marcador
+			if (mapaPrincipal.ubicacionUsuario.marcador) {
+				mapaPrincipal.ubicacionUsuario.marcador.openPopup();
+			}
+		} else {
+			obtenerUbicacionUsuario();
+		}
+	}
+
+	/**
+	 * Agrega el control de geolocalización al mapa
+	 */
+	function agregarControlGeolocalizacion() {
+		console.log('📍 === AGREGANDO CONTROL DE GEOLOCALIZACIÓN ===');
+		
+		if (!mapaPrincipal.instancia) {
+			console.error('❌ No hay instancia del mapa para agregar control');
+			return;
+		}
+
+		console.log('🎮 Creando control personalizado...');
+
+		// Crear control personalizado
+		const ControlGeolocalizacion = L.Control.extend({
+			options: {
+				position: 'topright'
+			},
+
+			onAdd: function (map) {
+				console.log('🔧 Construyendo elemento DOM del control...');
+				
+				const container = L.DomUtil.create('div', 'leaflet-control-geolocate leaflet-bar leaflet-control');
+				
+				container.innerHTML = '<i class="fas fa-location-arrow"></i>';
+				container.title = 'Mi ubicación';
+				
+				console.log('✅ Elemento DOM creado:', container);
+				
+				// Prevenir propagación de eventos de clic al mapa
+				L.DomEvent.disableClickPropagation(container);
+				
+				// Agregar evento de clic
+				L.DomEvent.on(container, 'click', function(e) {
+					console.log('🖱️ Clic en botón de geolocalización');
+					L.DomEvent.stopPropagation(e);
+					
+					if (mapaPrincipal.ubicacionUsuario.activa) {
+						console.log('🎯 Usuario ya localizado, centrando en ubicación...');
+						// Si ya está activo, centrar en ubicación
+						centrarEnMiUbicacion();
+					} else {
+						console.log('📍 Obteniendo nueva ubicación...');
+						// Si no está activo, obtener ubicación
+						obtenerUbicacionUsuario();
+					}
+				});
+
+				return container;
+			}
+		});
+
+		// Agregar control al mapa
+		console.log('➕ Agregando control al mapa...');
+		new ControlGeolocalizacion().addTo(mapaPrincipal.instancia);
+		console.log('✅ Control de geolocalización agregado exitosamente');
 	}
 
 	// Función para cargar establecimientos desde las ofertas públicas
@@ -8967,6 +9353,13 @@ const mapaPrincipal = {
         centro: [-32.89, -68.83], // Mendoza, Argentina
         zoom: 8,
         maxZoom: 18
+    },
+    ubicacionUsuario: {
+        activa: false,
+        marcador: null,
+        coordenadas: null,
+        watchId: null,
+        circuloPrecision: null
     }
 };
 

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔓 Activar Permisos de Ubicación</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .step {
+            background: rgba(255,255,255,0.2);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border-left: 5px solid #ff4757;
+        }
+        .big-button {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            margin: 20px 0;
+            transition: all 0.3s;
+        }
+        .big-button:hover {
+            background: #ff3742;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,71,87,0.4);
+        }
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        .status-info { background: rgba(52,152,219,0.3); }
+        .status-success { background: rgba(46,204,113,0.3); }
+        .status-error { background: rgba(231,76,60,0.3); }
+        .browser-instructions {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .emoji { font-size: 2em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="text-align: center;">
+            <div class="emoji">📍</div>
+            <h1>Activar Ubicación GPS</h1>
+            <p>Para mostrar tu ubicación en el mapa con un marcador rojo</p>
+        </div>
+
+        <div class="step">
+            <h3>🎯 Paso 1: Forzar Solicitud de Permisos</h3>
+            <p>Haz clic en el botón para que el navegador solicite permisos de ubicación:</p>
+            <button id="request-permission" class="big-button">
+                🔓 SOLICITAR PERMISOS DE UBICACIÓN
+            </button>
+        </div>
+
+        <div id="status-container">
+            <div class="status status-info">
+                ⏳ Esperando que hagas clic en el botón...
+            </div>
+        </div>
+
+        <div class="browser-instructions">
+            <h3>🌐 Instrucciones por Navegador:</h3>
+            
+            <div style="margin: 15px 0;">
+                <strong>🔵 Chrome/Edge:</strong>
+                <ol>
+                    <li>Busca el ícono de ubicación en la barra de direcciones (izquierda del URL)</li>
+                    <li>Haz clic y selecciona "Permitir"</li>
+                    <li>Si no aparece, ve a: Configuración → Privacidad → Configuración del sitio → Ubicación</li>
+                </ol>
+            </div>
+
+            <div style="margin: 15px 0;">
+                <strong>🦊 Firefox:</strong>
+                <ol>
+                    <li>Busca el ícono de escudo en la barra de direcciones</li>
+                    <li>Haz clic en "Permitir ubicación"</li>
+                    <li>O ve a: about:preferences#privacy → Permisos → Ubicación</li>
+                </ol>
+            </div>
+
+            <div style="margin: 15px 0;">
+                <strong>🍎 Safari:</strong>
+                <ol>
+                    <li>Safari → Preferencias → Sitios web → Ubicación</li>
+                    <li>Encuentra localhost y cambia a "Permitir"</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🚨 Si los permisos están bloqueados:</h3>
+            <div style="background: rgba(255,71,87,0.2); padding: 15px; border-radius: 8px;">
+                <p><strong>Opción 1:</strong> Resetear permisos del sitio</p>
+                <ol>
+                    <li>Haz clic en el candado/ícono de seguridad en la barra de direcciones</li>
+                    <li>Selecciona "Configuración del sitio" o "Permisos"</li>
+                    <li>Cambia "Ubicación" de "Bloquear" a "Permitir"</li>
+                    <li>Recarga la página</li>
+                </ol>
+                
+                <p><strong>Opción 2:</strong> Limpiar datos del sitio</p>
+                <ol>
+                    <li>Presiona F12 → Console</li>
+                    <li>Escribe: <code>navigator.permissions.query({name: 'geolocation'})</code></li>
+                    <li>Si dice "denied", limpia los datos del sitio</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🔄 Después de permitir ubicación:</h3>
+            <p>Una vez que hayas permitido la ubicación, regresa al mapa principal:</p>
+            <a href="index.html" style="display: inline-block; background: #2ecc71; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; margin: 10px 0;">
+                🗺️ IR AL MAPA PRINCIPAL
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function updateStatus(message, type = 'info') {
+            const container = document.getElementById('status-container');
+            const icons = {
+                'info': '⏳',
+                'success': '✅',
+                'error': '❌',
+                'warning': '⚠️'
+            };
+            
+            container.innerHTML = `
+                <div class="status status-${type}">
+                    ${icons[type]} ${message}
+                </div>
+            `;
+        }
+
+        document.getElementById('request-permission').addEventListener('click', function() {
+            updateStatus('Solicitando permisos de ubicación...', 'info');
+            
+            if (!navigator.geolocation) {
+                updateStatus('❌ Tu navegador no soporta geolocalización. Actualiza tu navegador.', 'error');
+                return;
+            }
+
+            // Verificar estado actual de permisos
+            if (navigator.permissions) {
+                navigator.permissions.query({name: 'geolocation'}).then(function(result) {
+                    console.log('Estado actual de permisos:', result.state);
+                    
+                    if (result.state === 'granted') {
+                        updateStatus('✅ Los permisos ya están concedidos. Probando ubicación...', 'success');
+                        testLocation();
+                    } else if (result.state === 'denied') {
+                        updateStatus('❌ Los permisos están DENEGADOS. Sigue las instrucciones de arriba para habilitarlos.', 'error');
+                    } else {
+                        updateStatus('⏳ Solicitando permisos... Acepta cuando aparezca el mensaje del navegador.', 'warning');
+                        testLocation();
+                    }
+                });
+            } else {
+                updateStatus('⏳ Solicitando permisos... Acepta cuando aparezca el mensaje del navegador.', 'warning');
+                testLocation();
+            }
+        });
+
+        function testLocation() {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude.toFixed(6);
+                    const lng = position.coords.longitude.toFixed(6);
+                    const accuracy = Math.round(position.coords.accuracy);
+                    
+                    updateStatus(`🎉 ¡ÉXITO! Ubicación obtenida: ${lat}, ${lng} (±${accuracy}m). Ahora puedes usar el mapa principal.`, 'success');
+                    
+                    // Guardar en localStorage para verificación
+                    localStorage.setItem('geolocation_working', 'true');
+                    localStorage.setItem('last_location', JSON.stringify({lat, lng, accuracy, timestamp: Date.now()}));
+                    
+                    // Mostrar botón para ir al mapa
+                    setTimeout(() => {
+                        const container = document.getElementById('status-container');
+                        container.innerHTML += `
+                            <div style="text-align: center; margin: 20px 0;">
+                                <a href="index.html" style="display: inline-block; background: #27ae60; color: white; padding: 20px 40px; text-decoration: none; border-radius: 10px; font-size: 18px; font-weight: bold;">
+                                    🗺️ IR AL MAPA PRINCIPAL - UBICACIÓN FUNCIONANDO
+                                </a>
+                            </div>
+                        `;
+                    }, 2000);
+                },
+                function(error) {
+                    let message = '';
+                    let instructions = '';
+                    
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            message = '❌ PERMISOS DENEGADOS';
+                            instructions = 'El usuario rechazó la solicitud. Haz clic en el ícono de ubicación en la barra de direcciones y selecciona "Permitir".';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            message = '📍 UBICACIÓN NO DISPONIBLE';
+                            instructions = 'Activa el GPS en tu dispositivo o conecta a WiFi para ubicación aproximada.';
+                            break;
+                        case error.TIMEOUT:
+                            message = '⏰ TIEMPO AGOTADO';
+                            instructions = 'La solicitud tardó demasiado. Verifica tu conexión GPS/WiFi e intenta nuevamente.';
+                            break;
+                        default:
+                            message = '❌ ERROR DESCONOCIDO';
+                            instructions = 'Error inesperado. Intenta refrescar la página.';
+                    }
+                    
+                    updateStatus(`${message}: ${instructions}`, 'error');
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 0  // Forzar nueva ubicación
+                }
+            );
+        }
+
+        // Verificar al cargar la página
+        window.addEventListener('load', function() {
+            const working = localStorage.getItem('geolocation_working');
+            if (working === 'true') {
+                const lastLocation = JSON.parse(localStorage.getItem('last_location') || '{}');
+                if (lastLocation.timestamp && (Date.now() - lastLocation.timestamp) < 300000) { // 5 minutos
+                    updateStatus(`✅ Geolocalización previamente funcionando. Última ubicación: ${lastLocation.lat}, ${lastLocation.lng}`, 'success');
+                }
+            }
+            
+            // Mostrar información del navegador
+            console.log('Navegador:', navigator.userAgent);
+            console.log('Geolocalización soportada:', 'geolocation' in navigator);
+            console.log('Protocolo:', location.protocol);
+            console.log('Host:', location.host);
+        });
+    </script>
+</body>
+</html>
