@@ -19,133 +19,14 @@
     <link rel="stylesheet" href="css/marcador-destacado.css">
     <link rel="stylesheet" href="css/map-markers.css?v=1">
     <link rel="stylesheet" href="css/ofertas-section.css?v=1">
-    <!-- Cards CSS - DEBE SER EL ÚLTIMO PARA MÁXIMA PRIORIDAD -->
+    <!-- Lista de Establecimientos CSS -->
+    <link rel="stylesheet" href="css/establecimientos-lista.css?v=1">
+    <!-- Cards CSS - MODALES -->
     <link rel="stylesheet" href="css/cards-modales.css?v=2">
     
-    <!-- Estilos adicionales para dashboard offcanvas y CARDS PRIORITARIOS -->
+    <!-- Estilos mínimos inline para optimización -->
     <style>
-        /* FORZAR ESTILOS DE CARDS - MÁXIMA PRIORIDAD */
-        .dashboard-card .establecimiento-card,
-        .establecimientos-container .establecimiento-card {
-            background: #2A2A2A !important;
-            border: 1px solid #444444 !important;
-            border-radius: 12px !important;
-            transition: all 0.3s ease !important;
-            overflow: hidden !important;
-            position: relative !important;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
-        }
-        
-        .dashboard-card .establecimiento-card::before,
-        .establecimientos-container .establecimiento-card::before {
-            content: '' !important;
-            position: absolute !important;
-            top: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            height: 3px !important;
-            background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%) !important;
-            opacity: 0 !important;
-            transition: opacity 0.3s ease !important;
-        }
-        
-        .dashboard-card .establecimiento-card:hover,
-        .establecimientos-container .establecimiento-card:hover {
-            transform: translateY(-1px) !important;
-            border-color: #4A90E2 !important;
-            box-shadow: 0 8px 15px rgba(74, 144, 226, 0.2) !important;
-        }
-        
-        .dashboard-card .establecimiento-card:hover::before,
-        .establecimientos-container .establecimiento-card:hover::before {
-            opacity: 1 !important;
-        }
-        
-        .dashboard-card .establecimiento-card .card-header,
-        .establecimientos-container .establecimiento-card .card-header {
-            background: #1E1E1E !important;
-            border-bottom: 1px solid #444444 !important;
-            padding: 1rem 1.25rem !important;
-        }
-        
-        .dashboard-card .establecimiento-card .card-body,
-        .establecimientos-container .establecimiento-card .card-body {
-            background: #2A2A2A !important;
-            padding: 1.25rem !important;
-        }
-        
-        .dashboard-card .establecimiento-card .card-footer,
-        .establecimientos-container .establecimiento-card .card-footer {
-            background: #1E1E1E !important;
-            border-top: 1px solid #444444 !important;
-            padding: 1rem 1.25rem !important;
-        }
-        
-        .dashboard-card .establecimiento-card .info-item:hover,
-        .establecimientos-container .establecimiento-card .info-item:hover {
-            background-color: rgba(74, 144, 226, 0.05) !important;
-            border-radius: 6px !important;
-            padding-left: 0.5rem !important;
-            padding-right: 0.5rem !important;
-        }
-        
-        .dashboard-card .establecimiento-card .coordinates-info,
-        .establecimientos-container .establecimiento-card .coordinates-info {
-            background: rgba(74, 144, 226, 0.1) !important;
-            border-radius: 8px !important;
-            padding: 0.75rem !important;
-            margin-top: 1rem !important;
-            border-left: 3px solid #3498DB !important;
-        }
-        
-        /* BOTONES CON EFECTOS PROFESIONALES */
-        .dashboard-card .establecimiento-card .card-footer .btn,
-        .establecimientos-container .establecimiento-card .card-footer .btn {
-            padding: 0.375rem 0.75rem !important;
-            font-size: 0.8rem !important;
-            font-weight: 500 !important;
-            border-radius: 6px !important;
-            min-width: 100px !important;
-            transition: all 0.3s ease !important;
-        }
-        
-        .dashboard-card .establecimiento-card .btn-outline-primary:hover,
-        .establecimientos-container .establecimiento-card .btn-outline-primary:hover {
-            background: #3498DB !important;
-            transform: translateY(-1px) !important;
-            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3) !important;
-        }
-        
-        .dashboard-card .establecimiento-card .btn-success:hover,
-        .establecimientos-container .establecimiento-card .btn-success:hover {
-            background: #219A52 !important;
-            transform: translateY(-1px) !important;
-            box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3) !important;
-        }
-        
-        /* DROPDOWN MEJORADO */
-        .dashboard-card .establecimiento-card .dropdown-toggle:hover,
-        .establecimientos-container .establecimiento-card .dropdown-toggle:hover {
-            background: rgba(74, 144, 226, 0.1) !important;
-            border-color: #4A90E2 !important;
-            transform: translateY(-1px) !important;
-        }
-        
-        .dashboard-card .establecimiento-card .dropdown-menu,
-        .establecimientos-container .establecimiento-card .dropdown-menu {
-            background: #2A2A2A !important;
-            border: 1px solid #444444 !important;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
-            border-radius: 10px !important;
-        }
-        
-        .dashboard-card .establecimiento-card .dropdown-item:hover,
-        .establecimientos-container .establecimiento-card .dropdown-item:hover {
-            background: rgba(74, 144, 226, 0.15) !important;
-            transform: translateX(3px) !important;
-        }
-        
-        .dashboard-card .establecimiento-card .dropdown-item.text-danger:hover,
+        /* Offcanvas dashboard styles */
         .establecimientos-container .establecimiento-card .dropdown-item.text-danger:hover {
             background: rgba(231, 76, 60, 0.15) !important;
             color: #ff6b6b !important;

@@ -1,0 +1,381 @@
+/* ===========================
+   LISTA DE ESTABLECIMIENTOS - OPTIMIZADA PARA ESCALABILIDAD
+   =========================== */
+
+.establecimientos-container {
+  width: 100%;
+  padding: 0;
+}
+
+.establecimientos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+/* ===========================
+   ITEM DE ESTABLECIMIENTO
+   =========================== */
+
+.establecimiento-item {
+  background: linear-gradient(145deg, #2c3e50 0%, #34495e 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.establecimiento-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, #3498DB 0%, #27AE60 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.establecimiento-item:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  border-color: rgba(52, 152, 219, 0.4);
+}
+
+.establecimiento-item:hover::before {
+  opacity: 1;
+}
+
+/* Efecto zebra (alternado) */
+.establecimiento-item:nth-child(even) {
+  background: linear-gradient(145deg, #34495e 0%, #2c3e50 100%);
+}
+
+/* ===========================
+   NÚMERO DE ESTABLECIMIENTO
+   =========================== */
+
+.establecimiento-numero {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.numero-badge {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+/* ===========================
+   INFORMACIÓN DEL ESTABLECIMIENTO
+   =========================== */
+
+.establecimiento-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0; /* Para que funcione el text-overflow */
+}
+
+.establecimiento-nombre {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.establecimiento-nombre h6 {
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+
+.establecimiento-nombre i {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.establecimiento-detalles {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.detalle-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+.detalle-item i {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* ===========================
+   ACCIONES (BOTONES)
+   =========================== */
+
+.establecimiento-actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.btn-accion {
+  padding: 10px 18px;
+  border: 2px solid;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  background: transparent;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-accion i {
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.btn-accion span {
+  flex-shrink: 0;
+}
+
+/* Botón de ubicación */
+.btn-ubicacion {
+  border-color: #3498DB;
+  color: #3498DB;
+}
+
+.btn-ubicacion:hover {
+  background: #3498DB;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+}
+
+/* Botón de crear oferta */
+.btn-oferta {
+  border-color: #27AE60;
+  color: #27AE60;
+}
+
+.btn-oferta:hover {
+  background: #27AE60;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+}
+
+/* Efecto ripple en click */
+.btn-accion::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-accion:active::after {
+  width: 200px;
+  height: 200px;
+}
+
+/* ===========================
+   RESPONSIVE - TABLET
+   =========================== */
+
+@media (max-width: 992px) {
+  .establecimiento-item {
+    padding: 16px 20px;
+    gap: 16px;
+  }
+  
+  .establecimiento-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .btn-accion {
+    padding: 8px 14px;
+    font-size: 13px;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ===========================
+   RESPONSIVE - MÓVIL
+   =========================== */
+
+@media (max-width: 768px) {
+  .establecimiento-item {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px;
+    gap: 14px;
+  }
+  
+  .establecimiento-numero {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+  }
+  
+  .numero-badge {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+  
+  .establecimiento-info {
+    width: 100%;
+    padding-right: 50px; /* Espacio para el número */
+  }
+  
+  .establecimiento-nombre h6 {
+    font-size: 16px;
+  }
+  
+  .establecimiento-detalles {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .detalle-item {
+    font-size: 12px;
+  }
+  
+  .establecimiento-actions {
+    width: 100%;
+    flex-direction: row;
+    gap: 8px;
+  }
+  
+  .btn-accion {
+    flex: 1;
+    padding: 10px 12px;
+    font-size: 12px;
+    justify-content: center;
+  }
+  
+  .btn-accion span {
+    display: none; /* Ocultar texto en móvil, solo iconos */
+  }
+  
+  .btn-accion i {
+    font-size: 16px;
+  }
+}
+
+/* ===========================
+   RESPONSIVE - MÓVIL PEQUEÑO
+   =========================== */
+
+@media (max-width: 576px) {
+  .establecimientos-lista {
+    gap: 10px;
+  }
+  
+  .establecimiento-item {
+    padding: 14px;
+    gap: 12px;
+  }
+  
+  .establecimiento-nombre h6 {
+    font-size: 15px;
+  }
+  
+  .detalle-item {
+    font-size: 11px;
+  }
+  
+  .detalle-item i {
+    font-size: 12px;
+  }
+  
+  .btn-accion {
+    padding: 8px 10px;
+  }
+}
+
+/* ===========================
+   ESTADOS VACÍOS
+   =========================== */
+
+.establecimientos-lista:empty::after {
+  content: 'No hay establecimientos registrados';
+  display: block;
+  text-align: center;
+  padding: 60px 20px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 16px;
+  font-style: italic;
+}
+
+/* ===========================
+   ANIMACIONES
+   =========================== */
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.establecimiento-item {
+  animation: slideIn 0.4s ease-out backwards;
+}
+
+.establecimiento-item:nth-child(1) { animation-delay: 0.05s; }
+.establecimiento-item:nth-child(2) { animation-delay: 0.1s; }
+.establecimiento-item:nth-child(3) { animation-delay: 0.15s; }
+.establecimiento-item:nth-child(4) { animation-delay: 0.2s; }
+.establecimiento-item:nth-child(5) { animation-delay: 0.25s; }
+.establecimiento-item:nth-child(n+6) { animation-delay: 0.3s; }

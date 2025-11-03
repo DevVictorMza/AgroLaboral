@@ -2091,74 +2091,45 @@ function mostrarEstadoCargando(container) {
 }
 
 /**
- * Genera el HTML para mostrar los establecimientos
+ * Genera el HTML para mostrar los establecimientos en formato lista
  * @param {Array} establecimientos - Array de establecimientos
  * @returns {string} HTML generado
  */
 function generarHtmlEstablecimientos(establecimientos) {
-    const establecimientosHtml = establecimientos.map(est => `
-        <div class="col-lg-6 col-xl-4 mb-4">
-            <div class="establecimiento-card h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0 text-success">
-                        <i class="fas fa-seedling me-2"></i>
-                        ${est.nombreEstablecimiento}
-                    </h6>
-                    <div class="dropdown">
-                        <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Opciones del establecimiento">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-dark">
-                            <li><a class="dropdown-item" href="#" onclick="verDetalleEstablecimiento(${est.idEstablecimiento})" role="button">
-                                <i class="fas fa-eye me-2"></i>Ver Detalles
-                            </a></li>
-                            <li><a class="dropdown-item" href="#" onclick="editarEstablecimiento(${est.idEstablecimiento})" role="button">
-                                <i class="fas fa-edit me-2"></i>Editar
-                            </a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="#" onclick="eliminarEstablecimiento(${est.idEstablecimiento}, '${est.nombreEstablecimiento.replace(/'/g, "\\'")}')">
-                                <i class="fas fa-trash me-2"></i>Eliminar
-                            </a></li>
-                        </ul>
-                    </div>
+    const establecimientosHtml = establecimientos.map((est, index) => `
+        <div class="establecimiento-item" data-id="${est.idEstablecimiento}">
+            <div class="establecimiento-numero">
+                <span class="numero-badge">${index + 1}</span>
+            </div>
+            <div class="establecimiento-info">
+                <div class="establecimiento-nombre">
+                    <i class="fas fa-seedling text-success me-2"></i>
+                    <h6 class="mb-0">${est.nombreEstablecimiento}</h6>
                 </div>
-                <div class="card-body">
-                    <div class="establecimiento-info">
-                        <div class="info-item mb-2">
-                            <i class="fas fa-map-marker-alt text-primary me-2"></i>
-                            <span class="text-light">${est.calle} ${est.numeracion}, CP ${est.codigoPostal}</span>
-                        </div>
-                        <div class="info-item mb-2">
-                            <i class="fas fa-map text-info me-2"></i>
-                            <span class="text-muted">${est.nombreDistrito}, ${est.nombreDepartamento}</span>
-                        </div>
-                        <div class="info-item mb-3">
-                            <i class="fas fa-leaf text-success me-2"></i>
-                            <span class="text-light">${est.especies.length} especie(s): ${est.especies.slice(0, 3).join(', ')}${est.especies.length > 3 ? '...' : ''}</span>
-                        </div>
-                        <div class="coordinates-info">
-                            <small class="text-muted">
-                                <i class="fas fa-globe me-1"></i>
-                                Lat: ${est.latitud.toFixed(5)}, Lng: ${est.longitud.toFixed(5)}
-                            </small>
-                        </div>
-                    </div>
+                <div class="establecimiento-detalles">
+                    <span class="detalle-item">
+                        <i class="fas fa-map-pin text-primary"></i>
+                        ${est.nombreDistrito}
+                    </span>
+                    <span class="detalle-item">
+                        <i class="fas fa-leaf text-success"></i>
+                        ${est.especies.length} especies
+                    </span>
+                    <span class="detalle-item">
+                        <i class="fas fa-check-circle text-success"></i>
+                        Activo
+                    </span>
                 </div>
-                <div class="card-footer">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="badge bg-success">
-                            <i class="fas fa-check-circle me-1"></i>Activo
-                        </span>
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-sm btn-outline-primary" onclick="verEnMapa(${est.latitud}, ${est.longitud})" title="Ver ubicación en mapa" aria-label="Ver ubicación en mapa">
-                                <i class="fas fa-location-dot me-1"></i><span>Ubicación</span>
-                            </button>
-                            <button class="btn btn-sm btn-success" onclick="crearOfertaLaboral(${est.idEstablecimiento}, '${est.nombreEstablecimiento}')" title="Crear nueva oferta laboral" aria-label="Crear oferta laboral">
-                                <i class="fas fa-briefcase me-1"></i><span>Crear Oferta</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            </div>
+            <div class="establecimiento-actions">
+                <button class="btn-accion btn-ubicacion" onclick="verEnMapa(${est.latitud}, ${est.longitud})" title="Ver ubicación en mapa">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Ver ubicación</span>
+                </button>
+                <button class="btn-accion btn-oferta" onclick="crearOfertaLaboral(${est.idEstablecimiento}, '${est.nombreEstablecimiento.replace(/'/g, "\\'")}')}" title="Crear nueva oferta laboral">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Crear oferta</span>
+                </button>
             </div>
         </div>
     `).join('');
@@ -2174,7 +2145,7 @@ function generarHtmlEstablecimientos(establecimientos) {
                     <i class="fas fa-plus me-2"></i>Agregar Nuevo
                 </button>
             </div>
-            <div class="row">
+            <div class="establecimientos-lista">
                 ${establecimientosHtml}
             </div>
         </div>
