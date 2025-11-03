@@ -2069,8 +2069,8 @@ function generarHtmlEstablecimientos(establecimientos) {
                             <i class="fas fa-check-circle me-1"></i>Activo
                         </span>
                         <div class="d-flex gap-2">
-                            <button class="btn btn-sm btn-outline-primary" onclick="verEnMapa(${est.latitud}, ${est.longitud})">
-                                <i class="fas fa-map-marked-alt me-1"></i>Ver en Mapa
+                            <button class="btn btn-sm btn-outline-primary" onclick="verEnMapa(${est.latitud}, ${est.longitud})" title="Ver ubicación en mapa">
+                                <i class="fas fa-location-dot me-1"></i>Ubicación
                             </button>
                             <button class="btn btn-sm btn-success" onclick="crearOfertaLaboral(${est.idEstablecimiento}, '${est.nombreEstablecimiento}')">
                                 <i class="fas fa-briefcase me-1"></i>Crear Oferta Laboral
@@ -9960,9 +9960,9 @@ function renderizarOfertasPublicas(ofertas) {
                                     Ubicación
                                 </small>
                                 <div class="fw-bold small">
-                                    <span class="text-info" title="Latitud: ${oferta.latitud}, Longitud: ${oferta.longitud}">
-                                        Ver en mapa
-                                    </span>
+                                    <button class="btn btn-link p-0 text-info fw-bold" onclick="verEnMapa('${oferta.idOfertaEmpleo}')" title="Ver ubicación en mapa">
+                                        <i class="fas fa-location-dot me-1"></i>Ver ubicación
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -9982,9 +9982,6 @@ function renderizarOfertasPublicas(ofertas) {
                         <button class="btn btn-primary btn-sm flex-fill" onclick="contactarEmpresa('${oferta.idOfertaEmpleo}')">
                             <i class="fas fa-phone me-1"></i>
                             Contactar
-                        </button>
-                        <button class="btn btn-outline-success btn-sm" onclick="verEnMapa('${oferta.idOfertaEmpleo}')" title="Ver en mapa">
-                            <i class="fas fa-map-marker-alt"></i>
                         </button>
                     </div>
                 </div>

@@ -1,0 +1,942 @@
+/* ===================================================
+   OFERTAS SECTION - ESTILOS ESPECIALIZADOS
+   Tema oscuro profesional para la sección de ofertas
+   =================================================== */
+
+/* ===== VARIABLES ESPECIALIZADAS ===== */
+:root {
+    /* Ofertas Theme */
+    --ofertas-bg-primary: #000000;
+    --ofertas-bg-secondary: #1a1a1a;
+    --ofertas-card-bg: #2A2A2A;
+    --ofertas-border: #444444;
+    --ofertas-text-primary: #FFFFFF;
+    --ofertas-text-secondary: #CCCCCC;
+    --ofertas-text-muted: #888888;
+    
+    /* Gradientes para Headers */
+    --ofertas-gradient-blue: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+    --ofertas-gradient-dark: linear-gradient(135deg, #2A2A2A 0%, #1a1a1a 100%);
+    
+    /* Estados de Ofertas */
+    --ofertas-success: #27AE60;
+    --ofertas-warning: #F39C12;
+    --ofertas-danger: #E74C3C;
+    --ofertas-info: #3498DB;
+    
+    /* Sombras */
+    --ofertas-shadow-light: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --ofertas-shadow-medium: 0 8px 15px rgba(0, 0, 0, 0.2);
+    --ofertas-shadow-heavy: 0 12px 24px rgba(0, 0, 0, 0.3);
+    --ofertas-shadow-glow: 0 0 20px rgba(74, 144, 226, 0.3);
+}
+
+/* ===== SECCIÓN PRINCIPAL ===== */
+#ofertas-disponibles {
+    background: var(--ofertas-bg-primary) !important;
+    color: var(--ofertas-text-primary) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Patrón de fondo sutil */
+#ofertas-disponibles::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(74, 144, 226, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(39, 174, 96, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Contenido por encima del patrón */
+#ofertas-disponibles > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* ===== HEADER PRINCIPAL CON GRADIENTE ===== */
+.servicio-card-ofertas {
+    background: var(--ofertas-gradient-blue) !important;
+    border: none !important;
+    box-shadow: var(--ofertas-shadow-medium) !important;
+    border-radius: 16px !important;
+    overflow: hidden;
+    position: relative;
+    animation: slideInFromTop 1s ease-out;
+}
+
+@keyframes slideInFromTop {
+    0% {
+        transform: translateY(-30px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.servicio-card-ofertas::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+    pointer-events: none;
+}
+
+.servicio-card-ofertas .card-body {
+    padding: 2.5rem !important;
+    position: relative;
+    z-index: 2;
+}
+
+.servicio-icon-ofertas {
+    font-size: 4rem !important;
+    color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    animation: iconPulse 2s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+    0%, 100% { 
+        transform: scale(1);
+        filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
+    }
+    50% { 
+        transform: scale(1.05);
+        filter: drop-shadow(0 0 15px rgba(255,255,255,0.5));
+    }
+}
+
+.servicio-card-ofertas h2 {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    margin-bottom: 1rem !important;
+    animation: fadeInUp 1.2s ease-out 0.3s both;
+}
+
+.servicio-card-ofertas p {
+    color: rgba(255,255,255,0.9) !important;
+    font-size: 1.1rem !important;
+    font-weight: 400 !important;
+    animation: fadeInUp 1.2s ease-out 0.5s both;
+}
+
+@keyframes fadeInUp {
+    0% {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Contador dinámico mejorado */
+#contador-ofertas-publicas {
+    background: rgba(255,255,255,0.2) !important;
+    color: #ffffff !important;
+    border: 2px solid rgba(255,255,255,0.3) !important;
+    padding: 0.8rem 1.5rem !important;
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    border-radius: 50px !important;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    animation: bounceIn 1.5s ease-out 0.7s both;
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+#contador-ofertas-publicas::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.6s ease;
+}
+
+#contador-ofertas-publicas:hover {
+    background: rgba(255,255,255,0.3) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+#contador-ofertas-publicas:hover::before {
+    left: 100%;
+}
+
+/* Estado de actualización del contador */
+#contador-ofertas-publicas.updating {
+    animation: pulse 0.8s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* ===== PANEL DE FILTROS CON GLASSMORPHISM ===== */
+.ofertas-filtros-container {
+    background: var(--ofertas-card-bg) !important;
+    border: 1px solid var(--ofertas-border) !important;
+    border-radius: 16px !important;
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    box-shadow: var(--ofertas-shadow-medium) !important;
+    overflow: hidden;
+    position: relative;
+}
+
+.ofertas-filtros-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+    pointer-events: none;
+}
+
+.ofertas-filtros-container .card-body {
+    padding: 2rem !important;
+    position: relative;
+    z-index: 2;
+}
+
+/* Labels de filtros */
+.ofertas-filtros-container .form-label {
+    color: var(--ofertas-text-primary) !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    margin-bottom: 0.8rem !important;
+    display: flex;
+    align-items: center;
+}
+
+.ofertas-filtros-container .form-label i {
+    color: var(--ofertas-info) !important;
+    margin-right: 0.5rem;
+}
+
+/* Form controls oscuros */
+.ofertas-filtros-container .form-select,
+.ofertas-filtros-container .form-control {
+    background: rgba(0,0,0,0.3) !important;
+    border: 2px solid var(--ofertas-border) !important;
+    color: var(--ofertas-text-primary) !important;
+    border-radius: 12px !important;
+    padding: 0.8rem 1rem !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease;
+}
+
+.ofertas-filtros-container .form-select:focus,
+.ofertas-filtros-container .form-control:focus {
+    background: rgba(0,0,0,0.5) !important;
+    border-color: var(--ofertas-info) !important;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25) !important;
+    color: var(--ofertas-text-primary) !important;
+}
+
+.ofertas-filtros-container .form-select option {
+    background: var(--ofertas-card-bg) !important;
+    color: var(--ofertas-text-primary) !important;
+}
+
+/* Botones de ordenamiento */
+.btn-orden-publico {
+    border: 2px solid var(--ofertas-border) !important;
+    background: rgba(0,0,0,0.3) !important;
+    color: var(--ofertas-text-secondary) !important;
+    font-weight: 600 !important;
+    border-radius: 12px !important;
+    padding: 0.8rem 1.2rem !important;
+    transition: all 0.3s ease;
+}
+
+.btn-orden-publico:hover,
+.btn-orden-publico.active {
+    background: var(--ofertas-info) !important;
+    border-color: var(--ofertas-info) !important;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+/* Botón de geolocalización */
+#btn-geolocalizacion {
+    background: rgba(0,0,0,0.3) !important;
+    border: 2px solid var(--ofertas-border) !important;
+    color: var(--ofertas-text-secondary) !important;
+    font-weight: 600 !important;
+    border-radius: 12px !important;
+    padding: 0.8rem 1.2rem !important;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+#btn-geolocalizacion::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+#btn-geolocalizacion:hover {
+    background: var(--ofertas-success) !important;
+    border-color: var(--ofertas-success) !important;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3);
+}
+
+#btn-geolocalizacion:hover::before {
+    left: 100%;
+}
+
+/* ===== TOGGLE VISTA LISTA/MAPA ===== */
+.ofertas-toggle-container {
+    margin-bottom: 2rem;
+}
+
+.ofertas-toggle-container .btn-group {
+    border-radius: 12px !important;
+    overflow: hidden;
+    box-shadow: var(--ofertas-shadow-light);
+}
+
+.ofertas-toggle-container .btn {
+    background: var(--ofertas-card-bg) !important;
+    border: 2px solid var(--ofertas-border) !important;
+    color: var(--ofertas-text-secondary) !important;
+    font-weight: 600 !important;
+    padding: 1rem 2rem !important;
+    transition: all 0.3s ease;
+}
+
+.ofertas-toggle-container .btn.active,
+.ofertas-toggle-container .btn:hover {
+    background: var(--ofertas-info) !important;
+    border-color: var(--ofertas-info) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+}
+
+/* ===== CONTAINER DEL MAPA ===== */
+#mapa-container .card {
+    background: var(--ofertas-card-bg) !important;
+    border: 1px solid var(--ofertas-border) !important;
+    border-radius: 16px !important;
+    overflow: hidden;
+    box-shadow: var(--ofertas-shadow-medium) !important;
+}
+
+#mapa-container .card-header {
+    background: var(--ofertas-gradient-blue) !important;
+    border-bottom: none !important;
+    padding: 1.5rem !important;
+}
+
+#mapa-container .card-header h5 {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+#mapa-container .card-footer {
+    background: rgba(0,0,0,0.3) !important;
+    border-top: 1px solid var(--ofertas-border) !important;
+    color: var(--ofertas-text-secondary) !important;
+    padding: 1rem 1.5rem !important;
+}
+
+/* ===== CARDS DE OFERTAS REDISEÑADAS ===== */
+.oferta-publica-card {
+    background: var(--ofertas-card-bg) !important;
+    border: 1px solid var(--ofertas-border) !important;
+    border-radius: 16px !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    overflow: hidden;
+    position: relative;
+    animation: fadeInUp 0.6s ease-out both;
+}
+
+.oferta-publica-card:nth-child(1) { animation-delay: 0.1s; }
+.oferta-publica-card:nth-child(2) { animation-delay: 0.2s; }
+.oferta-publica-card:nth-child(3) { animation-delay: 0.3s; }
+.oferta-publica-card:nth-child(4) { animation-delay: 0.4s; }
+.oferta-publica-card:nth-child(5) { animation-delay: 0.5s; }
+
+.oferta-publica-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(74, 144, 226, 0.03) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.oferta-publica-card:hover::before {
+    opacity: 1;
+}
+
+.oferta-publica-card:hover {
+    transform: translateY(-8px) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
+    border-color: var(--ofertas-info) !important;
+}
+
+/* Header de la card */
+.oferta-publica-card .card-header {
+    background: linear-gradient(135deg, #F39C12 0%, #E67E22 100%) !important;
+    border-bottom: none !important;
+    padding: 1.5rem !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.oferta-publica-card .card-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+    pointer-events: none;
+}
+
+.oferta-publica-card .card-header h5 {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 1.2rem !important;
+    margin-bottom: 0.5rem !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    position: relative;
+    z-index: 2;
+}
+
+.oferta-publica-card .card-header small {
+    color: rgba(255,255,255,0.9) !important;
+    font-weight: 500 !important;
+    position: relative;
+    z-index: 2;
+}
+
+/* Body de la card */
+.oferta-publica-card .card-body {
+    padding: 1.8rem !important;
+    background: var(--ofertas-card-bg) !important;
+}
+
+.oferta-publica-card .card-body h6 {
+    color: var(--ofertas-info) !important;
+    font-weight: 600 !important;
+    font-size: 1.1rem !important;
+    margin-bottom: 1.2rem !important;
+    display: flex;
+    align-items: center;
+}
+
+.oferta-publica-card .card-body h6 i {
+    margin-right: 0.5rem;
+    color: var(--ofertas-info) !important;
+}
+
+/* Información en grid */
+.oferta-publica-card .row.g-2 {
+    margin-bottom: 1.5rem !important;
+}
+
+.oferta-publica-card .row.g-2 .col-6 {
+    padding: 0.8rem;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.oferta-publica-card .row.g-2 .col-6:first-child {
+    margin-right: 0.5rem;
+}
+
+.oferta-publica-card .text-muted {
+    color: var(--ofertas-text-muted) !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem !important;
+}
+
+.oferta-publica-card .text-muted i {
+    margin-right: 0.5rem;
+    color: var(--ofertas-info) !important;
+}
+
+.oferta-publica-card .fw-bold {
+    color: var(--ofertas-text-primary) !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+}
+
+.oferta-publica-card .text-warning {
+    color: #F39C12 !important;
+}
+
+.oferta-publica-card .text-info {
+    color: var(--ofertas-info) !important;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.oferta-publica-card .text-info:hover {
+    color: #ffffff !important;
+    text-shadow: 0 0 8px var(--ofertas-info);
+}
+
+/* Fecha de cierre con estados */
+.oferta-publica-card .text-success {
+    color: var(--ofertas-success) !important;
+}
+
+.oferta-publica-card .text-danger {
+    color: var(--ofertas-danger) !important;
+    animation: pulseRed 2s ease-in-out infinite;
+}
+
+@keyframes pulseRed {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Footer de la card */
+.oferta-publica-card .card-footer {
+    background: rgba(0,0,0,0.3) !important;
+    border-top: 1px solid var(--ofertas-border) !important;
+    padding: 1.5rem !important;
+}
+
+.oferta-publica-card .card-footer .btn {
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.oferta-publica-card .card-footer .btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease, height 0.3s ease;
+}
+
+.oferta-publica-card .card-footer .btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.oferta-publica-card .card-footer .btn-primary {
+    background: var(--ofertas-info) !important;
+    border-color: var(--ofertas-info) !important;
+    color: #ffffff !important;
+}
+
+.oferta-publica-card .card-footer .btn-primary:hover {
+    background: #2980B9 !important;
+    border-color: #2980B9 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+.oferta-publica-card .card-footer .btn-outline-success {
+    border-color: var(--ofertas-success) !important;
+    color: var(--ofertas-success) !important;
+    background: transparent !important;
+}
+
+.oferta-publica-card .card-footer .btn-outline-success:hover {
+    background: var(--ofertas-success) !important;
+    border-color: var(--ofertas-success) !important;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3);
+}
+
+/* ===== SPINNER Y ESTADOS DE CARGA ===== */
+.ofertas-loading-container {
+    background: var(--ofertas-card-bg) !important;
+    border-radius: 16px !important;
+    padding: 4rem 2rem !important;
+    text-align: center;
+    border: 1px solid var(--ofertas-border) !important;
+}
+
+.spinner-border {
+    width: 3rem !important;
+    height: 3rem !important;
+    border-width: 0.3em !important;
+}
+
+.text-primary .spinner-border {
+    border-color: var(--ofertas-info) transparent var(--ofertas-info) transparent !important;
+}
+
+.ofertas-loading-container p {
+    color: var(--ofertas-text-secondary) !important;
+    font-size: 1.1rem !important;
+    font-weight: 500 !important;
+    margin-top: 1.5rem !important;
+}
+
+/* ===== RESPONSIVE MEJORADO ===== */
+@media (max-width: 1200px) {
+    .ofertas-filtros-container .row.g-3 {
+        gap: 1rem !important;
+    }
+    
+    .oferta-publica-card .card-body {
+        padding: 1.5rem !important;
+    }
+}
+
+@media (max-width: 992px) {
+    .servicio-card-ofertas .card-body {
+        padding: 2rem !important;
+    }
+    
+    .ofertas-toggle-container .btn {
+        padding: 0.8rem 1.5rem !important;
+        font-size: 0.95rem !important;
+    }
+    
+    .oferta-publica-card .row.g-2 .col-6 {
+        margin-bottom: 0.5rem;
+        margin-right: 0 !important;
+    }
+    
+    .oferta-publica-card .row.g-2 .col-6:first-child {
+        margin-right: 0 !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .servicio-card-ofertas .card-body {
+        padding: 2rem 1.5rem !important;
+    }
+    
+    .servicio-icon-ofertas {
+        font-size: 3rem !important;
+    }
+    
+    .ofertas-filtros-container .card-body {
+        padding: 1.5rem !important;
+    }
+    
+    .ofertas-filtros-container .row.g-3 {
+        gap: 1.5rem !important;
+    }
+    
+    .btn-orden-publico,
+    #btn-geolocalizacion {
+        padding: 0.7rem 1rem !important;
+        font-size: 0.9rem !important;
+    }
+    
+    .btn-orden-publico {
+        margin-bottom: 0.5rem;
+    }
+    
+    .ofertas-toggle-container .btn {
+        padding: 0.7rem 1.2rem !important;
+        font-size: 0.9rem !important;
+    }
+    
+    .oferta-publica-card {
+        margin-bottom: 1.5rem !important;
+    }
+    
+    .oferta-publica-card .card-header {
+        padding: 1.2rem !important;
+    }
+    
+    .oferta-publica-card .card-body {
+        padding: 1.2rem !important;
+    }
+    
+    .oferta-publica-card .card-footer {
+        padding: 1.2rem !important;
+    }
+    
+    .oferta-publica-card .card-footer .btn {
+        font-size: 0.9rem !important;
+        padding: 0.6rem 1rem !important;
+    }
+    
+    #btn-mi-ubicacion-mapa {
+        padding: 0.4rem 0.8rem !important;
+        font-size: 0.85rem !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .servicio-card-ofertas h2 {
+        font-size: 1.8rem !important;
+    }
+    
+    .servicio-card-ofertas p {
+        font-size: 1rem !important;
+    }
+    
+    #contador-ofertas-publicas {
+        padding: 0.6rem 1.2rem !important;
+        font-size: 1rem !important;
+    }
+    
+    .ofertas-filtros-container .form-label {
+        font-size: 0.9rem !important;
+    }
+    
+    .ofertas-filtros-container .form-select,
+    .ofertas-filtros-container .form-control {
+        padding: 0.7rem 0.9rem !important;
+        font-size: 0.9rem !important;
+    }
+    
+    .btn-orden-publico,
+    #btn-geolocalizacion {
+        padding: 0.6rem 0.8rem !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .ofertas-toggle-container .d-flex {
+        flex-direction: column !important;
+        gap: 1rem !important;
+    }
+    
+    .ofertas-toggle-container .btn-group {
+        width: 100% !important;
+    }
+    
+    .ofertas-toggle-container .btn {
+        padding: 0.8rem 1rem !important;
+        font-size: 0.9rem !important;
+    }
+    
+    .oferta-publica-card .row.g-2 {
+        margin-bottom: 1rem !important;
+    }
+    
+    .oferta-publica-card .row.g-2 .col-6 {
+        flex: 1 1 100% !important;
+        max-width: 100% !important;
+        margin-bottom: 0.8rem !important;
+    }
+    
+    .oferta-publica-card .card-footer .d-flex {
+        flex-direction: column !important;
+        gap: 0.8rem !important;
+    }
+    
+    .oferta-publica-card .card-footer .btn {
+        width: 100% !important;
+    }
+}
+
+/* ===== MEJORAS DE ACCESIBILIDAD ===== */
+.ofertas-filtros-container .form-select:focus,
+.ofertas-filtros-container .form-control:focus {
+    outline: 2px solid var(--ofertas-info);
+    outline-offset: 2px;
+}
+
+.btn-orden-publico:focus,
+#btn-geolocalizacion:focus,
+.ofertas-toggle-container .btn:focus {
+    outline: 2px solid var(--ofertas-info);
+    outline-offset: 2px;
+}
+
+.oferta-publica-card .card-footer .btn:focus {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+/* ===== BOTONES DE UBICACIÓN ESPECIALIZADOS ===== */
+.btn-link.text-info {
+    text-decoration: none !important;
+    transition: all 0.3s ease;
+    font-size: 0.9rem !important;
+}
+
+.btn-link.text-info:hover {
+    color: var(--ofertas-text-primary) !important;
+    text-shadow: 0 0 8px var(--ofertas-info);
+    transform: translateY(-1px);
+}
+
+.btn-link.text-info i {
+    color: var(--ofertas-info) !important;
+    transition: all 0.3s ease;
+}
+
+.btn-link.text-info:hover i {
+    color: #ffffff !important;
+    text-shadow: 0 0 8px var(--ofertas-info);
+    transform: scale(1.1);
+}
+
+/* ===== ESTADOS DE ALTA CONTRASTE ===== */
+@media (prefers-contrast: high) {
+    .ofertas-filtros-container {
+        border-width: 2px !important;
+    }
+    
+    .oferta-publica-card {
+        border-width: 2px !important;
+    }
+    
+    .oferta-publica-card .text-muted {
+        color: #CCCCCC !important;
+    }
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+    .servicio-card-ofertas,
+    .oferta-publica-card,
+    .btn-orden-publico,
+    #btn-geolocalizacion,
+    .ofertas-toggle-container .btn,
+    #contador-ofertas-publicas {
+        animation: none !important;
+        transition: none !important;
+    }
+    
+    .servicio-icon-ofertas {
+        animation: none !important;
+    }
+}
+
+/* ===== ESTILOS PARA ELEMENTOS CON INLINE STYLES ===== */
+#main-map {
+    position: relative;
+}
+
+#map-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    text-align: center;
+    display: none;
+}
+
+#map {
+    height: 500px;
+    width: 100%;
+    border-radius: 0 0 16px 16px;
+}
+
+/* ===== BOTÓN MI UBICACIÓN EN MAPA ===== */
+#btn-mi-ubicacion-mapa {
+    background: rgba(255,255,255,0.95) !important;
+    border: 2px solid rgba(74, 144, 226, 0.3) !important;
+    color: var(--ofertas-info) !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+#btn-mi-ubicacion-mapa:hover {
+    background: #ffffff !important;
+    border-color: var(--ofertas-info) !important;
+    color: var(--ofertas-info) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+}
+
+#btn-mi-ubicacion-mapa.active {
+    background: var(--ofertas-success) !important;
+    border-color: var(--ofertas-success) !important;
+    color: #ffffff !important;
+}
+
+/* Status de ubicación */
+#ubicacion-status {
+    display: none;
+    animation: slideInFromRight 0.5s ease-out;
+}
+
+#ubicacion-status.show {
+    display: inline-block !important;
+}
+
+@keyframes slideInFromRight {
+    0% {
+        transform: translateX(20px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}

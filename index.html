@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="css/map-establecimientos.css?v=1">
     <link rel="stylesheet" href="css/marcador-destacado.css">
     <link rel="stylesheet" href="css/map-markers.css?v=1">
+    <link rel="stylesheet" href="css/ofertas-section.css?v=1">
     
     <!-- Estilos adicionales para dashboard offcanvas -->
     <style>
@@ -296,9 +297,9 @@
                     </button>
                 </div>
                 
-                <div id="main-map" class="my-3" style="position: relative;">
+                <div id="main-map" class="my-3">
                     <!-- El mapa se cargará aquí -->
-                    <div id="map-loading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; text-align: center; display: none;">
+                    <div id="map-loading">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Cargando mapa...</span>
                         </div>
@@ -335,13 +336,13 @@
         <!-- Filtros de Ofertas Públicas -->
         <div class="row justify-content-center mb-4">
             <div class="col-lg-10">
-                <div class="card shadow-sm border-0">
+                <div class="card shadow-sm border-0 ofertas-filtros-container">
                     <div class="card-body">
-                        <div class="row g-3 align-items-center">
+                        <div class="row g-3 align-items-end">
                             <!-- Filtro por Puesto -->
                             <div class="col-md-4">
                                 <label for="filtro-puesto-publico" class="form-label">
-                                    <i class="fas fa-briefcase me-1"></i>
+                                    <i class="fas fa-briefcase"></i>
                                     Filtrar por puesto
                                 </label>
                                 <select class="form-select" id="filtro-puesto-publico">
@@ -359,7 +360,7 @@
                             <!-- Ordenamiento -->
                             <div class="col-md-4">
                                 <label class="form-label">
-                                    <i class="fas fa-sort me-1"></i>
+                                    <i class="fas fa-sort"></i>
                                     Ordenar por
                                 </label>
                                 <div class="btn-group w-100" role="group">
@@ -377,11 +378,11 @@
                             <!-- Geolocalización -->
                             <div class="col-md-4">
                                 <label class="form-label">
-                                    <i class="fas fa-location-arrow me-1"></i>
-                                    Ubicación
+                                    <i class="fas fa-location-arrow"></i>
+                                    Mi ubicación
                                 </label>
                                 <button type="button" class="btn btn-outline-secondary w-100" id="btn-geolocalizacion">
-                                    <i class="fas fa-map-marker-alt"></i>
+                                    <i class="fas fa-crosshairs me-2"></i>
                                     Activar ubicación
                                 </button>
                             </div>
@@ -392,15 +393,21 @@
         </div>
         
         <!-- Toggle Vista Lista/Mapa -->
-        <div class="row justify-content-center mb-4">
+        <div class="row justify-content-center mb-4 ofertas-toggle-container">
             <div class="col-lg-10">
                 <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <!-- Título removido -->
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-eye me-2 text-info"></i>
+                        <span class="text-light fw-semibold">Vista actual:</span>
                     </div>
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-primary" id="btn-vista-lista" onclick="cambiarVista('lista')">
-                            <i class="fas fa-list me-2"></i>Lista
+                    <div class="btn-group" role="group" aria-label="Cambiar vista">
+                        <button type="button" class="btn btn-primary active" id="btn-vista-lista" onclick="cambiarVista('lista')">
+                            <i class="fas fa-list me-2"></i>
+                            Lista de Ofertas
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" id="btn-vista-mapa" onclick="cambiarVista('mapa')">
+                            <i class="fas fa-map me-2"></i>
+                            Vista de Mapa
                         </button>
                     </div>
                 </div>
@@ -412,19 +419,31 @@
             <div class="col-lg-10">
                 <div class="card shadow-sm border-0">
                     <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">
-                            <i class="fas fa-map-marker-alt me-2"></i>
-                            Mapa de Ofertas Laborales
-                        </h5>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-map-marker-alt me-2"></i>
+                                Mapa de Ofertas Laborales
+                            </h5>
+                            <button type="button" class="btn btn-light btn-sm" id="btn-mi-ubicacion-mapa" onclick="mapaPrincipal.ubicacionUsuario.obtenerUbicacion()">
+                                <i class="fas fa-crosshairs me-1"></i>
+                                Mi Ubicación
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body p-0">
-                        <div id="map" style="height: 500px; width: 100%;"></div>
+                        <div id="map"></div>
                     </div>
                     <div class="card-footer text-muted">
-                        <small>
-                            <i class="fas fa-info-circle me-1"></i>
-                            Haz clic en los marcadores para ver detalles de cada oferta
-                        </small>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small>
+                                <i class="fas fa-info-circle me-1"></i>
+                                Haz clic en los marcadores para ver detalles de cada oferta
+                            </small>
+                            <small class="text-success" id="ubicacion-status">
+                                <i class="fas fa-check-circle me-1"></i>
+                                Ubicación activada
+                            </small>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -433,11 +452,12 @@
         <!-- Container de Ofertas -->
         <div class="row g-4 justify-content-center" id="ofertas-publicas-container">
             <!-- Las ofertas se cargarán aquí dinámicamente -->
-            <div class="col-12 text-center py-5">
-                <div class="spinner-border text-primary" role="status">
+            <div class="col-12 text-center py-5 ofertas-loading-container">
+                <div class="spinner-border text-primary" role="status" aria-label="Cargando ofertas">
                     <span class="visually-hidden">Cargando ofertas...</span>
                 </div>
-                <p class="mt-3 text-muted">Cargando ofertas disponibles...</p>
+                <p class="mt-3">Preparando sistema de ofertas laborales...</p>
+                <small class="text-muted">Conectando con base de datos de empleos agrícolas</small>
             </div>
         </div>
         
