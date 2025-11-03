@@ -16,6 +16,8 @@
     <link rel="stylesheet" href="css/botones-gigantes.css?v=1">
     <link rel="stylesheet" href="css/map-ofertas.css?v=1">
     <link rel="stylesheet" href="css/map-establecimientos.css?v=1">
+    <link rel="stylesheet" href="css/marcador-destacado.css">
+    <link rel="stylesheet" href="css/map-markers.css?v=1">
     
     <!-- Estilos adicionales para dashboard offcanvas -->
     <style>
@@ -372,13 +374,10 @@
             <div class="col-lg-10">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h4 class="mb-0">
-                            <span id="vista-actual-titulo">Lista de Ofertas</span>
-                            <span class="badge bg-info ms-2" id="total-ofertas-badge">0 ofertas</span>
-                        </h4>
+                        <!-- Título removido -->
                     </div>
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-outline-primary" id="btn-vista-lista" onclick="cambiarVista('lista')">
+                        <button type="button" class="btn btn-primary" id="btn-vista-lista" onclick="cambiarVista('lista')">
                             <i class="fas fa-list me-2"></i>Lista
                         </button>
                     </div>
@@ -397,7 +396,7 @@
                         </h5>
                     </div>
                     <div class="card-body p-0">
-                        <div id="map"></div>
+                        <div id="map" style="height: 500px; width: 100%;"></div>
                     </div>
                     <div class="card-footer text-muted">
                         <small>

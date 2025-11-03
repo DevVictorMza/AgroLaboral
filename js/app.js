@@ -4118,33 +4118,37 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 
 		console.log('🗺️ Inicializando mapa principal de establecimientos...');
 
-		var mainMap = L.map('main-map').setView([-32.89, -68.83], 8); // Mendoza
+		// Crear instancia del mapa principal
+		mapaPrincipal.instancia = L.map('main-map').setView(
+			mapaPrincipal.configuracion.centro, 
+			mapaPrincipal.configuracion.zoom
+		);
 
 		// Capa estándar OSM
-		var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-			maxZoom: 18,
+		mapaPrincipal.capas.clasica = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			maxZoom: mapaPrincipal.configuracion.maxZoom,
 			attribution: '© OpenStreetMap contributors'
 		});
 
 		// Capa satelital Esri World Imagery (gratuita)
-		var esriSatLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-			maxZoom: 18,
+		mapaPrincipal.capas.satelital = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+			maxZoom: mapaPrincipal.configuracion.maxZoom,
 			attribution: 'Tiles © Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 		});
 
 		// Control de capas
 		var baseMaps = {
-			"Mapa estándar": osmLayer,
-			"Vista satelital": esriSatLayer
+			"Mapa estándar": mapaPrincipal.capas.clasica,
+			"Vista satelital": mapaPrincipal.capas.satelital
 		};
-		osmLayer.addTo(mainMap);
-		L.control.layers(baseMaps).addTo(mainMap);
+		mapaPrincipal.capas.clasica.addTo(mapaPrincipal.instancia);
+		L.control.layers(baseMaps).addTo(mapaPrincipal.instancia);
 
 		// Cargar establecimientos desde el backend
-		cargarEstablecimientosEnMapa(mainMap);
+		cargarEstablecimientosEnMapa(mapaPrincipal.instancia);
 
 		console.log('✅ Mapa principal inicializado correctamente');
-		return mainMap;
+		return mapaPrincipal.instancia;
 	}
 
 	// Función para cargar establecimientos desde las ofertas públicas
@@ -4242,12 +4246,23 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 					`;
 					
 					// Crear marcador con popup
-					L.marker([establecimiento.latitud, establecimiento.longitud])
+					const marcador = L.marker([establecimiento.latitud, establecimiento.longitud])
 						.addTo(mapa)
 						.bindPopup(popupContent, {
 							maxWidth: 350,
 							className: 'establecimiento-popup-container'
 						});
+					
+					// Almacenar información del establecimiento en el marcador
+					marcador._establecimientoData = establecimiento;
+					
+					// Si es el mapa principal, almacenar en la variable global
+					if (mapa === mapaPrincipal.instancia) {
+						mapaPrincipal.marcadores.push({
+							marcador: marcador,
+							establecimiento: establecimiento
+						});
+					}
 				});
 				
 				console.log('✅ Marcadores de establecimientos agregados al mapa');
@@ -8933,6 +8948,28 @@ const mapaOfertasPublicas = {
     }
 };
 
+// ===========================
+// SISTEMA DE MAPA PRINCIPAL
+// ===========================
+
+/**
+ * Estado global del mapa principal de establecimientos
+ */
+const mapaPrincipal = {
+    instancia: null,
+    marcadores: [],
+    marcadorDestacado: null,
+    capas: {
+        clasica: null,
+        satelital: null
+    },
+    configuracion: {
+        centro: [-32.89, -68.83], // Mendoza, Argentina
+        zoom: 8,
+        maxZoom: 18
+    }
+};
+
 /**
  * Inicializa el mapa de ofertas públicas
  */
@@ -9303,35 +9340,77 @@ function scrollToOferta(idOferta) {
 let vistaActual = 'lista'; // 'lista' o 'mapa'
 
 /**
- * Cambia entre vista de lista y mapa
+ * Cambia entre vista de lista y mapa con efectos de transición mejorados
  * @param {string} vista - 'lista' o 'mapa'
  */
 function cambiarVista(vista) {
-    vistaActual = vista;
-    
-    const btnLista = document.getElementById('btn-vista-lista');
-    const btnMapa = document.getElementById('btn-vista-mapa');
-    const containerOfertas = document.getElementById('ofertas-publicas-container');
-    const containerMapa = document.getElementById('mapa-container');
-    const tituloVista = document.getElementById('vista-actual-titulo');
-    
-    if (!btnLista || !btnMapa || !containerOfertas || !containerMapa || !tituloVista) {
-        console.warn('⚠️ Elementos de vista no encontrados');
+    // Verificar que el DOM esté listo
+    if (document.readyState !== 'complete') {
+        console.log('⏳ DOM no está completo, esperando...');
+        setTimeout(() => cambiarVista(vista), 100);
         return;
     }
     
-    console.log('🔄 Cambiando vista a:', vista);
+    const vistaAnterior = vistaActual;
+    vistaActual = vista;
+    
+    const btnLista = document.getElementById('btn-vista-lista');
+    const btnMapa = document.getElementById('btn-vista-mapa'); // Optional - may not exist
+    const containerOfertas = document.getElementById('ofertas-publicas-container');
+    const containerMapa = document.getElementById('mapa-container');
+    
+    // Debug: verificar qué elementos faltan
+    console.log('🔍 Verificando elementos de vista:', {
+        btnLista: !!btnLista,
+        btnMapa: !!btnMapa,
+        containerOfertas: !!containerOfertas,
+        containerMapa: !!containerMapa
+    });
+    
+    // Only require essential elements (map button is optional)
+    if (!btnLista || !containerOfertas || !containerMapa) {
+        console.warn('⚠️ Elementos esenciales de vista no encontrados', {
+            btnLista: !!btnLista,
+            btnMapa: !!btnMapa,
+            containerOfertas: !!containerOfertas,
+            containerMapa: !!containerMapa
+        });
+        
+        // Intentar de nuevo después de un breve delay
+        if (document.readyState === 'complete') {
+            setTimeout(() => cambiarVista(vista), 500);
+        }
+        return;
+    }
+    
+    console.log('🔄 Cambiando vista a:', vista, 'desde:', vistaAnterior);
+    
+    // Limpiar efectos de marcadores cuando se cambia de vista
+    if (vistaAnterior === 'mapa' && vista === 'lista') {
+        limpiarEfectosMarcadores();
+    }
     
     if (vista === 'mapa') {
         // Activar vista mapa
-        btnMapa.classList.remove('btn-outline-primary');
-        btnMapa.classList.add('btn-primary');
-        btnLista.classList.remove('btn-primary');
-        btnLista.classList.add('btn-outline-primary');
+        if (btnMapa) {
+            btnMapa.classList.remove('btn-outline-primary');
+            btnMapa.classList.add('btn-primary');
+        }
+        if (btnLista) {
+            btnLista.classList.remove('btn-primary');
+            btnLista.classList.add('btn-outline-primary');
+        }
         
-        containerOfertas.classList.add('d-none');
-        containerMapa.classList.remove('d-none');
-        tituloVista.textContent = 'Mapa de Ofertas';
+        // Transición suave entre vistas
+        containerOfertas.style.transition = 'opacity 0.3s ease';
+        containerMapa.style.transition = 'opacity 0.3s ease';
+        
+        containerOfertas.style.opacity = '0';
+        setTimeout(() => {
+            containerOfertas.classList.add('d-none');
+            containerMapa.classList.remove('d-none');
+            containerMapa.style.opacity = '1';
+        }, 150);
         
         // Inicializar mapa si no existe
         if (!mapaOfertasPublicas.instancia) {
@@ -9340,7 +9419,7 @@ function cambiarVista(vista) {
                 if (estadoOfertasPublicas.ofertas.length > 0) {
                     agregarOfertasAlMapa(estadoOfertasPublicas.ofertas);
                 }
-            }, 100);
+            }, 200);
         } else {
             // Redimensionar mapa existente
             setTimeout(() => {
@@ -9348,33 +9427,45 @@ function cambiarVista(vista) {
                 if (estadoOfertasPublicas.ofertas.length > 0) {
                     agregarOfertasAlMapa(estadoOfertasPublicas.ofertas);
                 }
-            }, 100);
+            }, 200);
         }
         
     } else {
         // Activar vista lista
-        btnLista.classList.remove('btn-outline-primary');
-        btnLista.classList.add('btn-primary');
-        btnMapa.classList.remove('btn-primary');
-        btnMapa.classList.add('btn-outline-primary');
+        if (btnLista) {
+            btnLista.classList.remove('btn-outline-primary');
+            btnLista.classList.add('btn-primary');
+        }
+        if (btnMapa) {
+            btnMapa.classList.remove('btn-primary');
+            btnMapa.classList.add('btn-outline-primary');
+        }
         
-        containerMapa.classList.add('d-none');
-        containerOfertas.classList.remove('d-none');
-        tituloVista.textContent = 'Lista de Ofertas';
+        // Transición suave entre vistas
+        containerMapa.style.transition = 'opacity 0.3s ease';
+        containerOfertas.style.transition = 'opacity 0.3s ease';
+        
+        containerMapa.style.opacity = '0';
+        setTimeout(() => {
+            containerMapa.classList.add('d-none');
+            containerOfertas.classList.remove('d-none');
+            containerOfertas.style.opacity = '1';
+        }, 150);
     }
     
-    // Actualizar contador
-    actualizarContadorOfertas();
+    // Actualizar contador después del cambio
+    setTimeout(() => {
+        actualizarContadorOfertas();
+    }, 300);
 }
 
 /**
  * Actualiza el contador de ofertas según la vista
  */
 function actualizarContadorOfertas() {
-    const badge = document.getElementById('total-ofertas-badge');
     const contador = document.getElementById('contador-ofertas-publicas');
     
-    if (!badge || !contador) return;
+    if (!contador) return;
     
     const total = estadoOfertasPublicas.ofertas.length;
     const filtradas = estadoOfertasPublicas.ofertasFiltradas.length;
@@ -9386,21 +9477,20 @@ function actualizarContadorOfertas() {
         texto = `${filtradas} de ${total} ofertas`;
     }
     
-    badge.textContent = texto;
     contador.textContent = texto;
     
-    // Actualizar color del badge según disponibilidad
-    badge.className = 'badge ms-2';
+    // Actualizar color del contador según disponibilidad
     contador.className = 'badge bg-success fs-6';
     
     if (filtradas === 0) {
-        badge.classList.add('bg-secondary');
         contador.classList.remove('bg-success');
         contador.classList.add('bg-secondary');
     } else if (filtradas < total) {
-        badge.classList.add('bg-warning');
+        contador.classList.remove('bg-success');
+        contador.classList.add('bg-warning');
     } else {
-        badge.classList.add('bg-info');
+        contador.classList.remove('bg-secondary', 'bg-warning');
+        contador.classList.add('bg-success');
     }
 }
 
@@ -9779,42 +9869,474 @@ function contactarEmpresa(ofertaId) {
 }
 
 /**
- * Función para mostrar oferta en el mapa
+ * Variable para rastrear el marcador actualmente destacado
+ */
+let marcadorDestacadoActual = null;
+
+/**
+ * Función para mostrar oferta en el mapa con efectos visuales mejorados
  * @param {string} ofertaId - ID de la oferta
  */
 function verEnMapa(ofertaId) {
-    console.log('🗺️ Mostrando oferta en mapa:', ofertaId);
+    console.log('🗺️ Redirigiendo al mapa principal para oferta:', ofertaId);
     
-    // Cambiar a vista mapa si no estamos en ella
-    if (vistaActual !== 'mapa') {
-        cambiarVista('mapa');
+    // Verificar que el DOM esté listo
+    if (document.readyState !== 'complete') {
+        console.log('⏳ Esperando a que el DOM esté completo...');
+        setTimeout(() => verEnMapa(ofertaId), 100);
+        return;
     }
     
-    // Esperar a que el mapa esté listo
-    setTimeout(() => {
-        const oferta = estadoOfertasPublicas.ofertas.find(o => o.idOfertaEmpleo.toString() === ofertaId);
-        if (oferta && mapaOfertasPublicas.instancia) {
-            // Centrar el mapa en la oferta
-            mapaOfertasPublicas.instancia.setView([oferta.latitud, oferta.longitud], 16);
+    // Buscar el establecimiento correspondiente a la oferta
+    const oferta = estadoOfertasPublicas.ofertas.find(o => o.idOfertaEmpleo.toString() === ofertaId);
+    if (!oferta) {
+        console.warn('❌ No se encontró la oferta:', ofertaId);
+        return;
+    }
+    
+    // Verificar si tiene ubicación
+    if (!oferta.latitud || !oferta.longitud) {
+        console.warn('📍 La oferta no tiene ubicación definida');
+        alert('Esta oferta no tiene ubicación disponible en el mapa.');
+        return;
+    }
+    
+    // Hacer scroll suave hacia el mapa principal
+    const mainMap = document.getElementById('main-map');
+    if (mainMap) {
+        mainMap.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center',
+            inline: 'nearest'
+        });
+        
+        // Esperar a que termine el scroll y entonces trabajar con el mapa
+        setTimeout(() => {
+            buscarYDestacarUbicacion(oferta.latitud, oferta.longitud, oferta.nombreEmpresa || 'Ubicación de oferta');
+        }, 800);
+    } else {
+        console.warn('❌ No se encontró el elemento main-map');
+    }
+}
+
+// Función para buscar y destacar una ubicación específica en el mapa principal
+function buscarYDestacarUbicacion(latitud, longitud, nombreEstablecimiento) {
+    console.log('🎯 Buscando ubicación:', latitud, longitud, nombreEstablecimiento);
+    
+    // Verificar que el mapa principal esté inicializado
+    if (!mapaPrincipal.instancia) {
+        console.log('🔄 Inicializando mapa principal...');
+        inicializarMapaPrincipal();
+        
+        // Esperar a que se inicialice y intentar de nuevo
+        setTimeout(() => {
+            buscarYDestacarUbicacion(latitud, longitud, nombreEstablecimiento);
+        }, 1000);
+        return;
+    }
+    
+    // Verificar si hay marcadores cargados en el mapa principal
+    if (mapaPrincipal.marcadores.length === 0) {
+        console.log('📍 Cargando establecimientos en mapa principal...');
+        cargarEstablecimientosEnMapa(mapaPrincipal.instancia);
+        
+        // Esperar a que se carguen los marcadores
+        setTimeout(() => {
+            buscarYDestacarUbicacion(latitud, longitud, nombreEstablecimiento);
+        }, 1500);
+        return;
+    }
+    
+    // Limpiar destacados anteriores
+    limpiarDestacados();
+    
+    // Buscar marcador por coordenadas (con tolerancia para diferencias mínimas)
+    const marcadorEncontrado = mapaPrincipal.marcadores.find(item => {
+        const latDiff = Math.abs(item.establecimiento.latitud - latitud);
+        const lngDiff = Math.abs(item.establecimiento.longitud - longitud);
+        return latDiff < 0.0001 && lngDiff < 0.0001; // Tolerancia de ~10 metros
+    });
+    
+    if (marcadorEncontrado) {
+        console.log('✅ Marcador encontrado, destacando...');
+        destacarMarcador(marcadorEncontrado.marcador);
+    } else {
+        console.log('📍 Marcador no encontrado, centrando en ubicación...');
+        // Si no hay marcador, simplemente centrar el mapa en la ubicación
+        mapaPrincipal.instancia.flyTo([latitud, longitud], 15, {
+            animate: true,
+            duration: 1.5
+        });
+        
+        // Crear un marcador temporal para la ubicación
+        const marcadorTemporal = L.marker([latitud, longitud])
+            .addTo(mapaPrincipal.instancia)
+            .bindPopup(`<strong>${nombreEstablecimiento}</strong><br>Ubicación de oferta laboral`)
+            .openPopup();
             
-            // Buscar y abrir popup del marcador
-            const marcadorItem = mapaOfertasPublicas.marcadores.find(item => 
-                item.marcador._ofertaId === ofertaId
-            );
-            
-            if (marcadorItem) {
-                marcadorItem.marcador.openPopup();
-                
-                // Animar el marcador
-                setTimeout(() => {
-                    const markerElement = marcadorItem.marcador._icon;
-                    if (markerElement) {
-                        markerElement.style.animation = 'bounce 0.6s ease-in-out 3';
-                    }
-                }, 300);
+        // Agregar efecto de bounce
+        setTimeout(() => {
+            const iconElement = marcadorTemporal.getElement();
+            if (iconElement) {
+                iconElement.classList.add('marker-bounce');
             }
+        }, 100);
+    }
+}
+
+// Función para destacar un marcador específico
+function destacarMarcador(marcador) {
+    // Guardar referencia del marcador destacado
+    mapaPrincipal.marcadorDestacado = marcador;
+    
+    // Centrar mapa en el marcador con animación
+    const latlng = marcador.getLatLng();
+    mapaPrincipal.instancia.flyTo(latlng, 16, {
+        animate: true,
+        duration: 1.5
+    });
+    
+    // Abrir popup automáticamente después de la animación
+    setTimeout(() => {
+        marcador.openPopup();
+        
+        // Agregar efecto de bounce al marcador
+        const iconElement = marcador.getElement();
+        if (iconElement) {
+            iconElement.classList.add('marker-bounce');
+            
+            // Remover la clase después de la animación
+            setTimeout(() => {
+                iconElement.classList.remove('marker-bounce');
+            }, 1000);
         }
-    }, vistaActual === 'mapa' ? 100 : 600);
+    }, 1600);
+}
+
+// Función para limpiar destacados anteriores
+function limpiarDestacados() {
+    if (mapaPrincipal.marcadorDestacado) {
+        // Cerrar popup del marcador anterior
+        mapaPrincipal.marcadorDestacado.closePopup();
+        
+        // Remover efectos visuales
+        const iconElement = mapaPrincipal.marcadorDestacado.getElement();
+        if (iconElement) {
+            iconElement.classList.remove('marker-bounce', 'marker-highlight');
+        }
+        
+        // Limpiar referencia
+        mapaPrincipal.marcadorDestacado = null;
+    }
+}
+
+/**
+ * Ejecuta una secuencia profesional de efectos visuales
+ * @param {L.Marker} marcador - Marcador de Leaflet
+ * @param {Object} oferta - Datos de la oferta
+ */
+function ejecutarSecuenciaEfectos(marcador, oferta) {
+    // 1. Limpiar estado anterior
+    removerDestacadoAnterior();
+    
+    // 2. Esperar a que termine la animación del mapa
+    setTimeout(() => {
+        // 3. Aplicar efecto de identificación inicial
+        aplicarEfectoIdentificacion(marcador);
+        
+        // 4. Después del flash, aplicar destacado permanente
+        setTimeout(() => {
+            aplicarDestacadoMarcador(marcador);
+            
+            // 5. Abrir popup mejorado
+            mostrarPopupMejorado(marcador, oferta);
+            
+            // 6. Aplicar efectos visuales secuenciales
+            setTimeout(() => {
+                aplicarEfectosVisuales(marcador);
+            }, 200);
+            
+            // 7. Guardar referencia del marcador actual
+            marcadorDestacadoActual = marcador;
+            
+        }, 2500); // Esperar a que termine el flash
+        
+    }, 800); // Esperar a que termine flyTo
+}
+
+/**
+ * Determina el nivel de zoom óptimo basado en el contexto de la oferta
+ * @param {Object} oferta - Datos de la oferta
+ * @returns {number} Nivel de zoom
+ */
+function determinarNivelZoomOptimo(oferta) {
+    // Zoom más cercano para ubicaciones urbanas, más lejano para rurales
+    // Basado en el tipo de especie o área de trabajo
+    if (oferta.nombreEspecie && oferta.nombreEspecie.toLowerCase().includes('urbano')) {
+        return 18; // Zoom muy cercano para áreas urbanas
+    } else if (oferta.nombrePuestoTrabajo && oferta.nombrePuestoTrabajo.toLowerCase().includes('campo')) {
+        return 14; // Zoom más lejano para visualizar el área rural
+    } else {
+        return 16; // Zoom estándar
+    }
+}
+
+/**
+ * Muestra un indicador visual de transición
+ */
+function mostrarIndicadorTransicion() {
+    // Crear overlay temporal si no existe
+    let overlay = document.getElementById('mapa-transition-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'mapa-transition-overlay';
+        overlay.innerHTML = `
+            <div class="d-flex flex-column align-items-center justify-content-center h-100">
+                <div class="spinner-border text-primary mb-3" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <h5 class="text-primary">Ubicando en el mapa...</h5>
+                <p class="text-muted">Preparando vista detallada</p>
+            </div>
+        `;
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            backdrop-filter: blur(5px);
+        `;
+        document.body.appendChild(overlay);
+    }
+    overlay.style.display = 'flex';
+}
+
+/**
+ * Oculta el indicador de transición
+ */
+function ocultarIndicadorTransicion() {
+    const overlay = document.getElementById('mapa-transition-overlay');
+    if (overlay) {
+        overlay.style.opacity = '0';
+        overlay.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            overlay.style.opacity = '1';
+        }, 500);
+    }
+}
+
+/**
+ * Aplica efecto de identificación inicial (flash mejorado)
+ * @param {L.Marker} marcador - Marcador de Leaflet
+ */
+function aplicarEfectoIdentificacion(marcador) {
+    if (marcador && marcador._icon) {
+        const iconElement = marcador._icon;
+        iconElement.classList.add('marcador-flash');
+        
+        // Crear anillo de expansión
+        const anillo = document.createElement('div');
+        anillo.className = 'marcador-anillo-expansion';
+        anillo.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #4A90E2;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: anillo-expansion 2s ease-out;
+            pointer-events: none;
+            z-index: 1000;
+        `;
+        
+        iconElement.style.position = 'relative';
+        iconElement.appendChild(anillo);
+        
+        // Remover el anillo después de la animación
+        setTimeout(() => {
+            if (anillo.parentNode) {
+                anillo.remove();
+            }
+        }, 2000);
+    }
+}
+
+/**
+ * Muestra popup mejorado con información completa
+ * @param {L.Marker} marcador - Marcador de Leaflet
+ * @param {Object} oferta - Datos de la oferta
+ */
+function mostrarPopupMejorado(marcador, oferta) {
+    const popupContent = `
+        <div class="popup-oferta-destacada">
+            <div class="popup-header">
+                <h6 class="mb-2 text-primary fw-bold">
+                    <i class="fas fa-briefcase me-2"></i>
+                    ${oferta.nombrePuestoTrabajo}
+                </h6>
+                <div class="badge bg-success mb-2">${oferta.nombreEspecie}</div>
+            </div>
+            <div class="popup-body">
+                <p class="mb-2">
+                    <i class="fas fa-building me-2 text-muted"></i>
+                    <strong>${oferta.nombreEstablecimiento}</strong>
+                </p>
+                <p class="mb-2">
+                    <i class="fas fa-map-marker-alt me-2 text-danger"></i>
+                    ${oferta.ubicacion || 'Ubicación registrada'}
+                </p>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <small class="text-muted">
+                        <i class="fas fa-calendar me-1"></i>
+                        Vigente hasta ${new Date(oferta.fechaCierreOferta).toLocaleDateString()}
+                    </small>
+                    <button class="btn btn-primary btn-sm" onclick="contactarEmpresa('${oferta.idOfertaEmpleo}')">
+                        <i class="fas fa-phone me-1"></i>Contactar
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Configurar popup con estilo mejorado
+    marcador.bindPopup(popupContent, {
+        maxWidth: 350,
+        minWidth: 250,
+        className: 'popup-destacado-oferta'
+    }).openPopup();
+    
+    // Aplicar estilos adicionales al popup
+    setTimeout(() => {
+        const popup = marcador.getPopup();
+        if (popup && popup._container) {
+            popup._container.classList.add('popup-destacado');
+        }
+    }, 100);
+}
+
+/**
+ * Remueve el destacado del marcador anterior con efectos suaves
+ */
+function removerDestacadoAnterior() {
+    if (marcadorDestacadoActual && marcadorDestacadoActual._icon) {
+        const iconElement = marcadorDestacadoActual._icon;
+        
+        // Remover todas las clases de animación
+        iconElement.classList.remove('marcador-destacado', 'marcador-rebote', 'marcador-flash');
+        iconElement.style.animation = '';
+        iconElement.style.filter = '';
+        
+        // Remover cualquier anillo de expansión existente
+        const anillos = iconElement.querySelectorAll('.marcador-anillo-expansion');
+        anillos.forEach(anillo => anillo.remove());
+        
+        // Remover estilo del popup anterior
+        const popup = marcadorDestacadoActual.getPopup();
+        if (popup && popup._container) {
+            popup._container.classList.remove('popup-destacado', 'popup-destacado-oferta');
+        }
+        
+        // Cerrar popup anterior si está abierto
+        if (marcadorDestacadoActual.isPopupOpen()) {
+            marcadorDestacadoActual.closePopup();
+        }
+    }
+    
+    // Remover clase del contenedor del mapa
+    const mapaContainer = document.getElementById('mapa-ofertas-publicas');
+    if (mapaContainer) {
+        mapaContainer.classList.remove('marcador-destacado-activo');
+    }
+    
+    // Limpiar referencia
+    marcadorDestacadoActual = null;
+}
+
+/**
+ * Aplica el destacado visual al marcador seleccionado con efectos mejorados
+ * @param {L.Marker} marcador - Marcador de Leaflet
+ */
+function aplicarDestacadoMarcador(marcador) {
+    if (marcador && marcador._icon) {
+        const iconElement = marcador._icon;
+        
+        // Aplicar clase de marcador destacado
+        iconElement.classList.add('marcador-destacado');
+        
+        // Añadir clase al contenedor del mapa para atenuar otros marcadores
+        const mapaContainer = document.getElementById('mapa-ofertas-publicas');
+        if (mapaContainer) {
+            mapaContainer.classList.add('marcador-destacado-activo');
+        }
+        
+        // Asegurar que el marcador esté en el frente
+        marcador.setZIndexOffset(1000);
+    }
+}
+
+/**
+ * Aplica efectos visuales secuenciales al marcador con mejor control
+ * @param {L.Marker} marcador - Marcador de Leaflet  
+ */
+function aplicarEfectosVisuales(marcador) {
+    if (marcador && marcador._icon) {
+        const iconElement = marcador._icon;
+        
+        // 1. Efecto de flash inicial para llamar la atención (ya aplicado en identificación)
+        // Este paso se omite aquí porque ya se aplica en aplicarEfectoIdentificacion
+        
+        // 2. Aplicar efecto de rebote después de un breve delay
+        setTimeout(() => {
+            if (iconElement.classList.contains('marcador-destacado')) {
+                iconElement.classList.add('marcador-rebote');
+                
+                // 3. Remover rebote y mantener solo el pulso continuo
+                setTimeout(() => {
+                    iconElement.classList.remove('marcador-rebote');
+                }, 2400); // 0.8s * 3 repeticiones = 2.4s
+            }
+        }, 500);
+    }
+}
+
+/**
+ * Limpia todos los efectos de marcadores al cambiar de vista
+ */
+function limpiarEfectosMarcadores() {
+    // Limpiar marcador destacado actual
+    removerDestacadoAnterior();
+    
+    // Limpiar efectos de todos los marcadores en el mapa
+    if (mapaOfertasPublicas.marcadores) {
+        mapaOfertasPublicas.marcadores.forEach(item => {
+            if (item.marcador && item.marcador._icon) {
+                const iconElement = item.marcador._icon;
+                iconElement.classList.remove('marcador-destacado', 'marcador-rebote', 'marcador-flash');
+                iconElement.style.animation = '';
+                iconElement.style.filter = '';
+                
+                // Remover anillos de expansión
+                const anillos = iconElement.querySelectorAll('.marcador-anillo-expansion');
+                anillos.forEach(anillo => anillo.remove());
+            }
+        });
+    }
+    
+    // Remover clase del contenedor del mapa
+    const mapaContainer = document.getElementById('mapa-ofertas-publicas');
+    if (mapaContainer) {
+        mapaContainer.classList.remove('marcador-destacado-activo');
+    }
 }
 
 // ===========================

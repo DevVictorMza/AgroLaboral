@@ -1,0 +1,263 @@
+/* =========================== */
+/* ESTILOS PARA MARCADOR DESTACADO */
+/* =========================== */
+
+/* Animación de pulso para el marcador destacado */
+@keyframes marcador-pulso {
+    0% {
+        box-shadow: 0 0 0 0 rgba(74, 144, 226, 0.7);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 0 15px rgba(74, 144, 226, 0.2);
+        transform: scale(1.1);
+    }
+    100% {
+        box-shadow: 0 0 0 30px rgba(74, 144, 226, 0);
+        transform: scale(1);
+    }
+}
+
+/* Animación de rebote */
+@keyframes marcador-bounce {
+    0%, 100% { 
+        transform: translateY(0); 
+    }
+    50% { 
+        transform: translateY(-10px); 
+    }
+}
+
+/* Animación de anillo de expansión mejorada */
+@keyframes anillo-expansion {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+        border-width: 3px;
+    }
+    50% {
+        opacity: 0.6;
+        border-width: 2px;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(4);
+        opacity: 0;
+        border-width: 1px;
+    }
+}
+
+/* Marcador destacado con efectos mejorados */
+.marcador-destacado {
+    animation: marcador-pulso 2s infinite;
+    filter: hue-rotate(45deg) brightness(1.4) saturate(1.7) drop-shadow(0 0 15px rgba(74, 144, 226, 0.9));
+    border: 3px solid #4A90E2 !important;
+    border-radius: 50%;
+    z-index: 1000 !important;
+    position: relative;
+}
+
+/* Efecto de rebote mejorado para cuando se selecciona */
+.marcador-rebote {
+    animation: marcador-bounce 0.8s ease-in-out 3;
+    transform-origin: center bottom;
+}
+
+/* Estilo para el ícono del marcador destacado */
+.leaflet-marker-icon.marcador-destacado {
+    filter: hue-rotate(45deg) brightness(1.4) saturate(1.7) drop-shadow(0 0 15px rgba(74, 144, 226, 0.9));
+    transition: all 0.3s ease;
+}
+
+/* Hover effect mejorado para marcadores */
+.leaflet-marker-icon:hover {
+    filter: brightness(1.3) saturate(1.2);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    transform: scale(1.05);
+}
+
+/* Estilos mejorados para popup destacado */
+.popup-destacado .leaflet-popup-content-wrapper {
+    border: 3px solid #4A90E2 !important;
+    background: linear-gradient(135deg, #fff 0%, #f8f9ff 100%) !important;
+    box-shadow: 0 12px 30px rgba(74, 144, 226, 0.4) !important;
+    border-radius: 12px !important;
+    overflow: hidden;
+}
+
+.popup-destacado .leaflet-popup-tip {
+    border-top-color: #4A90E2 !important;
+    filter: drop-shadow(0 2px 4px rgba(74, 144, 226, 0.3));
+}
+
+/* Estilo para popup de oferta destacada */
+.popup-oferta-destacada {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.popup-oferta-destacada .popup-header {
+    background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+    color: white;
+    padding: 12px;
+    margin: -12px -12px 12px -12px;
+    border-radius: 8px 8px 0 0;
+}
+
+.popup-oferta-destacada .popup-header h6 {
+    color: white !important;
+    margin: 0;
+    font-weight: 600;
+}
+
+.popup-oferta-destacada .badge {
+    font-size: 0.75em;
+    padding: 4px 8px;
+}
+
+.popup-oferta-destacada .popup-body {
+    padding: 0 4px;
+}
+
+.popup-oferta-destacada .btn-primary {
+    background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+    border: none;
+    font-size: 0.8em;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.popup-oferta-destacada .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+}
+
+/* Efecto de parpadeo mejorado para identificación inicial */
+@keyframes marcador-flash {
+    0%, 100% { 
+        opacity: 1; 
+        transform: scale(1);
+    }
+    25% { 
+        opacity: 0.3; 
+        transform: scale(1.2);
+    }
+    50% { 
+        opacity: 1; 
+        transform: scale(1);
+    }
+    75% { 
+        opacity: 0.3; 
+        transform: scale(1.2);
+    }
+}
+
+.marcador-flash {
+    animation: marcador-flash 1s ease-in-out 6;
+}
+
+/* Anillo de expansión para efecto visual mejorado */
+.marcador-anillo-expansion {
+    animation: anillo-expansion 2s ease-out;
+}
+
+/* Estilos para el overlay de transición */
+#mapa-transition-overlay {
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(26, 26, 26, 0.8) 100%);
+}
+
+#mapa-transition-overlay .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    border-width: 0.3rem;
+}
+
+#mapa-transition-overlay h5 {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+#mapa-transition-overlay p {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* Animación para aparición suave del overlay */
+@keyframes overlay-fade-in {
+    from {
+        opacity: 0;
+        -webkit-backdrop-filter: blur(0px);
+        backdrop-filter: blur(0px);
+    }
+    to {
+        opacity: 1;
+        -webkit-backdrop-filter: blur(5px);
+        backdrop-filter: blur(5px);
+    }
+}
+
+#mapa-transition-overlay {
+    animation: overlay-fade-in 0.3s ease-out;
+}
+
+/* Mejoras para marcadores no destacados cuando hay uno seleccionado */
+.leaflet-marker-icon:not(.marcador-destacado) {
+    transition: all 0.3s ease;
+}
+
+.marcador-destacado-activo .leaflet-marker-icon:not(.marcador-destacado) {
+    opacity: 0.6;
+    filter: grayscale(30%);
+}
+
+/* Efectos de entrada suave para elementos del popup */
+.popup-oferta-destacada .popup-header {
+    animation: slide-down 0.3s ease-out;
+}
+
+.popup-oferta-destacada .popup-body {
+    animation: fade-in 0.4s ease-out 0.1s both;
+}
+
+@keyframes slide-down {
+    from {
+        transform: translateY(-10px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+    .popup-oferta-destacada {
+        font-size: 0.9em;
+    }
+    
+    .popup-destacado .leaflet-popup-content-wrapper {
+        max-width: 280px !important;
+    }
+    
+    #mapa-transition-overlay h5 {
+        font-size: 1.2rem;
+    }
+    
+    #mapa-transition-overlay p {
+        font-size: 0.8rem;
+    }
+}
