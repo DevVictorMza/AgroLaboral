@@ -643,28 +643,199 @@ function generarDashboard(perfil) {
             .text-muted-custom {
                 color: #CCCCCC !important;
             }
-            .profile-header {
-                background: linear-gradient(135deg, #4A90E2, #357ABD);
-                border-radius: 8px;
-                padding: 2rem;
+            
+            /* ===================================
+               PROFILE HEADER MODERNO
+               =================================== */
+            .profile-header-modern {
+                position: relative;
+                background: linear-gradient(135deg, #1a2332 0%, #263341 100%);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 16px;
+                padding: 0;
                 margin-bottom: 2rem;
-                text-align: left;
-                box-shadow: 0 8px 16px rgba(74, 144, 226, 0.2);
+                overflow: hidden;
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
             }
-            .company-details {
-                background: rgba(255, 255, 255, 0.1);
-                border-radius: 6px;
-                padding: 1rem;
-                margin: 1rem 0;
+            
+            .profile-backdrop {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 120px;
+                background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+                opacity: 0.15;
             }
-            .company-details p {
-                margin-bottom: 0.5rem !important;
-                font-size: 0.95rem;
+            
+            .profile-content {
+                position: relative;
+                padding: 2rem;
+                display: flex;
+                gap: 2rem;
+                align-items: flex-start;
             }
-            .company-status .badge {
+            
+            /* Avatar empresarial */
+            .company-avatar {
+                position: relative;
+                flex-shrink: 0;
+            }
+            
+            .avatar-circle {
+                width: 100px;
+                height: 100px;
+                border-radius: 20px;
+                background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 8px 24px rgba(74, 144, 226, 0.4);
+                border: 4px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .avatar-circle i {
+                font-size: 48px;
+                color: white;
+            }
+            
+            .avatar-badge {
+                position: absolute;
+                bottom: -5px;
+                right: -5px;
+                width: 32px;
+                height: 32px;
+                background: #27AE60;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 3px solid #1a2332;
+                box-shadow: 0 2px 8px rgba(39, 174, 96, 0.4);
+            }
+            
+            .avatar-badge i {
+                font-size: 14px;
+                color: white;
+            }
+            
+            /* Información de la empresa */
+            .company-info {
+                flex: 1;
+                min-width: 0;
+            }
+            
+            .company-header {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                margin-bottom: 1.5rem;
+                flex-wrap: wrap;
+            }
+            
+            .company-name {
+                font-size: 1.75rem;
+                font-weight: 700;
+                color: #ffffff;
+                margin: 0;
+                letter-spacing: -0.5px;
+            }
+            
+            .company-status-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
                 padding: 0.5rem 1rem;
+                background: rgba(39, 174, 96, 0.15);
+                border: 1px solid rgba(39, 174, 96, 0.3);
+                border-radius: 20px;
+                color: #27AE60;
                 font-size: 0.85rem;
+                font-weight: 600;
             }
+            
+            .company-status-badge i {
+                font-size: 0.7rem;
+                animation: pulse 2s ease-in-out infinite;
+            }
+            
+            @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.5; }
+            }
+            
+            /* Meta información */
+            .company-meta {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1.5rem;
+            }
+            
+            .meta-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: 1rem;
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: 12px;
+                transition: all 0.3s ease;
+            }
+            
+            .meta-item:hover {
+                background: rgba(255, 255, 255, 0.05);
+                border-color: rgba(74, 144, 226, 0.3);
+                transform: translateY(-2px);
+            }
+            
+            .meta-item i {
+                font-size: 20px;
+                color: #4A90E2;
+                margin-top: 2px;
+                flex-shrink: 0;
+            }
+            
+            .meta-content {
+                display: flex;
+                flex-direction: column;
+                gap: 0.25rem;
+                min-width: 0;
+            }
+            
+            .meta-label {
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: #8A92A6;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            
+            .meta-value {
+                font-size: 0.95rem;
+                font-weight: 600;
+                color: #ffffff;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            /* Responsive */
+            @media (max-width: 768px) {
+                .profile-content {
+                    flex-direction: column;
+                    align-items: center;
+                    text-align: center;
+                }
+                
+                .company-header {
+                    justify-content: center;
+                }
+                
+                .company-meta {
+                    grid-template-columns: 1fr;
+                }
+            }
+            
             /* Stats cards estilos deprecados - ahora en stats-cards.css */
             .empty-state {
                 text-align: center;
@@ -794,54 +965,59 @@ function generarDashboard(perfil) {
         
         <div class="dashboard-container">
             <!-- Header del perfil con todos los datos de la empresa -->
-            <div class="profile-header">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <h3 class="mb-2">${perfil.razonSocial}</h3>
-                        
-                        <!-- Datos completos de la empresa -->
-                        <div class="company-details mb-3">
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <p class="mb-1 opacity-75">
-                                        <i class="fas fa-id-card me-2"></i>
-                                        <strong>ID Empresa:</strong> ${perfil.idEmpresa}
-                                    </p>
-                                    <p class="mb-1 opacity-75">
-                                        <i class="fas fa-file-invoice me-2"></i>
-                                        <strong>CUIT:</strong> ${perfil.cuit}
-                                    </p>
-                                </div>
-                                <div class="col-sm-6">
-                                    <p class="mb-1 opacity-75">
-                                        <i class="fas fa-calendar-alt me-2"></i>
-                                        <strong>Miembro desde:</strong> ${new Date(perfil.fechaAlta).toLocaleDateString()}
-                                    </p>
-                                    <p class="mb-1 opacity-75">
-                                        <i class="fas fa-clock me-2"></i>
-                                        <strong>Hora de registro:</strong> ${new Date(perfil.fechaAlta).toLocaleTimeString()}
-                                    </p>
-                                </div>
-                            </div>
+            <div class="profile-header-modern">
+                <div class="profile-backdrop"></div>
+                <div class="profile-content">
+                    <div class="company-avatar">
+                        <div class="avatar-circle">
+                            <i class="fas fa-building"></i>
                         </div>
-                        
-                        <!-- Badge de estado -->
-                        <div class="company-status">
-                            <span class="badge bg-success">
-                                <i class="fas fa-check-circle me-1"></i>
-                                Empresa Activa
-                            </span>
+                        <div class="avatar-badge">
+                            <i class="fas fa-check-circle"></i>
                         </div>
                     </div>
-                    <div class="col-md-4 text-end">
-                        <div class="avatar-lg">
-                            <i class="fas fa-building fa-3x"></i>
+                    
+                    <div class="company-info">
+                        <div class="company-header">
+                            <h2 class="company-name">${perfil.razonSocial}</h2>
+                            <span class="company-status-badge active">
+                                <i class="fas fa-circle"></i>
+                                Activa
+                            </span>
                         </div>
-                        <div class="mt-2">
-                            <small class="opacity-75">
-                                <i class="fas fa-user-tie me-1"></i>
-                                Perfil Empresarial
-                            </small>
+                        
+                        <div class="company-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-id-card"></i>
+                                <div class="meta-content">
+                                    <span class="meta-label">ID Empresa</span>
+                                    <span class="meta-value">${perfil.idEmpresa}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="meta-item">
+                                <i class="fas fa-file-invoice"></i>
+                                <div class="meta-content">
+                                    <span class="meta-label">CUIT</span>
+                                    <span class="meta-value">${perfil.cuit}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="meta-item">
+                                <i class="fas fa-calendar-check"></i>
+                                <div class="meta-content">
+                                    <span class="meta-label">Miembro desde</span>
+                                    <span class="meta-value">${new Date(perfil.fechaAlta).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="meta-item">
+                                <i class="fas fa-user-tie"></i>
+                                <div class="meta-content">
+                                    <span class="meta-label">Tipo de Cuenta</span>
+                                    <span class="meta-value">Perfil Empresarial</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2127,39 +2303,37 @@ function mostrarEstadoCargando(container) {
  */
 function generarHtmlEstablecimientos(establecimientos) {
     const establecimientosHtml = establecimientos.map((est, index) => `
-        <div class="establecimiento-card" data-id="${est.idEstablecimiento}">
-            <div class="establecimiento-card-header">
-                <div class="establecimiento-numero-badge">#${index + 1}</div>
-                <div class="establecimiento-titulo">
-                    <i class="fas fa-warehouse me-2" style="font-size: 0.9rem; color: #27AE60;"></i>
-                    <h6 class="mb-0">${est.nombreEstablecimiento}</h6>
+        <div class="establecimiento-item-horizontal" data-id="${est.idEstablecimiento}">
+            <div class="establecimiento-badge-numero">#${index + 1}</div>
+            
+            <div class="establecimiento-info-principal">
+                <div class="establecimiento-nombre">
+                    <i class="fas fa-warehouse" style="font-size: 0.9rem; color: #27AE60;"></i>
+                    <h6>${est.nombreEstablecimiento}</h6>
+                </div>
+                <div class="establecimiento-detalles-inline">
+                    <span class="detalle-item">
+                        <i class="fas fa-map-marker-alt" style="color: #3498DB;"></i>
+                        ${est.nombreDistrito}
+                    </span>
+                    <span class="detalle-item">
+                        <i class="fas fa-leaf" style="color: #27AE60;"></i>
+                        ${est.especies.length} ${est.especies.length === 1 ? 'especie' : 'especies'}
+                    </span>
+                    <span class="detalle-item">
+                        <i class="fas fa-check-circle" style="color: #27AE60;"></i>
+                        Activo
+                    </span>
                 </div>
             </div>
             
-            <div class="establecimiento-card-body">
-                <div class="establecimiento-info-grid">
-                    <div class="info-item">
-                        <i class="fas fa-map-marker-alt" style="font-size: 0.75rem; color: #3498DB;"></i>
-                        <span>${est.nombreDistrito}</span>
-                    </div>
-                    <div class="info-item">
-                        <i class="fas fa-leaf" style="font-size: 0.75rem; color: #27AE60;"></i>
-                        <span>${est.especies.length} ${est.especies.length === 1 ? 'especie' : 'especies'}</span>
-                    </div>
-                    <div class="info-item">
-                        <i class="fas fa-check-circle" style="font-size: 0.75rem; color: #27AE60;"></i>
-                        <span>Activo</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="establecimiento-card-footer">
-                <button class="btn-card-action btn-ubicacion" onclick="verEnMapa(${est.latitud}, ${est.longitud})" title="Ver en mapa">
-                    <i class="fas fa-map-marked-alt" style="font-size: 0.85rem;"></i>
+            <div class="establecimiento-acciones">
+                <button class="btn-accion-compacto btn-ver-mapa" onclick="verEnMapa(${est.latitud}, ${est.longitud})" title="Ver en mapa">
+                    <i class="fas fa-map-marked-alt"></i>
                     <span>Ubicación</span>
                 </button>
-                <button class="btn-card-action btn-oferta" onclick="crearOfertaLaboral(${est.idEstablecimiento})" title="Crear oferta">
-                    <i class="fas fa-briefcase" style="font-size: 0.85rem;"></i>
+                <button class="btn-accion-compacto btn-crear-oferta" onclick="crearOfertaLaboral(${est.idEstablecimiento})" title="Crear oferta">
+                    <i class="fas fa-briefcase"></i>
                     <span>Nueva Oferta</span>
                 </button>
             </div>
@@ -2170,6 +2344,8 @@ function generarHtmlEstablecimientos(establecimientos) {
         <style>
             .establecimientos-container {
                 padding: 1.5rem;
+                max-width: 1400px;
+                margin: 0 auto;
             }
             
             .establecimientos-header {
@@ -2231,141 +2407,164 @@ function generarHtmlEstablecimientos(establecimientos) {
                 font-size: 0.85rem;
             }
             
+            /* LISTA VERTICAL - Una encima de otra */
             .establecimientos-lista {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-                gap: 1.25rem;
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
             }
             
-            .establecimiento-card {
+            /* TARJETA HORIZONTAL - De izquierda a derecha */
+            .establecimiento-item-horizontal {
                 background: linear-gradient(145deg, #2A2A2A, #252525);
                 border: 1px solid #3a3a3a;
-                border-radius: 12px;
-                overflow: hidden;
+                border-radius: 10px;
+                padding: 1.25rem;
+                display: flex;
+                align-items: center;
+                gap: 1.5rem;
                 transition: all 0.3s ease;
                 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
             }
             
-            .establecimiento-card:hover {
+            .establecimiento-item-horizontal:hover {
                 border-color: #4A90E2;
-                transform: translateY(-4px);
-                box-shadow: 0 6px 20px rgba(74, 144, 226, 0.2);
+                transform: translateX(8px);
+                box-shadow: 0 4px 16px rgba(74, 144, 226, 0.3);
             }
             
-            .establecimiento-card-header {
-                background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
-                padding: 1rem;
-                display: flex;
-                align-items: center;
-                gap: 0.75rem;
-                border-bottom: 1px solid #3a3a3a;
-            }
-            
-            .establecimiento-numero-badge {
+            /* Badge numérico a la izquierda */
+            .establecimiento-badge-numero {
                 background: linear-gradient(135deg, #4A90E2, #357ABD);
                 color: white;
-                width: 32px;
-                height: 32px;
-                border-radius: 8px;
+                width: 40px;
+                height: 40px;
+                border-radius: 10px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 font-weight: 700;
-                font-size: 0.85rem;
+                font-size: 1rem;
                 flex-shrink: 0;
+                box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
             }
             
-            .establecimiento-titulo {
-                display: flex;
-                align-items: center;
+            /* Información principal (centro) */
+            .establecimiento-info-principal {
                 flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem;
                 min-width: 0;
             }
             
-            .establecimiento-titulo h6 {
-                color: #fff;
-                font-weight: 600;
-                font-size: 1rem;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-            
-            .establecimiento-card-body {
-                padding: 1rem;
-            }
-            
-            .establecimiento-info-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            .establecimiento-nombre {
+                display: flex;
+                align-items: center;
                 gap: 0.75rem;
             }
             
-            .info-item {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                color: #CCCCCC;
-                font-size: 0.85rem;
-            }
-            
-            .info-item i {
+            .establecimiento-nombre i {
                 flex-shrink: 0;
             }
             
-            .info-item span {
+            .establecimiento-nombre h6 {
+                margin: 0;
+                color: #fff;
+                font-weight: 600;
+                font-size: 1.1rem;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
             
-            .establecimiento-card-footer {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 1px;
-                background: #3a3a3a;
-                border-top: 1px solid #3a3a3a;
-            }
-            
-            .btn-card-action {
-                background: #2A2A2A;
-                border: none;
-                color: #CCCCCC;
-                padding: 0.75rem;
+            /* Detalles en línea */
+            .establecimiento-detalles-inline {
                 display: flex;
                 align-items: center;
-                justify-content: center;
+                gap: 2rem;
+                flex-wrap: wrap;
+            }
+            
+            .detalle-item {
+                display: flex;
+                align-items: center;
                 gap: 0.5rem;
-                font-size: 0.85rem;
-                font-weight: 500;
-                transition: all 0.2s ease;
-                cursor: pointer;
+                color: #CCCCCC;
+                font-size: 0.9rem;
             }
             
-            .btn-card-action:hover {
-                background: #333;
-                color: #fff;
-            }
-            
-            .btn-ubicacion:hover {
-                background: linear-gradient(135deg, #3498DB, #2980B9);
-                color: white;
-            }
-            
-            .btn-oferta:hover {
-                background: linear-gradient(135deg, #27AE60, #229954);
-                color: white;
-            }
-            
-            .btn-card-action i {
+            .detalle-item i {
+                font-size: 0.8rem;
                 flex-shrink: 0;
             }
             
-            @media (max-width: 768px) {
-                .establecimientos-lista {
-                    grid-template-columns: 1fr;
+            /* Acciones a la derecha */
+            .establecimiento-acciones {
+                display: flex;
+                gap: 0.75rem;
+                flex-shrink: 0;
+            }
+            
+            .btn-accion-compacto {
+                background: #333;
+                border: 1px solid #444;
+                color: #CCCCCC;
+                padding: 0.7rem 1.5rem;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.6rem;
+                font-size: 0.9rem;
+                font-weight: 500;
+                transition: all 0.2s ease;
+                cursor: pointer;
+                white-space: nowrap;
+                min-width: 140px;
+                height: 42px;
+            }
+            
+            .btn-accion-compacto i {
+                font-size: 0.9rem;
+                flex-shrink: 0;
+            }
+            
+            .btn-accion-compacto span {
+                flex: 0 0 auto;
+            }
+            
+            .btn-accion-compacto:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            }
+            
+            .btn-ver-mapa:hover {
+                background: linear-gradient(135deg, #3498DB, #2980B9);
+                border-color: #3498DB;
+                color: white;
+            }
+            
+            .btn-crear-oferta:hover {
+                background: linear-gradient(135deg, #27AE60, #229954);
+                border-color: #27AE60;
+                color: white;
+            }
+            
+            /* Responsive */
+            @media (max-width: 992px) {
+                .establecimiento-item-horizontal {
+                    flex-wrap: wrap;
+                    gap: 1rem;
                 }
                 
+                .establecimiento-acciones {
+                    width: 100%;
+                    justify-content: flex-end;
+                }
+            }
+            
+            @media (max-width: 768px) {
                 .establecimientos-header {
                     flex-direction: column;
                     align-items: flex-start;
@@ -2374,6 +2573,25 @@ function generarHtmlEstablecimientos(establecimientos) {
                 
                 .btn-agregar-establecimiento {
                     width: 100%;
+                }
+                
+                .establecimiento-item-horizontal {
+                    padding: 1rem;
+                }
+                
+                .establecimiento-detalles-inline {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 0.5rem;
+                }
+                
+                .establecimiento-acciones {
+                    width: 100%;
+                }
+                
+                .btn-accion-compacto {
+                    flex: 1;
+                    justify-content: center;
                 }
             }
         </style>

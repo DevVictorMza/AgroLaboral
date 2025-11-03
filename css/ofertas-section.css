@@ -94,13 +94,13 @@
 }
 
 .servicio-card-ofertas .card-body {
-    padding: 2.5rem !important;
+    padding: 1rem 1.5rem !important;
     position: relative;
     z-index: 2;
 }
 
 .servicio-icon-ofertas {
-    font-size: 4rem !important;
+    font-size: 2rem !important;
     color: #ffffff !important;
     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     animation: iconPulse 2s ease-in-out infinite;
@@ -121,14 +121,16 @@
     color: #ffffff !important;
     font-weight: 700 !important;
     text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-    margin-bottom: 1rem !important;
+    margin-bottom: 0.25rem !important;
+    font-size: 1.5rem !important;
     animation: fadeInUp 1.2s ease-out 0.3s both;
 }
 
 .servicio-card-ofertas p {
     color: rgba(255,255,255,0.9) !important;
-    font-size: 1.1rem !important;
+    font-size: 0.875rem !important;
     font-weight: 400 !important;
+    margin-bottom: 0.25rem !important;
     animation: fadeInUp 1.2s ease-out 0.5s both;
 }
 
@@ -213,6 +215,13 @@
 }
 
 /* ===== PANEL DE FILTROS CON GLASSMORPHISM ===== */
+/* Asegurar que ambas tarjetas tengan el mismo ancho */
+#ofertas-disponibles .servicio-card-ofertas,
+#ofertas-disponibles .ofertas-filtros-container {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
 .ofertas-filtros-container {
     background: var(--ofertas-card-bg) !important;
     border: 1px solid var(--ofertas-border) !important;
