@@ -318,7 +318,7 @@ async function abrirDashboardUsuario() {
             return;
         }
 
-        // Mostrar estado de carga en el offcanvas
+        // Mostrar estado de carga en el modal
         const dashboardOffcanvas = document.getElementById('dashboardOffcanvas');
         const dashboardContent = document.getElementById('dashboard-content');
         
@@ -329,19 +329,100 @@ async function abrirDashboardUsuario() {
 
         // Mostrar loading en el dashboard
         dashboardContent.innerHTML = `
-            <div class="loading-container d-flex justify-content-center align-items-center" style="min-height: 400px;">
+            <div class="loading-container d-flex justify-content-center align-items-center">
                 <div class="text-center">
                     <div class="spinner-border text-primary mb-3" role="status">
                         <span class="visually-hidden">Cargando...</span>
                     </div>
-                    <h6 class="text-white">Cargando su perfil...</h6>
+                    <h5 class="text-white">Cargando Panel de Control...</h5>
+                    <p class="text-muted">Preparando su dashboard empresarial</p>
                 </div>
             </div>
         `;
 
-        // Abrir el offcanvas
-        const bsOffcanvas = new bootstrap.Offcanvas(dashboardOffcanvas);
-        bsOffcanvas.show();
+        // Abrir el modal fullscreen
+        const bsModal = new bootstrap.Modal(dashboardOffcanvas, {
+            backdrop: false,
+            keyboard: true,
+            focus: true
+        });
+        
+        // Forzar estilos de fullscreen antes de mostrar
+        dashboardOffcanvas.style.position = 'fixed';
+        dashboardOffcanvas.style.top = '0';
+        dashboardOffcanvas.style.left = '0';
+        dashboardOffcanvas.style.width = '100vw';
+        dashboardOffcanvas.style.height = '100vh';
+        dashboardOffcanvas.style.margin = '0';
+        dashboardOffcanvas.style.padding = '0';
+        dashboardOffcanvas.style.zIndex = '1060';
+        
+        const modalDialog = dashboardOffcanvas.querySelector('.modal-dialog');
+        if (modalDialog) {
+            modalDialog.style.position = 'fixed';
+            modalDialog.style.top = '0';
+            modalDialog.style.left = '0';
+            modalDialog.style.width = '100vw';
+            modalDialog.style.height = '100vh';
+            modalDialog.style.margin = '0';
+            modalDialog.style.padding = '0';
+            modalDialog.style.maxWidth = '100vw';
+            modalDialog.style.maxHeight = '100vh';
+        }
+        
+        const modalContent = dashboardOffcanvas.querySelector('.modal-content');
+        if (modalContent) {
+            modalContent.style.width = '100vw';
+            modalContent.style.height = '100vh';
+            modalContent.style.border = 'none';
+            modalContent.style.borderRadius = '0';
+        }
+        
+        bsModal.show();
+        
+        // Asegurar fullscreen después de que se muestre
+        dashboardOffcanvas.addEventListener('shown.bs.modal', function() {
+            // Forzar estilos después de que el modal se haya mostrado
+            this.style.position = 'fixed';
+            this.style.top = '0';
+            this.style.left = '0';
+            this.style.width = '100vw';
+            this.style.height = '100vh';
+            this.style.margin = '0';
+            this.style.padding = '0';
+            
+            const dialog = this.querySelector('.modal-dialog');
+            if (dialog) {
+                dialog.style.position = 'fixed';
+                dialog.style.top = '0';
+                dialog.style.left = '0';
+                dialog.style.width = '100vw';
+                dialog.style.height = '100vh';
+                dialog.style.margin = '0';
+                dialog.style.padding = '0';
+                dialog.style.maxWidth = '100vw';
+                dialog.style.maxHeight = '100vh';
+                dialog.style.transform = 'none';
+            }
+            
+            const content = this.querySelector('.modal-content');
+            if (content) {
+                content.style.width = '100vw';
+                content.style.height = '100vh';
+                content.style.border = 'none';
+                content.style.borderRadius = '0';
+            }
+            
+            // Eliminar backdrop si existe
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
+            
+            // Asegurar que body no tenga padding-right
+            document.body.style.paddingRight = '0';
+            document.body.style.overflow = 'hidden';
+        });
 
         // Cargar datos del perfil
         console.log('📊 Cargando datos del perfil...');
@@ -2024,14 +2105,14 @@ function generarHtmlEstablecimientos(establecimientos) {
                         ${est.nombreEstablecimiento}
                     </h6>
                     <div class="dropdown">
-                        <button class="btn btn-sm btn-outline-light" type="button" data-bs-toggle="dropdown">
+                        <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Opciones del establecimiento">
                             <i class="fas fa-ellipsis-v"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-dark">
-                            <li><a class="dropdown-item" href="#" onclick="verDetalleEstablecimiento(${est.idEstablecimiento})">
+                            <li><a class="dropdown-item" href="#" onclick="verDetalleEstablecimiento(${est.idEstablecimiento})" role="button">
                                 <i class="fas fa-eye me-2"></i>Ver Detalles
                             </a></li>
-                            <li><a class="dropdown-item" href="#" onclick="editarEstablecimiento(${est.idEstablecimiento})">
+                            <li><a class="dropdown-item" href="#" onclick="editarEstablecimiento(${est.idEstablecimiento})" role="button">
                                 <i class="fas fa-edit me-2"></i>Editar
                             </a></li>
                             <li><hr class="dropdown-divider"></li>
@@ -2069,11 +2150,11 @@ function generarHtmlEstablecimientos(establecimientos) {
                             <i class="fas fa-check-circle me-1"></i>Activo
                         </span>
                         <div class="d-flex gap-2">
-                            <button class="btn btn-sm btn-outline-primary" onclick="verEnMapa(${est.latitud}, ${est.longitud})" title="Ver ubicación en mapa">
-                                <i class="fas fa-location-dot me-1"></i>Ubicación
+                            <button class="btn btn-sm btn-outline-primary" onclick="verEnMapa(${est.latitud}, ${est.longitud})" title="Ver ubicación en mapa" aria-label="Ver ubicación en mapa">
+                                <i class="fas fa-location-dot me-1"></i><span>Ubicación</span>
                             </button>
-                            <button class="btn btn-sm btn-success" onclick="crearOfertaLaboral(${est.idEstablecimiento}, '${est.nombreEstablecimiento}')">
-                                <i class="fas fa-briefcase me-1"></i>Crear Oferta Laboral
+                            <button class="btn btn-sm btn-success" onclick="crearOfertaLaboral(${est.idEstablecimiento}, '${est.nombreEstablecimiento}')" title="Crear nueva oferta laboral" aria-label="Crear oferta laboral">
+                                <i class="fas fa-briefcase me-1"></i><span>Crear Oferta</span>
                             </button>
                         </div>
                     </div>
@@ -2698,16 +2779,16 @@ async function verDetalleEstablecimiento(idEstablecimiento) {
         // Crear modal con detalles
         const modalHtml = `
             <div class="modal fade" id="detalleEstablecimientoModal" tabindex="-1">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content bg-dark">
-                        <div class="modal-header border-secondary">
-                            <h5 class="modal-title text-white">
-                                <i class="fas fa-building me-2"></i>
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content cards-modal">
+                        <div class="modal-header cards-modal-header">
+                            <h5 class="modal-title cards-modal-title">
+                                <i class="fas fa-seedling me-2"></i>
                                 ${establecimiento.nombreEstablecimiento}
                             </h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                         </div>
-                        <div class="modal-body">
+                        <div class="modal-body cards-modal-body">
                             <div class="row">
                                 <div class="col-md-6">
                                     <h6 class="text-primary mb-3">
@@ -2767,10 +2848,15 @@ async function verDetalleEstablecimiento(idEstablecimiento) {
                             </div>
                             ` : ''}
                         </div>
-                        <div class="modal-footer border-secondary">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <div class="modal-footer cards-modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-2"></i>Cerrar
+                            </button>
                             <button type="button" class="btn btn-primary" onclick="editarEstablecimiento(${establecimiento.idEstablecimiento})">
                                 <i class="fas fa-edit me-2"></i>Editar
+                            </button>
+                            <button type="button" class="btn btn-success" onclick="verEnMapa(${establecimiento.latitud}, ${establecimiento.longitud})">
+                                <i class="fas fa-map-marker-alt me-2"></i>Ver en Mapa
                             </button>
                         </div>
                     </div>
@@ -2841,29 +2927,42 @@ function eliminarEstablecimiento(idEstablecimiento, nombreEstablecimiento) {
     // Mostrar modal de confirmación
     const confirmationHtml = `
         <div class="modal fade" id="confirmarEliminacionModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content bg-dark">
-                    <div class="modal-header border-secondary">
-                        <h5 class="modal-title text-white">
-                            <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content danger-modal">
+                    <div class="modal-header danger-modal-header">
+                        <h5 class="modal-title text-white text-shadow" style="margin-left: 3rem;">
                             Confirmar Eliminación
                         </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
-                    <div class="modal-body text-white">
-                        <p>¿Está seguro que desea eliminar el establecimiento?</p>
-                        <div class="alert alert-warning">
-                            <strong>${nombreEstablecimiento}</strong><br>
-                            <small>ID: ${idEstablecimiento}</small>
+                    <div class="modal-body text-white p-4">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-exclamation-triangle text-warning" style="font-size: 3rem; animation: warningBlink 1.5s infinite;"></i>
                         </div>
-                        <p class="text-danger">
-                            <strong>⚠️ Esta acción no se puede deshacer.</strong>
-                        </p>
+                        <p class="lead text-center mb-3">¿Está seguro que desea eliminar este establecimiento?</p>
+                        <div class="alert alert-warning glassmorphism border-warning">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-seedling text-warning me-3" style="font-size: 1.5rem;"></i>
+                                <div>
+                                    <strong class="d-block">${nombreEstablecimiento}</strong>
+                                    <small class="text-muted">ID: ${idEstablecimiento}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-danger glassmorphism border-danger">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-skull-crossbones text-danger me-3"></i>
+                                <strong>Esta acción es IRREVERSIBLE</strong>
+                            </div>
+                            <small class="d-block mt-2">Se eliminarán todos los datos asociados al establecimiento.</small>
+                        </div>
                     </div>
-                    <div class="modal-footer border-secondary">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-danger" onclick="confirmarEliminacionEstablecimiento(${idEstablecimiento}, '${nombreEstablecimiento.replace(/'/g, "\\'")}')">
-                            <i class="fas fa-trash me-2"></i>Eliminar
+                    <div class="modal-footer cards-modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </button>
+                        <button type="button" class="btn btn-danger btn-loading-danger" onclick="confirmarEliminacionEstablecimiento(${idEstablecimiento}, '${nombreEstablecimiento.replace(/'/g, "\\'")}')">
+                            <i class="fas fa-trash me-2"></i>Confirmar Eliminación
                         </button>
                     </div>
                 </div>
@@ -2896,15 +2995,23 @@ function eliminarEstablecimiento(idEstablecimiento, nombreEstablecimiento) {
 async function confirmarEliminacionEstablecimiento(idEstablecimiento, nombreEstablecimiento) {
     console.log('🗑️ Confirmando eliminación del establecimiento:', idEstablecimiento);
     
+    // Obtener botón de eliminación
+    const btnEliminar = document.querySelector(`[onclick*="confirmarEliminacionEstablecimiento(${idEstablecimiento}"]`);
+    
     try {
+        // Mostrar estado de carga en el botón
+        if (btnEliminar) {
+            addButtonLoadingState(btnEliminar, 'Eliminando...');
+        }
+
         // Cerrar modal de confirmación
         const modal = bootstrap.Modal.getInstance(document.getElementById('confirmarEliminacionModal'));
         if (modal) {
             modal.hide();
         }
 
-        // Mostrar loading
-        showMessage('Eliminando establecimiento...', 'info');
+        // Mostrar toast de progreso
+        showToast('Eliminando establecimiento...', 'info');
 
         // Realizar eliminación
         await executeWithTokenRetry(async () => {
@@ -2924,7 +3031,7 @@ async function confirmarEliminacionEstablecimiento(idEstablecimiento, nombreEsta
         }, 'Eliminar establecimiento');
 
         // Mostrar éxito
-        showMessage(`Establecimiento "${nombreEstablecimiento}" eliminado exitosamente`, 'success');
+        showToast(`Establecimiento "${nombreEstablecimiento}" eliminado exitosamente`, 'success');
 
         // Recargar lista de establecimientos
         setTimeout(async () => {
@@ -2933,8 +3040,100 @@ async function confirmarEliminacionEstablecimiento(idEstablecimiento, nombreEsta
 
     } catch (error) {
         console.error('❌ Error eliminando establecimiento:', error);
-        showMessage('Error al eliminar el establecimiento. Inténtelo nuevamente.', 'error');
+        showToast('Error al eliminar el establecimiento. Inténtelo nuevamente.', 'error');
+    } finally {
+        // Remover estado de carga del botón
+        if (btnEliminar) {
+            removeButtonLoadingState(btnEliminar);
+        }
     }
+}
+
+// ===========================
+// UTILIDADES PARA ESTADOS VISUALES
+// ===========================
+
+/**
+ * Agregar estado de carga a un botón
+ */
+function addButtonLoadingState(button, loadingText = 'Procesando...') {
+    if (!button) return;
+    
+    // Guardar estado original
+    button.dataset.originalText = button.innerHTML;
+    button.dataset.originalDisabled = button.disabled;
+    
+    // Aplicar estado de carga
+    button.disabled = true;
+    button.classList.add('btn-loading');
+    
+    // Cambiar texto si se proporciona
+    if (loadingText) {
+        button.innerHTML = `<span style="opacity: 0;">${loadingText}</span>`;
+    }
+}
+
+/**
+ * Remover estado de carga de un botón
+ */
+function removeButtonLoadingState(button) {
+    if (!button) return;
+    
+    // Restaurar estado original
+    button.disabled = button.dataset.originalDisabled === 'true';
+    button.classList.remove('btn-loading');
+    
+    if (button.dataset.originalText) {
+        button.innerHTML = button.dataset.originalText;
+    }
+    
+    // Limpiar datos temporales
+    delete button.dataset.originalText;
+    delete button.dataset.originalDisabled;
+}
+
+/**
+ * Mostrar toast de feedback
+ */
+function showToast(message, type = 'success', duration = 3000) {
+    const toastContainer = document.querySelector('.toast-container') || createToastContainer();
+    
+    const toastId = `toast-${Date.now()}`;
+    const toastClass = type === 'success' ? 'bg-success' : type === 'error' ? 'bg-danger' : 'bg-info';
+    const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle';
+    
+    const toastHtml = `
+        <div id="${toastId}" class="toast align-items-center text-white ${toastClass} border-0" role="alert" data-bs-autohide="true" data-bs-delay="${duration}">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-${icon} me-2"></i>${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+    
+    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+    
+    const toastElement = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastElement);
+    toast.show();
+    
+    // Limpiar después de mostrar
+    toastElement.addEventListener('hidden.bs.toast', () => {
+        toastElement.remove();
+    });
+}
+
+/**
+ * Crear contenedor de toasts si no existe
+ */
+function createToastContainer() {
+    const container = document.createElement('div');
+    container.className = 'toast-container position-fixed top-0 end-0 p-3';
+    container.style.zIndex = '1070';
+    document.body.appendChild(container);
+    return container;
 }
 
 // ===========================
@@ -5995,10 +6194,10 @@ function cerrarSesion() {
 	// Cerrar el panel del dashboard si está abierto
 	const dashboardOffcanvas = document.getElementById('dashboardOffcanvas');
 	if (dashboardOffcanvas) {
-		const offcanvasInstance = bootstrap.Offcanvas.getInstance(dashboardOffcanvas);
-		if (offcanvasInstance) {
+		const modalInstance = bootstrap.Modal.getInstance(dashboardOffcanvas);
+		if (modalInstance) {
 			console.log('🔄 Cerrando panel del dashboard...');
-			offcanvasInstance.hide();
+			modalInstance.hide();
 		}
 	}
 	

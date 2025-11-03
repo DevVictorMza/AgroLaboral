@@ -1,0 +1,682 @@
+/* ===================================
+   CARDS Y MODALES PROFESIONALES - AGRO LABORAL
+   ===================================
+   Archivo especializado para cards de establecimiento y modales
+   Diseño profesional con efectos visuales avanzados
+   Compatible con Bootstrap 5.3.3 y tema oscuro del proyecto
+   Enfoque de especificidad alta para sobrescribir estilos existentes
+   =================================== */
+
+/* ===================================
+   VARIABLES CSS PERSONALIZADAS
+   =================================== */
+
+:root {
+    /* === CARDS VARIABLES === */
+    --card-bg-primary: #2A2A2A;
+    --card-bg-secondary: #1E1E1E;
+    --card-border: #444444;
+    --card-border-hover: #4A90E2;
+    --card-shadow-default: 0 4px 6px rgba(0, 0, 0, 0.3);
+    --card-shadow-hover: 0 8px 15px rgba(74, 144, 226, 0.2);
+    --card-shadow-active: 0 12px 24px rgba(74, 144, 226, 0.3);
+    
+    /* === BUTTONS VARIABLES === */
+    --btn-sm-padding: 0.375rem 0.75rem;
+    --btn-sm-font-size: 0.8rem;
+    --btn-sm-border-radius: 6px;
+    --btn-hover-transform: translateY(-1px);
+    --btn-active-transform: translateY(0);
+    
+    /* === DROPDOWN VARIABLES === */
+    --dropdown-bg: #2A2A2A;
+    --dropdown-border: #444444;
+    --dropdown-item-hover: #4A90E2;
+    --dropdown-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    
+    /* === MODAL VARIABLES === */
+    --modal-bg: #1E1E1E;
+    --modal-header-bg: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+    --modal-border: #444444;
+    --modal-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    --modal-backdrop: rgba(0, 0, 0, 0.7);
+    
+    /* === ANIMATION VARIABLES === */
+    --transition-fast: 0.2s ease;
+    --transition-smooth: 0.3s ease;
+    --transition-slow: 0.5s ease;
+    --bounce-easing: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    /* === COLORS === */
+    --success-color: #27AE60;
+    --warning-color: #F39C12;
+    --danger-color: #E74C3C;
+    --info-color: #3498DB;
+    --text-light: #FFFFFF;
+    --text-muted: #CCCCCC;
+    --text-darker: #888888;
+}
+
+/* ===================================
+   ESTABLECIMIENTOS CARDS - REDISEÑO PROFESIONAL
+   ESPECIFICIDAD ALTA PARA SOBRESCRIBIR ESTILOS EXISTENTES
+   =================================== */
+
+.dashboard-card .establecimiento-card,
+.establecimientos-container .establecimiento-card {
+    background: var(--card-bg-primary) !important;
+    border: 1px solid var(--card-border) !important;
+    border-radius: 12px !important;
+    transition: all var(--transition-smooth) !important;
+    overflow: hidden !important;
+    position: relative !important;
+    box-shadow: var(--card-shadow-default) !important;
+}
+
+.dashboard-card .establecimiento-card::before,
+.establecimientos-container .establecimiento-card::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 3px !important;
+    background: var(--modal-header-bg) !important;
+    opacity: 0 !important;
+    transition: opacity var(--transition-smooth) !important;
+}
+
+.dashboard-card .establecimiento-card:hover,
+.establecimientos-container .establecimiento-card:hover {
+    transform: var(--btn-hover-transform) !important;
+    border-color: var(--card-border-hover) !important;
+    box-shadow: var(--card-shadow-hover) !important;
+}
+
+.dashboard-card .establecimiento-card:hover::before,
+.establecimientos-container .establecimiento-card:hover::before {
+    opacity: 1 !important;
+}
+
+/* === CARD HEADER === */
+.dashboard-card .establecimiento-card .card-header,
+.establecimientos-container .establecimiento-card .card-header {
+    background: var(--card-bg-secondary) !important;
+    border-bottom: 1px solid var(--card-border) !important;
+    padding: 1rem 1.25rem !important;
+    position: relative !important;
+}
+
+.dashboard-card .establecimiento-card .card-header h6,
+.establecimientos-container .establecimiento-card .card-header h6 {
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    margin: 0 !important;
+    color: var(--success-color) !important;
+}
+
+/* === CARD BODY === */
+.dashboard-card .establecimiento-card .card-body,
+.establecimientos-container .establecimiento-card .card-body {
+    padding: 1.25rem !important;
+    background: var(--card-bg-primary) !important;
+}
+
+.dashboard-card .establecimiento-card .info-item,
+.establecimientos-container .establecimiento-card .info-item {
+    display: flex !important;
+    align-items: center !important;
+    margin-bottom: 0.75rem !important;
+    padding: 0.5rem 0 !important;
+    border-radius: 6px !important;
+    transition: background-color var(--transition-fast) !important;
+}
+
+.dashboard-card .establecimiento-card .info-item:hover,
+.establecimientos-container .establecimiento-card .info-item:hover {
+    background-color: rgba(74, 144, 226, 0.05) !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+}
+
+.dashboard-card .establecimiento-card .info-item i,
+.establecimientos-container .establecimiento-card .info-item i {
+    width: 20px !important;
+    text-align: center !important;
+    margin-right: 0.75rem !important;
+}
+
+/* === COORDINATES INFO === */
+.dashboard-card .establecimiento-card .coordinates-info,
+.establecimientos-container .establecimiento-card .coordinates-info {
+    background: rgba(74, 144, 226, 0.1) !important;
+    border-radius: 8px !important;
+    padding: 0.75rem !important;
+    margin-top: 1rem !important;
+    border-left: 3px solid var(--info-color) !important;
+}
+
+/* === CARD FOOTER === */
+.dashboard-card .establecimiento-card .card-footer,
+.establecimientos-container .establecimiento-card .card-footer {
+    background: var(--card-bg-secondary) !important;
+    border-top: 1px solid var(--card-border) !important;
+    padding: 1rem 1.25rem !important;
+}
+
+/* ===================================
+   BOTONES OPTIMIZADOS - TAMAÑO PEQUEÑO
+   ESPECIFICIDAD ALTA PARA SOBRESCRIBIR
+   =================================== */
+
+.dashboard-card .establecimiento-card .card-footer .btn,
+.establecimientos-container .establecimiento-card .card-footer .btn {
+    padding: var(--btn-sm-padding) !important;
+    font-size: var(--btn-sm-font-size) !important;
+    font-weight: 500 !important;
+    border-radius: var(--btn-sm-border-radius) !important;
+    min-width: 100px !important;
+    position: relative !important;
+    overflow: hidden !important;
+    transition: all var(--transition-smooth) !important;
+}
+
+/* === RIPPLE EFFECT === */
+.dashboard-card .establecimiento-card .card-footer .btn::before,
+.establecimientos-container .establecimiento-card .card-footer .btn::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    width: 0 !important;
+    height: 0 !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    transform: translate(-50%, -50%) !important;
+    transition: width 0.3s, height 0.3s !important;
+}
+
+.dashboard-card .establecimiento-card .card-footer .btn:active::before,
+.establecimientos-container .establecimiento-card .card-footer .btn:active::before {
+    width: 300px !important;
+    height: 300px !important;
+}
+
+/* === BUTTON VARIANTS === */
+.dashboard-card .establecimiento-card .btn-outline-primary,
+.establecimientos-container .establecimiento-card .btn-outline-primary {
+    border-color: var(--info-color) !important;
+    color: var(--info-color) !important;
+}
+
+.dashboard-card .establecimiento-card .btn-outline-primary:hover,
+.establecimientos-container .establecimiento-card .btn-outline-primary:hover {
+    background: var(--info-color) !important;
+    transform: var(--btn-hover-transform) !important;
+    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3) !important;
+}
+
+.dashboard-card .establecimiento-card .btn-success,
+.establecimientos-container .establecimiento-card .btn-success {
+    background: var(--success-color) !important;
+    border-color: var(--success-color) !important;
+}
+
+.dashboard-card .establecimiento-card .btn-success:hover,
+.establecimientos-container .establecimiento-card .btn-success:hover {
+    background: #219A52 !important;
+    transform: var(--btn-hover-transform) !important;
+    box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3) !important;
+}
+
+/* === BUTTON SPACING === */
+.dashboard-card .establecimiento-card .d-flex.gap-2,
+.establecimientos-container .establecimiento-card .d-flex.gap-2 {
+    gap: 0.5rem !important;
+}
+
+/* ===================================
+   DROPDOWN MEJORADO - ESPECIFICIDAD ALTA
+   =================================== */
+
+.dashboard-card .establecimiento-card .dropdown-toggle,
+.establecimientos-container .establecimiento-card .dropdown-toggle {
+    border-radius: 8px !important;
+    padding: 0.5rem 0.75rem !important;
+    border: 1px solid transparent !important;
+    transition: all var(--transition-smooth) !important;
+}
+
+.dashboard-card .establecimiento-card .dropdown-toggle:hover,
+.establecimientos-container .establecimiento-card .dropdown-toggle:hover {
+    background: rgba(74, 144, 226, 0.1) !important;
+    border-color: var(--card-border-hover) !important;
+    transform: var(--btn-hover-transform) !important;
+}
+
+.dashboard-card .establecimiento-card .dropdown-menu,
+.establecimientos-container .establecimiento-card .dropdown-menu {
+    background: var(--dropdown-bg) !important;
+    border: 1px solid var(--dropdown-border) !important;
+    box-shadow: var(--dropdown-shadow) !important;
+    border-radius: 10px !important;
+    padding: 0.5rem 0 !important;
+    min-width: 180px !important;
+    animation: dropdownFadeIn 0.3s var(--bounce-easing) !important;
+}
+
+@keyframes dropdownFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.dashboard-card .establecimiento-card .dropdown-item,
+.establecimientos-container .establecimiento-card .dropdown-item {
+    padding: 0.75rem 1rem !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    border-radius: 6px !important;
+    margin: 0 0.5rem !important;
+    transition: all var(--transition-fast) !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.dashboard-card .establecimiento-card .dropdown-item:hover,
+.establecimientos-container .establecimiento-card .dropdown-item:hover {
+    background: rgba(74, 144, 226, 0.15) !important;
+    transform: translateX(3px) !important;
+    color: var(--text-light) !important;
+}
+
+.dashboard-card .establecimiento-card .dropdown-item.text-danger:hover,
+.establecimientos-container .establecimiento-card .dropdown-item.text-danger:hover {
+    background: rgba(231, 76, 60, 0.15) !important;
+    color: #ff6b6b !important;
+}
+
+.dashboard-card .establecimiento-card .dropdown-item i,
+.establecimientos-container .establecimiento-card .dropdown-item i {
+    width: 18px !important;
+    text-align: center !important;
+}
+
+.dashboard-card .establecimiento-card .dropdown-divider,
+.establecimientos-container .establecimiento-card .dropdown-divider {
+    margin: 0.5rem 0 !important;
+    border-color: var(--dropdown-border) !important;
+}
+
+/* ===================================
+   BADGE DE ESTADO - ESPECIFICIDAD ALTA
+   =================================== */
+
+.dashboard-card .establecimiento-card .badge,
+.establecimientos-container .establecimiento-card .badge {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    border-radius: 20px !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.dashboard-card .establecimiento-card .badge.bg-success,
+.establecimientos-container .establecimiento-card .badge.bg-success {
+    background: linear-gradient(135deg, var(--success-color), #2ECC71) !important;
+    box-shadow: 0 2px 4px rgba(39, 174, 96, 0.3) !important;
+}
+
+.dashboard-card .establecimiento-card .badge::before,
+.establecimientos-container .establecimiento-card .badge::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: -100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent) !important;
+    transition: left 0.5s !important;
+}
+
+.dashboard-card .establecimiento-card .badge:hover::before,
+.establecimientos-container .establecimiento-card .badge:hover::before {
+    left: 100% !important;
+}
+
+/* ===================================
+   MODAL PROFESIONAL - DETALLES
+   =================================== */
+
+.modal-content.cards-modal {
+    background: var(--modal-bg);
+    border: 1px solid var(--modal-border);
+    border-radius: 15px;
+    box-shadow: var(--modal-shadow);
+    overflow: hidden;
+}
+
+.modal-header.cards-modal-header {
+    background: var(--modal-header-bg);
+    border-bottom: 1px solid var(--modal-border);
+    padding: 1.5rem;
+    position: relative;
+}
+
+.modal-header.cards-modal-header::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+}
+
+.modal-title.cards-modal-title {
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: var(--text-light);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.modal-body.cards-modal-body {
+    padding: 2rem;
+    background: var(--modal-bg);
+}
+
+.modal-footer.cards-modal-footer {
+    background: var(--card-bg-secondary);
+    border-top: 1px solid var(--modal-border);
+    padding: 1.5rem;
+}
+
+/* ===================================
+   MODAL DE CONFIRMACIÓN - CRÍTICO
+   =================================== */
+
+.modal-content.danger-modal {
+    background: var(--modal-bg);
+    border: 2px solid var(--danger-color);
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(231, 76, 60, 0.3);
+    animation: dangerModalPulse 2s infinite;
+}
+
+@keyframes dangerModalPulse {
+    0%, 100% { 
+        box-shadow: 0 20px 40px rgba(231, 76, 60, 0.3); 
+    }
+    50% { 
+        box-shadow: 0 20px 40px rgba(231, 76, 60, 0.5); 
+    }
+}
+
+.modal-header.danger-modal-header {
+    background: linear-gradient(135deg, var(--danger-color), #c0392b);
+    border-bottom: 1px solid #a93226;
+    position: relative;
+}
+
+.modal-header.danger-modal-header::before {
+    content: '⚠️';
+    position: absolute;
+    top: 50%;
+    left: 1rem;
+    transform: translateY(-50%);
+    font-size: 1.5rem;
+    animation: warningBlink 1.5s infinite;
+}
+
+@keyframes warningBlink {
+    0%, 50% { opacity: 1; }
+    25%, 75% { opacity: 0.5; }
+}
+
+.danger-modal .btn-danger {
+    background: linear-gradient(135deg, var(--danger-color), #c0392b);
+    border: none;
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
+}
+
+.danger-modal .btn-danger::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.3s;
+}
+
+.danger-modal .btn-danger:hover::before {
+    left: 100%;
+}
+
+/* ===================================
+   EFECTOS DE ENTRADA MODAL
+   =================================== */
+
+.modal.fade .modal-dialog {
+    transition: all 0.4s var(--bounce-easing);
+    transform: scale(0.8) translateY(-50px);
+}
+
+.modal.show .modal-dialog {
+    transform: scale(1) translateY(0);
+}
+
+/* ===================================
+   LOADING STATES
+   =================================== */
+
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    color: white;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+
+@media (max-width: 768px) {
+    .establecimiento-card .card-header,
+    .establecimiento-card .card-body,
+    .establecimiento-card .card-footer {
+        padding: 1rem;
+    }
+    
+    .establecimiento-card .d-flex.gap-2 {
+        flex-direction: column;
+        gap: 0.5rem !important;
+    }
+    
+    .establecimiento-card .card-footer .btn {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .modal-dialog {
+        margin: 1rem;
+    }
+    
+    .modal-header.cards-modal-header,
+    .modal-body.cards-modal-body,
+    .modal-footer.cards-modal-footer {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .establecimiento-card {
+        margin-bottom: 1rem;
+    }
+    
+    .establecimiento-card .info-item {
+        font-size: 0.9rem;
+    }
+    
+    .establecimiento-card .coordinates-info {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* ===================================
+   ACCESIBILIDAD
+   =================================== */
+
+.establecimiento-card .btn:focus,
+.establecimiento-card .dropdown-toggle:focus {
+    outline: 2px solid var(--info-color);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
+}
+
+.establecimiento-card .dropdown-item:focus {
+    background: rgba(74, 144, 226, 0.2);
+    outline: none;
+}
+
+/* ===================================
+   ANIMACIONES ADICIONALES - ESPECIFICIDAD ALTA
+   =================================== */
+
+.dashboard-card .establecimiento-card,
+.establecimientos-container .establecimiento-card {
+    animation: cardFadeIn 0.6s ease-out !important;
+}
+
+@keyframes cardFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Delay para cards múltiples */
+.dashboard-card .establecimiento-card:nth-child(2),
+.establecimientos-container .establecimiento-card:nth-child(2) { 
+    animation-delay: 0.1s !important; 
+}
+.dashboard-card .establecimiento-card:nth-child(3),
+.establecimientos-container .establecimiento-card:nth-child(3) { 
+    animation-delay: 0.2s !important; 
+}
+.dashboard-card .establecimiento-card:nth-child(4),
+.establecimientos-container .establecimiento-card:nth-child(4) { 
+    animation-delay: 0.3s !important; 
+}
+.dashboard-card .establecimiento-card:nth-child(5),
+.establecimientos-container .establecimiento-card:nth-child(5) { 
+    animation-delay: 0.4s !important; 
+}
+.dashboard-card .establecimiento-card:nth-child(6),
+.establecimientos-container .establecimiento-card:nth-child(6) { 
+    animation-delay: 0.5s !important; 
+}
+
+/* ===================================
+   SOBRESCRIBIR ESTILOS EXISTENTES
+   MÁXIMA PRIORIDAD PARA STYLE.CSS
+   =================================== */
+
+/* Sobrescribir estilos del archivo style.css */
+.establecimiento-card,
+.dashboard-card .establecimiento-card,
+.establecimientos-container .establecimiento-card {
+    background: var(--card-bg-primary) !important;
+    border: 1px solid var(--card-border) !important;
+    border-radius: 12px !important;
+}
+
+.establecimiento-card:hover,
+.dashboard-card .establecimiento-card:hover,
+.establecimientos-container .establecimiento-card:hover {
+    border-color: var(--card-border-hover) !important;
+    box-shadow: var(--card-shadow-hover) !important;
+    transform: var(--btn-hover-transform) !important;
+}
+
+/* Sobrescribir card header específicamente */
+.establecimiento-card .card-header,
+.dashboard-card .establecimiento-card .card-header,
+.establecimientos-container .establecimiento-card .card-header {
+    background: var(--card-bg-secondary) !important;
+    border-bottom: 1px solid var(--card-border) !important;
+    padding: 1rem 1.25rem !important;
+}
+
+/* Sobrescribir card body específicamente */
+.establecimiento-card .card-body,
+.dashboard-card .establecimiento-card .card-body,
+.establecimientos-container .establecimiento-card .card-body {
+    background: var(--card-bg-primary) !important;
+    padding: 1.25rem !important;
+}
+
+/* Sobrescribir card footer específicamente */
+.establecimiento-card .card-footer,
+.dashboard-card .establecimiento-card .card-footer,
+.establecimientos-container .establecimiento-card .card-footer {
+    background: var(--card-bg-secondary) !important;
+    border-top: 1px solid var(--card-border) !important;
+    padding: 1rem 1.25rem !important;
+}
+
+/* ===================================
+   UTILIDADES ADICIONALES
+   =================================== */
+
+.glassmorphism {
+    background: rgba(42, 42, 42, 0.8);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.text-shadow {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.subtle-glow {
+    box-shadow: 0 0 20px rgba(74, 144, 226, 0.1);
+}
+
+.subtle-glow:hover {
+    box-shadow: 0 0 30px rgba(74, 144, 226, 0.2);
+}
