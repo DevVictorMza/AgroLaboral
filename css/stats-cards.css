@@ -1,0 +1,411 @@
+/* =========================================
+   STATS CARDS - PUNTOS DE REFERENCIA MODERNOS
+   ========================================= */
+
+/* Container de stats cards */
+.stats-card-moderna {
+    background: linear-gradient(145deg, #1e2a38 0%, #263341 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Borde izquierdo temático */
+.stats-card-moderna::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 5px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--stats-color-1) 0%, var(--stats-color-2) 100%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.stats-card-moderna:hover::before {
+    opacity: 1;
+}
+
+/* Efecto de brillo al hover */
+.stats-card-moderna::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.stats-card-moderna:hover::after {
+    opacity: 1;
+}
+
+.stats-card-moderna:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Icono de la card */
+.stats-icono {
+    width: 80px;
+    height: 80px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, var(--stats-color-1) 0%, var(--stats-color-2) 100%);
+    box-shadow: 0 6px 20px var(--stats-shadow);
+}
+
+.stats-icono::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    background: linear-gradient(135deg, var(--stats-color-1), var(--stats-color-2));
+    border-radius: 16px;
+    z-index: -1;
+    opacity: 0.5;
+    filter: blur(12px);
+}
+
+.stats-icono i {
+    font-size: 36px;
+    color: white;
+    transition: transform 0.4s ease;
+}
+
+.stats-card-moderna:hover .stats-icono i {
+    transform: scale(1.1) rotate(5deg);
+}
+
+/* Contenido de la card */
+.stats-contenido {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Número contador */
+.stats-numero {
+    font-size: 2.75rem;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, var(--stats-color-1) 0%, var(--stats-color-2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeInNumber 0.6s ease-out;
+}
+
+@keyframes fadeInNumber {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Animación de conteo (cuando cambia el valor) */
+@keyframes countUp {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.15);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.stats-numero.counting {
+    animation: countUp 0.5s ease-out;
+}
+
+/* Label descriptivo */
+.stats-label {
+    color: #adb5bd;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+/* Indicador de tendencia */
+.stats-trend {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--stats-color-1);
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 0.25rem;
+}
+
+.stats-trend i {
+    font-size: 0.9rem;
+}
+
+/* =========================================
+   TEMAS DE COLOR POR TIPO
+   ========================================= */
+
+/* Fincas - Verde */
+.stats-fincas {
+    --stats-color-1: #27AE60;
+    --stats-color-2: #2ECC71;
+    --stats-shadow: rgba(39, 174, 96, 0.4);
+}
+
+/* Ofertas - Azul */
+.stats-ofertas {
+    --stats-color-1: #3498DB;
+    --stats-color-2: #5DADE2;
+    --stats-shadow: rgba(52, 152, 219, 0.4);
+}
+
+/* Trabajadores - Naranja */
+.stats-trabajadores {
+    --stats-color-1: #E67E22;
+    --stats-color-2: #F39C12;
+    --stats-shadow: rgba(230, 126, 34, 0.4);
+}
+
+/* Solicitudes - Púrpura */
+.stats-solicitudes {
+    --stats-color-1: #9B59B6;
+    --stats-color-2: #BB8FCE;
+    --stats-shadow: rgba(155, 89, 182, 0.4);
+}
+
+/* =========================================
+   VARIANTES PARA ESTADOS
+   ========================================= */
+
+/* Card con alerta */
+.stats-card-moderna.stats-alerta {
+    border-color: rgba(231, 76, 60, 0.3);
+}
+
+.stats-card-moderna.stats-alerta::before {
+    background: linear-gradient(180deg, #E74C3C 0%, #C0392B 100%);
+    opacity: 1;
+}
+
+/* Card con éxito */
+.stats-card-moderna.stats-exito {
+    border-color: rgba(39, 174, 96, 0.3);
+}
+
+.stats-card-moderna.stats-exito::before {
+    background: linear-gradient(180deg, #27AE60 0%, #229954 100%);
+    opacity: 1;
+}
+
+/* =========================================
+   ANIMACIONES ADICIONALES
+   ========================================= */
+
+/* Pulso para números importantes */
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 6px 20px var(--stats-shadow);
+    }
+    50% {
+        box-shadow: 0 8px 30px var(--stats-shadow);
+    }
+}
+
+.stats-card-moderna.destacado .stats-icono {
+    animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Shimmer effect para carga */
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.stats-numero.loading {
+    background: linear-gradient(
+        90deg,
+        #444 0%,
+        #666 50%,
+        #444 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN
+   ========================================= */
+
+/* Tablet grande */
+@media (max-width: 1200px) {
+    .stats-card-moderna {
+        padding: 1.5rem;
+    }
+
+    .stats-icono {
+        width: 70px;
+        height: 70px;
+    }
+
+    .stats-icono i {
+        font-size: 32px;
+    }
+
+    .stats-numero {
+        font-size: 2.5rem;
+    }
+}
+
+/* Tablet */
+@media (max-width: 992px) {
+    .stats-card-moderna {
+        padding: 1.25rem;
+        gap: 1rem;
+    }
+
+    .stats-icono {
+        width: 64px;
+        height: 64px;
+    }
+
+    .stats-icono i {
+        font-size: 28px;
+    }
+
+    .stats-numero {
+        font-size: 2.25rem;
+    }
+
+    .stats-label {
+        font-size: 0.85rem;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .stats-card-moderna {
+        padding: 1rem;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .stats-icono {
+        width: 60px;
+        height: 60px;
+    }
+
+    .stats-icono i {
+        font-size: 26px;
+    }
+
+    .stats-numero {
+        font-size: 2rem;
+    }
+
+    .stats-label {
+        font-size: 0.8rem;
+    }
+
+    .stats-trend {
+        justify-content: center;
+    }
+}
+
+/* Mobile pequeño */
+@media (max-width: 576px) {
+    .stats-card-moderna {
+        padding: 1.25rem 1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .stats-icono {
+        width: 56px;
+        height: 56px;
+    }
+
+    .stats-icono i {
+        font-size: 24px;
+    }
+
+    .stats-numero {
+        font-size: 1.85rem;
+    }
+
+    .stats-label {
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
+
+    .stats-trend {
+        font-size: 0.75rem;
+    }
+}
+
+/* =========================================
+   UTILIDADES
+   ========================================= */
+
+/* Para ocultar trends en mobile si es necesario */
+@media (max-width: 576px) {
+    .stats-trend.hide-mobile {
+        display: none;
+    }
+}
+
+/* Estados de carga */
+.stats-card-moderna.skeleton {
+    pointer-events: none;
+}
+
+.stats-card-moderna.skeleton .stats-numero,
+.stats-card-moderna.skeleton .stats-label {
+    background: linear-gradient(90deg, #444 0%, #666 50%, #444 100%);
+    background-size: 200% 100%;
+    color: transparent;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Transición suave al actualizar datos */
+.stats-card-moderna.updating {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.stats-card-moderna.updating .stats-numero {
+    animation: fadeInNumber 0.4s ease-out;
+}

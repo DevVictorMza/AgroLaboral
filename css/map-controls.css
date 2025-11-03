@@ -1,0 +1,494 @@
+/* =========================================
+   CONTROLES MODERNOS DEL MAPA - LEAFLET
+   ========================================= */
+
+/* =========================================
+   BOTONES DE ZOOM (+/-)
+   ========================================= */
+
+/* Contenedor de zoom */
+.leaflet-control-zoom,
+#mapa-establecimientos .leaflet-control-zoom,
+#map .leaflet-control-zoom,
+#mapFinca .leaflet-control-zoom {
+    border: none !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25) !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+}
+
+/* Botones individuales de zoom */
+.leaflet-control-zoom a,
+#mapa-establecimientos .leaflet-control-zoom a,
+#map .leaflet-control-zoom a,
+#mapFinca .leaflet-control-zoom a {
+    background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%) !important;
+    color: #000000 !important;
+    border: none !important;
+    width: 40px !important;
+    height: 40px !important;
+    line-height: 40px !important;
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+/* Separador entre botones */
+.leaflet-control-zoom a + a,
+#mapa-establecimientos .leaflet-control-zoom a + a,
+#map .leaflet-control-zoom a + a,
+#mapFinca .leaflet-control-zoom a + a {
+    border-top: 1px solid rgba(0, 0, 0, 0.1) !important;
+    margin-top: 0 !important;
+}
+
+/* Efecto hover en botones de zoom */
+.leaflet-control-zoom a:hover,
+#mapa-establecimientos .leaflet-control-zoom a:hover,
+#map .leaflet-control-zoom a:hover,
+#mapFinca .leaflet-control-zoom a:hover {
+    background: linear-gradient(145deg, #e9ecef 0%, #dee2e6 100%) !important;
+    color: #000000 !important;
+    transform: scale(1.05) !important;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Botón de zoom activo/presionado */
+.leaflet-control-zoom a:active,
+#mapa-establecimientos .leaflet-control-zoom a:active,
+#map .leaflet-control-zoom a:active,
+#mapFinca .leaflet-control-zoom a:active {
+    transform: scale(0.95) !important;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Botón deshabilitado */
+.leaflet-control-zoom a.leaflet-disabled,
+#mapa-establecimientos .leaflet-control-zoom a.leaflet-disabled,
+#map .leaflet-control-zoom a.leaflet-disabled,
+#mapFinca .leaflet-control-zoom a.leaflet-disabled {
+    background: linear-gradient(145deg, #f8f9fa 0%, #e9ecef 100%) !important;
+    color: #999999 !important;
+    cursor: not-allowed !important;
+    opacity: 0.5 !important;
+}
+
+.leaflet-control-zoom a.leaflet-disabled:hover,
+#mapa-establecimientos .leaflet-control-zoom a.leaflet-disabled:hover,
+#map .leaflet-control-zoom a.leaflet-disabled:hover,
+#mapFinca .leaflet-control-zoom a.leaflet-disabled:hover {
+    transform: none !important;
+}
+
+/* =========================================
+   CONTROL DE CAPAS (Vista Clásica/Satelital)
+   ========================================= */
+
+/* Contenedor del control de capas */
+.leaflet-control-layers,
+#mapa-establecimientos .leaflet-control-layers,
+#map .leaflet-control-layers,
+#mapFinca .leaflet-control-layers {
+    background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%) !important;
+    border: 1px solid rgba(0, 0, 0, 0.15) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+    padding: 8px 12px !important;
+}
+
+/* Toggle del control de capas */
+.leaflet-control-layers-toggle,
+#mapa-establecimientos .leaflet-control-layers-toggle,
+#map .leaflet-control-layers-toggle,
+#mapFinca .leaflet-control-layers-toggle {
+    background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%) !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+    background-size: 60% !important;
+    transition: all 0.3s ease !important;
+    filter: brightness(0) !important;
+}
+
+.leaflet-control-layers-toggle:hover,
+#mapa-establecimientos .leaflet-control-layers-toggle:hover,
+#map .leaflet-control-layers-toggle:hover,
+#mapFinca .leaflet-control-layers-toggle:hover {
+    background: linear-gradient(145deg, #e9ecef 0%, #dee2e6 100%) !important;
+    transform: scale(1.05) !important;
+    filter: brightness(0.3) !important;
+}
+
+/* Contenido expandido del control de capas */
+.leaflet-control-layers-expanded,
+#mapa-establecimientos .leaflet-control-layers-expanded,
+#map .leaflet-control-layers-expanded,
+#mapFinca .leaflet-control-layers-expanded {
+    padding: 12px !important;
+    min-width: 200px !important;
+}
+
+/* Labels del control de capas */
+.leaflet-control-layers label,
+.leaflet-control-layers-base label,
+.leaflet-control-layers-overlays label,
+#mapa-establecimientos .leaflet-control-layers label,
+#map .leaflet-control-layers label,
+#mapFinca .leaflet-control-layers label {
+    color: #000000 !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    padding: 6px 8px !important;
+    border-radius: 6px !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+.leaflet-control-layers label:hover,
+#mapa-establecimientos .leaflet-control-layers label:hover,
+#map .leaflet-control-layers label:hover,
+#mapFinca .leaflet-control-layers label:hover {
+    background: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Inputs (radio/checkbox) en control de capas */
+.leaflet-control-layers input,
+#mapa-establecimientos .leaflet-control-layers input,
+#map .leaflet-control-layers input,
+#mapFinca .leaflet-control-layers input {
+    margin: 0 !important;
+    width: 18px !important;
+    height: 18px !important;
+    cursor: pointer !important;
+    accent-color: #000000 !important;
+}
+
+/* Separador en control de capas */
+.leaflet-control-layers-separator,
+#mapa-establecimientos .leaflet-control-layers-separator,
+#map .leaflet-control-layers-separator,
+#mapFinca .leaflet-control-layers-separator {
+    height: 1px !important;
+    background: rgba(0, 0, 0, 0.1) !important;
+    margin: 8px 0 !important;
+    border: none !important;
+}
+
+/* =========================================
+   CONTROL DE ESCALA
+   ========================================= */
+
+.leaflet-control-scale,
+#mapa-establecimientos .leaflet-control-scale,
+#map .leaflet-control-scale,
+#mapFinca .leaflet-control-scale {
+    background: linear-gradient(145deg, rgba(30, 42, 56, 0.95) 0%, rgba(38, 51, 65, 0.95) 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px !important;
+    padding: 6px 10px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+    font-weight: 600 !important;
+}
+
+.leaflet-control-scale-line,
+#mapa-establecimientos .leaflet-control-scale-line,
+#map .leaflet-control-scale-line,
+#mapFinca .leaflet-control-scale-line {
+    background: transparent !important;
+    border: 2px solid #3498DB !important;
+    border-top: none !important;
+    color: #ffffff !important;
+    font-size: 11px !important;
+    line-height: 1.1 !important;
+    padding: 3px 6px !important;
+    font-weight: 600 !important;
+}
+
+/* =========================================
+   CONTROL DE ATRIBUCIÓN
+   ========================================= */
+
+.leaflet-control-attribution,
+#mapa-establecimientos .leaflet-control-attribution,
+#map .leaflet-control-attribution,
+#mapFinca .leaflet-control-attribution {
+    background: rgba(30, 42, 56, 0.9) !important;
+    color: #adb5bd !important;
+    font-size: 10px !important;
+    border-radius: 6px 0 0 0 !important;
+    padding: 4px 8px !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-right: none !important;
+    border-bottom: none !important;
+}
+
+.leaflet-control-attribution a,
+#mapa-establecimientos .leaflet-control-attribution a,
+#map .leaflet-control-attribution a,
+#mapFinca .leaflet-control-attribution a {
+    color: #3498DB !important;
+    font-weight: 600 !important;
+    transition: color 0.2s ease !important;
+}
+
+.leaflet-control-attribution a:hover,
+#mapa-establecimientos .leaflet-control-attribution a:hover,
+#map .leaflet-control-attribution a:hover,
+#mapFinca .leaflet-control-attribution a:hover {
+    color: #5DADE2 !important;
+    text-decoration: underline !important;
+}
+
+/* =========================================
+   BOTÓN DE GEOLOCALIZACIÓN PERSONALIZADO
+   ========================================= */
+
+.leaflet-control-geolocate,
+.btn-mi-ubicacion,
+#btn-geolocalizacion {
+    background: linear-gradient(145deg, #27AE60 0%, #2ECC71 100%) !important;
+    border: 2px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 12px !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4) !important;
+    color: white !important;
+    font-size: 18px !important;
+    line-height: 40px !important;
+    text-align: center !important;
+}
+
+.leaflet-control-geolocate:hover,
+.btn-mi-ubicacion:hover,
+#btn-geolocalizacion:hover {
+    background: linear-gradient(145deg, #2ECC71 0%, #27AE60 100%) !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 8px 25px rgba(39, 174, 96, 0.5) !important;
+}
+
+.leaflet-control-geolocate:active,
+.btn-mi-ubicacion:active,
+#btn-geolocalizacion:active {
+    transform: scale(0.95) !important;
+}
+
+/* Estado activo de geolocalización */
+.leaflet-control-geolocate.active,
+.btn-mi-ubicacion.active,
+#btn-geolocalizacion.active {
+    background: linear-gradient(145deg, #dc3545 0%, #e74c3c 100%) !important;
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
+    animation: pulseGeolocate 2s ease-in-out infinite !important;
+}
+
+@keyframes pulseGeolocate {
+    0%, 100% {
+        box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+    }
+    50% {
+        box-shadow: 0 8px 30px rgba(220, 53, 69, 0.6);
+    }
+}
+
+/* Estado de carga de geolocalización */
+.leaflet-control-geolocate.loading,
+.btn-mi-ubicacion.loading,
+#btn-geolocalizacion.loading {
+    background: linear-gradient(145deg, #ffc107 0%, #ffb300 100%) !important;
+    box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4) !important;
+    animation: spin 1s linear infinite !important;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* =========================================
+   CONTROLES EN CONTAINERS ESPECÍFICOS
+   ========================================= */
+
+/* Controles en el mapa de establecimientos del dashboard */
+#mapa-establecimientos .leaflet-top,
+#mapa-establecimientos .leaflet-bottom,
+#mapa-establecimientos .leaflet-left,
+#mapa-establecimientos .leaflet-right {
+    z-index: 500 !important;
+}
+
+/* Controles en el mapa principal de ofertas */
+#map .leaflet-top,
+#map .leaflet-bottom,
+#map .leaflet-left,
+#map .leaflet-right {
+    z-index: 500 !important;
+}
+
+/* Controles en el wizard de fincas */
+#mapFinca .leaflet-top,
+#mapFinca .leaflet-bottom,
+#mapFinca .leaflet-left,
+#mapFinca .leaflet-right {
+    z-index: 500 !important;
+}
+
+/* =========================================
+   EFECTOS ADICIONALES
+   ========================================= */
+
+/* Efecto de brillo en controles al aparecer */
+.leaflet-control {
+    animation: fadeInControl 0.4s ease-out !important;
+}
+
+@keyframes fadeInControl {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Sombra adicional en todos los controles */
+.leaflet-bar,
+.leaflet-control {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN
+   ========================================= */
+
+/* Tablet */
+@media (max-width: 992px) {
+    .leaflet-control-zoom a,
+    #mapa-establecimientos .leaflet-control-zoom a,
+    #map .leaflet-control-zoom a,
+    #mapFinca .leaflet-control-zoom a {
+        width: 36px !important;
+        height: 36px !important;
+        line-height: 36px !important;
+        font-size: 18px !important;
+    }
+
+    .leaflet-control-geolocate,
+    .btn-mi-ubicacion,
+    #btn-geolocalizacion {
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 16px !important;
+        line-height: 36px !important;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .leaflet-control-zoom,
+    #mapa-establecimientos .leaflet-control-zoom,
+    #map .leaflet-control-zoom,
+    #mapFinca .leaflet-control-zoom {
+        border-radius: 10px !important;
+    }
+
+    .leaflet-control-zoom a,
+    #mapa-establecimientos .leaflet-control-zoom a,
+    #map .leaflet-control-zoom a,
+    #mapFinca .leaflet-control-zoom a {
+        width: 34px !important;
+        height: 34px !important;
+        line-height: 34px !important;
+        font-size: 16px !important;
+    }
+
+    .leaflet-control-layers,
+    #mapa-establecimientos .leaflet-control-layers,
+    #map .leaflet-control-layers,
+    #mapFinca .leaflet-control-layers {
+        padding: 6px 10px !important;
+    }
+
+    .leaflet-control-layers-toggle,
+    #mapa-establecimientos .leaflet-control-layers-toggle,
+    #map .leaflet-control-layers-toggle,
+    #mapFinca .leaflet-control-layers-toggle {
+        width: 34px !important;
+        height: 34px !important;
+    }
+
+    .leaflet-control-geolocate,
+    .btn-mi-ubicacion,
+    #btn-geolocalizacion {
+        width: 34px !important;
+        height: 34px !important;
+        font-size: 14px !important;
+        line-height: 34px !important;
+    }
+
+    .leaflet-control-scale,
+    #mapa-establecimientos .leaflet-control-scale,
+    #map .leaflet-control-scale,
+    #mapFinca .leaflet-control-scale {
+        font-size: 10px !important;
+        padding: 4px 8px !important;
+    }
+}
+
+/* Mobile pequeño */
+@media (max-width: 576px) {
+    .leaflet-control-zoom a,
+    #mapa-establecimientos .leaflet-control-zoom a,
+    #map .leaflet-control-zoom a,
+    #mapFinca .leaflet-control-zoom a {
+        width: 32px !important;
+        height: 32px !important;
+        line-height: 32px !important;
+        font-size: 14px !important;
+    }
+
+    .leaflet-control-geolocate,
+    .btn-mi-ubicacion,
+    #btn-geolocalizacion {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 12px !important;
+        line-height: 32px !important;
+    }
+
+    .leaflet-control-layers-expanded,
+    #mapa-establecimientos .leaflet-control-layers-expanded,
+    #map .leaflet-control-layers-expanded,
+    #mapFinca .leaflet-control-layers-expanded {
+        min-width: 160px !important;
+        padding: 10px !important;
+    }
+}
+
+/* =========================================
+   MEJORAS DE ACCESIBILIDAD
+   ========================================= */
+
+/* Enfoque visible en controles */
+.leaflet-control-zoom a:focus,
+.leaflet-control-layers-toggle:focus,
+.leaflet-control-geolocate:focus {
+    outline: 2px solid #3498DB !important;
+    outline-offset: 2px !important;
+}
+
+/* Mejora de contraste para texto */
+.leaflet-control-layers label {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}

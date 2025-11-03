@@ -1,0 +1,484 @@
+/**
+ * WIZARD FINCA - Estilos Profesionales y Responsive
+ * ==================================================
+ * Mejora la experiencia de usuario en el formulario de agregar finca
+ */
+
+/* ===================================
+   MODAL WIZARD - TAMAÑO Y ESTRUCTURA
+   =================================== */
+
+/* Modal con ancho controlado */
+#wizardFincaModal .modal-dialog {
+    max-width: 900px !important;
+}
+
+/* Contenido del modal */
+#wizardFincaModal .modal-content {
+    background: var(--card-bg-primary);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Header del modal */
+#wizardFincaModal .modal-header {
+    background: linear-gradient(135deg, #27AE60 0%, #2ECC71 100%);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+}
+
+#wizardFincaModal .modal-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+}
+
+/* Body del modal */
+#wizardFincaModal .modal-body {
+    padding: 2rem;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+/* ===================================
+   WIZARD PROGRESS - INDICADOR DE PASOS
+   =================================== */
+
+.wizard-progress {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.wizard-progress .row {
+    position: relative;
+}
+
+/* Línea conectora entre pasos */
+.wizard-progress .row::before {
+    content: '';
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    width: calc(100% - 100px);
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(-50%);
+    z-index: 0;
+}
+
+/* Pasos individuales */
+.wizard-progress .step {
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.wizard-progress .step-number {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0 auto 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.wizard-progress .step-label {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+/* Paso activo */
+.wizard-progress .step.active .step-number {
+    background: linear-gradient(135deg, #27AE60, #2ECC71);
+    border-color: #27AE60;
+    color: white;
+    box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4);
+}
+
+.wizard-progress .step.active .step-label {
+    color: white;
+    font-weight: 600;
+}
+
+/* Paso completado */
+.wizard-progress .step.completed .step-number {
+    background: linear-gradient(135deg, #3498DB, #2ECC71);
+    border-color: #2ECC71;
+    color: white;
+}
+
+.wizard-progress .step.completed .step-number::after {
+    content: '✓';
+    position: absolute;
+    font-size: 1.2rem;
+}
+
+/* ===================================
+   FORMULARIO - CAMPOS Y LABELS
+   =================================== */
+
+/* Labels */
+#finca-form .form-label {
+    color: var(--text-light);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+#finca-form .form-label .text-danger {
+    color: #E74C3C !important;
+}
+
+/* Inputs y selects */
+#finca-form .form-control,
+#finca-form .form-select {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-light);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+#finca-form .form-control:focus,
+#finca-form .form-select:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #27AE60;
+    box-shadow: 0 0 0 0.25rem rgba(39, 174, 96, 0.15);
+    color: white;
+}
+
+#finca-form .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* Selects deshabilitados */
+#finca-form .form-select:disabled {
+    background: rgba(255, 255, 255, 0.02);
+    border-color: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.3);
+    cursor: not-allowed;
+}
+
+/* ===================================
+   FEEDBACK Y VALIDACIÓN
+   =================================== */
+
+.field-feedback {
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    min-height: 1.2rem;
+}
+
+.field-feedback.valid {
+    color: #2ECC71;
+}
+
+.field-feedback.invalid {
+    color: #E74C3C;
+}
+
+/* Inputs válidos */
+#finca-form .form-control.is-valid,
+#finca-form .form-select.is-valid {
+    border-color: #2ECC71;
+    background: rgba(46, 204, 113, 0.05);
+}
+
+/* Inputs inválidos */
+#finca-form .form-control.is-invalid,
+#finca-form .form-select.is-invalid {
+    border-color: #E74C3C;
+    background: rgba(231, 76, 60, 0.05);
+}
+
+/* ===================================
+   SECCIÓN DE ESPECIES
+   =================================== */
+
+.especies-seleccionadas {
+    background: rgba(39, 174, 96, 0.05);
+    border: 1px solid rgba(39, 174, 96, 0.2);
+    border-radius: 8px;
+    padding: 1rem;
+    min-height: 80px;
+}
+
+.especies-seleccionadas .badge {
+    background: linear-gradient(135deg, #27AE60, #2ECC71);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 500;
+    margin: 0.25rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.especies-seleccionadas .badge i {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.especies-seleccionadas .badge i:hover {
+    transform: scale(1.2);
+}
+
+/* ===================================
+   MAPA Y UBICACIÓN
+   =================================== */
+
+#map-container-wizard {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+#mapa-finca {
+    height: 350px;
+    width: 100%;
+}
+
+/* Controles del mapa */
+.map-controls {
+    margin-top: 1rem;
+}
+
+.map-controls .btn-group {
+    width: 100%;
+}
+
+.map-controls .btn {
+    flex: 1;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+}
+
+/* Coordenadas display */
+.coordenadas-display {
+    background: rgba(74, 144, 226, 0.1);
+    border: 1px solid rgba(74, 144, 226, 0.3);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.coordenadas-display .coordenada-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.coordenadas-display .coordenada-item:last-child {
+    border-bottom: none;
+}
+
+.coordenadas-display .coordenada-label {
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+}
+
+.coordenadas-display .coordenada-valor {
+    color: #4A90E2;
+    font-family: monospace;
+    font-size: 0.95rem;
+}
+
+/* ===================================
+   BOTONES DE ACCIÓN
+   =================================== */
+
+#finca-form .btn {
+    padding: 0.75rem 2rem;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+#finca-form .btn-primary {
+    background: linear-gradient(135deg, #4A90E2, #357ABD);
+    border: none;
+}
+
+#finca-form .btn-primary:hover {
+    background: linear-gradient(135deg, #357ABD, #2E6BA5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+}
+
+#finca-form .btn-success {
+    background: linear-gradient(135deg, #27AE60, #2ECC71);
+    border: none;
+}
+
+#finca-form .btn-success:hover {
+    background: linear-gradient(135deg, #229954, #27AE60);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+}
+
+#finca-form .btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+#finca-form .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* ===================================
+   LOADING STATES
+   =================================== */
+
+.loading-container-small {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    min-height: 200px;
+}
+
+.loading-container-small .spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* ===================================
+   RESPONSIVE
+   =================================== */
+
+/* Tablets */
+@media (max-width: 991px) {
+    #wizardFincaModal .modal-dialog {
+        max-width: 90%;
+        margin: 1rem auto;
+    }
+    
+    #wizardFincaModal .modal-body {
+        padding: 1.5rem;
+    }
+    
+    .wizard-progress {
+        padding: 1rem;
+    }
+    
+    #mapa-finca {
+        height: 300px;
+    }
+}
+
+/* Móviles */
+@media (max-width: 767px) {
+    #wizardFincaModal .modal-dialog {
+        max-width: 95%;
+        margin: 0.5rem auto;
+    }
+    
+    #wizardFincaModal .modal-body {
+        padding: 1rem;
+    }
+    
+    #wizardFincaModal .modal-title {
+        font-size: 1.25rem;
+    }
+    
+    .wizard-progress .step-number {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+    
+    .wizard-progress .step-label {
+        font-size: 0.85rem;
+    }
+    
+    #finca-form .btn {
+        padding: 0.65rem 1.5rem;
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    #mapa-finca {
+        height: 250px;
+    }
+    
+    .map-controls .btn-group {
+        flex-direction: column;
+    }
+    
+    .map-controls .btn {
+        width: 100%;
+    }
+}
+
+/* ===================================
+   ANIMACIONES
+   =================================== */
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#wizard-content > * {
+    animation: slideIn 0.3s ease;
+}
+
+/* ===================================
+   ACCESIBILIDAD
+   =================================== */
+
+/* Focus visible para navegación por teclado */
+#finca-form .form-control:focus-visible,
+#finca-form .form-select:focus-visible,
+#finca-form .btn:focus-visible {
+    outline: 2px solid #27AE60;
+    outline-offset: 2px;
+}
+
+/* Alto contraste para texto */
+#finca-form label,
+#finca-form .form-label {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+/* Indicadores de estado accesibles */
+#finca-form .is-valid::after {
+    content: '✓';
+    position: absolute;
+    right: 1rem;
+    color: #2ECC71;
+}
+
+#finca-form .is-invalid::after {
+    content: '✗';
+    position: absolute;
+    right: 1rem;
+    color: #E74C3C;
+}

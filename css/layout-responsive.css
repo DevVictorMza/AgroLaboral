@@ -1,0 +1,195 @@
+/**
+ * LAYOUT RESPONSIVE - Sistema de Contenedores Estandarizados
+ * ============================================================
+ * Mejora la experiencia de usuario limitando el ancho del contenido
+ * en pantallas grandes para facilitar la lectura y navegación
+ */
+
+/* ===================================
+   CONTENEDORES PRINCIPALES
+   =================================== */
+
+/* Sección de Ofertas Disponibles - Control de ancho */
+#ofertas-disponibles {
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+#ofertas-disponibles .container-fluid {
+    max-width: 1600px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* ===================================
+   TARJETAS Y CONTENIDO
+   =================================== */
+
+/* Tarjeta de Título - Ancho controlado */
+#ofertas-disponibles .servicio-card-ofertas {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Card de Filtros - Ancho óptimo */
+.ofertas-filtros-container {
+    max-width: 100%;
+}
+
+/* ===================================
+   GRID DE OFERTAS - CENTRADO
+   =================================== */
+
+/* Wrapper para centrar el grid */
+#ofertas-publicas-container {
+    width: 100%;
+}
+
+/* Control del ancho máximo de las ofertas */
+@media (min-width: 1600px) {
+    #ofertas-publicas-container {
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+@media (min-width: 1200px) and (max-width: 1599px) {
+    #ofertas-publicas-container {
+        max-width: 1200px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+/* ===================================
+   COLUMNAS RESPONSIVE
+   =================================== */
+
+/* Ajuste automático de columnas según espacio disponible */
+@media (min-width: 1400px) {
+    /* 3 columnas en pantallas extra grandes */
+    #ofertas-publicas-container > .col-md-6 {
+        flex: 0 0 33.333%;
+        max-width: 33.333%;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1399px) {
+    /* 2 columnas en pantallas grandes */
+    #ofertas-publicas-container > .col-md-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    /* 2 columnas en tablets */
+    #ofertas-publicas-container > .col-md-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}
+
+@media (max-width: 767px) {
+    /* 1 columna en móviles */
+    #ofertas-publicas-container > .col-md-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/* ===================================
+   ESPACIADO Y PADDING
+   =================================== */
+
+/* Padding general */
+#ofertas-disponibles {
+    padding-top: 3rem;
+    padding-bottom: 4rem;
+}
+
+/* Espaciado entre secciones */
+#ofertas-disponibles .container-fluid > .row {
+    margin-bottom: 2rem;
+}
+
+/* Filtros */
+.ofertas-filtros-container .card-body {
+    padding: 2rem 2.5rem !important;
+}
+
+@media (max-width: 767px) {
+    .ofertas-filtros-container .card-body {
+        padding: 1.5rem 1rem !important;
+    }
+    
+    #ofertas-disponibles {
+        padding-top: 2rem;
+        padding-bottom: 3rem;
+    }
+}
+
+/* ===================================
+   STATS CARDS
+   =================================== */
+
+.stats-cards-container {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ===================================
+   MEJORAS VISUALES
+   =================================== */
+
+.ofertas-filtros-container {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    border-radius: 12px !important;
+}
+
+.servicio-card-ofertas {
+    border-radius: 12px !important;
+}
+
+.servicio-card-ofertas .card-body p {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.servicio-card-ofertas .card-body h2 {
+    letter-spacing: -0.5px;
+    line-height: 1.3;
+}
+
+/* ===================================
+   ACCESIBILIDAD
+   =================================== */
+
+.ofertas-filtros-container .form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--ofertas-text-primary);
+}
+
+.ofertas-filtros-container .form-select:focus,
+.ofertas-filtros-container .btn:focus {
+    box-shadow: 0 0 0 0.25rem rgba(74, 144, 226, 0.25);
+    border-color: #4A90E2;
+}
+
+/* ===================================
+   TRANSICIONES
+   =================================== */
+
+#ofertas-disponibles .container-fluid,
+#ofertas-publicas-container,
+.ofertas-filtros-container {
+    transition: max-width 0.3s ease, padding 0.3s ease;
+}

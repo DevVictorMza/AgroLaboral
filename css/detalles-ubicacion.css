@@ -1,0 +1,571 @@
+/* =========================================
+   MODAL DETALLES DE UBICACIÓN - DISEÑO MODERNO
+   ========================================= */
+
+/* Modal container */
+.modal-ubicacion-detalle {
+    background: linear-gradient(145deg, #1e2a38 0%, #263341 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+/* =========================================
+   HEADER DEL MODAL
+   ========================================= */
+
+.modal-ubicacion-header {
+    background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+    border-bottom: 2px solid rgba(52, 152, 219, 0.3);
+    border-radius: 16px 16px 0 0;
+    padding: 1.5rem;
+}
+
+.header-ubicacion-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+.header-ubicacion-icon {
+    background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%);
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+    position: relative;
+}
+
+.header-ubicacion-icon::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(135deg, #3498DB, #2980B9);
+    border-radius: 16px;
+    z-index: -1;
+    opacity: 0.5;
+    filter: blur(10px);
+}
+
+.header-ubicacion-icon i {
+    font-size: 32px;
+    color: white;
+}
+
+.header-ubicacion-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.header-ubicacion-text h5 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+.especies-contador-badge {
+    display: inline-flex;
+    align-items: center;
+    background: linear-gradient(135deg, #27AE60 0%, #2ECC71 100%);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 3px 10px rgba(39, 174, 96, 0.3);
+    width: fit-content;
+}
+
+/* =========================================
+   BODY DEL MODAL
+   ========================================= */
+
+.modal-ubicacion-body {
+    padding: 2rem;
+    background: transparent;
+}
+
+/* Secciones de información */
+.info-section {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 1.5rem;
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+.info-section:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(52, 152, 219, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.info-section-destacada {
+    background: linear-gradient(145deg, rgba(52, 152, 219, 0.08) 0%, rgba(41, 128, 185, 0.08) 100%);
+    border: 1px solid rgba(52, 152, 219, 0.2);
+}
+
+.info-section-destacada:hover {
+    background: linear-gradient(145deg, rgba(52, 152, 219, 0.12) 0%, rgba(41, 128, 185, 0.12) 100%);
+    border-color: rgba(52, 152, 219, 0.4);
+}
+
+/* Títulos de sección */
+.section-title {
+    color: #3498DB;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid rgba(52, 152, 219, 0.2);
+    display: flex;
+    align-items: center;
+}
+
+.section-title i {
+    font-size: 1.2rem;
+}
+
+/* Items de información */
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.info-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.info-label {
+    color: #95A5A6;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.info-label i {
+    color: #3498DB;
+    font-size: 0.9rem;
+}
+
+.info-value {
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+/* Item de coordenadas especial */
+.info-item-coordenadas {
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.1) 0%, rgba(39, 174, 96, 0.1) 100%);
+    border: 1px solid rgba(46, 204, 113, 0.2);
+    border-radius: 8px;
+    padding: 1rem !important;
+    margin-top: 0.5rem;
+}
+
+.coordenadas-badge {
+    background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    box-shadow: 0 3px 10px rgba(46, 204, 113, 0.3);
+}
+
+/* =========================================
+   SECCIÓN DE ESPECIES
+   ========================================= */
+
+.especies-section {
+    background: linear-gradient(145deg, rgba(39, 174, 96, 0.08) 0%, rgba(46, 204, 113, 0.08) 100%);
+    border: 1px solid rgba(39, 174, 96, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.especies-section .section-title {
+    color: #27AE60;
+    border-bottom-color: rgba(39, 174, 96, 0.3);
+    margin-bottom: 1.5rem;
+}
+
+.especies-total-badge {
+    background: linear-gradient(135deg, #27AE60 0%, #2ECC71 100%);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-left: 10px;
+    box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+}
+
+/* Grid de especies */
+.especies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+/* Card de especie */
+.especie-card {
+    background: linear-gradient(145deg, #1e2a38 0%, #263341 100%);
+    border: 1px solid rgba(46, 204, 113, 0.2);
+    border-radius: 12px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.especie-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #27AE60 0%, #2ECC71 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.especie-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(46, 204, 113, 0.5);
+    box-shadow: 0 8px 20px rgba(39, 174, 96, 0.2);
+}
+
+.especie-card:hover::before {
+    opacity: 1;
+}
+
+.especie-numero {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: linear-gradient(135deg, #95A5A6 0%, #7F8C8D 100%);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.especie-icono {
+    background: linear-gradient(135deg, #27AE60 0%, #2ECC71 100%);
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+}
+
+.especie-icono i {
+    font-size: 28px;
+    color: white;
+}
+
+.especie-nombre {
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.4;
+}
+
+/* =========================================
+   FOOTER DEL MODAL
+   ========================================= */
+
+.modal-ubicacion-footer {
+    background: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0 0 16px 16px;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+}
+
+/* Botones del modal */
+.btn-ubicacion-modal {
+    background: transparent;
+    border: 2px solid;
+    border-radius: 10px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-ubicacion-modal::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+    z-index: 0;
+}
+
+.btn-ubicacion-modal i,
+.btn-ubicacion-modal span {
+    position: relative;
+    z-index: 1;
+}
+
+.btn-ubicacion-modal i {
+    font-size: 1.1rem;
+}
+
+/* Botón Cerrar */
+.btn-cerrar {
+    border-color: #95A5A6;
+    color: #95A5A6;
+}
+
+.btn-cerrar::before {
+    background: #95A5A6;
+}
+
+.btn-cerrar:hover {
+    color: white;
+    border-color: #95A5A6;
+    box-shadow: 0 6px 16px rgba(149, 165, 166, 0.3);
+}
+
+.btn-cerrar:hover::before {
+    width: 120%;
+    height: 120%;
+}
+
+/* Botón Editar */
+.btn-editar {
+    border-color: #FFC107;
+    color: #FFC107;
+}
+
+.btn-editar::before {
+    background: #FFC107;
+}
+
+.btn-editar:hover {
+    color: #1a1d23;
+    border-color: #FFC107;
+    box-shadow: 0 6px 16px rgba(255, 193, 7, 0.4);
+}
+
+.btn-editar:hover::before {
+    width: 120%;
+    height: 120%;
+}
+
+/* Botón Ver en Mapa */
+.btn-mapa {
+    border-color: #2ECC71;
+    color: #2ECC71;
+}
+
+.btn-mapa::before {
+    background: #2ECC71;
+}
+
+.btn-mapa:hover {
+    color: white;
+    border-color: #2ECC71;
+    box-shadow: 0 6px 16px rgba(46, 204, 113, 0.4);
+}
+
+.btn-mapa:hover::before {
+    width: 120%;
+    height: 120%;
+}
+
+/* Estado activo */
+.btn-ubicacion-modal:active {
+    transform: scale(0.96);
+}
+
+/* =========================================
+   RESPONSIVE DESIGN
+   ========================================= */
+
+/* Tablet */
+@media (max-width: 992px) {
+    .modal-ubicacion-header {
+        padding: 1.25rem;
+    }
+
+    .header-ubicacion-icon {
+        width: 56px;
+        height: 56px;
+    }
+
+    .header-ubicacion-icon i {
+        font-size: 28px;
+    }
+
+    .header-ubicacion-text h5 {
+        font-size: 20px;
+    }
+
+    .modal-ubicacion-body {
+        padding: 1.5rem;
+    }
+
+    .especies-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+
+    .info-section {
+        padding: 1.25rem;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .modal-ubicacion-header {
+        padding: 1rem;
+    }
+
+    .header-ubicacion-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .header-ubicacion-icon i {
+        font-size: 24px;
+    }
+
+    .header-ubicacion-text h5 {
+        font-size: 18px;
+    }
+
+    .especies-contador-badge {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+    }
+
+    .modal-ubicacion-body {
+        padding: 1.25rem;
+    }
+
+    .info-section {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .section-title {
+        font-size: 1rem;
+    }
+
+    .especies-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-ubicacion-footer {
+        flex-direction: column;
+        padding: 1rem;
+    }
+
+    .btn-ubicacion-modal {
+        width: 100%;
+        justify-content: center;
+        padding: 0.85rem 1.25rem;
+    }
+}
+
+/* Mobile pequeño */
+@media (max-width: 576px) {
+    .header-ubicacion-info {
+        gap: 0.75rem;
+    }
+
+    .header-ubicacion-icon {
+        width: 44px;
+        height: 44px;
+    }
+
+    .header-ubicacion-icon i {
+        font-size: 22px;
+    }
+
+    .header-ubicacion-text h5 {
+        font-size: 16px;
+    }
+
+    .info-item {
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.75rem;
+    }
+
+    .info-label {
+        font-size: 0.75rem;
+    }
+
+    .info-value {
+        font-size: 0.9rem;
+    }
+
+    .especie-card {
+        padding: 1rem;
+    }
+
+    .especie-icono {
+        width: 48px;
+        height: 48px;
+    }
+
+    .especie-icono i {
+        font-size: 24px;
+    }
+
+    .especie-nombre {
+        font-size: 0.85rem;
+    }
+}

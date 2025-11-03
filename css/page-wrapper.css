@@ -1,0 +1,240 @@
+/**
+ * PAGE WRAPPER - Contenedor Principal Centrado
+ * =============================================
+ * Centra toda la página con un ancho máximo profesional
+ * y bordes negros a los costados
+ */
+
+/* ===================================
+   BODY - FONDO NEGRO COMPLETO
+   =================================== */
+
+body {
+    background: #000000 !important;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+/* ===================================
+   PAGE WRAPPER - CONTENEDOR CENTRADO
+   =================================== */
+
+#page-wrapper {
+    max-width: 1680px; /* Ancho máximo profesional - más estrecho */
+    margin: 0 auto;
+    background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+    min-height: 100vh;
+    box-shadow: 
+        -20px 0 40px rgba(0, 0, 0, 0.5),
+        20px 0 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+/* Bordes laterales sutiles para definir el contenedor */
+#page-wrapper::before,
+#page-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(74, 144, 226, 0.1) 20%,
+        rgba(74, 144, 226, 0.2) 50%,
+        rgba(74, 144, 226, 0.1) 80%,
+        transparent 100%
+    );
+    z-index: 1000;
+}
+
+#page-wrapper::before {
+    left: 0;
+}
+
+#page-wrapper::after {
+    right: 0;
+}
+
+/* ===================================
+   RESPONSIVE - AJUSTES POR TAMAÑO
+   =================================== */
+
+/* Pantallas Extra Grandes (2560px+) */
+@media (min-width: 2560px) {
+    #page-wrapper {
+        max-width: 2200px;
+    }
+}
+
+/* Pantallas Muy Grandes (1920px - 2559px) */
+@media (min-width: 1920px) and (max-width: 2559px) {
+    #page-wrapper {
+        max-width: 1680px;
+    }
+}
+
+/* Pantallas Grandes (1600px - 1919px) */
+@media (min-width: 1600px) and (max-width: 1919px) {
+    #page-wrapper {
+        max-width: 1580px;
+    }
+}
+
+/* Pantallas Medianas-Grandes (1400px - 1599px) */
+@media (min-width: 1400px) and (max-width: 1599px) {
+    #page-wrapper {
+        max-width: 1500px;
+    }
+}
+
+/* Pantallas Medianas (1200px - 1399px) */
+@media (min-width: 1200px) and (max-width: 1399px) {
+    #page-wrapper {
+        max-width: 100%;
+        box-shadow: none;
+    }
+    
+    #page-wrapper::before,
+    #page-wrapper::after {
+        display: none;
+    }
+}
+
+/* Tablets y Móviles (< 1200px) */
+@media (max-width: 1199px) {
+    #page-wrapper {
+        max-width: 100%;
+        box-shadow: none;
+    }
+    
+    #page-wrapper::before,
+    #page-wrapper::after {
+        display: none;
+    }
+}
+
+/* ===================================
+   OPTIMIZACIÓN DE CONTENIDO
+   =================================== */
+
+/* Asegurar que todo el contenido respete el wrapper */
+#page-wrapper > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Navbar FUERA del wrapper - centrado sobre el contenido */
+.navbar.fixed-top {
+    max-width: 1680px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Responsive: Navbar ocupa 100% en pantallas pequeñas */
+@media (max-width: 1679px) {
+    .navbar.fixed-top {
+        max-width: 100%;
+        left: 0;
+        transform: none;
+    }
+}
+
+/* Banner - NO modificar sus márgenes/padding originales */
+/* El banner ya tiene margin-top: -80px y padding-top: 80px en style.css */
+/* Esto permite que el video esté detrás del navbar transparente */
+
+/* Secciones centradas */
+#page-wrapper section,
+#page-wrapper main {
+    width: 100%;
+}
+
+/* ===================================
+   TRANSICIONES SUAVES
+   =================================== */
+
+#page-wrapper {
+    transition: max-width 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ===================================
+   MEJORA VISUAL - GRADIENTES LATERALES
+   =================================== */
+
+/* Sombras laterales para efecto de profundidad */
+@media (min-width: 1680px) {
+    body::before,
+    body::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        width: calc((100vw - 1680px) / 2);
+        background: linear-gradient(
+            to right,
+            rgba(0, 0, 0, 1) 0%,
+            rgba(0, 0, 0, 0.9) 30%,
+            rgba(0, 0, 0, 0.5) 70%,
+            rgba(0, 0, 0, 0) 100%
+        );
+        z-index: 999;
+        pointer-events: none;
+    }
+    
+    body::before {
+        left: 0;
+    }
+    
+    body::after {
+        right: 0;
+        background: linear-gradient(
+            to left,
+            rgba(0, 0, 0, 1) 0%,
+            rgba(0, 0, 0, 0.9) 30%,
+            rgba(0, 0, 0, 0.5) 70%,
+            rgba(0, 0, 0, 0) 100%
+        );
+    }
+}
+
+/* ===================================
+   MODALES Y OVERLAYS
+   =================================== */
+
+/* Asegurar que modales estén por encima del wrapper */
+.modal,
+.offcanvas,
+.modal-backdrop {
+    z-index: 2000 !important;
+}
+
+/* ===================================
+   SCROLL SUAVE
+   =================================== */
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* ===================================
+   ACCESIBILIDAD
+   =================================== */
+
+/* Asegurar contraste adecuado */
+#page-wrapper {
+    color: var(--text-light, #FFFFFF);
+}
+
+/* Focus visible dentro del wrapper */
+#page-wrapper *:focus-visible {
+    outline: 2px solid rgba(74, 144, 226, 0.5);
+    outline-offset: 2px;
+}

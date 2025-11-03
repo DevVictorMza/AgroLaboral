@@ -665,22 +665,7 @@ function generarDashboard(perfil) {
                 padding: 0.5rem 1rem;
                 font-size: 0.85rem;
             }
-            .stats-card {
-                background: #2A2A2A;
-                border: 1px solid #444444;
-                border-radius: 8px;
-                padding: 1.5rem;
-                text-align: center;
-                transition: transform 0.3s ease;
-            }
-            .stats-card:hover {
-                transform: translateY(-5px);
-            }
-            .stats-number {
-                font-size: 2.5rem;
-                font-weight: bold;
-                color: #4A90E2;
-            }
+            /* Stats cards estilos deprecados - ahora en stats-cards.css */
             .empty-state {
                 text-align: center;
                 padding: 3rem;
@@ -863,29 +848,65 @@ function generarDashboard(perfil) {
             </div>
 
             <!-- Stats cards -->
-            <div class="row mb-4">
-                <div class="col-md-3 mb-3">
-                    <div class="stats-card">
-                        <div class="stats-number">0</div>
-                        <div class="text-muted-custom">Fincas Registradas</div>
+            <div class="row mb-4 g-3 stats-cards-container">
+                <div class="col-md-3 col-sm-6">
+                    <div class="stats-card-moderna stats-fincas">
+                        <div class="stats-icono">
+                            <i class="fas fa-warehouse"></i>
+                        </div>
+                        <div class="stats-contenido">
+                            <div class="stats-numero" data-contador="fincas">0</div>
+                            <div class="stats-label">Fincas Registradas</div>
+                            <div class="stats-trend">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>Activas</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <div class="stats-card">
-                        <div class="stats-number">0</div>
-                        <div class="text-muted-custom">Ofertas Activas</div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="stats-card-moderna stats-ofertas">
+                        <div class="stats-icono">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div class="stats-contenido">
+                            <div class="stats-numero" data-contador="ofertas">0</div>
+                            <div class="stats-label">Ofertas Activas</div>
+                            <div class="stats-trend">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Vigentes</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <div class="stats-card">
-                        <div class="stats-number">0</div>
-                        <div class="text-muted-custom">Trabajadores</div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="stats-card-moderna stats-trabajadores">
+                        <div class="stats-icono">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stats-contenido">
+                            <div class="stats-numero" data-contador="trabajadores">0</div>
+                            <div class="stats-label">Trabajadores</div>
+                            <div class="stats-trend">
+                                <i class="fas fa-user-check"></i>
+                                <span>Contratados</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <div class="stats-card">
-                        <div class="stats-number">0</div>
-                        <div class="text-muted-custom">Solicitudes</div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="stats-card-moderna stats-solicitudes">
+                        <div class="stats-icono">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="stats-contenido">
+                            <div class="stats-numero" data-contador="solicitudes">0</div>
+                            <div class="stats-label">Solicitudes</div>
+                            <div class="stats-trend">
+                                <i class="fas fa-clock"></i>
+                                <span>Pendientes</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -951,35 +972,42 @@ function generarDashboard(perfil) {
             <div class="row mt-4">
                 <div class="col-12">
                     <div class="dashboard-card p-4">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h5 class="mb-0">
-                                <i class="fas fa-briefcase me-2 text-info"></i>
-                                Ofertas de Trabajo Disponibles
-                            </h5>
+                        <!-- Header mejorado de ofertas -->
+                        <div class="ofertas-header mb-4">
+                            <div class="header-info">
+                                <i class="fas fa-briefcase"></i>
+                                <div class="header-text">
+                                    <h5>Ofertas de Trabajo Disponibles</h5>
+                                    <span class="contador-badge" id="ofertas-contador-badge">Cargando...</span>
+                                </div>
+                            </div>
                             
                             <!-- Controles de filtrado -->
                             <div class="ofertas-filter-controls">
-                                <div class="btn-group" role="group" aria-label="Filtros de ofertas">
+                                <div class="btn-group-ofertas" role="group" aria-label="Filtros de ofertas">
                                     <button type="button" 
-                                            class="btn btn-outline-light btn-sm filter-btn" 
+                                            class="btn-filter btn-filter-todas" 
                                             id="filtro-todas"
                                             onclick="aplicarFiltroOfertas(null)"
                                             data-filter="todas">
-                                        <i class="fas fa-list me-1"></i>Todas
+                                        <i class="fas fa-list"></i>
+                                        <span>Todas</span>
                                     </button>
                                     <button type="button" 
-                                            class="btn btn-outline-success btn-sm filter-btn" 
+                                            class="btn-filter btn-filter-vigentes" 
                                             id="filtro-vigentes"
                                             onclick="aplicarFiltroOfertas(true)"
                                             data-filter="vigentes">
-                                        <i class="fas fa-check-circle me-1"></i>Vigentes
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Vigentes</span>
                                     </button>
                                     <button type="button" 
-                                            class="btn btn-outline-secondary btn-sm filter-btn" 
+                                            class="btn-filter btn-filter-cerradas" 
                                             id="filtro-cerradas"
                                             onclick="aplicarFiltroOfertas(false)"
                                             data-filter="cerradas">
-                                        <i class="fas fa-times-circle me-1"></i>Cerradas
+                                        <i class="fas fa-times-circle"></i>
+                                        <span>Cerradas</span>
                                     </button>
                                 </div>
                             </div>
@@ -1010,7 +1038,7 @@ function generarDashboard(perfil) {
                                 <i class="fas fa-exclamation-triangle text-warning mb-3"></i>
                                 <h6 class="text-white mb-3">Error cargando ofertas</h6>
                                 <p class="text-muted-custom mb-4">No se pudieron cargar las ofertas de trabajo.</p>
-                                <button class="btn btn-outline-info" onclick="cargarOfertasEmpleo()">
+                                <button class="btn btn-outline-info" onclick="cargarOfertasEmpleo(true)">
                                     <i class="fas fa-redo me-2"></i>Reintentar
                                 </button>
                             </div>
@@ -1056,7 +1084,7 @@ function generarDashboard(perfil) {
             setTimeout(() => {
                 console.log('💼 Iniciando carga de ofertas de empleo...');
                 inicializarFiltrosOfertas();
-                cargarOfertasEmpleo();
+                cargarOfertasEmpleo(true); // Cargar solo ofertas vigentes por defecto
             }, 800);
         }, 200);
     });
@@ -2136,13 +2164,17 @@ function generarHtmlEstablecimientos(establecimientos) {
 
     return `
         <div class="establecimientos-container">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h6 class="text-light mb-0">
-                    <i class="fas fa-clipboard-list me-2 text-primary"></i>
-                    Mis Establecimientos (${establecimientos.length})
-                </h6>
-                <button class="btn btn-primary btn-sm" onclick="abrirWizardFinca()">
-                    <i class="fas fa-plus me-2"></i>Agregar Nuevo
+            <div class="establecimientos-header">
+                <div class="header-info">
+                    <i class="fas fa-clipboard-list"></i>
+                    <div class="header-text">
+                        <h5>Mis Establecimientos</h5>
+                        <span class="contador-badge">${establecimientos.length} ${establecimientos.length === 1 ? 'establecimiento' : 'establecimientos'}</span>
+                    </div>
+                </div>
+                <button class="btn btn-success btn-agregar-establecimiento" onclick="abrirWizardFinca()">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    <span>Agregar Establecimiento</span>
                 </button>
             </div>
             <div class="establecimientos-lista">
@@ -2157,9 +2189,19 @@ function generarHtmlEstablecimientos(establecimientos) {
  * @param {number} cantidad - Cantidad de establecimientos
  */
 function actualizarContadorEstablecimientos(cantidad) {
-    const statsNumbers = document.querySelectorAll('.stats-card .stats-number');
-    if (statsNumbers.length > 0) {
-        statsNumbers[0].textContent = cantidad.toString();
+    const statsNumero = document.querySelector('[data-contador="fincas"]');
+    if (statsNumero) {
+        // Agregar clase de animación
+        statsNumero.classList.add('counting');
+        
+        // Actualizar el número
+        statsNumero.textContent = cantidad.toString();
+        
+        // Remover clase después de la animación
+        setTimeout(() => {
+            statsNumero.classList.remove('counting');
+        }, 500);
+        
         console.log(`📊 Contador actualizado: ${cantidad} establecimientos`);
     }
 }
@@ -2751,83 +2793,120 @@ async function verDetalleEstablecimiento(idEstablecimiento) {
         const modalHtml = `
             <div class="modal fade" id="detalleEstablecimientoModal" tabindex="-1">
                 <div class="modal-dialog modal-lg modal-dialog-centered">
-                    <div class="modal-content cards-modal">
-                        <div class="modal-header cards-modal-header">
-                            <h5 class="modal-title cards-modal-title">
-                                <i class="fas fa-seedling me-2"></i>
-                                ${establecimiento.nombreEstablecimiento}
-                            </h5>
+                    <div class="modal-content modal-ubicacion-detalle">
+                        <div class="modal-header modal-ubicacion-header">
+                            <div class="header-ubicacion-info">
+                                <div class="header-ubicacion-icon">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                                <div class="header-ubicacion-text">
+                                    <h5 class="modal-title">${establecimiento.nombreEstablecimiento}</h5>
+                                    ${establecimiento.especies && establecimiento.especies.length > 0 ? `
+                                        <span class="especies-contador-badge">
+                                            <i class="fas fa-seedling me-1"></i>
+                                            ${establecimiento.especies.length} ${establecimiento.especies.length === 1 ? 'especie' : 'especies'}
+                                        </span>
+                                    ` : ''}
+                                </div>
+                            </div>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                         </div>
-                        <div class="modal-body cards-modal-body">
-                            <div class="row">
+                        <div class="modal-body modal-ubicacion-body">
+                            <div class="row g-4">
                                 <div class="col-md-6">
-                                    <h6 class="text-primary mb-3">
-                                        <i class="fas fa-info-circle me-2"></i>Información General
-                                    </h6>
-                                    <div class="mb-3">
-                                        <small class="text-muted">ID Establecimiento</small>
-                                        <p class="text-white mb-0">${establecimiento.idEstablecimiento}</p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <small class="text-muted">Nombre</small>
-                                        <p class="text-white mb-0">${establecimiento.nombreEstablecimiento}</p>
+                                    <div class="info-section">
+                                        <h6 class="section-title">
+                                            <i class="fas fa-info-circle me-2"></i>Información General
+                                        </h6>
+                                        <div class="info-item">
+                                            <span class="info-label">ID Establecimiento</span>
+                                            <span class="info-value">#${establecimiento.idEstablecimiento}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Nombre</span>
+                                            <span class="info-value">${establecimiento.nombreEstablecimiento}</span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <h6 class="text-primary mb-3">
-                                        <i class="fas fa-map-marker-alt me-2"></i>Ubicación
-                                    </h6>
-                                    <div class="mb-3">
-                                        <small class="text-muted">Dirección</small>
-                                        <p class="text-white mb-0">${establecimiento.calle} ${establecimiento.numeracion}</p>
+                                    <div class="info-section info-section-destacada">
+                                        <h6 class="section-title">
+                                            <i class="fas fa-map-marked-alt me-2"></i>Ubicación
+                                        </h6>
+                                        <div class="info-item">
+                                            <span class="info-label">
+                                                <i class="fas fa-road"></i> Dirección
+                                            </span>
+                                            <span class="info-value">${establecimiento.calle} ${establecimiento.numeracion}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">
+                                                <i class="fas fa-mailbox"></i> Código Postal
+                                            </span>
+                                            <span class="info-value">${establecimiento.codigoPostal}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">
+                                                <i class="fas fa-map-pin"></i> Distrito
+                                            </span>
+                                            <span class="info-value">${establecimiento.nombreDistrito}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">
+                                                <i class="fas fa-globe-americas"></i> Departamento
+                                            </span>
+                                            <span class="info-value">${establecimiento.nombreDepartamento}</span>
+                                        </div>
+                                        ${establecimiento.latitud && establecimiento.longitud ? `
+                                        <div class="info-item info-item-coordenadas">
+                                            <span class="info-label">
+                                                <i class="fas fa-crosshairs"></i> Coordenadas GPS
+                                            </span>
+                                            <span class="info-value coordenadas-badge">
+                                                <i class="fas fa-compass me-1"></i>
+                                                ${establecimiento.latitud.toFixed(6)}, ${establecimiento.longitud.toFixed(6)}
+                                            </span>
+                                        </div>
+                                        ` : ''}
                                     </div>
-                                    <div class="mb-3">
-                                        <small class="text-muted">Código Postal</small>
-                                        <p class="text-white mb-0">${establecimiento.codigoPostal}</p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <small class="text-muted">Distrito</small>
-                                        <p class="text-white mb-0">${establecimiento.nombreDistrito}</p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <small class="text-muted">Departamento</small>
-                                        <p class="text-white mb-0">${establecimiento.nombreDepartamento}</p>
-                                    </div>
-                                    ${establecimiento.latitud && establecimiento.longitud ? `
-                                    <div class="mb-3">
-                                        <small class="text-muted">Coordenadas</small>
-                                        <p class="text-white mb-0">${establecimiento.latitud}, ${establecimiento.longitud}</p>
-                                    </div>
-                                    ` : ''}
                                 </div>
                             </div>
                             ${establecimiento.especies && establecimiento.especies.length > 0 ? `
                             <div class="row mt-4">
                                 <div class="col-12">
-                                    <h6 class="text-primary mb-3">
-                                        <i class="fas fa-seedling me-2"></i>Especies Cultivadas
-                                    </h6>
-                                    <div class="row">
-                                        ${establecimiento.especies.map(especie => `
-                                            <div class="col-md-4 mb-2">
-                                                <span class="badge bg-success">${especie.nombre || especie}</span>
-                                            </div>
-                                        `).join('')}
+                                    <div class="especies-section">
+                                        <h6 class="section-title mb-3">
+                                            <i class="fas fa-leaf me-2"></i>Especies Cultivadas
+                                            <span class="especies-total-badge">${establecimiento.especies.length}</span>
+                                        </h6>
+                                        <div class="especies-grid">
+                                            ${establecimiento.especies.map((especie, index) => `
+                                                <div class="especie-card">
+                                                    <div class="especie-numero">${index + 1}</div>
+                                                    <div class="especie-icono">
+                                                        <i class="fas fa-seedling"></i>
+                                                    </div>
+                                                    <div class="especie-nombre">${especie.nombre || especie}</div>
+                                                </div>
+                                            `).join('')}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             ` : ''}
                         </div>
-                        <div class="modal-footer cards-modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                <i class="fas fa-times me-2"></i>Cerrar
+                        <div class="modal-footer modal-ubicacion-footer">
+                            <button type="button" class="btn-ubicacion-modal btn-cerrar" data-bs-dismiss="modal">
+                                <i class="fas fa-times"></i>
+                                <span>Cerrar</span>
                             </button>
-                            <button type="button" class="btn btn-primary" onclick="editarEstablecimiento(${establecimiento.idEstablecimiento})">
-                                <i class="fas fa-edit me-2"></i>Editar
+                            <button type="button" class="btn-ubicacion-modal btn-editar" onclick="editarEstablecimiento(${establecimiento.idEstablecimiento})">
+                                <i class="fas fa-edit"></i>
+                                <span>Editar</span>
                             </button>
-                            <button type="button" class="btn btn-success" onclick="verEnMapa(${establecimiento.latitud}, ${establecimiento.longitud})">
-                                <i class="fas fa-map-marker-alt me-2"></i>Ver en Mapa
+                            <button type="button" class="btn-ubicacion-modal btn-mapa" onclick="verEnMapa(${establecimiento.latitud}, ${establecimiento.longitud})" data-bs-dismiss="modal">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Ver en Mapa</span>
                             </button>
                         </div>
                     </div>
@@ -3444,9 +3523,11 @@ function actualizarDashboardConFinca(finca) {
     }
 
     // Actualizar contador de fincas
-    const statsNumber = document.querySelector('.stats-card .stats-number');
-    if (statsNumber && statsNumber.textContent === '0') {
-        statsNumber.textContent = '1';
+    const statsNumero = document.querySelector('[data-contador="fincas"]');
+    if (statsNumero && statsNumero.textContent === '0') {
+        statsNumero.classList.add('counting');
+        statsNumero.textContent = '1';
+        setTimeout(() => statsNumero.classList.remove('counting'), 500);
     }
 
     // Mostrar toast de éxito
@@ -8788,13 +8869,13 @@ async function cargarOfertasEmpleo(vigente = null) {
         // Guardar filtro actual
         filtroActualOfertas = vigente;
 
-        // Construir URL con parámetro vigente si es necesario
+        // Construir URL - siempre sin parámetro para obtener todas las ofertas
+        // El filtrado se hará en el frontend
         let endpoint = buildURL(OFERTAS_CONFIG.ENDPOINT);
-        if (vigente !== null) {
-            endpoint += `?vigente=${vigente}`;
-        }
 
-        console.log(`🔄 Cargando ofertas de empleo... ${vigente !== null ? `(vigente=${vigente})` : '(todas)'}`);
+        console.log(`🔄 Cargando TODAS las ofertas del backend...`);
+        console.log(`   Filtro a aplicar: ${vigente === null ? 'TODAS' : vigente === true ? 'VIGENTES' : 'CERRADAS'}`);
+        console.log(`   Endpoint: ${endpoint}`);
 
         // Usar fetchWithAuth que ya maneja la autenticación
         const response = await fetchWithAuth(endpoint, {
@@ -8846,7 +8927,8 @@ async function cargarOfertasEmpleo(vigente = null) {
         // Guardar en cache
         ofertasCache = ofertas;
 
-        console.log(`✅ ${ofertas.length} ofertas cargadas exitosamente`);
+        console.log(`✅ ${ofertas.length} ofertas cargadas desde backend`);
+        console.log(`   Filtro aplicado: ${vigente === null ? 'TODAS' : vigente === true ? 'VIGENTES' : 'CERRADAS'}`);
 
         // Mostrar contenido y renderizar ofertas
         mostrarEstadoOfertas('content');
@@ -8892,8 +8974,33 @@ function mostrarEstadoOfertas(estado) {
 function renderizarOfertas(ofertas) {
     const contentDiv = document.getElementById('ofertas-content');
     
-    if (!ofertas || ofertas.length === 0) {
+    // FILTRADO ADICIONAL EN FRONTEND (por si el backend no filtra correctamente)
+    let ofertasFiltradas = ofertas;
+    if (estadoFiltroOfertas.actual !== null) {
+        ofertasFiltradas = ofertas.filter(oferta => {
+            const fechaCierreDate = parsearFechaSegura(oferta.fechaCierre);
+            const esVigente = oferta.vigente && fechaCierreDate && fechaCierreDate > new Date();
+            
+            // Si el filtro es "vigentes" (true), mostrar solo vigentes
+            // Si el filtro es "cerradas" (false), mostrar solo cerradas
+            if (estadoFiltroOfertas.actual === true) {
+                return esVigente;
+            } else if (estadoFiltroOfertas.actual === false) {
+                return !esVigente;
+            }
+            return true;
+        });
+        console.log(`🔍 Filtrado frontend: ${ofertas.length} ofertas → ${ofertasFiltradas.length} después de filtrar`);
+    } else {
+        console.log(`📋 Mostrando todas las ofertas sin filtro: ${ofertas.length} ofertas`);
+    }
+    
+    if (!ofertasFiltradas || ofertasFiltradas.length === 0) {
         const tipoFiltro = obtenerDescripcionFiltroActual();
+        
+        // Actualizar badge del header
+        actualizarBadgeOfertas(0, ofertas.length);
+        
         contentDiv.innerHTML = `
             <div class="text-center py-5">
                 <i class="fas fa-briefcase text-muted mb-3" style="font-size: 3rem;"></i>
@@ -8914,29 +9021,19 @@ function renderizarOfertas(ofertas) {
         return;
     }
 
-    // Estadísticas simplificadas
+    // Estadísticas basadas en TODAS las ofertas (no filtradas)
     const estadisticas = calcularEstadisticasOfertasReales(ofertas);
     const tipoFiltro = obtenerDescripcionFiltroActual();
     
+    // Actualizar badge del header
+    actualizarBadgeOfertas(ofertasFiltradas.length, ofertas.length);
+    
     let html = `
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h6 class="text-white mb-0">
-                    <i class="fas fa-chart-bar me-2 text-info"></i>
-                    ${ofertas.length} ${ofertas.length === 1 ? 'Oferta' : 'Ofertas'} - ${tipoFiltro}
-                </h6>
-                <small class="text-muted">
-                    <i class="fas fa-info-circle me-1"></i>
-                    Total en sistema: ${estadisticas.vigentes} vigente${estadisticas.vigentes !== 1 ? 's' : ''} • 
-                    ${estadisticas.noVigentes} cerrada${estadisticas.noVigentes !== 1 ? 's' : ''}
-                </small>
-            </div>
-        </div>
         <div class="row" id="ofertas-grid">
     `;
 
-    // Generar cards de ofertas adaptadas a la estructura real del backend
-    ofertas.forEach(oferta => {
+    // Generar cards SOLO de ofertas filtradas
+    ofertasFiltradas.forEach(oferta => {
         // Determinar estado basado en vigente y fecha de cierre
         const fechaCierreDate = parsearFechaSegura(oferta.fechaCierre);
         const esVigente = oferta.vigente && fechaCierreDate && fechaCierreDate > new Date();
@@ -8950,72 +9047,93 @@ function renderizarOfertas(ofertas) {
         
         html += `
             <div class="col-md-6 col-lg-4 mb-4" data-vigente="${oferta.vigente}">
-                <div class="card bg-dark border-secondary h-100 oferta-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <h5 class="card-title text-white mb-0" title="${escapeHtml(oferta.nombrePuesto)}">
-                                ${truncarTexto(escapeHtml(oferta.nombrePuesto), 40)}
-                            </h5>
-                            <span class="badge bg-${estadoBadge.color} ms-2">
-                                <i class="${estadoBadge.icon} me-1"></i>${estadoBadge.label}
-                            </span>
+                <div class="oferta-card-moderna ${esVigente ? 'vigente' : 'cerrada'}">
+                    <!-- Header de la card -->
+                    <div class="oferta-card-header">
+                        <div class="oferta-estado-badge ${esVigente ? 'vigente' : 'cerrada'}">
+                            <i class="${estadoBadge.icon}"></i>
+                            <span>${estadoBadge.label}</span>
+                        </div>
+                        ${oferta.nombreEspecie ? `
+                            <div class="oferta-especie-tag">
+                                <i class="fas fa-seedling"></i>
+                                <span>${escapeHtml(oferta.nombreEspecie)}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <!-- Contenido principal -->
+                    <div class="oferta-card-body">
+                        <h5 class="oferta-titulo" title="${escapeHtml(oferta.nombrePuesto)}">
+                            ${escapeHtml(oferta.nombrePuesto)}
+                        </h5>
+                        
+                        <div class="oferta-establecimiento">
+                            <i class="fas fa-building"></i>
+                            <span>${escapeHtml(oferta.nombreEstablecimiento)}</span>
                         </div>
                         
-                        <h6 class="text-info mb-2">
-                            <i class="fas fa-building me-1"></i>
-                            ${escapeHtml(oferta.nombreEstablecimiento)}
-                        </h6>
-                        
-                        <div class="mb-3">
-                            ${oferta.nombreEspecie ? `
-                                <span class="badge bg-info text-dark">
-                                    <i class="fas fa-seedling me-1"></i>${escapeHtml(oferta.nombreEspecie)}
-                                </span>
-                            ` : ''}
-                        </div>
-                        
-                        <div class="row text-center mb-3">
-                            <div class="col-6">
-                                <small class="text-muted">� Vacantes</small>
-                                <div class="text-white fw-bold">
-                                    ${oferta.vacantes} puesto${oferta.vacantes !== 1 ? 's' : ''}
+                        <!-- Grid de información -->
+                        <div class="oferta-info-grid">
+                            <div class="oferta-info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="info-content">
+                                    <span class="info-label">Vacantes</span>
+                                    <span class="info-value">${oferta.vacantes}</span>
                                 </div>
                             </div>
-                            <div class="col-6">
-                                <small class="text-muted">� Cierre</small>
-                                <div class="text-white" title="Fecha límite de aplicación">
-                                    ${fechaCierre}
+                            
+                            <div class="oferta-info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-calendar-times"></i>
+                                </div>
+                                <div class="info-content">
+                                    <span class="info-label">Cierre</span>
+                                    <span class="info-value">${fechaCierre}</span>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <div class="row text-center mb-3">
-                            <div class="col-12">
-                                <small class="text-muted">📅 Publicada</small>
-                                <div class="text-white-50 small">
-                                    ${fechaAlta}
+                            
+                            <div class="oferta-info-item full-width">
+                                <div class="info-icon">
+                                    <i class="fas fa-calendar-plus"></i>
+                                </div>
+                                <div class="info-content">
+                                    <span class="info-label">Publicada</span>
+                                    <span class="info-value">${fechaAlta}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="card-footer bg-transparent border-secondary">
-                        <div class="btn-group w-100" role="group">
-                            <button class="btn btn-outline-info btn-sm" onclick="verDetallesOferta(${oferta.idOfertaEmpleo})" title="Ver detalles">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="btn btn-outline-warning btn-sm" onclick="editarOferta(${oferta.idOfertaEmpleo})" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-outline-danger btn-sm" onclick="eliminarOferta(${oferta.idOfertaEmpleo})" title="Eliminar">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
+                    <!-- Footer con acciones -->
+                    <div class="oferta-card-footer">
+                        <button class="btn-oferta btn-oferta-ver" onclick="verDetallesOferta(${oferta.idOfertaEmpleo})" title="Ver detalles completos">
+                            <i class="fas fa-eye"></i>
+                            <span>Ver detalles</span>
+                        </button>
+                        <button class="btn-oferta btn-oferta-editar" onclick="editarOferta(${oferta.idOfertaEmpleo})" title="Editar oferta">
+                            <i class="fas fa-edit"></i>
+                            <span>Editar</span>
+                        </button>
+                        <button class="btn-oferta btn-oferta-eliminar" onclick="eliminarOferta(${oferta.idOfertaEmpleo})" title="Eliminar oferta">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
                     </div>
                 </div>
             </div>
         `;
     });
+
+    html += '</div>';
+    contentDiv.innerHTML = html;
+}
+
+/**
+ * Función para calcular estadísticas de ofertas basada en la estructura real del backend
+ */
+function calcularEstadisticasOfertasReales(ofertas) {
 
     html += '</div>';
     contentDiv.innerHTML = html;
@@ -9284,9 +9402,12 @@ function actualizarEstadoBotonesFiltro(filtroActivo, loading = false) {
  * Inicializa los controles de filtro con el estado por defecto
  */
 function inicializarFiltrosOfertas() {
-    // Establecer "Todas" como filtro por defecto
-    estadoFiltroOfertas.actual = null;
-    actualizarEstadoBotonesFiltro(null, false);
+    // Establecer "Vigentes" como filtro por defecto
+    estadoFiltroOfertas.actual = true;
+    actualizarEstadoBotonesFiltro(true, false);
+    
+    // Aplicar el filtro de vigentes al iniciar
+    console.log('🔄 Inicializando filtro de ofertas vigentes por defecto');
 }
 
 /**
@@ -9299,6 +9420,33 @@ function obtenerDescripcionFiltroActual() {
     if (filtro === true) return 'ofertas vigentes';
     if (filtro === false) return 'ofertas cerradas';
     return 'filtro desconocido';
+}
+
+/**
+ * Actualiza el badge contador del header de ofertas
+ * @param {number} mostradas - Cantidad de ofertas mostradas (filtradas)
+ * @param {number} total - Total de ofertas en el sistema
+ */
+function actualizarBadgeOfertas(mostradas, total) {
+    const badge = document.getElementById('ofertas-contador-badge');
+    if (!badge) return;
+    
+    const estadisticas = calcularEstadisticasOfertasReales(ofertasCache);
+    const filtro = estadoFiltroOfertas.actual;
+    
+    let texto = '';
+    if (filtro === null) {
+        // Mostrando todas
+        texto = `${total} ${total === 1 ? 'oferta' : 'ofertas'} • ${estadisticas.vigentes} vigente${estadisticas.vigentes !== 1 ? 's' : ''}`;
+    } else if (filtro === true) {
+        // Mostrando vigentes
+        texto = `${mostradas} vigente${mostradas !== 1 ? 's' : ''} de ${total} total${total !== 1 ? 'es' : ''}`;
+    } else {
+        // Mostrando cerradas
+        texto = `${mostradas} cerrada${mostradas !== 1 ? 's' : ''} de ${total} total${total !== 1 ? 'es' : ''}`;
+    }
+    
+    badge.textContent = texto;
 }
 
 // ===========================
@@ -9894,134 +10042,6 @@ function scrollToOferta(idOferta) {
 }
 
 // ===========================
-// SISTEMA DE CAMBIO DE VISTA (LISTA/MAPA)
-// ===========================
-
-/**
- * Estado actual de la vista
- */
-let vistaActual = 'lista'; // 'lista' o 'mapa'
-
-/**
- * Cambia entre vista de lista y mapa con efectos de transición mejorados
- * @param {string} vista - 'lista' o 'mapa'
- */
-function cambiarVista(vista) {
-    // Verificar que el DOM esté listo
-    if (document.readyState !== 'complete') {
-        console.log('⏳ DOM no está completo, esperando...');
-        setTimeout(() => cambiarVista(vista), 100);
-        return;
-    }
-    
-    const vistaAnterior = vistaActual;
-    vistaActual = vista;
-    
-    const btnLista = document.getElementById('btn-vista-lista');
-    const btnMapa = document.getElementById('btn-vista-mapa'); // Optional - may not exist
-    const containerOfertas = document.getElementById('ofertas-publicas-container');
-    const containerMapa = document.getElementById('mapa-container');
-    
-    // Debug: verificar qué elementos faltan
-    console.log('🔍 Verificando elementos de vista:', {
-        btnLista: !!btnLista,
-        btnMapa: !!btnMapa,
-        containerOfertas: !!containerOfertas,
-        containerMapa: !!containerMapa
-    });
-    
-    // Only require essential elements (map button is optional)
-    if (!btnLista || !containerOfertas || !containerMapa) {
-        console.warn('⚠️ Elementos esenciales de vista no encontrados', {
-            btnLista: !!btnLista,
-            btnMapa: !!btnMapa,
-            containerOfertas: !!containerOfertas,
-            containerMapa: !!containerMapa
-        });
-        
-        // Intentar de nuevo después de un breve delay
-        if (document.readyState === 'complete') {
-            setTimeout(() => cambiarVista(vista), 500);
-        }
-        return;
-    }
-    
-    console.log('🔄 Cambiando vista a:', vista, 'desde:', vistaAnterior);
-    
-    // Limpiar efectos de marcadores cuando se cambia de vista
-    if (vistaAnterior === 'mapa' && vista === 'lista') {
-        limpiarEfectosMarcadores();
-    }
-    
-    if (vista === 'mapa') {
-        // Activar vista mapa
-        if (btnMapa) {
-            btnMapa.classList.remove('btn-outline-primary');
-            btnMapa.classList.add('btn-primary');
-        }
-        if (btnLista) {
-            btnLista.classList.remove('btn-primary');
-            btnLista.classList.add('btn-outline-primary');
-        }
-        
-        // Transición suave entre vistas
-        containerOfertas.style.transition = 'opacity 0.3s ease';
-        containerMapa.style.transition = 'opacity 0.3s ease';
-        
-        containerOfertas.style.opacity = '0';
-        setTimeout(() => {
-            containerOfertas.classList.add('d-none');
-            containerMapa.classList.remove('d-none');
-            containerMapa.style.opacity = '1';
-        }, 150);
-        
-        // Inicializar mapa si no existe
-        if (!mapaOfertasPublicas.instancia) {
-            setTimeout(() => {
-                inicializarMapaOfertasPublicas();
-                if (estadoOfertasPublicas.ofertas.length > 0) {
-                    agregarOfertasAlMapa(estadoOfertasPublicas.ofertas);
-                }
-            }, 200);
-        } else {
-            // Redimensionar mapa existente
-            setTimeout(() => {
-                mapaOfertasPublicas.instancia.invalidateSize();
-                if (estadoOfertasPublicas.ofertas.length > 0) {
-                    agregarOfertasAlMapa(estadoOfertasPublicas.ofertas);
-                }
-            }, 200);
-        }
-        
-    } else {
-        // Activar vista lista
-        if (btnLista) {
-            btnLista.classList.remove('btn-outline-primary');
-            btnLista.classList.add('btn-primary');
-        }
-        if (btnMapa) {
-            btnMapa.classList.remove('btn-primary');
-            btnMapa.classList.add('btn-outline-primary');
-        }
-        
-        // Transición suave entre vistas
-        containerMapa.style.transition = 'opacity 0.3s ease';
-        containerOfertas.style.transition = 'opacity 0.3s ease';
-        
-        containerMapa.style.opacity = '0';
-        setTimeout(() => {
-            containerMapa.classList.add('d-none');
-            containerOfertas.classList.remove('d-none');
-            containerOfertas.style.opacity = '1';
-        }, 150);
-    }
-    
-    // Actualizar contador después del cambio
-    setTimeout(() => {
-        actualizarContadorOfertas();
-    }, 300);
-}
-
 /**
  * Actualiza el contador de ofertas según la vista
  */
@@ -10247,7 +10267,6 @@ async function aplicarFiltrosOfertasPublicas(nuevos_filtros = {}) {
     if (filtros.orden === 'distancia' && !estadoOfertasPublicas.ubicacion.disponible) {
         try {
             await getUbicacionUsuario();
-            actualizarEstadoBotonGeolocalizacion(true);
         } catch (error) {
             console.warn('No se pudo obtener ubicación para ordenamiento por distancia');
             mostrarNotificacionGeolocalizacion(false);
@@ -10279,25 +10298,6 @@ async function onCambioOrdenPublico(orden) {
 }
 
 /**
- * Solicita permisos de geolocalización y actualiza ofertas
- */
-async function solicitarGeolocalizacion() {
-    try {
-        mostrarEstadoGeolocalizacion('cargando');
-        await getUbicacionUsuario();
-        mostrarEstadoGeolocalizacion('exito');
-        
-        // Si el orden actual es distancia, recargar ofertas
-        if (estadoOfertasPublicas.filtros.orden === 'distancia') {
-            await aplicarFiltrosOfertasPublicas();
-        }
-    } catch (error) {
-        mostrarEstadoGeolocalizacion('error');
-        console.error('Error obteniendo geolocalización:', error);
-    }
-}
-
-/**
  * Actualiza la interfaz de filtros públicos
  * @param {Object} filtros - Filtros activos
  */
@@ -10315,55 +10315,6 @@ function actualizarInterfazFiltrosPublicos(filtros) {
             btn.classList.add('active');
         }
     });
-    
-    // Actualizar estado de geolocalización
-    actualizarEstadoBotonGeolocalizacion(estadoOfertasPublicas.ubicacion.disponible);
-}
-
-/**
- * Actualiza el estado visual del botón de geolocalización
- * @param {boolean} disponible - Si la ubicación está disponible
- */
-function actualizarEstadoBotonGeolocalizacion(disponible) {
-    const boton = document.getElementById('btn-geolocalizacion');
-    if (boton) {
-        if (disponible) {
-            boton.innerHTML = '<i class="fas fa-map-marker-alt text-success"></i> Ubicación activa';
-            boton.classList.remove('btn-outline-secondary');
-            boton.classList.add('btn-outline-success');
-        } else {
-            boton.innerHTML = '<i class="fas fa-map-marker-alt"></i> Activar ubicación';
-            boton.classList.remove('btn-outline-success');
-            boton.classList.add('btn-outline-secondary');
-        }
-    }
-}
-
-/**
- * Muestra el estado de la geolocalización
- * @param {string} estado - Estado (cargando|exito|error)
- */
-function mostrarEstadoGeolocalizacion(estado) {
-    const boton = document.getElementById('btn-geolocalizacion');
-    if (!boton) return;
-    
-    switch (estado) {
-        case 'cargando':
-            boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Obteniendo ubicación...';
-            boton.disabled = true;
-            break;
-        case 'exito':
-            boton.innerHTML = '<i class="fas fa-map-marker-alt text-success"></i> Ubicación activa';
-            boton.disabled = false;
-            break;
-        case 'error':
-            boton.innerHTML = '<i class="fas fa-map-marker-alt text-danger"></i> Error de ubicación';
-            boton.disabled = false;
-            setTimeout(() => {
-                actualizarEstadoBotonGeolocalizacion(false);
-            }, 3000);
-            break;
-    }
 }
 
 /**
@@ -10371,20 +10322,6 @@ function mostrarEstadoGeolocalizacion(estado) {
  */
 async function inicializarOfertasPublicas() {
     console.log('🚀 Inicializando sistema de ofertas públicas');
-    
-    // Inicializar vista por defecto (lista)
-    vistaActual = 'lista';
-    
-    // Configurar botones de vista
-    const btnLista = document.getElementById('btn-vista-lista');
-    const btnMapa = document.getElementById('btn-vista-mapa');
-    
-    if (btnLista && btnMapa) {
-        btnLista.classList.add('btn-primary');
-        btnLista.classList.remove('btn-outline-primary');
-        btnMapa.classList.add('btn-outline-primary');
-        btnMapa.classList.remove('btn-primary');
-    }
     
     // Cargar ofertas por defecto (ordenadas por fecha)
     await cargarOfertasPublicas({ orden: 'fecha' });
@@ -10411,12 +10348,6 @@ function configurarEventListenersOfertasPublicas() {
             onCambioOrdenPublico(btn.dataset.orden);
         });
     });
-    
-    // Botón de geolocalización
-    const btnGeo = document.getElementById('btn-geolocalizacion');
-    if (btnGeo) {
-        btnGeo.addEventListener('click', solicitarGeolocalizacion);
-    }
 }
 
 /**

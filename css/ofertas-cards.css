@@ -1,0 +1,364 @@
+/* =========================================
+   OFERTAS CARDS - DISEÑO MODERNO
+   ========================================= */
+
+/* Contenedor de ofertas */
+#content-ofertas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+/* Card moderna de oferta */
+.oferta-card-moderna {
+    background: linear-gradient(145deg, #1e2a38 0%, #263341 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.oferta-card-moderna::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #28a745 0%, #20c997 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.oferta-card-moderna:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-color: rgba(40, 167, 69, 0.3);
+}
+
+.oferta-card-moderna:hover::before {
+    opacity: 1;
+}
+
+/* Estado cerrada */
+.oferta-card-moderna.cerrada {
+    opacity: 0.75;
+    background: linear-gradient(145deg, #1a1d23 0%, #24272e 100%);
+}
+
+.oferta-card-moderna.cerrada::before {
+    background: linear-gradient(180deg, #6c757d 0%, #868e96 100%);
+}
+
+.oferta-card-moderna.cerrada:hover {
+    border-color: rgba(108, 117, 125, 0.3);
+}
+
+/* Header de la card */
+.oferta-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+/* Badge de estado */
+.oferta-estado-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s ease;
+}
+
+.oferta-estado-badge.vigente {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    box-shadow: 0 2px 6px rgba(40, 167, 69, 0.3);
+}
+
+.oferta-estado-badge.cerrada {
+    background: linear-gradient(135deg, #6c757d 0%, #868e96 100%);
+    color: white;
+    box-shadow: 0 2px 6px rgba(108, 117, 125, 0.3);
+}
+
+/* Tag de especie */
+.oferta-especie-tag {
+    background: linear-gradient(135deg, #17a2b8 0%, #20c997 100%);
+    color: white;
+    padding: 0.3rem 0.65rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    box-shadow: 0 2px 4px rgba(23, 162, 184, 0.2);
+}
+
+/* Body de la card */
+.oferta-card-body {
+    margin-bottom: 1rem;
+}
+
+.oferta-card-body h5 {
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.oferta-establecimiento-nombre {
+    color: #17a2b8;
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* Grid de información */
+.oferta-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.oferta-info-item {
+    text-align: center;
+}
+
+.oferta-info-label {
+    display: block;
+    color: #adb5bd;
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.oferta-info-value {
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.oferta-info-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.oferta-info-item.full-width .oferta-info-value {
+    color: #ced4da;
+    font-size: 0.85rem;
+    font-weight: 400;
+}
+
+/* Footer de la card */
+.oferta-card-footer {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Botones de acción */
+.btn-oferta {
+    flex: 1;
+    background: transparent;
+    border: 1.5px solid;
+    border-radius: 8px;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-oferta::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+    z-index: 0;
+}
+
+.btn-oferta i,
+.btn-oferta span {
+    position: relative;
+    z-index: 1;
+}
+
+.btn-oferta span {
+    font-size: 0.85rem;
+}
+
+/* Botón Ver */
+.btn-oferta-ver {
+    border-color: #17a2b8;
+    color: #17a2b8;
+}
+
+.btn-oferta-ver::before {
+    background: #17a2b8;
+}
+
+.btn-oferta-ver:hover {
+    color: white;
+    border-color: #17a2b8;
+    box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
+}
+
+.btn-oferta-ver:hover::before {
+    width: 120%;
+    height: 120%;
+}
+
+/* Botón Editar */
+.btn-oferta-editar {
+    border-color: #ffc107;
+    color: #ffc107;
+}
+
+.btn-oferta-editar::before {
+    background: #ffc107;
+}
+
+.btn-oferta-editar:hover {
+    color: #1a1d23;
+    border-color: #ffc107;
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+}
+
+.btn-oferta-editar:hover::before {
+    width: 120%;
+    height: 120%;
+}
+
+/* Botón Eliminar */
+.btn-oferta-eliminar {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.btn-oferta-eliminar::before {
+    background: #dc3545;
+}
+
+.btn-oferta-eliminar:hover {
+    color: white;
+    border-color: #dc3545;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.btn-oferta-eliminar:hover::before {
+    width: 120%;
+    height: 120%;
+}
+
+/* Estados activos */
+.btn-oferta:active {
+    transform: scale(0.96);
+}
+
+/* =========================================
+   RESPONSIVE DESIGN
+   ========================================= */
+
+/* Tablet */
+@media (max-width: 992px) {
+    #content-ofertas {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.25rem;
+    }
+
+    .oferta-card-moderna {
+        padding: 1rem;
+    }
+
+    .oferta-card-body h5 {
+        font-size: 1rem;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    #content-ofertas {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .oferta-card-header {
+        flex-wrap: wrap;
+    }
+
+    .oferta-info-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .oferta-info-item.full-width {
+        grid-column: 1;
+    }
+
+    .oferta-card-footer {
+        flex-direction: column;
+    }
+
+    .btn-oferta {
+        width: 100%;
+        padding: 0.75rem;
+    }
+
+    .btn-oferta span {
+        display: inline;
+    }
+}
+
+/* Mobile pequeño */
+@media (max-width: 576px) {
+    .oferta-card-moderna {
+        padding: 0.85rem;
+    }
+
+    .oferta-card-body h5 {
+        font-size: 0.95rem;
+    }
+
+    .oferta-establecimiento-nombre {
+        font-size: 0.85rem;
+    }
+
+    .oferta-estado-badge,
+    .oferta-especie-tag {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.5rem;
+    }
+}
