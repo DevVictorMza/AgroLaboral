@@ -243,26 +243,64 @@ async function cargarPuestosTrabajo() {
 
 /**
  * Cargar especies desde la API para ofertas laborales
+ * @param {number} idEstablecimiento - ID del establecimiento (opcional)
  * @returns {Promise<Array>} Lista de especies
  */
-async function cargarEspeciesParaOfertas() {
+async function cargarEspeciesParaOfertas(idEstablecimiento) {
     try {
         console.log('🔄 Cargando especies para ofertas...');
-        const response = await fetchWithAuth('http://localhost:8080/privado/especies');
+        console.log('🆔 ID de establecimiento recibido:', idEstablecimiento);
         
-        if (!response.ok) {
-            if (response.status === 401) {
-                throw new Error('Token expirado. Por favor, inicie sesión nuevamente.');
+        // Si se proporciona ID del establecimiento, buscar en caché local
+        if (idEstablecimiento) {
+            console.log('🔍 Buscando establecimiento en caché...');
+            
+            // Verificar que existe el caché
+            if (!window.establecimientosCache || !Array.isArray(window.establecimientosCache)) {
+                console.warn('⚠️ Caché de establecimientos no disponible o inválida');
+                console.log('📊 Estado del caché:', window.establecimientosCache);
+                return [];
             }
-            throw new Error(`Error HTTP: ${response.status}`);
+            
+            console.log(`📦 Caché disponible con ${window.establecimientosCache.length} establecimientos`);
+            
+            // Buscar el establecimiento específico en caché
+            const establecimiento = window.establecimientosCache.find(
+                est => est.idEstablecimiento === idEstablecimiento || est.id === idEstablecimiento
+            );
+            
+            if (!establecimiento) {
+                console.warn(`⚠️ Establecimiento ${idEstablecimiento} no encontrado en caché`);
+                console.log('📋 IDs disponibles en caché:', 
+                    window.establecimientosCache.map(e => e.idEstablecimiento || e.id)
+                );
+                return [];
+            }
+            
+            console.log('✅ Establecimiento encontrado:', establecimiento.nombreEstablecimiento || establecimiento.nombre);
+            console.log('📋 Datos del establecimiento:', establecimiento);
+            
+            // Extraer especies del establecimiento
+            const especies = establecimiento.especies || [];
+            
+            console.log(`🌿 Especies del establecimiento: ${especies.length} encontradas`);
+            if (especies.length > 0) {
+                console.log('📊 Listado de especies:');
+                console.table(especies);
+            } else {
+                console.warn('⚠️ El establecimiento no tiene especies registradas');
+            }
+            
+            return especies;
         }
         
-        const especies = await response.json();
-        console.log('✅ Especies cargadas para ofertas:', especies);
-        return especies || [];
+        // Si no hay ID, retornar array vacío (no cargar todas las especies)
+        console.warn('⚠️ No se proporcionó ID de establecimiento');
+        return [];
+        
     } catch (error) {
         console.error('❌ Error al cargar especies para ofertas:', error);
-        showMessage('Error al cargar especies: ' + error.message, 'error');
+        console.error('📍 Stack trace:', error.stack);
         return [];
     }
 }
@@ -2223,6 +2261,10 @@ async function cargarEstablecimientos() {
             return [];
         }
 
+        // Guardar en caché global para uso posterior (especialmente para ofertas laborales)
+        window.establecimientosCache = establecimientos;
+        console.log('💾 Establecimientos guardados en caché global');
+
         return establecimientos;
 
     } catch (error) {
@@ -2692,15 +2734,42 @@ function verEnMapa(latitud, longitud) {
  */
 async function crearOfertaLaboral(idEstablecimiento) {
     console.log('🏢 Creando oferta laboral para establecimiento:', idEstablecimiento);
+    console.log('═'.repeat(60));
     
     try {
         showMessage('Cargando datos del formulario...', 'info');
         
-        // Cargar datos necesarios
-        await Promise.all([
+        // Validar que tenemos el ID del establecimiento
+        if (!idEstablecimiento) {
+            console.error('❌ No se proporcionó ID de establecimiento');
+            showMessage('Error: No se pudo identificar el establecimiento', 'error');
+            return;
+        }
+        
+        console.log('📥 Cargando puestos de trabajo y especies...');
+        
+        // Cargar datos necesarios - ahora las especies son del establecimiento específico
+        const [puestos, especies] = await Promise.all([
             cargarPuestosTrabajo(),
-            cargarEspeciesParaOfertas()
+            cargarEspeciesParaOfertas(idEstablecimiento)
         ]);
+        
+        console.log('📊 Resultados de carga:');
+        console.log(`  - Puestos de trabajo: ${puestos ? puestos.length : 0}`);
+        console.log(`  - Especies del establecimiento: ${especies ? especies.length : 0}`);
+        
+        // Validar que al menos tenemos puestos de trabajo
+        if (!puestos || puestos.length === 0) {
+            console.error('❌ No se pudieron cargar los puestos de trabajo');
+            showMessage('Error: No hay puestos de trabajo disponibles. Contacte al administrador.', 'error');
+            return;
+        }
+        
+        // Guardar especies en variable global para poblarDropdowns
+        window.especiesDisponibles = especies || [];
+        console.log('💾 Especies guardadas en window.especiesDisponibles');
+        
+        console.log('✅ Datos cargados correctamente, mostrando modal...');
         
         // Crear HTML del modal con dropdowns dinámicos
         const modalHtml = `
@@ -2742,8 +2811,13 @@ async function crearOfertaLaboral(idEstablecimiento) {
                                     <label class="form-label text-light fw-semibold fs-6">
                                         <i class="fas fa-calendar-times me-2 text-danger"></i>Fecha de Cierre *
                                     </label>
-                                    <input type="date" class="form-control form-control-lg bg-dark text-light border-secondary" 
-                                           id="fechaCierre" required>
+                                    <input type="text" 
+                                           class="form-control form-control-lg bg-dark text-light border-secondary" 
+                                           id="fechaCierre" 
+                                           placeholder="dd/mm/aaaa"
+                                           pattern="\d{2}/\d{2}/\d{4}"
+                                           required>
+                                    <small class="text-muted">Formato: día/mes/año (ej: 15/12/2025)</small>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label text-light fw-semibold fs-6">
@@ -2781,10 +2855,51 @@ async function crearOfertaLaboral(idEstablecimiento) {
         const modal = new bootstrap.Modal(document.getElementById('modalCrearOferta'));
         modal.show();
         
-        // Establecer fecha mínima como mañana
-        const mañana = new Date();
-        mañana.setDate(mañana.getDate() + 1);
-        document.getElementById('fechaCierre').min = mañana.toISOString().split('T')[0];
+        // Configurar input de fecha con formato dd/mm/aaaa
+        const inputFecha = document.getElementById('fechaCierre');
+        
+        // Agregar máscara de entrada para formato dd/mm/aaaa
+        inputFecha.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, ''); // Solo números
+            
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2);
+            }
+            if (value.length >= 5) {
+                value = value.substring(0, 5) + '/' + value.substring(5, 9);
+            }
+            
+            e.target.value = value;
+        });
+        
+        // Validación en blur
+        inputFecha.addEventListener('blur', function(e) {
+            const valor = e.target.value;
+            const regex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+            const match = valor.match(regex);
+            
+            if (match) {
+                const dia = parseInt(match[1]);
+                const mes = parseInt(match[2]);
+                const año = parseInt(match[3]);
+                
+                // Validar que la fecha sea válida
+                const fecha = new Date(año, mes - 1, dia);
+                if (fecha.getDate() !== dia || fecha.getMonth() !== mes - 1 || fecha.getFullYear() !== año) {
+                    e.target.setCustomValidity('Fecha inválida');
+                } else if (fecha <= new Date()) {
+                    e.target.setCustomValidity('La fecha debe ser posterior a hoy');
+                } else {
+                    e.target.setCustomValidity('');
+                }
+            } else if (valor) {
+                e.target.setCustomValidity('Formato incorrecto. Use dd/mm/aaaa');
+            }
+        });
+        
+        inputFecha.addEventListener('input', function(e) {
+            e.target.setCustomValidity('');
+        });
         
         // Cargar y poblar dropdowns después de mostrar el modal
         await poblarDropdowns();
@@ -2804,14 +2919,12 @@ async function poblarDropdowns() {
     try {
         console.log('🔄 Poblando dropdowns del formulario...');
         
-        // Cargar datos en paralelo
-        const [puestos, especies] = await Promise.all([
-            cargarPuestosTrabajo(),
-            cargarEspeciesParaOfertas()
-        ]);
+        // Cargar solo puestos - las especies ya están en window.especiesDisponibles
+        const puestos = await cargarPuestosTrabajo();
+        const especies = window.especiesDisponibles || [];
         
         console.log('📋 Datos de puestos recibidos:', puestos);
-        console.log('📋 Datos de especies recibidos:', especies);
+        console.log('📋 Datos de especies disponibles:', especies);
         
         // Mostrar estructura detallada del primer puesto para debugging
         if (Array.isArray(puestos) && puestos.length > 0) {
@@ -2857,33 +2970,60 @@ async function poblarDropdowns() {
         
         // Poblar dropdown de especies
         const selectEspecies = document.getElementById('idEspecie');
-        if (selectEspecies && Array.isArray(especies) && especies.length > 0) {
+        if (selectEspecies) {
+            console.log('🌿 Poblando dropdown de especies...');
+            console.log(`📊 Especies disponibles: ${especies ? especies.length : 0}`);
+            
             // Limpiar opciones existentes (excepto la primera)
             while (selectEspecies.children.length > 1) {
                 selectEspecies.removeChild(selectEspecies.lastChild);
             }
             
-            especies.forEach(especie => {
-                const option = document.createElement('option');
-                option.value = especie.id || especie.idEspecie || especie.codigo;
+            // Habilitar el select por defecto (se deshabilitará si no hay especies)
+            selectEspecies.disabled = false;
+            
+            if (Array.isArray(especies) && especies.length > 0) {
+                console.log('✅ Agregando especies al dropdown...');
+                especies.forEach((especie, index) => {
+                    const option = document.createElement('option');
+                    option.value = especie.id || especie.idEspecie || especie.codigo;
+                    
+                    // Intentar diferentes campos para el nombre
+                    const nombreEspecie = especie.nombre || 
+                                         especie.descripcion || 
+                                         especie.nombreEspecie || 
+                                         especie.nombreComun || 
+                                         especie.nombreCientifico || 
+                                         especie.title || 
+                                         especie.label || 
+                                         `Especie ${option.value}`;
+                    
+                    option.textContent = nombreEspecie;
+                    selectEspecies.appendChild(option);
+                    console.log(`  ${index + 1}. Especie agregada: ID=${option.value}, Nombre="${nombreEspecie}"`);
+                });
+                console.log(`✅ Total: ${especies.length} especies agregadas al dropdown`);
+                console.log('📋 Estado del dropdown: Habilitado con especies del establecimiento');
+            } else {
+                // No hay especies para este establecimiento
+                console.warn('⚠️ No hay especies disponibles para este establecimiento');
                 
-                // Intentar diferentes campos para el nombre
-                const nombreEspecie = especie.nombre || 
-                                     especie.descripcion || 
-                                     especie.nombreEspecie || 
-                                     especie.nombreComun || 
-                                     especie.nombreCientifico || 
-                                     especie.title || 
-                                     especie.label || 
-                                     `Especie ${option.value}`;
+                // Actualizar la primera opción para mostrar mensaje informativo
+                const primeraOpcion = selectEspecies.children[0];
+                if (primeraOpcion) {
+                    primeraOpcion.textContent = "Este establecimiento no tiene especies registradas";
+                }
                 
-                option.textContent = nombreEspecie;
-                selectEspecies.appendChild(option);
-                console.log(`✅ Agregada especie: ID=${option.value}, Nombre="${nombreEspecie}"`);
-            });
-            console.log(`✅ ${especies.length} especies agregadas al dropdown`);
+                // Deshabilitar el dropdown
+                selectEspecies.disabled = true;
+                selectEspecies.style.opacity = '0.6';
+                selectEspecies.style.cursor = 'not-allowed';
+                
+                console.log('📋 Estado del dropdown: Deshabilitado (sin especies)');
+                showMessage('Este establecimiento no tiene especies registradas. La especie es opcional.', 'info');
+            }
         } else {
-            console.warn('⚠️ No se encontraron especies válidas o el endpoint devolvió vacío:', especies);
+            console.error('❌ No se encontró el select de especies en el DOM');
         }
         
     } catch (error) {
@@ -2906,15 +3046,31 @@ async function guardarOfertaLaboral(idEstablecimiento) {
         btnGuardar.disabled = true;
         btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Guardando...';
         
+        // Obtener y convertir fecha de formato dd/mm/aaaa a yyyy-mm-dd
+        const fechaInput = document.getElementById('fechaCierre').value;
+        const regex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+        const match = fechaInput.match(regex);
+        
+        if (!match) {
+            throw new Error('Formato de fecha inválido. Use dd/mm/aaaa');
+        }
+        
+        const dia = match[1];
+        const mes = match[2];
+        const año = match[3];
+        const fechaISO = `${año}-${mes}-${dia}`; // Convertir a yyyy-mm-dd
+        
         // Recopilar datos del formulario según el formato de la API
         const formData = {
-            fechaCierre: document.getElementById('fechaCierre').value,
+            fechaCierre: fechaISO,
             vacantes: parseInt(document.getElementById('vacantes').value),
             idPuestoTrabajo: parseInt(document.getElementById('idPuestoTrabajo').value),
             idEspecie: document.getElementById('idEspecie').value ? parseInt(document.getElementById('idEspecie').value) : null,
             idEstablecimiento: parseInt(idEstablecimiento)
         };
         
+        console.log('📋 Fecha ingresada:', fechaInput);
+        console.log('📋 Fecha convertida a ISO:', fechaISO);
         console.log('📋 Datos a enviar:', formData);
         
         // Validar datos requeridos
