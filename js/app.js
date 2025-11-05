@@ -9260,6 +9260,273 @@ const OFERTAS_CONFIG = {
 let ofertasCache = [];
 let filtroActualOfertas = null; // null = todas, true = vigentes, false = no vigentes
 
+// ===========================
+// ESTADO DE ORDENAMIENTO Y GEOLOCALIZACIÓN
+// ===========================
+
+/**
+ * Estado global del ordenamiento de ofertas
+ * @type {Object}
+ */
+window.estadoOrdenamiento = {
+    tipo: null,              // null | 'fecha' | 'cercania'
+    direccion: 'desc',       // 'asc' | 'desc'
+    ubicacionUsuario: null   // {lat, lng} | null
+};
+
+/**
+ * Cache de distancias calculadas para optimizar performance
+ * @type {Map<number, number>}
+ */
+let cacheDistancias = new Map();
+
+/**
+ * Detectar si estamos en modo desarrollo
+ * @returns {boolean}
+ */
+function esDesarrollo() {
+    return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+}
+
+// ===========================
+// FUNCIONES DE GEOLOCALIZACIÓN
+// ===========================
+
+/**
+ * Obtiene la ubicación del usuario usando Geolocation API
+ * @returns {Promise<{lat: number, lng: number}>}
+ * @throws {Error} Si falla la geolocalización
+ */
+function obtenerUbicacionUsuario() {
+    return new Promise((resolve, reject) => {
+        // Verificar soporte de geolocalización
+        if (!navigator.geolocation) {
+            const error = new Error('GEOLOCATION_NOT_SUPPORTED');
+            error.code = 0;
+            reject(error);
+            return;
+        }
+
+        // Verificar si es HTTPS (excepto localhost)
+        if (window.location.protocol !== 'https:' && !esDesarrollo()) {
+            const error = new Error('HTTPS_REQUIRED');
+            error.code = 0;
+            reject(error);
+            return;
+        }
+
+        if (esDesarrollo()) {
+            console.log('📍 Solicitando ubicación del usuario...');
+        }
+
+        const opciones = {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 300000 // 5 minutos de cache
+        };
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const ubicacion = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                
+                if (esDesarrollo()) {
+                    console.log('✅ Ubicación obtenida:', ubicacion);
+                }
+                
+                resolve(ubicacion);
+            },
+            (error) => {
+                if (esDesarrollo()) {
+                    console.error('❌ Error obteniendo ubicación:', error);
+                }
+                reject(error);
+            },
+            opciones
+        );
+    });
+}
+
+/**
+ * Maneja errores de geolocalización con mensajes claros
+ * @param {GeolocationPositionError|Error} error
+ * @returns {Object} Información del error formateada
+ */
+function manejarErrorGeolocalizacion(error) {
+    const errores = {
+        1: { // PERMISSION_DENIED
+            titulo: 'Permiso de ubicación denegado',
+            mensaje: 'Para ordenar por cercanía, necesitamos acceso a tu ubicación.',
+            accion: 'Por favor, permite el acceso a la ubicación en tu navegador y vuelve a intentar.',
+            icono: 'fa-location-slash'
+        },
+        2: { // POSITION_UNAVAILABLE
+            titulo: 'Ubicación no disponible',
+            mensaje: 'No pudimos determinar tu ubicación en este momento.',
+            accion: 'Verifica tu conexión a internet y que el GPS esté activado, luego reintenta.',
+            icono: 'fa-wifi-slash'
+        },
+        3: { // TIMEOUT
+            titulo: 'Tiempo de espera agotado',
+            mensaje: 'La solicitud de ubicación tardó demasiado tiempo.',
+            accion: 'Por favor, intenta nuevamente.',
+            icono: 'fa-clock'
+        },
+        'GEOLOCATION_NOT_SUPPORTED': {
+            titulo: 'Geolocalización no soportada',
+            mensaje: 'Tu navegador no soporta geolocalización.',
+            accion: 'Actualiza tu navegador o usa uno más moderno.',
+            icono: 'fa-browser'
+        },
+        'HTTPS_REQUIRED': {
+            titulo: 'Conexión segura requerida',
+            mensaje: 'La geolocalización requiere una conexión HTTPS.',
+            accion: 'Accede al sitio usando https://',
+            icono: 'fa-lock'
+        }
+    };
+
+    const codigo = error.code !== undefined ? error.code : error.message;
+    return errores[codigo] || {
+        titulo: 'Error de ubicación',
+        mensaje: 'Ocurrió un error al obtener tu ubicación.',
+        accion: 'Por favor, intenta nuevamente.',
+        icono: 'fa-exclamation-triangle'
+    };
+}
+
+// ===========================
+// FUNCIONES DE CÁLCULO DE DISTANCIAS
+// ===========================
+
+/**
+ * Calcula la distancia entre dos puntos geográficos usando la fórmula Haversine
+ * @param {number} lat1 - Latitud del punto 1 en grados decimales (-90 a 90)
+ * @param {number} lon1 - Longitud del punto 1 en grados decimales (-180 a 180)
+ * @param {number} lat2 - Latitud del punto 2 en grados decimales (-90 a 90)
+ * @param {number} lon2 - Longitud del punto 2 en grados decimales (-180 a 180)
+ * @returns {number|null} Distancia en kilómetros o null si parámetros inválidos
+ * @example
+ * // Distancia entre Buenos Aires y Mendoza
+ * const distancia = calcularDistanciaHaversine(-34.6037, -58.3816, -32.8908, -68.8272);
+ * console.log(distancia); // ~1037.5 km
+ */
+function calcularDistanciaHaversine(lat1, lon1, lat2, lon2) {
+    // Validar parámetros
+    if (typeof lat1 !== 'number' || typeof lon1 !== 'number' ||
+        typeof lat2 !== 'number' || typeof lon2 !== 'number') {
+        console.warn('⚠️ calcularDistanciaHaversine: Parámetros inválidos');
+        return null;
+    }
+
+    // Validar rangos
+    if (lat1 < -90 || lat1 > 90 || lat2 < -90 || lat2 > 90 ||
+        lon1 < -180 || lon1 > 180 || lon2 < -180 || lon2 > 180) {
+        console.warn('⚠️ calcularDistanciaHaversine: Coordenadas fuera de rango');
+        return null;
+    }
+
+    // Radio de la Tierra en kilómetros
+    const R = 6371;
+
+    // Convertir grados a radianes
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const lat1Rad = lat1 * Math.PI / 180;
+    const lat2Rad = lat2 * Math.PI / 180;
+
+    // Fórmula Haversine
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1Rad) * Math.cos(lat2Rad) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distancia = R * c;
+
+    return distancia;
+}
+
+/**
+ * Formatea una distancia en kilómetros a formato legible
+ * @param {number} km - Distancia en kilómetros
+ * @returns {string} Distancia formateada (ej: "2.5 km" o "450 m")
+ * @example
+ * formatearDistancia(0.450); // "450 m"
+ * formatearDistancia(2.567); // "2.6 km"
+ */
+function formatearDistancia(km) {
+    if (km === null || km === undefined || isNaN(km)) {
+        return 'N/A';
+    }
+
+    if (km < 1) {
+        // Mostrar en metros
+        const metros = Math.round(km * 1000);
+        return `${metros} m`;
+    } else {
+        // Mostrar en kilómetros con 1 decimal
+        return `${km.toFixed(1)} km`;
+    }
+}
+
+/**
+ * Enriquece las ofertas con coordenadas desde establecimientos
+ * @param {Array} ofertas - Array de ofertas a enriquecer
+ * @returns {Array} Ofertas enriquecidas con latitud y longitud
+ */
+function enriquecerOfertasConCoordenadas(ofertas) {
+    if (!Array.isArray(ofertas)) {
+        console.warn('⚠️ enriquecerOfertasConCoordenadas: ofertas no es un array');
+        return [];
+    }
+
+    if (!window.establecimientosCache || !Array.isArray(window.establecimientosCache)) {
+        console.warn('⚠️ enriquecerOfertasConCoordenadas: No hay cache de establecimientos');
+        return ofertas;
+    }
+
+    const ofertasEnriquecidas = ofertas.map(oferta => {
+        // Si ya tiene coordenadas, retornar sin modificar
+        if (oferta.latitud && oferta.longitud) {
+            return oferta;
+        }
+
+        // Buscar establecimiento en cache
+        const establecimiento = window.establecimientosCache.find(
+            est => est.idEstablecimiento === oferta.idEstablecimiento
+        );
+
+        if (establecimiento && establecimiento.latitud && establecimiento.longitud) {
+            // Validar que las coordenadas sean números válidos
+            const lat = parseFloat(establecimiento.latitud);
+            const lng = parseFloat(establecimiento.longitud);
+
+            if (!isNaN(lat) && !isNaN(lng) && 
+                lat >= -90 && lat <= 90 && 
+                lng >= -180 && lng <= 180) {
+                
+                return {
+                    ...oferta,
+                    latitud: lat,
+                    longitud: lng
+                };
+            }
+        }
+
+        return oferta;
+    });
+
+    const conCoordenadas = ofertasEnriquecidas.filter(o => o.latitud && o.longitud).length;
+    
+    if (esDesarrollo()) {
+        console.log(`📍 Ofertas enriquecidas: ${conCoordenadas}/${ofertas.length} con coordenadas`);
+    }
+
+    return ofertasEnriquecidas;
+}
+
 /**
  * Función principal para cargar ofertas de empleo con filtro opcional
  * @param {boolean|null} vigente - null: todas las ofertas, true: solo vigentes, false: solo no vigentes  
@@ -9466,7 +9733,7 @@ function renderizarOfertas(ofertas) {
         
         html += `
             <div class="col-md-6 col-lg-4 mb-4" data-vigente="${oferta.vigente}">
-                <div class="oferta-card-moderna ${esVigente ? 'vigente' : 'cerrada'}">
+                <div class="oferta-card-moderna ${esVigente ? 'vigente' : 'cerrada'}" style="position: relative;">
                     <!-- Header de la card -->
                     <div class="oferta-card-header">
                         <div class="oferta-estado-badge ${esVigente ? 'vigente' : 'cerrada'}">
@@ -9477,6 +9744,12 @@ function renderizarOfertas(ofertas) {
                             <div class="oferta-especie-tag">
                                 <i class="fas fa-seedling"></i>
                                 <span>${escapeHtml(oferta.nombreEspecie)}</span>
+                            </div>
+                        ` : ''}
+                        ${oferta.distancia !== undefined && oferta.distancia !== null ? `
+                            <div class="oferta-distancia-badge">
+                                <i class="fas fa-location-arrow"></i>
+                                <span>${formatearDistancia(oferta.distancia)}</span>
                             </div>
                         ` : ''}
                     </div>
@@ -9723,6 +9996,437 @@ function formatearFecha(fecha) {
 }
 
 // Las ofertas se inicializan desde el dashboard cuando se abre
+
+// ===========================
+// FUNCIONES DE ORDENAMIENTO DE OFERTAS
+// ===========================
+
+/**
+ * Aplica ordenamiento a las ofertas
+ * @param {string} tipo - 'fecha' | 'cercania' | null
+ */
+async function aplicarOrdenamiento(tipo) {
+    if (esDesarrollo()) {
+        console.group(`🔄 APLICAR ORDENAMIENTO: ${tipo || 'ninguno'}`);
+    }
+
+    try {
+        // Si es cercanía, necesitamos ubicación
+        if (tipo === 'cercania') {
+            if (!window.estadoOrdenamiento.ubicacionUsuario) {
+                // Solicitar ubicación
+                showMessage('Obteniendo tu ubicación...', 'info');
+                
+                try {
+                    const ubicacion = await obtenerUbicacionUsuario();
+                    window.estadoOrdenamiento.ubicacionUsuario = ubicacion;
+                    
+                    // Habilitar botón de cercanía
+                    const btnCercania = document.getElementById('btn-ordenar-cercania');
+                    if (btnCercania) {
+                        btnCercania.disabled = false;
+                        btnCercania.classList.add('ubicacion-obtenida');
+                    }
+                    
+                    showMessage('✅ Ubicación obtenida correctamente', 'success');
+                } catch (error) {
+                    const errorInfo = manejarErrorGeolocalizacion(error);
+                    showMessage(`${errorInfo.titulo}: ${errorInfo.accion}`, 'error');
+                    
+                    if (esDesarrollo()) {
+                        console.error('❌ Error obteniendo ubicación:', error);
+                        console.groupEnd();
+                    }
+                    return;
+                }
+            }
+        }
+
+        // Actualizar estado
+        const estadoAnterior = window.estadoOrdenamiento.tipo;
+        
+        // Si es el mismo tipo, alternar dirección
+        if (estadoAnterior === tipo && tipo === 'fecha') {
+            window.estadoOrdenamiento.direccion = 
+                window.estadoOrdenamiento.direccion === 'desc' ? 'asc' : 'desc';
+        } else {
+            window.estadoOrdenamiento.tipo = tipo;
+            window.estadoOrdenamiento.direccion = tipo === 'fecha' ? 'desc' : 'asc';
+        }
+
+        // Aplicar ordenamiento
+        await aplicarFiltrosYOrdenamiento();
+
+        // Actualizar UI de botones
+        actualizarBotonesOrdenamiento();
+
+        // Mostrar mensaje de confirmación
+        if (tipo === 'fecha') {
+            const dir = window.estadoOrdenamiento.direccion === 'desc' ? 'recientes' : 'antiguas';
+            showMessage(`Ordenado por fecha: más ${dir} primero`, 'info');
+        } else if (tipo === 'cercania') {
+            showMessage('Ordenado por cercanía: más cercanas primero', 'info');
+        } else {
+            showMessage('Orden original restaurado', 'info');
+        }
+
+    } catch (error) {
+        console.error('❌ Error aplicando ordenamiento:', error);
+        showMessage('Error al ordenar ofertas', 'error');
+    } finally {
+        if (esDesarrollo()) {
+            console.groupEnd();
+        }
+    }
+}
+
+/**
+ * Aplica filtros y ordenamiento de forma coordinada
+ */
+async function aplicarFiltrosYOrdenamiento() {
+    if (esDesarrollo()) {
+        console.time('⏱️ Tiempo total filtrado + ordenamiento');
+    }
+
+    // Detectar contexto: ¿estamos en vista pública o dashboard privado?
+    const esVistaPublica = document.getElementById('ofertas-publicas-container') !== null;
+    const esDashboardPrivado = document.getElementById('ofertas-content') !== null;
+
+    if (esVistaPublica) {
+        // Vista pública - usar lógica para ofertas públicas
+        await aplicarFiltrosYOrdenamientoPublico();
+        if (esDesarrollo()) {
+            console.timeEnd('⏱️ Tiempo total filtrado + ordenamiento');
+        }
+        return;
+    }
+
+    if (!esDashboardPrivado) {
+        console.warn('⚠️ No se detectó ningún contexto válido para ordenamiento');
+        return;
+    }
+
+    // Dashboard privado - lógica original
+    // 1. Obtener ofertas base desde cache
+    let ofertas = [...ofertasCache];
+
+    if (esDesarrollo()) {
+        console.log(`📦 Ofertas base: ${ofertas.length}`);
+    }
+
+    // 2. Aplicar filtro de estado (vigente/cerrada)
+    if (estadoFiltroOfertas.actual !== null) {
+        ofertas = ofertas.filter(oferta => {
+            const fechaCierreDate = parsearFechaSegura(oferta.fechaCierre);
+            const esVigente = oferta.vigente && fechaCierreDate && fechaCierreDate > new Date();
+            
+            if (estadoFiltroOfertas.actual === true) {
+                return esVigente;
+            } else if (estadoFiltroOfertas.actual === false) {
+                return !esVigente;
+            }
+            return true;
+        });
+
+        if (esDesarrollo()) {
+            console.log(`🔍 Después de filtro de estado: ${ofertas.length}`);
+        }
+    }
+
+    // 3. Aplicar filtro de puesto si existe
+    const filtroPuesto = document.getElementById('filtro-puesto-publico');
+    if (filtroPuesto && filtroPuesto.value) {
+        ofertas = ofertas.filter(o => o.nombrePuesto === filtroPuesto.value);
+        if (esDesarrollo()) {
+            console.log(`🔍 Después de filtro de puesto: ${ofertas.length}`);
+        }
+    }
+
+    // 4. Aplicar ordenamiento
+    const tipo = window.estadoOrdenamiento.tipo;
+    
+    if (tipo === 'fecha') {
+        // Ordenar por fecha de alta
+        ofertas.sort((a, b) => {
+            const fechaA = parsearFechaSegura(a.fechaAlta);
+            const fechaB = parsearFechaSegura(b.fechaAlta);
+            
+            if (!fechaA || !fechaB) return 0;
+            
+            const diff = fechaB.getTime() - fechaA.getTime();
+            return window.estadoOrdenamiento.direccion === 'desc' ? diff : -diff;
+        });
+
+        if (esDesarrollo()) {
+            console.log(`📅 Ordenado por fecha (${window.estadoOrdenamiento.direccion})`);
+        }
+
+    } else if (tipo === 'cercania') {
+        // Enriquecer con coordenadas
+        ofertas = enriquecerOfertasConCoordenadas(ofertas);
+
+        // Calcular distancias
+        const ubicacion = window.estadoOrdenamiento.ubicacionUsuario;
+        let ofertasConDistancia = [];
+        let ofertasSinDistancia = [];
+
+        ofertas.forEach(oferta => {
+            if (oferta.latitud && oferta.longitud) {
+                // Usar cache si existe
+                let distancia = cacheDistancias.get(oferta.idOfertaEmpleo);
+                
+                if (distancia === undefined) {
+                    distancia = calcularDistanciaHaversine(
+                        ubicacion.lat,
+                        ubicacion.lng,
+                        oferta.latitud,
+                        oferta.longitud
+                    );
+                    
+                    if (distancia !== null) {
+                        cacheDistancias.set(oferta.idOfertaEmpleo, distancia);
+                    }
+                }
+
+                if (distancia !== null) {
+                    ofertasConDistancia.push({ ...oferta, distancia });
+                } else {
+                    ofertasSinDistancia.push(oferta);
+                }
+            } else {
+                ofertasSinDistancia.push(oferta);
+            }
+        });
+
+        // Ordenar por distancia
+        ofertasConDistancia.sort((a, b) => a.distancia - b.distancia);
+
+        // Concatenar: primero con distancia, luego sin distancia
+        ofertas = [...ofertasConDistancia, ...ofertasSinDistancia];
+
+        if (esDesarrollo()) {
+            console.log(`📍 Ordenado por cercanía: ${ofertasConDistancia.length} con distancia, ${ofertasSinDistancia.length} sin coordenadas`);
+            
+            if (ofertasConDistancia.length > 0) {
+                console.table(ofertasConDistancia.slice(0, 10).map(o => ({
+                    Puesto: o.nombrePuesto,
+                    Establecimiento: o.nombreEstablecimiento,
+                    Distancia: formatearDistancia(o.distancia)
+                })));
+            }
+        }
+
+        // Advertir si no hay ofertas con coordenadas
+        if (ofertasConDistancia.length === 0) {
+            showMessage('⚠️ Ninguna oferta tiene ubicación disponible', 'warning');
+        }
+    }
+
+    // 5. Renderizar ofertas filtradas y ordenadas
+    renderizarOfertas(ofertas);
+
+    // Actualizar indicador de ordenamiento
+    actualizarIndicadorOrdenamiento();
+
+    if (esDesarrollo()) {
+        console.timeEnd('⏱️ Tiempo total filtrado + ordenamiento');
+    }
+}
+
+/**
+ * Aplica filtros y ordenamiento para la vista pública
+ */
+async function aplicarFiltrosYOrdenamientoPublico() {
+    if (esDesarrollo()) {
+        console.log('🌐 Aplicando filtros y ordenamiento en vista PÚBLICA');
+    }
+
+    // 1. Obtener ofertas desde estadoOfertasPublicas o recargar
+    let ofertas = estadoOfertasPublicas.ofertas || [];
+
+    if (ofertas.length === 0) {
+        // Si no hay ofertas cargadas, intentar cargar
+        if (esDesarrollo()) {
+            console.log('📦 No hay ofertas en cache, recargando...');
+        }
+        await cargarOfertasPublicas({});
+        ofertas = estadoOfertasPublicas.ofertas || [];
+    }
+
+    if (esDesarrollo()) {
+        console.log(`📦 Ofertas base (pública): ${ofertas.length}`);
+    }
+
+    // 2. Aplicar filtro de estado si existe
+    const selectorEstado = document.getElementById('filtro-estado-oferta');
+    if (selectorEstado && selectorEstado.value) {
+        const valorEstado = selectorEstado.value;
+        
+        ofertas = ofertas.filter(oferta => {
+            const fechaCierreDate = parsearFechaSegura(oferta.fechaCierre);
+            const esVigente = fechaCierreDate && fechaCierreDate > new Date();
+            
+            if (valorEstado === 'vigente') {
+                return esVigente;
+            } else if (valorEstado === 'vencida') {
+                return !esVigente;
+            }
+            return true; // 'todas'
+        });
+
+        if (esDesarrollo()) {
+            console.log(`🔍 Después de filtro de estado: ${ofertas.length}`);
+        }
+    }
+
+    // 3. Aplicar filtro de puesto si existe
+    const filtroPuesto = document.getElementById('filtro-puesto-publico');
+    if (filtroPuesto && filtroPuesto.value) {
+        ofertas = ofertas.filter(o => o.nombrePuestoTrabajo === filtroPuesto.value);
+        if (esDesarrollo()) {
+            console.log(`🔍 Después de filtro de puesto: ${ofertas.length}`);
+        }
+    }
+
+    // 4. Aplicar ordenamiento
+    const tipo = window.estadoOrdenamiento.tipo;
+    
+    if (tipo === 'fecha') {
+        // Ordenar por fecha de alta
+        ofertas.sort((a, b) => {
+            const fechaA = parsearFechaSegura(a.fechaAlta);
+            const fechaB = parsearFechaSegura(b.fechaAlta);
+            
+            if (!fechaA || !fechaB) return 0;
+            
+            const diff = fechaB.getTime() - fechaA.getTime();
+            return window.estadoOrdenamiento.direccion === 'desc' ? diff : -diff;
+        });
+
+        if (esDesarrollo()) {
+            console.log(`📅 Ordenado por fecha (${window.estadoOrdenamiento.direccion})`);
+        }
+
+    } else if (tipo === 'cercania') {
+        const ubicacion = window.estadoOrdenamiento.ubicacionUsuario;
+        let ofertasConDistancia = [];
+        let ofertasSinDistancia = [];
+
+        ofertas.forEach(oferta => {
+            if (oferta.latitud && oferta.longitud) {
+                let distancia = cacheDistancias.get(oferta.idOfertaEmpleo);
+                
+                if (distancia === undefined) {
+                    distancia = calcularDistanciaHaversine(
+                        ubicacion.lat,
+                        ubicacion.lng,
+                        parseFloat(oferta.latitud),
+                        parseFloat(oferta.longitud)
+                    );
+                    
+                    if (distancia !== null) {
+                        cacheDistancias.set(oferta.idOfertaEmpleo, distancia);
+                    }
+                }
+
+                if (distancia !== null) {
+                    ofertasConDistancia.push({ ...oferta, distancia });
+                } else {
+                    ofertasSinDistancia.push(oferta);
+                }
+            } else {
+                ofertasSinDistancia.push(oferta);
+            }
+        });
+
+        ofertasConDistancia.sort((a, b) => a.distancia - b.distancia);
+        ofertas = [...ofertasConDistancia, ...ofertasSinDistancia];
+
+        if (esDesarrollo()) {
+            console.log(`📍 Ordenado por cercanía: ${ofertasConDistancia.length} con distancia`);
+        }
+
+        if (ofertasConDistancia.length === 0) {
+            showMessage('⚠️ Ninguna oferta tiene ubicación disponible', 'warning');
+        }
+    }
+
+    // 5. Renderizar usando la función de vista pública
+    renderizarOfertasPublicas(ofertas);
+
+    // Actualizar contador de ofertas
+    actualizarContadorOfertasPublicas(ofertas.length);
+
+    // Actualizar indicador
+    actualizarIndicadorOrdenamiento();
+
+    if (esDesarrollo()) {
+        console.log('✅ Filtros y ordenamiento aplicados en vista pública');
+    }
+}
+
+/**
+ * Actualiza el estado visual de los botones de ordenamiento
+ */
+function actualizarBotonesOrdenamiento() {
+    const btnFecha = document.getElementById('btn-ordenar-fecha');
+    const btnCercania = document.getElementById('btn-ordenar-cercania');
+
+    if (!btnFecha || !btnCercania) return;
+
+    // Remover estados activos
+    btnFecha.classList.remove('btn-ordenar-activo');
+    btnCercania.classList.remove('btn-ordenar-activo');
+
+    // Aplicar estado activo según corresponda
+    const tipo = window.estadoOrdenamiento.tipo;
+    
+    if (tipo === 'fecha') {
+        btnFecha.classList.add('btn-ordenar-activo');
+        
+        // Actualizar icono de dirección
+        const icono = btnFecha.querySelector('.fa-sort, .fa-sort-up, .fa-sort-down');
+        if (icono) {
+            icono.classList.remove('fa-sort', 'fa-sort-up', 'fa-sort-down');
+            icono.classList.add(
+                window.estadoOrdenamiento.direccion === 'desc' ? 'fa-sort-down' : 'fa-sort-up'
+            );
+        }
+    } else if (tipo === 'cercania') {
+        btnCercania.classList.add('btn-ordenar-activo');
+    } else {
+        // Restaurar icono de fecha a neutral
+        const icono = btnFecha.querySelector('.fa-sort, .fa-sort-up, .fa-sort-down');
+        if (icono) {
+            icono.classList.remove('fa-sort-up', 'fa-sort-down');
+            icono.classList.add('fa-sort');
+        }
+    }
+}
+
+/**
+ * Actualiza el texto indicador de ordenamiento activo
+ */
+function actualizarIndicadorOrdenamiento() {
+    const indicador = document.getElementById('ordenamiento-info');
+    if (!indicador) return;
+
+    const tipo = window.estadoOrdenamiento.tipo;
+
+    if (!tipo) {
+        indicador.classList.add('ordenamiento-info-hidden');
+        indicador.textContent = '';
+    } else {
+        indicador.classList.remove('ordenamiento-info-hidden');
+        
+        if (tipo === 'fecha') {
+            const dir = window.estadoOrdenamiento.direccion === 'desc' ? 'más recientes' : 'más antiguas';
+            indicador.innerHTML = `<i class="fas fa-info-circle me-1"></i>Ordenado por fecha: ${dir} primero`;
+        } else if (tipo === 'cercania') {
+            indicador.innerHTML = `<i class="fas fa-info-circle me-1"></i>Ordenado por cercanía: más cercanas primero`;
+        }
+    }
+}
 
 // ===========================
 // FUNCIONES DE FILTRADO DE OFERTAS
@@ -10534,8 +11238,8 @@ function renderizarOfertasPublicas(ofertas) {
         
         return `
             <div class="col-lg-6 col-xl-4 mb-4">
-                <div class="card h-100 shadow-sm border-0 oferta-publica-card" data-oferta-id="${oferta.idOfertaEmpleo}" data-lat="${oferta.latitud}" data-lng="${oferta.longitud}">
-                    <div class="card-header ${headerColor} text-white">
+                <div class="card h-100 shadow-sm border-0 oferta-publica-card" data-oferta-id="${oferta.idOfertaEmpleo}" data-lat="${oferta.latitud}" data-lng="${oferta.longitud}" style="position: relative;">
+                    <div class="card-header ${headerColor} text-white" style="position: relative;">
                         <h5 class="card-title mb-0">
                             <i class="fas fa-briefcase me-2"></i>
                             ${oferta.nombrePuestoTrabajo || 'Puesto no especificado'}
@@ -10544,6 +11248,12 @@ function renderizarOfertasPublicas(ofertas) {
                             <i class="fas fa-seedling me-1"></i>
                             ${oferta.nombreEspecie || 'Especie no especificada'}
                         </small>
+                        ${oferta.distancia !== undefined && oferta.distancia !== null ? `
+                            <div class="oferta-distancia-badge">
+                                <i class="fas fa-location-arrow"></i>
+                                <span>${formatearDistancia(oferta.distancia)}</span>
+                            </div>
+                        ` : ''}
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
@@ -10760,8 +11470,113 @@ function configurarEventListenersOfertasPublicas() {
     if (selectorPuesto) {
         selectorPuesto.addEventListener('change', onCambioPuestoPublico);
     }
+
+    // ===== NUEVO: Selector de estado (vigente/vencida) =====
+    const selectorEstado = document.getElementById('filtro-estado-oferta');
+    if (selectorEstado) {
+        selectorEstado.addEventListener('change', function(e) {
+            const valor = e.target.value;
+            
+            if (esDesarrollo()) {
+                console.log(`🔄 Filtro de estado cambiado (vista pública): "${valor}"`);
+            }
+            
+            // En vista pública, simplemente reaplicar filtros y ordenamiento
+            aplicarFiltrosYOrdenamiento();
+        });
+        
+        if (esDesarrollo()) {
+            console.log('✅ Event listener de filtro de estado configurado');
+        }
+    }
+
+    // ===== NUEVO: Botón ordenar por fecha =====
+    const btnOrdenarFecha = document.getElementById('btn-ordenar-fecha');
+    if (btnOrdenarFecha) {
+        btnOrdenarFecha.addEventListener('click', function() {
+            const tipoActual = window.estadoOrdenamiento.tipo;
+            
+            // Si ya está ordenado por fecha, quitar ordenamiento
+            if (tipoActual === 'fecha') {
+                // Alternar dirección en vez de quitar
+                aplicarOrdenamiento('fecha');
+            } else {
+                // Aplicar ordenamiento por fecha
+                aplicarOrdenamiento('fecha');
+            }
+        });
+        
+        if (esDesarrollo()) {
+            console.log('✅ Event listener de ordenar por fecha configurado');
+        }
+    }
+
+    // ===== NUEVO: Botón ordenar por cercanía =====
+    const btnOrdenarCercania = document.getElementById('btn-ordenar-cercania');
+    if (btnOrdenarCercania) {
+        btnOrdenarCercania.addEventListener('click', async function() {
+            const tipoActual = window.estadoOrdenamiento.tipo;
+            
+            // Si ya está ordenado por cercanía, quitar ordenamiento
+            if (tipoActual === 'cercania') {
+                aplicarOrdenamiento(null);
+            } else {
+                // Aplicar ordenamiento por cercanía
+                aplicarOrdenamiento('cercania');
+            }
+        });
+        
+        if (esDesarrollo()) {
+            console.log('✅ Event listener de ordenar por cercanía configurado');
+        }
+    }
+
+    // ===== NUEVO: Botón limpiar filtros =====
+    const btnLimpiarFiltros = document.getElementById('btn-limpiar-filtros');
+    if (btnLimpiarFiltros) {
+        btnLimpiarFiltros.addEventListener('click', function() {
+            if (esDesarrollo()) {
+                console.log('🧹 Limpiando filtros y ordenamiento...');
+            }
+
+            // Resetear filtro de estado a 'vigente'
+            const selectorEstado = document.getElementById('filtro-estado-oferta');
+            if (selectorEstado) {
+                selectorEstado.value = 'vigente';
+            }
+
+            // Resetear filtro de puesto
+            const selectorPuesto = document.getElementById('filtro-puesto-publico');
+            if (selectorPuesto) {
+                selectorPuesto.value = '';
+            }
+
+            // Resetear ordenamiento
+            window.estadoOrdenamiento = {
+                tipo: null,
+                direccion: 'desc',
+                ubicacionUsuario: window.estadoOrdenamiento.ubicacionUsuario // Mantener ubicación
+            };
+
+            // Limpiar cache de distancias
+            cacheDistancias.clear();
+
+            // Actualizar botones
+            actualizarBotonesOrdenamiento();
+            actualizarIndicadorOrdenamiento();
+
+            // Recargar ofertas con filtro de vigentes (default)
+            aplicarFiltroOfertas(true);
+
+            showMessage('Filtros y ordenamiento restablecidos', 'info');
+        });
+        
+        if (esDesarrollo()) {
+            console.log('✅ Event listener de limpiar filtros configurado');
+        }
+    }
     
-    // Botones de ordenamiento
+    // Botones de ordenamiento originales
     document.querySelectorAll('.btn-orden-publico').forEach(btn => {
         btn.addEventListener('click', () => {
             onCambioOrdenPublico(btn.dataset.orden);

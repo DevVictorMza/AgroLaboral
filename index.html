@@ -701,23 +701,41 @@
                             
                             <!-- Filtro por Estado -->
                             <div class="col-md-4">
-                                <label class="form-label">
+                                <label class="form-label" for="filtro-estado-oferta">
                                     <i class="fas fa-filter"></i>
                                     Estado de oferta
                                 </label>
-                                <select class="form-select" id="filtro-estado-oferta">
+                                <select class="form-select" id="filtro-estado-oferta" title="Filtrar ofertas por estado">
                                     <option value="">Todas</option>
                                     <option value="vigente" selected>Vigentes</option>
                                     <option value="vencida">Vencidas</option>
                                 </select>
                             </div>
 
-                                <!-- Limpiar filtros -->
-                                <div class="col-md-3">
-                                    <button type="button" class="btn btn-outline-secondary w-100" id="btn-limpiar-filtros">
-                                        <i class="fas fa-eraser me-1"></i>
-                                        Limpiar filtros
+                            <!-- Limpiar filtros -->
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-outline-secondary w-100" id="btn-limpiar-filtros">
+                                    <i class="fas fa-eraser me-1"></i>
+                                    Limpiar filtros
+                                </button>
+                            </div>
+
+                            <!-- Botones de ordenamiento -->
+                            <div class="col-md-12 mt-3">
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <button type="button" class="btn btn-outline-primary flex-fill" id="btn-ordenar-fecha">
+                                        <i class="fas fa-calendar-alt me-1"></i>
+                                        Ordenar por fecha
+                                        <i class="fas fa-sort ms-1"></i>
                                     </button>
+                                    <button type="button" class="btn btn-outline-success flex-fill" id="btn-ordenar-cercania" disabled>
+                                        <i class="fas fa-map-marker-alt me-1"></i>
+                                        Ordenar por cercanía
+                                    </button>
+                                </div>
+                                <div id="ordenamiento-info" class="text-muted text-center mt-2 small ordenamiento-info-hidden">
+                                    <!-- Texto descriptivo del ordenamiento activo -->
+                                </div>
                             </div>
                         </div>
                     </div>
