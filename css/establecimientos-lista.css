@@ -560,18 +560,6 @@
   box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
 }
 
-.btn-filter-cerradas {
-  color: #95a5a6;
-}
-
-.btn-filter-cerradas:hover,
-.btn-filter-cerradas.active {
-  background: rgba(149, 165, 166, 0.15);
-  border-color: #95a5a6;
-  color: #bdc3c7;
-  box-shadow: 0 2px 8px rgba(149, 165, 166, 0.3);
-}
-
 /* Estado activo más pronunciado */
 .btn-filter.active {
   transform: scale(1.05);

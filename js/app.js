@@ -1215,14 +1215,6 @@ function generarDashboard(perfil) {
                                         <i class="fas fa-check-circle"></i>
                                         <span>Vigentes</span>
                                     </button>
-                                    <button type="button" 
-                                            class="btn-filter btn-filter-cerradas" 
-                                            id="filtro-cerradas"
-                                            onclick="aplicarFiltroOfertas(false)"
-                                            data-filter="cerradas">
-                                        <i class="fas fa-times-circle"></i>
-                                        <span>Cerradas</span>
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -9258,7 +9250,7 @@ const OFERTAS_CONFIG = {
 
 // Variable global para ofertas
 let ofertasCache = [];
-let filtroActualOfertas = null; // null = todas, true = vigentes, false = no vigentes
+let filtroActualOfertas = null; // null = todas, true = vigentes
 
 // ===========================
 // ESTADO DE ORDENAMIENTO Y GEOLOCALIZACIÓN
@@ -9555,13 +9547,18 @@ async function cargarOfertasEmpleo(vigente = null) {
         // Guardar filtro actual
         filtroActualOfertas = vigente;
 
-        // Construir URL - siempre sin parámetro para obtener todas las ofertas
-        // El filtrado se hará en el frontend
+        // Construir URL base
         let endpoint = buildURL(OFERTAS_CONFIG.ENDPOINT);
 
-        console.log(`🔄 Cargando TODAS las ofertas del backend...`);
-        console.log(`   Filtro a aplicar: ${vigente === null ? 'TODAS' : vigente === true ? 'VIGENTES' : 'CERRADAS'}`);
-        console.log(`   Endpoint: ${endpoint}`);
+        // Agregar parámetro vigente si no es null (null = todas las ofertas)
+        if (vigente !== null) {
+            endpoint += `?vigente=${vigente}`;
+        }
+
+        const tipoFiltro = vigente === null ? 'TODAS' : vigente === true ? 'VIGENTES' : 'CERRADAS';
+        console.log(`🔄 Cargando ofertas: ${tipoFiltro}`);
+        console.log(`   Endpoint completo: ${endpoint}`);
+        console.log(`   Parámetro vigente: ${vigente}`);
 
         // Usar fetchWithAuth que ya maneja la autenticación
         const response = await fetchWithAuth(endpoint, {
@@ -9613,8 +9610,7 @@ async function cargarOfertasEmpleo(vigente = null) {
         // Guardar en cache
         ofertasCache = ofertas;
 
-        console.log(`✅ ${ofertas.length} ofertas cargadas desde backend`);
-        console.log(`   Filtro aplicado: ${vigente === null ? 'TODAS' : vigente === true ? 'VIGENTES' : 'CERRADAS'}`);
+        console.log(`✅ ${ofertas.length} ofertas ${tipoFiltro} cargadas desde backend`);
 
         // Mostrar contenido y renderizar ofertas
         mostrarEstadoOfertas('content');
@@ -9660,32 +9656,16 @@ function mostrarEstadoOfertas(estado) {
 function renderizarOfertas(ofertas) {
     const contentDiv = document.getElementById('ofertas-content');
     
-    // FILTRADO ADICIONAL EN FRONTEND (por si el backend no filtra correctamente)
-    let ofertasFiltradas = ofertas;
-    if (estadoFiltroOfertas.actual !== null) {
-        ofertasFiltradas = ofertas.filter(oferta => {
-            const fechaCierreDate = parsearFechaSegura(oferta.fechaCierre);
-            const esVigente = oferta.vigente && fechaCierreDate && fechaCierreDate > new Date();
-            
-            // Si el filtro es "vigentes" (true), mostrar solo vigentes
-            // Si el filtro es "cerradas" (false), mostrar solo cerradas
-            if (estadoFiltroOfertas.actual === true) {
-                return esVigente;
-            } else if (estadoFiltroOfertas.actual === false) {
-                return !esVigente;
-            }
-            return true;
-        });
-        console.log(`🔍 Filtrado frontend: ${ofertas.length} ofertas → ${ofertasFiltradas.length} después de filtrar`);
-    } else {
-        console.log(`📋 Mostrando todas las ofertas sin filtro: ${ofertas.length} ofertas`);
-    }
+    // El backend ya retorna las ofertas filtradas correctamente según el parámetro vigente
+    // No es necesario filtrar nuevamente en el frontend
+    const ofertasFiltradas = ofertas;
+    console.log(`📋 Mostrando ${ofertas.length} ofertas recibidas del backend`);
     
     if (!ofertasFiltradas || ofertasFiltradas.length === 0) {
         const tipoFiltro = obtenerDescripcionFiltroActual();
         
         // Actualizar badge del header
-        actualizarBadgeOfertas(0, ofertas.length);
+        actualizarBadgeOfertas(0, 0);
         
         contentDiv.innerHTML = `
             <div class="text-center py-5">
@@ -9706,19 +9686,15 @@ function renderizarOfertas(ofertas) {
         `;
         return;
     }
-
-    // Estadísticas basadas en TODAS las ofertas (no filtradas)
-    const estadisticas = calcularEstadisticasOfertasReales(ofertas);
-    const tipoFiltro = obtenerDescripcionFiltroActual();
     
     // Actualizar badge del header
-    actualizarBadgeOfertas(ofertasFiltradas.length, ofertas.length);
+    actualizarBadgeOfertas(ofertasFiltradas.length, ofertasFiltradas.length);
     
     let html = `
         <div class="row" id="ofertas-grid">
     `;
 
-    // Generar cards SOLO de ofertas filtradas
+    // Generar cards de todas las ofertas recibidas
     ofertasFiltradas.forEach(oferta => {
         // Determinar estado basado en vigente y fecha de cierre
         const fechaCierreDate = parsearFechaSegura(oferta.fechaCierre);
@@ -10488,12 +10464,11 @@ async function aplicarFiltroOfertas(filtro) {
 function actualizarEstadoBotonesFiltro(filtroActivo, loading = false) {
     const botones = {
         todas: document.getElementById('filtro-todas'),
-        vigentes: document.getElementById('filtro-vigentes'),
-        cerradas: document.getElementById('filtro-cerradas')
+        vigentes: document.getElementById('filtro-vigentes')
     };
 
     // Verificar que los botones existan
-    if (!botones.todas || !botones.vigentes || !botones.cerradas) {
+    if (!botones.todas || !botones.vigentes) {
         console.warn('⚠️ No se encontraron todos los botones de filtro');
         return;
     }
@@ -10516,8 +10491,6 @@ function actualizarEstadoBotonesFiltro(filtroActivo, loading = false) {
         botones.todas.classList.add('active');
     } else if (filtroActivo === true) {
         botones.vigentes.classList.add('active');
-    } else if (filtroActivo === false) {
-        botones.cerradas.classList.add('active');
     }
 }
 
