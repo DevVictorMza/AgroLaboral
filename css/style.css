@@ -3542,3 +3542,60 @@ main h2 {
  
  
  
+/* ========================================
+   ESTILOS DE ORDENAMIENTO DE OFERTAS
+   ======================================== */
+
+/* Botones de ordenamiento */
+#btn-ordenar-fecha,
+#btn-ordenar-cercania {
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+#btn-ordenar-fecha.active,
+#btn-ordenar-cercania.active {
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+}
+
+#btn-ordenar-fecha.active {
+    background-color: var(--primary-blue, #4A90E2);
+    color: white;
+    border-color: var(--primary-blue, #4A90E2);
+}
+
+#btn-ordenar-cercania.active {
+    background-color: var(--success-green, #27AE60);
+    color: white;
+    border-color: var(--success-green, #27AE60);
+}
+
+/* Indicador de ordenamiento */
+#ordenamiento-info {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    background: rgba(74, 144, 226, 0.1);
+    border-left: 4px solid var(--primary-blue, #4A90E2);
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
+}
+
+#ordenamiento-info.ordenamiento-info-hidden {
+    display: none;
+}
+
+#ordenamiento-info i {
+    color: var(--primary-blue, #4A90E2);
+}
+
+#ordenamiento-info strong {
+    color: var(--text-light, #FFFFFF);
+}
+
+/* Spinner para botón de cercanía */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.15em;
+}

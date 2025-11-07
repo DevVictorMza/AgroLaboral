@@ -11257,10 +11257,14 @@ function renderizarOfertasPublicas(ofertas) {
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <h6 class="fw-bold text-primary">
+                            <h6 class="fw-bold text-primary mb-2">
                                 <i class="fas fa-building me-1"></i>
-                                ${oferta.nombreEstablecimiento || 'Establecimiento no especificado'}
+                                ${oferta.nombreEmpresa || 'Empresa no especificada'}
                             </h6>
+                            <p class="text-muted small mb-0">
+                                <i class="fas fa-map-pin me-1"></i>
+                                ${oferta.nombreEstablecimiento || 'Establecimiento no especificado'}
+                            </p>
                         </div>
                         
                         <div class="row g-2 mb-3">
@@ -11383,6 +11387,35 @@ function actualizarContadorOfertasPublicas(cantidad) {
 }
 
 /**
+ * Actualiza el indicador visual de ordenamiento activo
+ * @param {string} tipo - Tipo de ordenamiento ('fecha', 'distancia', null)
+ */
+function actualizarIndicadorOrdenamiento(tipo) {
+    const indicador = document.getElementById('ordenamiento-info');
+    if (!indicador) return;
+    
+    if (!tipo) {
+        indicador.classList.add('ordenamiento-info-hidden');
+        indicador.innerHTML = '';
+        return;
+    }
+    
+    indicador.classList.remove('ordenamiento-info-hidden');
+    
+    if (tipo === 'fecha') {
+        indicador.innerHTML = `
+            <i class="fas fa-calendar-alt me-1"></i>
+            <strong>Ordenado por fecha de cierre</strong> - Las ofertas más recientes aparecen primero
+        `;
+    } else if (tipo === 'distancia') {
+        indicador.innerHTML = `
+            <i class="fas fa-location-arrow me-1 text-success"></i>
+            <strong>Ordenado por distancia</strong> - Las ofertas más cercanas a tu ubicación aparecen primero
+        `;
+    }
+}
+
+/**
  * Aplica filtros a las ofertas públicas
  * @param {Object} nuevos_filtros - Filtros a aplicar
  */
@@ -11493,16 +11526,38 @@ function configurarEventListenersOfertasPublicas() {
     // ===== NUEVO: Botón ordenar por fecha =====
     const btnOrdenarFecha = document.getElementById('btn-ordenar-fecha');
     if (btnOrdenarFecha) {
-        btnOrdenarFecha.addEventListener('click', function() {
-            const tipoActual = window.estadoOrdenamiento.tipo;
-            
-            // Si ya está ordenado por fecha, quitar ordenamiento
-            if (tipoActual === 'fecha') {
-                // Alternar dirección en vez de quitar
-                aplicarOrdenamiento('fecha');
-            } else {
-                // Aplicar ordenamiento por fecha
-                aplicarOrdenamiento('fecha');
+        btnOrdenarFecha.addEventListener('click', async function() {
+            try {
+                // Obtener filtro actual de puesto
+                const selectorPuesto = document.getElementById('filtro-puesto-publico');
+                const puestoActual = selectorPuesto ? selectorPuesto.value : '';
+                
+                // Cargar ofertas ordenadas por fecha (por defecto)
+                await cargarOfertasPublicas({ 
+                    orden: 'fecha',
+                    puesto: puestoActual
+                });
+                
+                // Actualizar estado de los botones
+                btnOrdenarFecha.classList.add('active');
+                document.getElementById('btn-ordenar-cercania')?.classList.remove('active');
+                
+                // Restaurar texto del botón cercanía
+                const btnCercania = document.getElementById('btn-ordenar-cercania');
+                if (btnCercania) {
+                    btnCercania.innerHTML = `
+                        <i class="fas fa-map-marker-alt me-1"></i>
+                        Ordenar por cercanía
+                    `;
+                }
+                
+                // Actualizar indicador
+                actualizarIndicadorOrdenamiento('fecha');
+                
+                console.log('📅 Ofertas ordenadas por fecha');
+                
+            } catch (error) {
+                console.error('❌ Error al ordenar por fecha:', error);
             }
         });
         
@@ -11515,14 +11570,55 @@ function configurarEventListenersOfertasPublicas() {
     const btnOrdenarCercania = document.getElementById('btn-ordenar-cercania');
     if (btnOrdenarCercania) {
         btnOrdenarCercania.addEventListener('click', async function() {
-            const tipoActual = window.estadoOrdenamiento.tipo;
-            
-            // Si ya está ordenado por cercanía, quitar ordenamiento
-            if (tipoActual === 'cercania') {
-                aplicarOrdenamiento(null);
-            } else {
-                // Aplicar ordenamiento por cercanía
-                aplicarOrdenamiento('cercania');
+            try {
+                // Mostrar indicador de carga
+                btnOrdenarCercania.disabled = true;
+                btnOrdenarCercania.innerHTML = `
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    Obteniendo ubicación...
+                `;
+                
+                // Solicitar ubicación del usuario
+                const coords = await getUbicacionUsuario();
+                
+                console.log('📍 Ubicación obtenida:', coords);
+                
+                // Obtener filtro actual de puesto
+                const selectorPuesto = document.getElementById('filtro-puesto-publico');
+                const puestoActual = selectorPuesto ? selectorPuesto.value : '';
+                
+                // Cargar ofertas ordenadas por distancia
+                await cargarOfertasPublicas({ 
+                    orden: 'distancia',
+                    puesto: puestoActual
+                });
+                
+                // Actualizar estado de los botones
+                btnOrdenarCercania.classList.add('active');
+                document.getElementById('btn-ordenar-fecha')?.classList.remove('active');
+                
+                btnOrdenarCercania.innerHTML = `
+                    <i class="fas fa-map-marker-alt me-1"></i>
+                    Ordenado por cercanía
+                    <i class="fas fa-check ms-1"></i>
+                `;
+                
+                // Actualizar indicador
+                actualizarIndicadorOrdenamiento('distancia');
+                
+            } catch (error) {
+                console.error('❌ Error al ordenar por cercanía:', error);
+                
+                // Mostrar mensaje de error amigable
+                alert('No se pudo obtener tu ubicación. Por favor, permite el acceso a tu ubicación para usar esta función.');
+                
+                // Restaurar botón
+                btnOrdenarCercania.innerHTML = `
+                    <i class="fas fa-map-marker-alt me-1"></i>
+                    Ordenar por cercanía
+                `;
+            } finally {
+                btnOrdenarCercania.disabled = false;
             }
         });
         
@@ -11551,6 +11647,22 @@ function configurarEventListenersOfertasPublicas() {
                 selectorPuesto.value = '';
             }
 
+            // Resetear botones de ordenamiento
+            document.getElementById('btn-ordenar-fecha')?.classList.remove('active');
+            document.getElementById('btn-ordenar-cercania')?.classList.remove('active');
+
+            // Restaurar texto de botón cercanía
+            const btnCercania = document.getElementById('btn-ordenar-cercania');
+            if (btnCercania) {
+                btnCercania.innerHTML = `
+                    <i class="fas fa-map-marker-alt me-1"></i>
+                    Ordenar por cercanía
+                `;
+            }
+
+            // Ocultar indicador de ordenamiento
+            actualizarIndicadorOrdenamiento(null);
+
             // Resetear ordenamiento
             window.estadoOrdenamiento = {
                 tipo: null,
@@ -11563,10 +11675,12 @@ function configurarEventListenersOfertasPublicas() {
 
             // Actualizar botones
             actualizarBotonesOrdenamiento();
-            actualizarIndicadorOrdenamiento();
 
-            // Recargar ofertas con filtro de vigentes (default)
-            aplicarFiltroOfertas(true);
+            // Cargar ofertas sin ordenamiento específico (por defecto: fecha)
+            cargarOfertasPublicas({ 
+                puesto: '',
+                orden: 'fecha'
+            });
 
             showMessage('Filtros y ordenamiento restablecidos', 'info');
         });
