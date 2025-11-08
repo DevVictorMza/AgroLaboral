@@ -8689,9 +8689,27 @@ function agregarMarcadoresEstablecimientos(establecimientos) {
  */
 function crearPopupEstablecimiento(establecimiento) {
     const direccion = `${establecimiento.calle} ${establecimiento.numeracion}`;
-    const especies = establecimiento.especies && establecimiento.especies.length > 0 
-        ? establecimiento.especies.join(', ') 
-        : 'No especificadas';
+    
+    // Extraer nombres de especies de forma robusta
+    let especies = 'No especificadas';
+    if (establecimiento.especies && establecimiento.especies.length > 0) {
+        // Verificar si son objetos o strings
+        if (typeof establecimiento.especies[0] === 'object' && establecimiento.especies[0] !== null) {
+            // Son objetos: extraer el nombre de cada especie
+            especies = establecimiento.especies
+                .map(esp => esp.nombreEspecie || esp.nombre || 'Especie desconocida')
+                .filter(nombre => nombre && nombre !== 'Especie desconocida')
+                .join(', ');
+            
+            // Si después del filtrado no quedó nada, mostrar mensaje
+            if (!especies || especies.trim() === '') {
+                especies = 'No especificadas';
+            }
+        } else if (typeof establecimiento.especies[0] === 'string') {
+            // Ya son strings: unirlos directamente
+            especies = establecimiento.especies.join(', ');
+        }
+    }
 
     return `
         <div class="popup-establecimiento" style="font-family: Arial, sans-serif; font-size: 14px; max-width: 300px;">
@@ -8709,7 +8727,7 @@ function crearPopupEstablecimiento(establecimiento) {
 
             <div style="margin-bottom: 8px;">
                 <strong style="color: #34495e;">🌱 Especies:</strong><br>
-                <span style="color: #27ae60; font-style: ${establecimiento.especies && establecimiento.especies.length > 0 ? 'normal' : 'italic'};">
+                <span style="color: #27ae60; font-style: ${especies !== 'No especificadas' ? 'normal' : 'italic'};">
                     ${especies}
                 </span>
             </div>
