@@ -1237,6 +1237,218 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal de Postulación -->
+    <div class="modal fade" id="modalPostulacion" tabindex="-1" aria-labelledby="modalPostulacionLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content bg-dark text-white">
+                <!-- Header -->
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title" id="modalPostulacionLabel">
+                        <i class="fas fa-file-signature me-2 text-primary"></i>
+                        Postularse a Oferta Laboral
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <!-- Body -->
+                <div class="modal-body">
+                    <form id="form-postulacion" novalidate>
+                        <div class="row">
+                            <!-- Columna Izquierda: Formulario -->
+                            <div class="col-md-6">
+                                <h6 class="mb-3 text-info">
+                                    <i class="fas fa-user me-2"></i>Datos Personales
+                                </h6>
+                                
+                                <!-- DNI -->
+                                <div class="mb-3">
+                                    <label for="dni-postulacion" class="form-label">DNI *</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="dni-postulacion" 
+                                           name="dni" 
+                                           pattern="[0-9]{7,8}" 
+                                           required 
+                                           placeholder="Sin puntos ni guiones"
+                                           maxlength="8">
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                                
+                                <!-- Apellido -->
+                                <div class="mb-3">
+                                    <label for="apellido-postulacion" class="form-label">Apellido *</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="apellido-postulacion" 
+                                           name="apellido" 
+                                           required 
+                                           minlength="2"
+                                           placeholder="Ingrese su apellido">
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                                
+                                <!-- Nombre -->
+                                <div class="mb-3">
+                                    <label for="nombre-postulacion" class="form-label">Nombre *</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="nombre-postulacion" 
+                                           name="nombre" 
+                                           required 
+                                           minlength="2"
+                                           placeholder="Ingrese su nombre">
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                                
+                                <!-- Teléfono -->
+                                <div class="mb-3">
+                                    <label for="telefono-postulacion" class="form-label">Teléfono *</label>
+                                    <input type="tel" 
+                                           class="form-control" 
+                                           id="telefono-postulacion" 
+                                           name="telefono" 
+                                           required 
+                                           placeholder="Ej: +54 261 123-4567">
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                                
+                                <h6 class="mb-3 mt-4 text-info">
+                                    <i class="fas fa-map-marker-alt me-2"></i>Domicilio
+                                </h6>
+                                
+                                <!-- Calle y Numeración -->
+                                <div class="row">
+                                    <div class="col-md-8 mb-3">
+                                        <label for="calle-postulacion" class="form-label">Calle *</label>
+                                        <input type="text" 
+                                               class="form-control" 
+                                               id="calle-postulacion" 
+                                               name="calle" 
+                                               required 
+                                               minlength="3"
+                                               placeholder="Nombre de la calle">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="numeracion-postulacion" class="form-label">Número *</label>
+                                        <input type="text" 
+                                               class="form-control" 
+                                               id="numeracion-postulacion" 
+                                               name="numeracion" 
+                                               required 
+                                               pattern="[0-9]+"
+                                               placeholder="1234">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Código Postal -->
+                                <div class="mb-3">
+                                    <label for="codigoPostal-postulacion" class="form-label">Código Postal *</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="codigoPostal-postulacion" 
+                                           name="codigoPostal" 
+                                           required 
+                                           pattern="[0-9]{4}"
+                                           maxlength="4"
+                                           placeholder="5500">
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                                
+                                <!-- Departamento -->
+                                <div class="mb-3">
+                                    <label for="departamento-postulacion" class="form-label">Departamento *</label>
+                                    <select class="form-select" 
+                                            id="departamento-postulacion" 
+                                            name="departamento" 
+                                            required>
+                                        <option value="">Cargando...</option>
+                                    </select>
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                                
+                                <!-- Distrito -->
+                                <div class="mb-3">
+                                    <label for="distrito-postulacion" class="form-label">Distrito *</label>
+                                    <select class="form-select" 
+                                            id="distrito-postulacion" 
+                                            name="distrito" 
+                                            required 
+                                            disabled>
+                                        <option value="">Seleccione primero un departamento</option>
+                                    </select>
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                                
+                                <!-- Latitud y Longitud (readonly) -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="latitud-postulacion" class="form-label">Latitud *</label>
+                                        <input type="text" 
+                                               class="form-control" 
+                                               id="latitud-postulacion" 
+                                               name="latitud" 
+                                               required 
+                                               readonly
+                                               placeholder="Marque en el mapa">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="longitud-postulacion" class="form-label">Longitud *</label>
+                                        <input type="text" 
+                                               class="form-control" 
+                                               id="longitud-postulacion" 
+                                               name="longitud" 
+                                               required 
+                                               readonly
+                                               placeholder="Marque en el mapa">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Columna Derecha: Mapa -->
+                            <div class="col-md-6">
+                                <h6 class="mb-3 text-info">
+                                    <i class="fas fa-map-marked-alt me-2"></i>Marque su Ubicación
+                                </h6>
+                                <p class="text-muted small mb-3">
+                                    Haga click en el mapa o arrastre el marcador para indicar su ubicación exacta.
+                                </p>
+                                
+                                <div class="position-relative">
+                                    <div id="mapa-postulacion" style="height: 550px; border-radius: 8px; border: 1px solid #444;"></div>
+                                    <button type="button" 
+                                            class="btn btn-sm btn-primary position-absolute top-0 end-0 m-2" 
+                                            onclick="obtenerUbicacionActual()"
+                                            style="z-index: 1000;">
+                                        <i class="fas fa-crosshairs me-1"></i>
+                                        Usar mi ubicación
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Footer -->
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button type="button" 
+                            class="btn btn-primary" 
+                            id="btn-enviar-postulacion"
+                            onclick="enviarPostulacion()">
+                        <i class="fas fa-paper-plane me-2"></i>Enviar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     </div><!-- Cierre de #page-wrapper -->
 
 </body>

@@ -999,6 +999,103 @@ function generarDashboard(perfil) {
                 0% { transform: rotate(0deg); }
                 100% { transform: rotate(360deg); }
             }
+            
+            /* ===================================
+               ESTILOS MODAL DE POSTULACIÓN
+               =================================== */
+            
+            /* Modal */
+            #modalPostulacion .modal-content {
+                background: #1a1a1a;
+                color: #ffffff;
+                border: 1px solid #333;
+            }
+            
+            #modalPostulacion .modal-header,
+            #modalPostulacion .modal-footer {
+                border-color: #444;
+            }
+            
+            /* Formulario */
+            #form-postulacion .form-control,
+            #form-postulacion .form-select {
+                background: #2a2a2a;
+                border: 1px solid #444;
+                color: #ffffff;
+            }
+            
+            #form-postulacion .form-control:focus,
+            #form-postulacion .form-select:focus {
+                background: #2a2a2a;
+                border-color: #4A90E2;
+                color: #ffffff;
+                box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+            }
+            
+            #form-postulacion .form-control::placeholder {
+                color: #888;
+            }
+            
+            #form-postulacion .form-control[readonly] {
+                background: #1a1a1a;
+                border-color: #555;
+                cursor: not-allowed;
+            }
+            
+            #form-postulacion .form-label {
+                color: #ccc;
+                font-weight: 500;
+            }
+            
+            /* Validación */
+            #form-postulacion .form-control.is-invalid,
+            #form-postulacion .form-select.is-invalid {
+                border-color: #dc3545;
+                padding-right: calc(1.5em + 0.75rem);
+                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+                background-repeat: no-repeat;
+                background-position: right calc(0.375em + 0.1875rem) center;
+                background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+            }
+            
+            #form-postulacion .form-control.is-valid,
+            #form-postulacion .form-select.is-valid {
+                border-color: #28a745;
+                padding-right: calc(1.5em + 0.75rem);
+                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+                background-repeat: no-repeat;
+                background-position: right calc(0.375em + 0.1875rem) center;
+                background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+            }
+            
+            .invalid-feedback {
+                display: none;
+                color: #dc3545;
+                font-size: 0.875rem;
+                margin-top: 0.25rem;
+            }
+            
+            .invalid-feedback.d-block {
+                display: block !important;
+            }
+            
+            /* Mapa */
+            #mapa-postulacion {
+                background: #2a2a2a;
+            }
+            
+            #mapa-postulacion .leaflet-control-attribution {
+                background: rgba(42, 42, 42, 0.9);
+                color: #ccc;
+            }
+            
+            /* Responsive */
+            @media (max-width: 768px) {
+                #mapa-postulacion {
+                    height: 300px !important;
+                    margin-top: 1rem;
+                }
+            }
         </style>
         
         <div class="dashboard-container">
@@ -6397,7 +6494,8 @@ function almacenarSesion(token, datosUsuario) {
 function obtenerToken() {
     const token = localStorage.getItem(AUTH_CONFIG.storage.tokenKey);
     if (!token) {
-        console.warn('🔒 Token no encontrado en localStorage');
+        // Solo log de debug, no warning (puede ser contexto público)
+        console.log('� Token no encontrado en localStorage (contexto público)');
         return null;
     }
     console.log('🔑 Token obtenido de localStorage:', token ? 'Presente' : 'No disponible');
@@ -11094,7 +11192,7 @@ function crearPopupOferta(oferta) {
                     <button class="btn btn-sm btn-success flex-fill" 
                             onclick="contactarEmpresa('${oferta.idOfertaEmpleo}')">
                         <i class="fas fa-envelope me-1"></i>
-                        Contactar
+                        Postularse
                     </button>
                 </div>
             </div>
@@ -11277,7 +11375,7 @@ function renderizarOfertasPublicas(ofertas) {
                     <div class="card-footer bg-light d-flex gap-2">
                         <button class="btn btn-primary btn-sm flex-fill" onclick="contactarEmpresa('${oferta.idOfertaEmpleo}')">
                             <i class="fas fa-phone me-1"></i>
-                            Contactar
+                            Postularse
                         </button>
                     </div>
                 </div>
@@ -11671,13 +11769,666 @@ function configurarEventListenersOfertasPublicas() {
     });
 }
 
+// ===========================
+// MODAL DE POSTULACIÓN
+// ===========================
+
+// Variables globales para el modal de postulación
+let mapaPostulacion = null;
+let marcadorPostulacion = null;
+
 /**
- * Función placeholder para contactar empresa
+ * Función para abrir modal de postulación
  * @param {string} ofertaId - ID de la oferta
  */
 function contactarEmpresa(ofertaId) {
-    // Por ahora mostrar modal de información
-    alert(`Para contactar con esta empresa, debe registrarse como trabajador en la plataforma.\n\nOferta ID: ${ofertaId}`);
+    abrirModalPostulacion(ofertaId);
+}
+
+/**
+ * Abrir modal de postulación y configurarlo
+ * @param {number} idOferta - ID de la oferta
+ */
+function abrirModalPostulacion(idOferta) {
+    console.log('🎯 Abriendo modal de postulación para oferta:', idOferta);
+    
+    // Guardar ID de oferta en variable global
+    window.ofertaActual = idOferta;
+    
+    // Resetear formulario
+    const form = document.getElementById('form-postulacion');
+    if (form) {
+        form.reset();
+        // Limpiar clases de validación
+        form.querySelectorAll('.is-valid, .is-invalid').forEach(el => {
+            el.classList.remove('is-valid', 'is-invalid');
+        });
+    }
+    
+    // Obtener instancia del modal
+    const modalElement = document.getElementById('modalPostulacion');
+    const modal = new bootstrap.Modal(modalElement);
+    
+    // Configurar evento shown para inicializar después de que el modal esté visible
+    modalElement.addEventListener('shown.bs.modal', function() {
+        inicializarModalPostulacion(idOferta);
+    }, { once: true });
+    
+    // Configurar evento hidden para limpiar recursos
+    modalElement.addEventListener('hidden.bs.modal', function() {
+        cerrarModalPostulacion();
+    }, { once: true });
+    
+    modal.show();
+}
+
+/**
+ * Inicializar modal de postulación (mapa, departamentos, validación)
+ * @param {number} idOferta - ID de la oferta
+ */
+async function inicializarModalPostulacion(idOferta) {
+    console.log('🔄 Inicializando modal de postulación...');
+    
+    try {
+        // 1. Cargar departamentos
+        await cargarDepartamentosPostulacion();
+        
+        // 2. Inicializar mapa
+        inicializarMapaPostulacion();
+        
+        // 3. Configurar validación en tiempo real
+        configurarValidacionEnTiempoReal();
+        
+        // 4. Configurar evento onChange de departamento
+        const selectDepartamento = document.getElementById('departamento-postulacion');
+        if (selectDepartamento) {
+            selectDepartamento.addEventListener('change', function(e) {
+                const idDepartamento = e.target.value;
+                
+                // Limpiar distrito
+                const selectDistrito = document.getElementById('distrito-postulacion');
+                selectDistrito.innerHTML = '<option value="">Seleccione primero un departamento</option>';
+                selectDistrito.disabled = true;
+                selectDistrito.classList.remove('is-valid', 'is-invalid');
+                
+                // Cargar distritos si hay departamento
+                if (idDepartamento) {
+                    cargarDistritosPostulacion(idDepartamento);
+                }
+            });
+        }
+        
+        // 5. Focus en primer campo
+        setTimeout(() => {
+            const primerCampo = document.getElementById('dni-postulacion');
+            if (primerCampo) primerCampo.focus();
+        }, 300);
+        
+        console.log('✅ Modal de postulación inicializado correctamente');
+        
+    } catch (error) {
+        console.error('❌ Error inicializando modal de postulación:', error);
+        showMessage('Error al inicializar el formulario. Intente nuevamente.', 'error');
+    }
+}
+
+/**
+ * Cargar departamentos desde API pública
+ */
+async function cargarDepartamentosPostulacion() {
+    try {
+        console.log('🔄 Cargando departamentos...');
+        
+        const response = await fetch('http://localhost:8080/publico/departamentos', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const departamentos = await response.json();
+        console.log(`✅ ${departamentos.length} departamentos cargados`);
+        
+        const selectDepartamento = document.getElementById('departamento-postulacion');
+        selectDepartamento.innerHTML = '<option value="">Seleccione un departamento</option>';
+        
+        departamentos.forEach(dep => {
+            const option = document.createElement('option');
+            option.value = dep.idDepartamento;
+            option.textContent = dep.nombreDepartamento;
+            selectDepartamento.appendChild(option);
+        });
+        
+        return departamentos;
+        
+    } catch (error) {
+        console.error('❌ Error cargando departamentos:', error);
+        showMessage('Error al cargar departamentos. Por favor, recargue la página.', 'error');
+        
+        const selectDepartamento = document.getElementById('departamento-postulacion');
+        selectDepartamento.innerHTML = '<option value="">Error al cargar departamentos</option>';
+        
+        throw error;
+    }
+}
+
+/**
+ * Cargar distritos según departamento seleccionado
+ * @param {number} idDepartamento - ID del departamento
+ */
+async function cargarDistritosPostulacion(idDepartamento) {
+    if (!idDepartamento) {
+        console.warn('⚠️ ID de departamento no proporcionado');
+        return;
+    }
+    
+    try {
+        console.log(`🔄 Cargando distritos para departamento ${idDepartamento}...`);
+        
+        const selectDistrito = document.getElementById('distrito-postulacion');
+        selectDistrito.innerHTML = '<option value="">Cargando...</option>';
+        selectDistrito.disabled = true;
+        
+        const response = await fetch(`http://localhost:8080/publico/distritos/${idDepartamento}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const distritos = await response.json();
+        console.log(`✅ ${distritos.length} distritos cargados`);
+        
+        selectDistrito.innerHTML = '<option value="">Seleccione un distrito</option>';
+        
+        if (distritos.length === 0) {
+            selectDistrito.innerHTML = '<option value="">Sin distritos disponibles</option>';
+            return;
+        }
+        
+        distritos.forEach(dist => {
+            const option = document.createElement('option');
+            option.value = dist.idDistrito;
+            option.textContent = dist.nombreDistrito;
+            selectDistrito.appendChild(option);
+        });
+        
+        selectDistrito.disabled = false;
+        
+    } catch (error) {
+        console.error('❌ Error cargando distritos:', error);
+        const selectDistrito = document.getElementById('distrito-postulacion');
+        selectDistrito.innerHTML = '<option value="">Error al cargar distritos</option>';
+        showMessage('Error al cargar distritos. Intente nuevamente.', 'error');
+    }
+}
+
+/**
+ * Inicializar mapa Leaflet en el modal
+ */
+function inicializarMapaPostulacion() {
+    console.log('🗺️ Inicializando mapa de postulación...');
+    
+    // Destruir instancia previa si existe
+    if (mapaPostulacion) {
+        mapaPostulacion.remove();
+        mapaPostulacion = null;
+        marcadorPostulacion = null;
+    }
+    
+    // Coordenadas de Mendoza, Argentina
+    const mendozaLat = -32.8895;
+    const mendozaLng = -68.8458;
+    
+    // Inicializar mapa
+    mapaPostulacion = L.map('mapa-postulacion').setView([mendozaLat, mendozaLng], 13);
+    
+    // Agregar tiles de OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19,
+        minZoom: 10
+    }).addTo(mapaPostulacion);
+    
+    // Event listener para click en el mapa
+    mapaPostulacion.on('click', function(e) {
+        colocarMarcadorPostulacion(e.latlng.lat, e.latlng.lng);
+    });
+    
+    // Invalidar tamaño después de un breve delay (fix de Leaflet en modales)
+    setTimeout(() => {
+        if (mapaPostulacion) {
+            mapaPostulacion.invalidateSize();
+        }
+    }, 300);
+    
+    console.log('✅ Mapa inicializado correctamente');
+}
+
+/**
+ * Colocar marcador en el mapa
+ * @param {number} lat - Latitud
+ * @param {number} lng - Longitud
+ */
+function colocarMarcadorPostulacion(lat, lng) {
+    console.log(`📍 Colocando marcador en: ${lat}, ${lng}`);
+    
+    // Remover marcador previo si existe
+    if (marcadorPostulacion) {
+        mapaPostulacion.removeLayer(marcadorPostulacion);
+    }
+    
+    // Crear nuevo marcador draggable
+    marcadorPostulacion = L.marker([lat, lng], {
+        draggable: true,
+        autoPan: true
+    }).addTo(mapaPostulacion);
+    
+    // Popup con coordenadas
+    marcadorPostulacion.bindPopup(`
+        <div style="text-align: center;">
+            <strong>Ubicación Seleccionada</strong><br>
+            Lat: ${lat.toFixed(6)}<br>
+            Lng: ${lng.toFixed(6)}
+        </div>
+    `).openPopup();
+    
+    // Actualizar campos del formulario
+    document.getElementById('latitud-postulacion').value = lat.toFixed(6);
+    document.getElementById('longitud-postulacion').value = lng.toFixed(6);
+    
+    // Marcar campos como válidos
+    document.getElementById('latitud-postulacion').classList.add('is-valid');
+    document.getElementById('longitud-postulacion').classList.add('is-valid');
+    document.getElementById('latitud-postulacion').classList.remove('is-invalid');
+    document.getElementById('longitud-postulacion').classList.remove('is-invalid');
+    
+    // Event listener para drag del marcador
+    marcadorPostulacion.on('dragend', function(e) {
+        const pos = e.target.getLatLng();
+        colocarMarcadorPostulacion(pos.lat, pos.lng);
+    });
+    
+    // Centrar mapa en marcador
+    mapaPostulacion.panTo([lat, lng]);
+}
+
+/**
+ * Obtener ubicación actual del usuario usando geolocalización
+ */
+function obtenerUbicacionActual() {
+    if (!navigator.geolocation) {
+        showMessage('Geolocalización no soportada en este navegador', 'warning');
+        return;
+    }
+    
+    console.log('📍 Solicitando ubicación actual...');
+    showMessage('Obteniendo su ubicación...', 'info');
+    
+    navigator.geolocation.getCurrentPosition(
+        function(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            
+            console.log(`✅ Ubicación obtenida: ${lat}, ${lng}`);
+            colocarMarcadorPostulacion(lat, lng);
+            mapaPostulacion.setView([lat, lng], 15);
+            showMessage('Ubicación obtenida correctamente', 'success');
+        },
+        function(error) {
+            console.error('❌ Error obteniendo ubicación:', error);
+            let mensaje = 'No se pudo obtener su ubicación';
+            
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    mensaje = 'Permiso de ubicación denegado';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    mensaje = 'Ubicación no disponible';
+                    break;
+                case error.TIMEOUT:
+                    mensaje = 'Tiempo de espera agotado';
+                    break;
+            }
+            
+            showMessage(mensaje, 'error');
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        }
+    );
+}
+
+/**
+ * Configurar validación en tiempo real del formulario
+ */
+function configurarValidacionEnTiempoReal() {
+    const form = document.getElementById('form-postulacion');
+    const campos = form.querySelectorAll('input:not([readonly]), select');
+    
+    campos.forEach(campo => {
+        // Validar al perder foco
+        campo.addEventListener('blur', function() {
+            validarCampo(this);
+        });
+        
+        // Validar al escribir (solo para inputs)
+        if (campo.tagName === 'INPUT' && !campo.readOnly) {
+            campo.addEventListener('input', function() {
+                if (this.classList.contains('is-invalid')) {
+                    validarCampo(this);
+                }
+            });
+        }
+        
+        // Validar al cambiar (para selects)
+        if (campo.tagName === 'SELECT') {
+            campo.addEventListener('change', function() {
+                validarCampo(this);
+            });
+        }
+    });
+}
+
+/**
+ * Validar un campo individual
+ * @param {HTMLElement} campo - Campo a validar
+ * @returns {boolean} - True si es válido
+ */
+function validarCampo(campo) {
+    const valor = campo.value.trim();
+    const nombre = campo.name;
+    let esValido = true;
+    let mensajeError = '';
+    
+    // Validación específica por campo
+    switch(nombre) {
+        case 'dni':
+            esValido = /^[0-9]{7,8}$/.test(valor);
+            mensajeError = 'DNI debe tener 7 u 8 dígitos';
+            break;
+            
+        case 'apellido':
+        case 'nombre':
+            esValido = valor.length >= 2 && /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(valor);
+            mensajeError = `${nombre.charAt(0).toUpperCase() + nombre.slice(1)} debe tener al menos 2 letras`;
+            break;
+            
+        case 'calle':
+            esValido = valor.length >= 3;
+            mensajeError = 'Calle debe tener al menos 3 caracteres';
+            break;
+            
+        case 'numeracion':
+            esValido = /^[0-9]+$/.test(valor) && parseInt(valor) > 0;
+            mensajeError = 'Numeración debe ser un número positivo';
+            break;
+            
+        case 'codigoPostal':
+            esValido = /^[0-9]{4}$/.test(valor);
+            mensajeError = 'Código postal debe tener 4 dígitos';
+            break;
+            
+        case 'departamento':
+        case 'distrito':
+            esValido = valor !== '';
+            mensajeError = `Debe seleccionar un ${nombre}`;
+            break;
+            
+        case 'latitud':
+        case 'longitud':
+            esValido = valor !== '' && !isNaN(parseFloat(valor));
+            mensajeError = 'Debe marcar su ubicación en el mapa';
+            break;
+            
+        case 'telefono':
+            esValido = /^[+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,9}$/.test(valor);
+            mensajeError = 'Formato de teléfono inválido';
+            break;
+            
+        default:
+            esValido = campo.checkValidity();
+            mensajeError = 'Campo inválido';
+    }
+    
+    // Aplicar clases de validación
+    if (esValido) {
+        campo.classList.remove('is-invalid');
+        campo.classList.add('is-valid');
+        const feedback = campo.nextElementSibling;
+        if (feedback && feedback.classList.contains('invalid-feedback')) {
+            feedback.style.display = 'none';
+        }
+    } else {
+        campo.classList.remove('is-valid');
+        campo.classList.add('is-invalid');
+        
+        // Mostrar mensaje de error
+        let feedback = campo.nextElementSibling;
+        if (!feedback || !feedback.classList.contains('invalid-feedback')) {
+            feedback = document.createElement('div');
+            feedback.className = 'invalid-feedback';
+            campo.parentNode.insertBefore(feedback, campo.nextSibling);
+        }
+        feedback.textContent = mensajeError;
+        feedback.style.display = 'block';
+    }
+    
+    return esValido;
+}
+
+/**
+ * Validar formulario completo
+ * @returns {boolean} - True si todo el formulario es válido
+ */
+function validarFormularioCompleto() {
+    const form = document.getElementById('form-postulacion');
+    const campos = form.querySelectorAll('input:not([readonly]), select');
+    
+    let formularioValido = true;
+    let primerCampoInvalido = null;
+    
+    campos.forEach(campo => {
+        const esValido = validarCampo(campo);
+        if (!esValido) {
+            formularioValido = false;
+            if (!primerCampoInvalido) {
+                primerCampoInvalido = campo;
+            }
+        }
+    });
+    
+    // Scroll al primer campo con error
+    if (primerCampoInvalido) {
+        primerCampoInvalido.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        primerCampoInvalido.focus();
+    }
+    
+    return formularioValido;
+}
+
+/**
+ * Construir objeto de datos para envío
+ * @returns {Object} - Datos de postulación en formato PostulacionRegistroDTO
+ */
+function construirDatosPostulacion() {
+    const form = document.getElementById('form-postulacion');
+    const formData = new FormData(form);
+    
+    // Construir objeto según estructura exacta del DTO backend
+    const datos = {
+        persona: {
+            dni: formData.get('dni').trim(),
+            apellido: formData.get('apellido').trim(),
+            nombre: formData.get('nombre').trim(),
+            calle: formData.get('calle').trim(),
+            numeracion: formData.get('numeracion').trim(),
+            codigoPostal: formData.get('codigoPostal').trim(),
+            latitud: parseFloat(formData.get('latitud')),
+            longitud: parseFloat(formData.get('longitud')),
+            telefono: formData.get('telefono').trim(),
+            idDistrito: parseInt(formData.get('distrito'))
+        },
+        idOfertaEmpleo: parseInt(window.ofertaActual)
+    };
+    
+    console.log('📦 Datos de postulación construidos:', datos);
+    return datos;
+}
+
+/**
+ * Enviar postulación al backend
+ */
+async function enviarPostulacion() {
+    console.log('🚀 Iniciando envío de postulación...');
+    
+    // 1. Validar formulario
+    if (!validarFormularioCompleto()) {
+        showMessage('Por favor, corrija los errores en el formulario', 'error');
+        return;
+    }
+    
+    // 2. Construir datos
+    const datos = construirDatosPostulacion();
+    
+    // 3. Mostrar loading
+    const btnEnviar = document.getElementById('btn-enviar-postulacion');
+    const textoOriginal = btnEnviar.innerHTML;
+    btnEnviar.disabled = true;
+    btnEnviar.innerHTML = `
+        <span class="spinner-border spinner-border-sm me-2"></span>
+        Enviando...
+    `;
+    
+    try {
+        console.log('📡 Enviando POST a /publico/postulaciones/registro...');
+        
+        const response = await fetch('http://localhost:8080/publico/postulaciones/registro', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(datos)
+        });
+        
+        console.log(`📡 Respuesta recibida: ${response.status} ${response.statusText}`);
+        
+        if (!response.ok) {
+            // Intentar parsear mensaje de error del backend
+            let errorMsg = 'Error al enviar la postulación';
+            try {
+                const errorData = await response.json();
+                errorMsg = errorData.message || errorData.error || errorMsg;
+            } catch (e) {
+                // Si no se puede parsear, usar mensaje genérico basado en código HTTP
+                console.warn('⚠️ No se pudo parsear respuesta de error del backend');
+            }
+            
+            // Manejo específico según código HTTP
+            if (response.status === 400) {
+                // Bad Request - Datos inválidos
+                throw new Error(`Datos inválidos: ${errorMsg}`);
+                
+            } else if (response.status === 404) {
+                // Not Found - Oferta no existe
+                throw new Error('La oferta laboral no existe o fue eliminada');
+                
+            } else if (response.status === 409) {
+                // Conflict - Postulación duplicada
+                throw new Error('Ya existe una postulación suya para esta oferta laboral');
+                
+            } else if (response.status >= 500) {
+                // Server Error - Error del servidor
+                console.error(`🔴 Error del servidor (${response.status}):`, errorMsg);
+                throw new Error('Error en el servidor. Por favor, intente nuevamente más tarde.');
+                
+            } else {
+                // Otros errores HTTP (401, 403, 405, etc.)
+                console.error(`⚠️ Error HTTP ${response.status}:`, errorMsg);
+                throw new Error(`Error (${response.status}): ${errorMsg}`);
+            }
+        }
+        
+        // Parsear respuesta solo si tiene contenido
+        let resultado = null;
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            try {
+                const text = await response.text();
+                if (text && text.trim().length > 0) {
+                    resultado = JSON.parse(text);
+                    console.log('✅ Postulación enviada exitosamente:', resultado);
+                } else {
+                    console.log('✅ Postulación enviada exitosamente (sin respuesta del servidor)');
+                }
+            } catch (e) {
+                console.warn('⚠️ Respuesta del servidor no es JSON válido, pero postulación fue exitosa');
+            }
+        } else {
+            console.log('✅ Postulación enviada exitosamente (respuesta sin contenido JSON)');
+        }
+        
+        // Mostrar mensaje de éxito
+        showMessage('¡Postulación enviada exitosamente! La empresa se pondrá en contacto.', 'success');
+        
+        // Cerrar modal después de 2 segundos
+        setTimeout(() => {
+            const modalElement = document.getElementById('modalPostulacion');
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) {
+                modal.hide();
+            }
+        }, 2000);
+        
+    } catch (error) {
+        console.error('❌ Error enviando postulación:', error);
+        showMessage(error.message || 'Error al enviar la postulación. Intente nuevamente.', 'error');
+        
+        // Restaurar botón
+        btnEnviar.disabled = false;
+        btnEnviar.innerHTML = textoOriginal;
+    }
+}
+
+/**
+ * Cerrar modal y limpiar recursos
+ */
+function cerrarModalPostulacion() {
+    console.log('🔒 Cerrando modal de postulación y limpiando recursos...');
+    
+    // Limpiar formulario
+    const form = document.getElementById('form-postulacion');
+    if (form) {
+        form.reset();
+        form.querySelectorAll('.is-valid, .is-invalid').forEach(el => {
+            el.classList.remove('is-valid', 'is-invalid');
+        });
+    }
+    
+    // Destruir mapa
+    if (mapaPostulacion) {
+        mapaPostulacion.remove();
+        mapaPostulacion = null;
+        marcadorPostulacion = null;
+    }
+    
+    // Limpiar variable global
+    window.ofertaActual = null;
+    
+    console.log('✅ Modal cerrado y recursos liberados');
 }
 
 /**
@@ -12013,7 +12764,7 @@ function mostrarPopupMejorado(marcador, oferta) {
                         Vigente hasta ${new Date(oferta.fechaCierreOferta).toLocaleDateString()}
                     </small>
                     <button class="btn btn-primary btn-sm" onclick="contactarEmpresa('${oferta.idOfertaEmpleo}')">
-                        <i class="fas fa-phone me-1"></i>Contactar
+                        <i class="fas fa-phone me-1"></i>Postularse
                     </button>
                 </div>
             </div>
