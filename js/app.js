@@ -1368,6 +1368,80 @@ function generarDashboard(perfil) {
                 </div>
             </div>
         </div>
+
+        <!-- Modal de Postulaciones -->
+        <div class="modal fade" id="modalPostulaciones" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                <div class="modal-content bg-dark text-white">
+                    <div class="modal-header border-secondary">
+                        <h5 class="modal-title">
+                            <i class="fas fa-users me-2 text-info"></i>
+                            Postulaciones - <span id="modal-oferta-titulo">Oferta</span>
+                        </h5>
+                        <span class="badge bg-info ms-3" id="modal-total-postulaciones">
+                            0 candidatos
+                        </span>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <!-- Loading State -->
+                        <div id="postulaciones-loading" class="text-center py-5">
+                            <div class="spinner-border text-info mb-3" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            <h6 class="text-white">Cargando postulaciones...</h6>
+                            <p class="text-muted">Obteniendo candidatos</p>
+                        </div>
+                        
+                        <!-- Empty State -->
+                        <div id="postulaciones-empty" class="d-none text-center py-5">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <h6 class="text-white">No hay postulaciones aún</h6>
+                            <p class="text-muted">Las postulaciones de los candidatos aparecerán aquí</p>
+                        </div>
+                        
+                        <!-- Error State -->
+                        <div id="postulaciones-error" class="d-none alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <span id="error-mensaje">Error cargando postulaciones</span>
+                        </div>
+                        
+                        <!-- Data Table -->
+                        <div id="postulaciones-table-container" class="d-none">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-dark">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">#</th>
+                                            <th>DNI</th>
+                                            <th>Nombre Completo</th>
+                                            <th>Teléfono</th>
+                                            <th>Ubicación</th>
+                                            <th>Fecha Postulación</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="postulaciones-tbody">
+                                        <!-- Filas dinámicas -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer border-secondary">
+                        <small class="text-muted me-auto">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Postulaciones recibidas para esta oferta laboral
+                        </small>
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     `;
     
     // Inicializar la carga de establecimientos después de generar el dashboard
@@ -9893,9 +9967,17 @@ function renderizarOfertas(ofertas) {
                     
                     <!-- Footer con acciones -->
                     <div class="oferta-card-footer">
-                        <button class="btn-oferta btn-oferta-ver" onclick="verDetallesOferta(${oferta.idOfertaEmpleo})" title="Ver detalles completos">
-                            <i class="fas fa-eye"></i>
-                            <span>Ver detalles</span>
+                        <button class="btn-oferta btn-oferta-postulaciones" 
+                                onclick="abrirModalPostulaciones(${oferta.idOfertaEmpleo})" 
+                                title="Ver postulaciones recibidas"
+                                data-oferta-id="${oferta.idOfertaEmpleo}">
+                            <i class="fas fa-users"></i>
+                            <span>Postulaciones</span>
+                            <span class="badge badge-postulaciones" 
+                                  id="badge-oferta-${oferta.idOfertaEmpleo}"
+                                  style="display: none;">
+                                0
+                            </span>
                         </button>
                         <button class="btn-oferta btn-oferta-editar" onclick="editarOferta(${oferta.idOfertaEmpleo})" title="Editar oferta">
                             <i class="fas fa-edit"></i>
@@ -9912,6 +9994,11 @@ function renderizarOfertas(ofertas) {
 
     html += '</div>';
     contentDiv.innerHTML = html;
+    
+    // Cargar contadores de postulaciones después de renderizar las ofertas
+    setTimeout(() => {
+        cargarContadoresPostulaciones();
+    }, 500);
 }
 
 /**
@@ -12917,6 +13004,628 @@ function limpiarEfectosMarcadores() {
     const mapaContainer = document.getElementById('mapa-ofertas-publicas');
     if (mapaContainer) {
         mapaContainer.classList.remove('marcador-destacado-activo');
+    }
+}
+
+// ===========================
+// SISTEMA DE GESTIÓN DE POSTULACIONES
+// ===========================
+
+/**
+ * Cache global de postulaciones
+ */
+window.postulacionesCache = {};
+window.totalPostulacionesNuevas = 0;
+
+/**
+ * Obtener postulaciones de una oferta específica
+ * @param {number} idOferta - ID de la oferta de empleo
+ * @returns {Promise<Array>} Array de postulaciones
+ */
+async function fetchPostulacionesPorOferta(idOferta) {
+    try {
+        console.log(`🔄 Obteniendo postulaciones para oferta ${idOferta}...`);
+        
+        const url = `http://localhost:8080/privado/postulaciones/oferta/${idOferta}`;
+        const response = await fetchWithAuth(url);
+        
+        if (!response.ok) {
+            // Manejo específico de errores HTTP
+            if (response.status === 401) {
+                throw new Error('Sesión expirada. Por favor, inicie sesión nuevamente.');
+            } else if (response.status === 403) {
+                throw new Error('No tiene permisos para ver estas postulaciones.');
+            } else if (response.status === 404) {
+                console.warn(`⚠️ No se encontraron postulaciones para la oferta ${idOferta}`);
+                return []; // Retornar array vacío en lugar de error
+            } else if (response.status >= 500) {
+                throw new Error('Error del servidor. Intente nuevamente más tarde.');
+            } else {
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
+            }
+        }
+        
+        const postulaciones = await response.json();
+        console.log(`✅ ${postulaciones.length} postulaciones obtenidas para oferta ${idOferta}`);
+        
+        // Actualizar cache
+        actualizarCachePostulaciones(idOferta, postulaciones);
+        
+        return postulaciones;
+        
+    } catch (error) {
+        console.error(`❌ Error obteniendo postulaciones para oferta ${idOferta}:`, error);
+        
+        // Si es error de autenticación, redirigir a login
+        if (error.message.includes('Sesión expirada')) {
+            setTimeout(() => {
+                cerrarSesion();
+            }, 2000);
+        }
+        
+        throw error;
+    }
+}
+
+/**
+ * Actualizar cache de postulaciones
+ */
+function actualizarCachePostulaciones(idOferta, postulaciones) {
+    if (!window.postulacionesCache) {
+        window.postulacionesCache = {};
+    }
+    
+    window.postulacionesCache[idOferta] = {
+        data: postulaciones,
+        timestamp: Date.now(),
+        count: postulaciones.length
+    };
+}
+
+/**
+ * Obtener postulaciones desde cache (si está fresco)
+ */
+function obtenerPostulacionesDesdeCache(idOferta, maxAge = 60000) {
+    if (!window.postulacionesCache || !window.postulacionesCache[idOferta]) {
+        return null;
+    }
+    
+    const cached = window.postulacionesCache[idOferta];
+    const age = Date.now() - cached.timestamp;
+    
+    if (age > maxAge) {
+        console.log('⚠️ Cache expirado, se necesita refresh');
+        return null;
+    }
+    
+    console.log('✅ Usando datos desde cache');
+    return cached.data;
+}
+
+/**
+ * Formatear fecha de postulación a formato amigable
+ * @param {string} fechaISO - Fecha en formato ISO
+ * @returns {string} Fecha formateada
+ */
+function formatearFechaPostulacion(fechaISO) {
+    try {
+        const fecha = new Date(fechaISO);
+        const ahora = new Date();
+        const diffMs = ahora - fecha;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+        
+        if (diffMins < 1) {
+            return 'Hace un momento';
+        } else if (diffMins < 60) {
+            return `Hace ${diffMins} min`;
+        } else if (diffHours < 24) {
+            return `Hace ${diffHours} hora${diffHours > 1 ? 's' : ''}`;
+        } else if (diffDays < 7) {
+            return `Hace ${diffDays} día${diffDays > 1 ? 's' : ''}`;
+        } else {
+            return fecha.toLocaleDateString('es-AR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+    } catch (error) {
+        console.error('Error formateando fecha:', error);
+        return 'Fecha no disponible';
+    }
+}
+
+/**
+ * Abrir modal de postulaciones
+ */
+async function abrirModalPostulaciones(idOferta) {
+    console.log(`🎯 Abriendo modal de postulaciones para oferta ${idOferta}`);
+    
+    // Obtener modal
+    const modalElement = document.getElementById('modalPostulaciones');
+    if (!modalElement) {
+        console.error('❌ Modal de postulaciones no encontrado');
+        showMessage('Error: Modal no encontrado', 'error');
+        return;
+    }
+    
+    // Obtener datos de la oferta para el título
+    const oferta = obtenerDatosOfertaDesdeCache(idOferta);
+    
+    // Actualizar título del modal
+    const tituloElement = document.getElementById('modal-oferta-titulo');
+    if (tituloElement) {
+        tituloElement.textContent = oferta?.nombrePuesto || `Oferta #${idOferta}`;
+    }
+    
+    // Mostrar modal
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+    
+    // Mostrar loading state
+    mostrarEstadoPostulacionesLoading();
+    
+    try {
+        // Obtener postulaciones
+        const postulaciones = await fetchPostulacionesPorOferta(idOferta);
+        
+        // Renderizar postulaciones
+        renderizarPostulaciones(postulaciones);
+        
+        // Marcar como vistas
+        marcarPostulacionesComoVistas(idOferta, postulaciones);
+        
+        // Actualizar badge de la oferta
+        actualizarBadgeOferta(idOferta, postulaciones.length, false);
+        
+        // Recalcular contador global
+        await recalcularContadorGlobal();
+        
+    } catch (error) {
+        mostrarEstadoPostulacionesError(error.message);
+    }
+}
+
+/**
+ * Mostrar estado de loading en modal de postulaciones
+ */
+function mostrarEstadoPostulacionesLoading() {
+    document.getElementById('postulaciones-loading')?.classList.remove('d-none');
+    document.getElementById('postulaciones-empty')?.classList.add('d-none');
+    document.getElementById('postulaciones-error')?.classList.add('d-none');
+    document.getElementById('postulaciones-table-container')?.classList.add('d-none');
+}
+
+/**
+ * Mostrar estado de error en modal de postulaciones
+ */
+function mostrarEstadoPostulacionesError(mensaje) {
+    document.getElementById('postulaciones-loading')?.classList.add('d-none');
+    document.getElementById('postulaciones-empty')?.classList.add('d-none');
+    document.getElementById('postulaciones-table-container')?.classList.add('d-none');
+    
+    const errorDiv = document.getElementById('postulaciones-error');
+    const errorMensaje = document.getElementById('error-mensaje');
+    
+    if (errorDiv && errorMensaje) {
+        errorMensaje.textContent = mensaje;
+        errorDiv.classList.remove('d-none');
+    }
+}
+
+/**
+ * Renderizar tabla de postulaciones
+ */
+function renderizarPostulaciones(postulaciones) {
+    const tbody = document.getElementById('postulaciones-tbody');
+    const totalBadge = document.getElementById('modal-total-postulaciones');
+    
+    // Ocultar loading
+    document.getElementById('postulaciones-loading')?.classList.add('d-none');
+    document.getElementById('postulaciones-error')?.classList.add('d-none');
+    
+    if (!postulaciones || postulaciones.length === 0) {
+        // Mostrar estado vacío
+        document.getElementById('postulaciones-empty')?.classList.remove('d-none');
+        document.getElementById('postulaciones-table-container')?.classList.add('d-none');
+        if (totalBadge) totalBadge.textContent = '0 candidatos';
+        return;
+    }
+    
+    // Mostrar tabla
+    document.getElementById('postulaciones-empty')?.classList.add('d-none');
+    document.getElementById('postulaciones-table-container')?.classList.remove('d-none');
+    
+    if (totalBadge) {
+        totalBadge.textContent = `${postulaciones.length} candidato${postulaciones.length > 1 ? 's' : ''}`;
+    }
+    
+    // Generar filas
+    if (tbody) {
+        tbody.innerHTML = postulaciones.map((postulacion, index) => {
+            const persona = postulacion.persona;
+            const fechaFormateada = formatearFechaPostulacion(postulacion.fechaPostulacion);
+            
+            return `
+                <tr data-persona-id="${persona.idPersona}">
+                    <td class="text-center">${index + 1}</td>
+                    <td>
+                        <code class="text-light bg-dark px-2 py-1 rounded">${persona.dni}</code>
+                    </td>
+                    <td>
+                        <strong class="text-white">${persona.apellido}, ${persona.nombre}</strong>
+                    </td>
+                    <td>
+                        <a href="tel:${persona.telefono}" class="text-info text-decoration-none">
+                            <i class="fas fa-phone me-1"></i>${persona.telefono}
+                        </a>
+                    </td>
+                    <td>
+                        <small class="text-muted">
+                            <i class="fas fa-map-marker-alt me-1"></i>
+                            ${persona.nombreDistrito}, ${persona.nombreDepartamento}
+                        </small>
+                    </td>
+                    <td>
+                        <span class="badge bg-secondary" title="${postulacion.fechaPostulacion}">
+                            <i class="fas fa-clock me-1"></i>${fechaFormateada}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-info" 
+                                onclick="verUbicacionPostulante(${persona.latitud}, ${persona.longitud}, '${persona.apellido}, ${persona.nombre}')"
+                                title="Ver ubicación en mapa">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+}
+
+/**
+ * Ver ubicación del postulante en el mapa
+ */
+function verUbicacionPostulante(lat, lng, nombre) {
+    console.log(`📍 Ver ubicación de ${nombre}: [${lat}, ${lng}]`);
+    
+    // Crear un mini modal o alert con el mapa
+    showMessage(`Ubicación de ${nombre}: Lat ${lat.toFixed(5)}, Lng ${lng.toFixed(5)}`, 'info');
+    
+    // TODO: Implementar modal con mapa Leaflet si se requiere
+}
+
+/**
+ * Obtener datos de oferta desde cache/DOM
+ */
+function obtenerDatosOfertaDesdeCache(idOferta) {
+    // Buscar en el DOM la card de la oferta
+    const cardElement = document.querySelector(`[data-oferta-id="${idOferta}"]`);
+    if (cardElement) {
+        const nombrePuesto = cardElement.closest('.oferta-card')?.querySelector('.oferta-title')?.textContent?.trim();
+        return { idOfertaEmpleo: idOferta, nombrePuesto };
+    }
+    return null;
+}
+
+/**
+ * Marcar postulaciones como vistas
+ */
+function marcarPostulacionesComoVistas(idOferta, postulaciones) {
+    try {
+        const key = `postulaciones_vistas`;
+        const vistas = JSON.parse(localStorage.getItem(key) || '{}');
+        
+        vistas[`oferta_${idOferta}`] = {
+            lastViewed: new Date().toISOString(),
+            viewedPostulaciones: postulaciones.map(p => p.persona.idPersona),
+            totalCount: postulaciones.length
+        };
+        
+        localStorage.setItem(key, JSON.stringify(vistas));
+        console.log(`✅ Postulaciones de oferta ${idOferta} marcadas como vistas`);
+    } catch (error) {
+        console.error('Error guardando postulaciones vistas:', error);
+    }
+}
+
+/**
+ * Obtener postulaciones no vistas
+ */
+function obtenerPostulacionesNoVistas(idOferta) {
+    try {
+        const key = `postulaciones_vistas`;
+        const vistas = JSON.parse(localStorage.getItem(key) || '{}');
+        const ofertaKey = `oferta_${idOferta}`;
+        
+        if (!vistas[ofertaKey]) {
+            return null; // Nunca vistas
+        }
+        
+        return vistas[ofertaKey];
+    } catch (error) {
+        console.error('Error obteniendo postulaciones vistas:', error);
+        return null;
+    }
+}
+
+/**
+ * Actualizar badge de una oferta
+ */
+function actualizarBadgeOferta(idOferta, count, esNueva = false) {
+    const badgeElement = document.getElementById(`badge-oferta-${idOferta}`);
+    if (badgeElement) {
+        badgeElement.textContent = count;
+        
+        if (count === 0) {
+            badgeElement.style.display = 'none';
+        } else {
+            badgeElement.style.display = 'inline-block';
+            
+            if (esNueva) {
+                badgeElement.classList.add('badge-nuevas');
+            } else {
+                badgeElement.classList.remove('badge-nuevas');
+            }
+        }
+    }
+}
+
+/**
+ * Recalcular contador global de postulaciones
+ */
+async function recalcularContadorGlobal() {
+    console.log('🔄 Recalculando contador global de postulaciones...');
+    
+    try {
+        // Obtener todas las ofertas del cache
+        const ofertasElements = document.querySelectorAll('[data-oferta-id]');
+        const idsOfertas = Array.from(ofertasElements).map(el => el.getAttribute('data-oferta-id'));
+        
+        let totalPostulaciones = 0;
+        let totalNuevas = 0;
+        
+        // Procesar cada oferta
+        for (const idOferta of idsOfertas) {
+            try {
+                const cached = window.postulacionesCache[idOferta];
+                if (cached) {
+                    const vistas = obtenerPostulacionesNoVistas(idOferta);
+                    const countNuevas = vistas ? Math.max(0, cached.count - vistas.viewedPostulaciones.length) : cached.count;
+                    
+                    totalPostulaciones += cached.count;
+                    totalNuevas += countNuevas;
+                }
+            } catch (error) {
+                console.error(`Error procesando oferta ${idOferta}:`, error);
+            }
+        }
+        
+        // Actualizar stats card
+        actualizarStatsCardSolicitudes(totalNuevas, totalPostulaciones);
+        
+        // Mostrar/ocultar banner
+        if (totalNuevas > 0 && !esBannerDismissed()) {
+            mostrarBannerPostulaciones(totalNuevas);
+        } else {
+            ocultarBannerPostulaciones();
+        }
+        
+        console.log(`✅ Contador global actualizado: ${totalPostulaciones} total, ${totalNuevas} nuevas`);
+        
+        // Guardar en variable global
+        window.totalPostulacionesNuevas = totalNuevas;
+        
+    } catch (error) {
+        console.error('❌ Error recalculando contador global:', error);
+    }
+}
+
+/**
+ * Actualizar stats card de solicitudes
+ */
+function actualizarStatsCardSolicitudes(countNuevas, countTotal = null) {
+    const contadorElement = document.querySelector('[data-contador="solicitudes"]');
+    if (contadorElement) {
+        // Animar el contador
+        animarContador(contadorElement, parseInt(contadorElement.textContent) || 0, countNuevas);
+        
+        // Agregar clase de pulsación si hay nuevas
+        const statsCard = contadorElement.closest('.stats-card-moderna');
+        if (statsCard) {
+            if (countNuevas > 0) {
+                statsCard.classList.add('stats-card-pulse');
+            } else {
+                statsCard.classList.remove('stats-card-pulse');
+            }
+        }
+    }
+}
+
+/**
+ * Animar contador con efecto de incremento
+ */
+function animarContador(element, desde, hasta) {
+    const duracion = 1000;
+    const paso = (hasta - desde) / (duracion / 16);
+    let actual = desde;
+    
+    const interval = setInterval(() => {
+        actual += paso;
+        if ((paso > 0 && actual >= hasta) || (paso < 0 && actual <= hasta)) {
+            element.textContent = hasta;
+            clearInterval(interval);
+        } else {
+            element.textContent = Math.floor(actual);
+        }
+    }, 16);
+}
+
+/**
+ * Mostrar banner de postulaciones nuevas
+ */
+function mostrarBannerPostulaciones(count) {
+    let banner = document.getElementById('banner-postulaciones');
+    
+    if (!banner) {
+        // Crear banner si no existe
+        banner = crearBannerPostulaciones();
+    }
+    
+    // Actualizar contador
+    const countElement = document.getElementById('banner-count');
+    if (countElement) {
+        countElement.textContent = count;
+    }
+    
+    // Mostrar banner
+    banner.style.display = 'block';
+}
+
+/**
+ * Crear banner de notificaciones
+ */
+function crearBannerPostulaciones() {
+    const banner = document.createElement('div');
+    banner.id = 'banner-postulaciones';
+    banner.className = 'alert alert-postulaciones-nuevas alert-dismissible fade show';
+    banner.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="fas fa-bell fa-2x text-warning me-3 bell-animated"></i>
+            <div class="flex-grow-1">
+                <h6 class="alert-heading mb-1 text-white">
+                    ¡Tienes <strong id="banner-count">0</strong> postulaciones nuevas!
+                </h6>
+                <p class="mb-0 small text-white-50">
+                    Revisa las solicitudes de empleo pendientes
+                </p>
+            </div>
+            <button class="btn btn-warning btn-sm me-3" onclick="scrollToOfertas()">
+                <i class="fas fa-arrow-down me-1"></i>Ver Ofertas
+            </button>
+        </div>
+        <button type="button" class="btn-close btn-close-white" onclick="dismissBannerPostulaciones()"></button>
+    `;
+    
+    // Insertar después del header de perfil en el dashboard
+    const dashboardContent = document.getElementById('dashboard-content');
+    if (dashboardContent) {
+        dashboardContent.insertBefore(banner, dashboardContent.firstChild);
+    }
+    
+    return banner;
+}
+
+/**
+ * Ocultar banner de postulaciones
+ */
+function ocultarBannerPostulaciones() {
+    const banner = document.getElementById('banner-postulaciones');
+    if (banner) {
+        banner.style.display = 'none';
+    }
+}
+
+/**
+ * Dismiss banner de postulaciones
+ */
+function dismissBannerPostulaciones() {
+    ocultarBannerPostulaciones();
+    
+    // Guardar estado en localStorage
+    try {
+        const estado = {
+            dismissed: true,
+            lastDismissed: new Date().toISOString()
+        };
+        localStorage.setItem('notificaciones_banner', JSON.stringify(estado));
+    } catch (error) {
+        console.error('Error guardando estado de banner:', error);
+    }
+}
+
+/**
+ * Verificar si el banner fue dismissed
+ */
+function esBannerDismissed() {
+    try {
+        const estado = JSON.parse(localStorage.getItem('notificaciones_banner') || '{}');
+        
+        // Si fue dismissed hace menos de 24 horas, no mostrar
+        if (estado.dismissed && estado.lastDismissed) {
+            const lastDismissed = new Date(estado.lastDismissed);
+            const ahora = new Date();
+            const diffHours = (ahora - lastDismissed) / 3600000;
+            
+            return diffHours < 24;
+        }
+        
+        return false;
+    } catch (error) {
+        console.error('Error verificando estado de banner:', error);
+        return false;
+    }
+}
+
+/**
+ * Scroll to ofertas section
+ */
+function scrollToOfertas() {
+    const ofertasSection = document.getElementById('ofertas-content');
+    if (ofertasSection) {
+        ofertasSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+        // Dismiss banner después de scroll
+        setTimeout(() => {
+            dismissBannerPostulaciones();
+        }, 500);
+    }
+}
+
+/**
+ * Cargar contadores de postulaciones para todas las ofertas
+ */
+async function cargarContadoresPostulaciones() {
+    console.log('🔄 Cargando contadores de postulaciones...');
+    
+    try {
+        // Obtener todas las ofertas del DOM
+        const ofertasElements = document.querySelectorAll('[data-oferta-id]');
+        const idsOfertas = Array.from(ofertasElements).map(el => el.getAttribute('data-oferta-id'));
+        
+        console.log(`📊 ${idsOfertas.length} ofertas encontradas`);
+        
+        // Cargar postulaciones en paralelo
+        const promises = idsOfertas.map(async (idOferta) => {
+            try {
+                const postulaciones = await fetchPostulacionesPorOferta(idOferta);
+                const vistas = obtenerPostulacionesNoVistas(idOferta);
+                const esNueva = !vistas || postulaciones.length > vistas.totalCount;
+                
+                // Actualizar badge
+                actualizarBadgeOferta(idOferta, postulaciones.length, esNueva);
+                
+                return postulaciones.length;
+            } catch (error) {
+                console.error(`Error cargando postulaciones de oferta ${idOferta}:`, error);
+                return 0;
+            }
+        });
+        
+        await Promise.all(promises);
+        
+        // Recalcular contador global
+        await recalcularContadorGlobal();
+        
+        console.log('✅ Contadores de postulaciones cargados');
+        
+    } catch (error) {
+        console.error('❌ Error cargando contadores:', error);
     }
 }
 

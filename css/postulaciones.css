@@ -1,0 +1,243 @@
+/* ===================================
+   SISTEMA DE POSTULACIONES - ESTILOS
+   =================================== */
+
+/* Badge de Postulaciones en Botones */
+.badge-postulaciones {
+    margin-left: 8px;
+    font-size: 0.75rem;
+    padding: 0.35rem 0.65rem;
+    background: #4A90E2;
+    border-radius: 12px;
+    color: white;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    display: inline-block;
+    min-width: 24px;
+    text-align: center;
+}
+
+/* Badge con postulaciones nuevas - Efecto Pulsante */
+.badge-postulaciones.badge-nuevas {
+    background: #27AE60;
+    animation: badge-pulse 2s ease-in-out infinite;
+    box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.7);
+}
+
+@keyframes badge-pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.7);
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 8px rgba(39, 174, 96, 0);
+    }
+}
+
+/* Botón de Postulaciones */
+.btn-oferta-postulaciones {
+    position: relative;
+    overflow: visible !important;
+}
+
+.btn-oferta-postulaciones:hover .badge-postulaciones {
+    transform: scale(1.1);
+}
+
+/* Banner de Notificaciones Nuevas */
+.alert-postulaciones-nuevas {
+    background: linear-gradient(135deg, #F39C12 0%, #E67E22 100%);
+    border: 2px solid #F39C12;
+    color: white;
+    box-shadow: 0 4px 12px rgba(243, 156, 18, 0.4);
+    animation: slide-down 0.5s ease-out;
+    margin-bottom: 2rem;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+}
+
+.alert-postulaciones-nuevas::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes slide-down {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.alert-postulaciones-nuevas .alert-heading {
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.alert-postulaciones-nuevas strong {
+    font-size: 1.3em;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Animación de campana */
+.bell-animated {
+    animation: bell-ring 1s ease-in-out infinite;
+    transform-origin: top center;
+    display: inline-block;
+}
+
+@keyframes bell-ring {
+    0%, 100% { transform: rotate(0deg); }
+    10%, 30% { transform: rotate(14deg); }
+    20%, 40% { transform: rotate(-14deg); }
+    50% { transform: rotate(0deg); }
+}
+
+/* Stats Card con efecto pulsante */
+.stats-card-pulse {
+    animation: stats-card-pulse-animation 2s ease-in-out infinite;
+}
+
+@keyframes stats-card-pulse-animation {
+    0%, 100% {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 20px rgba(74, 144, 226, 0.5);
+        transform: translateY(-2px);
+    }
+}
+
+/* Modal de Postulaciones - Tabla */
+#modalPostulaciones .table {
+    margin-bottom: 0;
+}
+
+#modalPostulaciones .table thead th {
+    background: #1a1a1a;
+    color: #4A90E2;
+    font-weight: 600;
+    border-bottom: 2px solid #4A90E2;
+    padding: 1rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#modalPostulaciones .table tbody tr {
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #333;
+}
+
+#modalPostulaciones .table tbody tr:hover {
+    background: rgba(74, 144, 226, 0.1);
+    transform: scale(1.01);
+}
+
+#modalPostulaciones .table tbody td {
+    vertical-align: middle;
+    padding: 1rem;
+}
+
+/* Estados del modal */
+#postulaciones-loading,
+#postulaciones-empty,
+#postulaciones-error {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#postulaciones-empty i {
+    opacity: 0.5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .badge-postulaciones {
+        font-size: 0.65rem;
+        padding: 0.25rem 0.5rem;
+        margin-left: 4px;
+    }
+    
+    .alert-postulaciones-nuevas {
+        font-size: 0.9rem;
+    }
+    
+    .alert-postulaciones-nuevas .d-flex {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .alert-postulaciones-nuevas .bell-animated {
+        margin-bottom: 1rem;
+    }
+    
+    #modalPostulaciones .table {
+        font-size: 0.85rem;
+    }
+    
+    #modalPostulaciones .table thead th,
+    #modalPostulaciones .table tbody td {
+        padding: 0.5rem;
+    }
+}
+
+/* Efecto hover en botones del modal */
+#modalPostulaciones .btn-sm {
+    transition: all 0.3s ease;
+}
+
+#modalPostulaciones .btn-sm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Badge en header del modal */
+#modal-total-postulaciones {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+}
+
+/* Scroll suave en tabla */
+#postulaciones-table-container {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+#postulaciones-table-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+#postulaciones-table-container::-webkit-scrollbar-track {
+    background: #1a1a1a;
+    border-radius: 4px;
+}
+
+#postulaciones-table-container::-webkit-scrollbar-thumb {
+    background: #4A90E2;
+    border-radius: 4px;
+}
+
+#postulaciones-table-container::-webkit-scrollbar-thumb:hover {
+    background: #357ABD;
+}
