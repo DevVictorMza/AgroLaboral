@@ -11963,7 +11963,10 @@ async function inicializarModalPostulacion(idOferta) {
             });
         }
         
-        // 5. Focus en primer campo
+        // 5. Configurar búsqueda por DNI
+        configurarBusquedaPorDNI();
+        
+        // 6. Focus en primer campo
         setTimeout(() => {
             const primerCampo = document.getElementById('dni-postulacion');
             if (primerCampo) primerCampo.focus();
@@ -12076,6 +12079,203 @@ async function cargarDistritosPostulacion(idDepartamento) {
         selectDistrito.innerHTML = '<option value="">Error al cargar distritos</option>';
         showMessage('Error al cargar distritos. Intente nuevamente.', 'error');
     }
+}
+
+/**
+ * Configurar búsqueda automática por DNI
+ */
+function configurarBusquedaPorDNI() {
+    const inputDNI = document.getElementById('dni-postulacion');
+    
+    if (!inputDNI) {
+        console.warn('⚠️ Campo DNI no encontrado');
+        return;
+    }
+    
+    // Debounce para evitar múltiples llamadas
+    let timeoutId = null;
+    
+    inputDNI.addEventListener('input', function(e) {
+        const dni = e.target.value.trim();
+        
+        // Limpiar timeout previo
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+        
+        // Validar que tenga 7 u 8 dígitos
+        if (dni.length >= 7 && dni.length <= 8 && /^\d+$/.test(dni)) {
+            // Esperar 500ms después de que el usuario deje de escribir
+            timeoutId = setTimeout(() => {
+                buscarPersonaPorDNI(dni);
+            }, 500);
+        }
+    });
+    
+    console.log('✅ Búsqueda por DNI configurada');
+}
+
+/**
+ * Buscar persona por DNI en el backend
+ * @param {string} dni - DNI a buscar
+ */
+async function buscarPersonaPorDNI(dni) {
+    try {
+        console.log(`🔍 Buscando persona con DNI: ${dni}...`);
+        
+        const response = await fetch(`http://localhost:8080/publico/personas/buscar/${dni}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        });
+        
+        if (response.status === 404) {
+            console.log('ℹ️ Persona no encontrada, usuario nuevo');
+            limpiarCamposPostulacion(dni);
+            return;
+        }
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const persona = await response.json();
+        console.log('✅ Persona encontrada:', persona);
+        
+        // Autocompletar campos con datos de la persona
+        autocompletarDatosPersona(persona);
+        
+        showMessage('Datos cargados correctamente. Puede editarlos si es necesario.', 'success');
+        
+    } catch (error) {
+        console.error('❌ Error buscando persona por DNI:', error);
+        // No mostrar mensaje de error al usuario para no interrumpir el flujo
+    }
+}
+
+/**
+ * Autocompletar campos del formulario con datos de la persona
+ * @param {Object} persona - Datos de la persona
+ */
+async function autocompletarDatosPersona(persona) {
+    try {
+        // Campos de texto simples
+        const camposTexto = {
+            'nombre-postulacion': persona.nombre,
+            'apellido-postulacion': persona.apellido,
+            'calle-postulacion': persona.calle,
+            'numeracion-postulacion': persona.numeracion,
+            'telefono-postulacion': persona.telefono
+        };
+        
+        // Rellenar campos de texto
+        for (const [idCampo, valor] of Object.entries(camposTexto)) {
+            const campo = document.getElementById(idCampo);
+            if (campo && valor) {
+                campo.value = valor;
+                // Marcar como válido si tiene valor
+                campo.classList.remove('is-invalid');
+                campo.classList.add('is-valid');
+            }
+        }
+        
+        // Seleccionar departamento
+        if (persona.nombreDepartamento) {
+            const selectDepartamento = document.getElementById('departamento-postulacion');
+            
+            // Buscar la opción que coincida con el nombre
+            for (let i = 0; i < selectDepartamento.options.length; i++) {
+                if (selectDepartamento.options[i].text.toUpperCase() === persona.nombreDepartamento.toUpperCase()) {
+                    selectDepartamento.selectedIndex = i;
+                    selectDepartamento.classList.remove('is-invalid');
+                    selectDepartamento.classList.add('is-valid');
+                    
+                    // Cargar distritos del departamento
+                    const idDepartamento = selectDepartamento.value;
+                    if (idDepartamento) {
+                        await cargarDistritosPostulacion(idDepartamento);
+                        
+                        // Esperar a que se carguen los distritos y luego seleccionar
+                        if (persona.nombreDistrito) {
+                            setTimeout(() => {
+                                const selectDistrito = document.getElementById('distrito-postulacion');
+                                for (let j = 0; j < selectDistrito.options.length; j++) {
+                                    if (selectDistrito.options[j].text.toUpperCase() === persona.nombreDistrito.toUpperCase()) {
+                                        selectDistrito.selectedIndex = j;
+                                        selectDistrito.classList.remove('is-invalid');
+                                        selectDistrito.classList.add('is-valid');
+                                        break;
+                                    }
+                                }
+                            }, 300);
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        
+        // Colocar marcador en el mapa si hay coordenadas
+        if (persona.latitud && persona.longitud) {
+            if (mapaPostulacion) {
+                colocarMarcadorPostulacion(persona.latitud, persona.longitud);
+                mapaPostulacion.setView([persona.latitud, persona.longitud], 15);
+            }
+        }
+        
+        console.log('✅ Campos autocompletados correctamente');
+        
+    } catch (error) {
+        console.error('❌ Error autocompletando datos:', error);
+    }
+}
+
+/**
+ * Limpiar campos del formulario cuando no se encuentra la persona
+ * @param {string} dni - DNI ingresado (se mantiene)
+ */
+function limpiarCamposPostulacion(dni) {
+    // Mantener solo el DNI, limpiar el resto
+    const camposALimpiar = [
+        'nombre-postulacion',
+        'apellido-postulacion',
+        'calle-postulacion',
+        'numeracion-postulacion',
+        'telefono-postulacion'
+    ];
+    
+    camposALimpiar.forEach(idCampo => {
+        const campo = document.getElementById(idCampo);
+        if (campo) {
+            campo.value = '';
+            campo.classList.remove('is-valid', 'is-invalid');
+        }
+    });
+    
+    // Resetear selects
+    const selectDepartamento = document.getElementById('departamento-postulacion');
+    const selectDistrito = document.getElementById('distrito-postulacion');
+    
+    if (selectDepartamento) {
+        selectDepartamento.selectedIndex = 0;
+        selectDepartamento.classList.remove('is-valid', 'is-invalid');
+    }
+    
+    if (selectDistrito) {
+        selectDistrito.innerHTML = '<option value="">Seleccione primero un departamento</option>';
+        selectDistrito.disabled = true;
+        selectDistrito.classList.remove('is-valid', 'is-invalid');
+    }
+    
+    // Limpiar marcador del mapa
+    if (marcadorPostulacion && mapaPostulacion) {
+        mapaPostulacion.removeLayer(marcadorPostulacion);
+        marcadorPostulacion = null;
+    }
+    
+    console.log('🧹 Campos limpiados para nuevo usuario');
 }
 
 /**
@@ -13645,3 +13845,141 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 500);
     }
 });
+
+/* ===================================
+     MÓDULO: BÚSQUEDA Y AUTOCOMPLETADO POR DNI
+     Detecta DNI en el formulario, consulta:
+         GET http://localhost:8080/publico/personas/buscar/{dni}
+     y autocompleta los campos si existe la persona.
+     - Debounce en input
+     - Timeout y retry en fetch
+     - Selectores flexibles (id/name)
+     - Crea spinner / mensaje si no están
+     =================================== */
+
+(function(){
+    const API_BASE = 'http://localhost:8080/publico/personas';
+    const TIMEOUT_MS = 6000;
+    const DEBOUNCE_MS = 400;
+    const RETRY_ATTEMPTS = 2;
+
+    function findDniInput() {
+        const candidates = ['#dni-postulacion', '#dni', '#dniInput', 'input[name="dni"]', '.dni-lookup'];
+        for (const sel of candidates) {
+            const el = document.querySelector(sel);
+            if (el) return el;
+        }
+        const inputs = Array.from(document.querySelectorAll('input[type="text"], input[type="tel"]'));
+        for (const i of inputs) {
+            const patt = i.getAttribute('pattern') || '';
+            if (patt.includes('0-9') || /\d\{7,8\}/.test(patt)) return i;
+        }
+        return null;
+    }
+
+    function createHelperElements(dniEl) {
+        let spinner = document.getElementById('dni-search-spinner');
+        let msg = document.getElementById('dni-search-msg');
+        if (!spinner) {
+            spinner = document.createElement('span');
+            spinner.id = 'dni-search-spinner';
+            spinner.className = 'spinner-border spinner-border-sm ms-2';
+            spinner.style.display = 'none';
+            spinner.setAttribute('role','status');
+            spinner.innerHTML = '<span class="visually-hidden">Cargando...</span>';
+            dniEl.insertAdjacentElement('afterend', spinner);
+        }
+        if (!msg) {
+            msg = document.createElement('div');
+            msg.id = 'dni-search-msg';
+            msg.className = 'form-text mt-1';
+            msg.setAttribute('aria-live','polite');
+            spinner.insertAdjacentElement('afterend', msg);
+        }
+        return {spinner, msg};
+    }
+
+    function setLoading(isLoading) {
+        const s = document.getElementById('dni-search-spinner');
+        if (!s) return; s.style.display = isLoading ? 'inline-block' : 'none';
+    }
+    function showInlineMessage(text) {
+        const el = document.getElementById('dni-search-msg'); if (!el) return; el.textContent = text;
+    }
+
+    function fetchWithTimeout(resource, options = {}, timeout = TIMEOUT_MS) {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeout);
+        return fetch(resource, { ...options, signal: controller.signal }).finally(() => clearTimeout(id));
+    }
+
+    async function fetchWithRetry(url, opts = {}, attempts = RETRY_ATTEMPTS) {
+        let lastErr;
+        for (let i=0;i<=attempts;i++) {
+            try { return await fetchWithTimeout(url, opts); } catch(err) { lastErr = err; if (i<attempts) await new Promise(r=>setTimeout(r,300*(i+1))); }
+        }
+        throw lastErr;
+    }
+
+    function findField(fieldNames) {
+        for (const nm of fieldNames) {
+            if (nm.startsWith('#')) { const el = document.querySelector(nm); if (el) return el; continue; }
+            const byName = document.querySelector(`[name="${nm}"]`); if (byName) return byName;
+            const ids = [`${nm}-postulacion`, nm, `${nm}Input`];
+            for (const id of ids) { const el = document.getElementById(id); if (el) return el; }
+        }
+        return null;
+    }
+
+    function populateForm(data) {
+        const map = {
+            dni: ['dni','dni-postulacion','#dni','#dniInput'],
+            nombre: ['nombre','nombre-postulacion','#nombre'],
+            apellido: ['apellido','apellido-postulacion','#apellido'],
+            calle: ['calle','calle-postulacion','#calle'],
+            numeracion: ['numeracion','numeracion-postulacion','#numeracion'],
+            telefono: ['telefono','telefono-postulacion','#telefono'],
+            nombreDistrito: ['nombreDistrito','distrito','distrito-postulacion','#distrito'],
+            nombreDepartamento: ['nombreDepartamento','departamento','departamento-postulacion','#departamento']
+        };
+        for (const [key, variants] of Object.entries(map)) {
+            const el = findField(variants); if (!el) continue;
+            const value = (data[key] === undefined || data[key] === null) ? '' : String(data[key]);
+            el.value = value; el.classList.add('field-autofill'); el.disabled = false;
+        }
+    }
+
+    function clearForm(keepDni=true) {
+        const fields = ['nombre','apellido','calle','numeracion','telefono','nombreDistrito','nombreDepartamento'];
+        for (const f of fields) { const el = findField([f]); if (!el) continue; el.value = ''; el.classList.remove('field-autofill'); }
+        if (!keepDni) { const dni = findField(['dni']); if (dni) dni.value = ''; }
+    }
+
+    function validateDniFormat(dni) { return /^[0-9]{7,8}$/.test((dni||'').trim()); }
+
+    async function buscarYAutocompletar(dni) {
+        const url = `${API_BASE}/buscar/${encodeURIComponent(dni)}`;
+        setLoading(true); showInlineMessage('Buscando...');
+        try {
+            const res = await fetchWithRetry(url, { method: 'GET', headers: { 'Accept': 'application/json' } });
+            if (res.status === 200) { const json = await res.json(); populateForm({ dni: json.dni, nombre: json.nombre, apellido: json.apellido, calle: json.calle, numeracion: json.numeracion, telefono: json.telefono, nombreDistrito: json.nombreDistrito, nombreDepartamento: json.nombreDepartamento }); showInlineMessage('Usuario encontrado.'); }
+            else if (res.status === 404) { clearForm(true); showInlineMessage('No existe. Complete los datos.'); }
+            else { showInlineMessage('Errores del servidor'); console.error('Unexpected response', res); }
+        } catch(err) { if (err.name==='AbortError') showInlineMessage('Tiempo de espera agotado'); else showInlineMessage('Error de red'); console.error(err); }
+        finally { setLoading(false); }
+    }
+
+    function debounce(fn, wait=DEBOUNCE_MS) { let t; return function(...args){ clearTimeout(t); t = setTimeout(()=>fn.apply(this,args), wait); }; }
+
+    function initDniModule() {
+        const dniEl = findDniInput(); if (!dniEl) { console.log('DNI lookup: campo no encontrado'); return; }
+        createHelperElements(dniEl);
+        const doSearch = debounce((e)=>{ const v = (e.target.value||'').trim(); if (!v) return; if (!validateDniFormat(v)) { showInlineMessage('DNI inválido (7-8 dígitos)'); return; } buscarYAutocompletar(v); }, DEBOUNCE_MS);
+        dniEl.addEventListener('input', doSearch);
+        dniEl.addEventListener('blur', (e)=>{ const v=(e.target.value||'').trim(); if (validateDniFormat(v)) buscarYAutocompletar(v); });
+        dniEl.addEventListener('keydown', (e)=>{ if (e.key==='Enter'){ e.preventDefault(); const v=dniEl.value.trim(); if (validateDniFormat(v)) buscarYAutocompletar(v); else showInlineMessage('DNI inválido'); } });
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initDniModule); else initDniModule();
+
+})();
