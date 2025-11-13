@@ -39,6 +39,8 @@
     <link rel="stylesheet" href="css/cards-modales.css?v=2">
     <!-- Sistema de Postulaciones CSS -->
     <link rel="stylesheet" href="css/postulaciones.css?v=1">
+    <!-- Carrusel de Servicios Agrícolas CSS -->
+    <link rel="stylesheet" href="css/servicios-carousel-agro.css?v=1">
     
     <!-- Estilos mínimos inline para optimización -->
     <style>
@@ -603,12 +605,8 @@
     <!-- Main Page Wrapper -->
     <div id="page-wrapper">
     <div class="banner-container text-white d-flex align-items-center justify-content-center">
-        <!-- Video de fondo -->
-        <video autoplay muted loop id="background-video" class="video-background">
-            <source src="video-agricultura.mp4" type="video/mp4">
-            <!-- Fallback para navegadores que no soportan video -->
-            Tu navegador no soporta videos HTML5.
-        </video>
+        <!-- Imagen de fondo -->
+        <div class="banner-background-image"></div>
         
         <!-- Overlay para mejorar legibilidad del texto -->
         <div class="video-overlay"></div>
@@ -620,6 +618,205 @@
             <p class="lead subtitle-enhanced">La plataforma para conectar Al Empresario y Al trabajador.</p>
         </div>
     </div>
+    
+    <!-- Carrusel de Servicios Agrícolas -->
+    <section id="servicios-carousel" aria-label="Nuestros Servicios Agrícolas">
+        <div class="container">
+            <!-- Header del Carrusel -->
+            <div class="row justify-content-center mb-4">
+                <div class="col-lg-8">
+                    <div class="servicio-header-card">
+                        <div class="text-center">
+                            <div class="servicio-main-icon">
+                                <i class="fas fa-seedling"></i>
+                            </div>
+                            <h2 class="agro-title">Nuestros Servicios</h2>
+                            <p class="agro-subtitle">
+                                Conectamos el talento agrícola con las mejores oportunidades laborales del sector
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Carrusel Container -->
+            <div class="carousel-agro-container">
+                <div class="carousel-track-container">
+                    <div class="carousel-track">
+                        <!-- Slide 1: 3 servicios para desktop -->
+                        <div class="servicio-slide">
+                            <div class="servicio-card-agro">
+                                <div class="servicio-icon-agro servicio-icon-ubicacion">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <h5>Ubicación Precisa</h5>
+                                <p>Encuentra trabajo agrícola cerca de tu ubicación con mapas interactivos y geolocalización avanzada</p>
+                            </div>
+                            
+                            <div class="servicio-card-agro">
+                                <div class="servicio-icon-agro servicio-icon-perfiles">
+                                    <i class="fas fa-user-check"></i>
+                                </div>
+                                <h5>Perfiles Verificados</h5>
+                                <p>Trabajadores y empleadores con identidad verificada para mayor seguridad y confianza</p>
+                            </div>
+                            
+                            <div class="servicio-card-agro">
+                                <div class="servicio-icon-agro servicio-icon-trabajo">
+                                    <i class="fas fa-briefcase"></i>
+                                </div>
+                                <h5>Trabajo Temporal y Fijo</h5>
+                                <p>Oportunidades laborales flexibles adaptadas a las temporadas agrícolas y necesidades del campo</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Slide 2: 3 servicios restantes -->
+                        <div class="servicio-slide">
+                            <div class="servicio-card-agro">
+                                <div class="servicio-icon-agro servicio-icon-comunicacion">
+                                    <i class="fas fa-comments"></i>
+                                </div>
+                                <h5>Comunicación Directa</h5>
+                                <p>Chat integrado para comunicación directa entre trabajadores y empleadores sin intermediarios</p>
+                            </div>
+                            
+                            <div class="servicio-card-agro">
+                                <div class="servicio-icon-agro servicio-icon-pagos">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <h5>Pagos Seguros</h5>
+                                <p>Sistema de pagos protegido con garantías para empleadores y trabajadores del sector agrícola</p>
+                            </div>
+                            
+                            <div class="servicio-card-agro">
+                                <div class="servicio-icon-agro servicio-icon-horarios">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <h5>Horarios Flexibles</h5>
+                                <p>Adaptabilidad a los ciclos de cultivo y las necesidades específicas de cada establecimiento</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Slide 3: ¿Cómo Funciona? -->
+                        <div class="servicio-slide">
+                            <div class="como-funciona-wrapper">
+                                <!-- Header centralizado -->
+                                <div class="como-funciona-header">
+                                    <div class="servicio-icon-agro servicio-icon-funciona">
+                                        <i class="fas fa-question-circle"></i>
+                                    </div>
+                                    <h2 class="como-funciona-title">¿Cómo Funciona?</h2>
+                                    <p class="como-funciona-subtitle">Simple, rápido y efectivo</p>
+                                </div>
+                                
+                                <!-- Cards para trabajadores y empleadores -->
+                                <div class="como-funciona-cards">
+                                    <!-- Para Trabajadores -->
+                                    <div class="como-funciona-card como-funciona-trabajadores">
+                                        <h4 class="como-funciona-card-title">Para Trabajadores</h4>
+                                        <div class="como-funciona-steps">
+                                            <div class="como-funciona-step">
+                                                <span class="como-funciona-num funciona-num-trabajador">1</span>
+                                                <div class="como-funciona-content">
+                                                    <span class="como-funciona-step-title">Regístrate y Crea tu Perfil</span>
+                                                    <span class="como-funciona-step-desc">Completa tu información personal, experiencia y habilidades</span>
+                                                </div>
+                                            </div>
+                                            <div class="como-funciona-step">
+                                                <span class="como-funciona-num funciona-num-trabajador">2</span>
+                                                <div class="como-funciona-content">
+                                                    <span class="como-funciona-step-title">Busca Ofertas de Trabajo</span>
+                                                    <span class="como-funciona-step-desc">Explora trabajos disponibles en tu área geográfica</span>
+                                                </div>
+                                            </div>
+                                            <div class="como-funciona-step">
+                                                <span class="como-funciona-num funciona-num-trabajador">3</span>
+                                                <div class="como-funciona-content">
+                                                    <span class="como-funciona-step-title">Aplica y Conecta</span>
+                                                    <span class="como-funciona-step-desc">Envía tu solicitud y conecta directamente con empleadores</span>
+                                                </div>
+                                            </div>
+                                            <div class="como-funciona-step">
+                                                <span class="como-funciona-num funciona-num-trabajador">4</span>
+                                                <div class="como-funciona-content">
+                                                    <span class="como-funciona-step-title">Trabaja y Recibe Pago</span>
+                                                    <span class="como-funciona-step-desc">Completa el trabajo y recibe tu pago de forma segura</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Para Empleadores -->
+                                    <div class="como-funciona-card como-funciona-empleadores">
+                                        <h4 class="como-funciona-card-title">Para Empleadores</h4>
+                                        <div class="como-funciona-steps">
+                                            <div class="como-funciona-step">
+                                                <span class="como-funciona-num funciona-num-empleador">1</span>
+                                                <div class="como-funciona-content">
+                                                    <span class="como-funciona-step-title">Crea tu Cuenta Empresarial</span>
+                                                    <span class="como-funciona-step-desc">Registra tu empresa y verifica tu información</span>
+                                                </div>
+                                            </div>
+                                            <div class="como-funciona-step">
+                                                <span class="como-funciona-num funciona-num-empleador">2</span>
+                                                <div class="como-funciona-content">
+                                                    <span class="como-funciona-step-title">Publica Ofertas de Trabajo</span>
+                                                    <span class="como-funciona-step-desc">Describe el trabajo, ubicación y requisitos necesarios</span>
+                                                </div>
+                                            </div>
+                                            <div class="como-funciona-step">
+                                                <span class="como-funciona-num funciona-num-empleador">3</span>
+                                                <div class="como-funciona-content">
+                                                    <span class="como-funciona-step-title">Revisa Candidatos</span>
+                                                    <span class="como-funciona-step-desc">Examina perfiles y selecciona a los mejores candidatos</span>
+                                                </div>
+                                            </div>
+                                            <div class="como-funciona-step">
+                                                <span class="como-funciona-num funciona-num-empleador">4</span>
+                                                <div class="como-funciona-content">
+                                                    <span class="como-funciona-step-title">Contrata y Supervisa</span>
+                                                    <span class="como-funciona-step-desc">Contrata trabajadores y supervisa el progreso del trabajo</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Controles de navegación -->
+                <nav class="carousel-nav" aria-label="Navegación del carrusel">
+                    <button class="carousel-btn carousel-btn--prev" aria-label="Servicios anteriores">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="carousel-btn carousel-btn--next" aria-label="Siguientes servicios">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </nav>
+                
+                <!-- Indicadores -->
+                <div class="carousel-indicators" role="tablist" aria-label="Indicadores de servicios">
+                    <button class="carousel-indicator active" 
+                            data-slide="0" 
+                            aria-label="Grupo de servicios 1"
+                            role="tab"
+                            aria-selected="true"></button>
+                    <button class="carousel-indicator" 
+                            data-slide="1" 
+                            aria-label="Grupo de servicios 2"
+                            role="tab"
+                            aria-selected="false"></button>
+                    <button class="carousel-indicator" 
+                            data-slide="2" 
+                            aria-label="Cómo funciona"
+                            role="tab"
+                            aria-selected="false"></button>
+                </div>
+            </div>
+        </div>
+    </section>
     
     <!-- Vista Pública (visible por defecto) -->
     <div id="public-view">
@@ -761,170 +958,6 @@
         </div>
     </section>
 
-    <!-- Servicios -->
-    <section id="servicios" class="container py-5">
-        <div class="row justify-content-center mb-4">
-            <div class="col-lg-10">
-                <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-servicios">
-                    <div class="card-body text-center">
-                        <div class="mb-3 servicio-icon servicio-icon-servicios"><i class="fas fa-cogs"></i></div>
-                        <h2 class="fw-bold">Nuestros Servicios</h2>
-                        <p class="mb-0">Conectamos el talento agrícola con las mejores oportunidades laborales</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <div class="row g-4">
-                    <div class="col-md-4">
-                        <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-ubicacion">
-                            <div class="card-body">
-                                <div class="mb-3 servicio-icon servicio-icon-ubicacion"><i class="fas fa-map-marker-alt"></i></div>
-                                <h5 class="fw-bold">Ubicación Precisa</h5>
-                                <p class="mb-0">Encuentra trabajos cerca de tu ubicación o personal en tu zona específica</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-perfiles">
-                            <div class="card-body">
-                                <div class="mb-3 servicio-icon servicio-icon-perfiles"><i class="fas fa-user-check"></i></div>
-                                <h5 class="fw-bold">Perfiles Verificados</h5>
-                                <p class="mb-0">Todos los usuarios pasan por un proceso de verificación para garantizar confiabilidad</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-trabajo">
-                            <div class="card-body">
-                                <div class="mb-3 servicio-icon servicio-icon-trabajo"><i class="fas fa-clock"></i></div>
-                                <h5 class="fw-bold">Trabajo Temporal y Fijo</h5>
-                                <p class="mb-0">Desde trabajos de temporada hasta empleos permanentes en el sector agrícola</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-comunicacion">
-                            <div class="card-body">
-                                <div class="mb-3 servicio-icon servicio-icon-comunicacion"><i class="fas fa-comments"></i></div>
-                                <h5 class="fw-bold">Comunicación Directa</h5>
-                                <p class="mb-0">Chatea directamente con empleadores o trabajadores sin intermediarios</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-pagos">
-                            <div class="card-body">
-                                <div class="mb-3 servicio-icon servicio-icon-pagos"><i class="fas fa-shield-alt"></i></div>
-                                <h5 class="fw-bold">Pagos Seguros</h5>
-                                <p class="mb-0">Sistema de pagos protegido que garantiza la seguridad de ambas partes</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-horarios">
-                            <div class="card-body">
-                                <div class="mb-3 servicio-icon servicio-icon-horarios"><i class="fas fa-calendar-alt"></i></div>
-                                <h5 class="fw-bold">Horarios Flexibles</h5>
-                                <p class="mb-0">Adapta tus horarios de trabajo según tus necesidades y disponibilidad</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- Cómo Funciona -->
-    <section id="como-funciona" class="container py-5">
-        <div class="row justify-content-center mb-4">
-            <div class="col-lg-10">
-                <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-funciona">
-                    <div class="card-body text-center">
-                        <div class="mb-3 servicio-icon servicio-icon-funciona"><i class="fas fa-question-circle"></i></div>
-                        <h2 class="fw-bold">¿Cómo Funciona?</h2>
-                        <p class="mb-0">Simple, rápido y efectivo</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row justify-content-center g-4">
-            <div class="col-lg-5">
-                <div class="funciona-card shadow servicio-card h-100 d-flex flex-column">
-                    <div class="p-4">
-                        <h4 class="fw-bold text-success text-center mb-4">Para Trabajadores</h4>
-                        <ul class="list-unstyled flex-grow-1">
-                            <li class="d-flex mb-4 align-items-start">
-                                <span class="funciona-num funciona-num-trabajador me-3">1</span>
-                                <div>
-                                    <span class="fw-bold">Regístrate y Crea tu Perfil</span><br>
-                                    <span class="text-muted">Completa tu información personal, experiencia y habilidades</span>
-                                </div>
-                            </li>
-                            <li class="d-flex mb-4 align-items-start">
-                                <span class="funciona-num funciona-num-trabajador me-3">2</span>
-                                <div>
-                                    <span class="fw-bold">Busca Ofertas de Trabajo</span><br>
-                                    <span class="text-muted">Explora trabajos disponibles en tu área geográfica</span>
-                                </div>
-                            </li>
-                            <li class="d-flex mb-4 align-items-start">
-                                <span class="funciona-num funciona-num-trabajador me-3">3</span>
-                                <div>
-                                    <span class="fw-bold">Aplica y Conecta</span><br>
-                                    <span class="text-muted">Envía tu solicitud y conecta directamente con empleadores</span>
-                                </div>
-                            </li>
-                            <li class="d-flex mb-0 align-items-start">
-                                <span class="funciona-num funciona-num-trabajador me-3">4</span>
-                                <div>
-                                    <span class="fw-bold">Trabaja y Recibe Pago</span><br>
-                                    <span class="text-muted">Completa el trabajo y recibe tu pago de forma segura</span>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-5">
-                <div class="funciona-card shadow servicio-card h-100 d-flex flex-column">
-                    <div class="p-4">
-                        <h4 class="fw-bold text-primary text-center mb-4">Para Empleadores</h4>
-                        <ul class="list-unstyled flex-grow-1">
-                            <li class="d-flex mb-4 align-items-start">
-                                <span class="funciona-num funciona-num-empleador me-3">1</span>
-                                <div>
-                                    <span class="fw-bold">Crea tu Cuenta Empresarial</span><br>
-                                    <span class="text-muted">Registra tu empresa y verifica tu información</span>
-                                </div>
-                            </li>
-                            <li class="d-flex mb-4 align-items-start">
-                                <span class="funciona-num funciona-num-empleador me-3">2</span>
-                                <div>
-                                    <span class="fw-bold">Publica Ofertas de Trabajo</span><br>
-                                    <span class="text-muted">Describe el trabajo, ubicación y requisitos necesarios</span>
-                                </div>
-                            </li>
-                            <li class="d-flex mb-4 align-items-start">
-                                <span class="funciona-num funciona-num-empleador me-3">3</span>
-                                <div>
-                                    <span class="fw-bold">Revisa Candidatos</span><br>
-                                    <span class="text-muted">Examina perfiles y selecciona a los mejores candidatos</span>
-                                </div>
-                            </li>
-                            <li class="d-flex mb-0 align-items-start">
-                                <span class="funciona-num funciona-num-empleador me-3">4</span>
-                                <div>
-                                    <span class="fw-bold">Contrata y Supervisa</span><br>
-                                    <span class="text-muted">Contrata trabajadores y supervisa el progreso del trabajo</span>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
     <!-- Main Content -->
     </div> <!-- Fin de public-view -->
     
@@ -1037,6 +1070,8 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- Especies Modal JS -->
     <script src="js/especies-modal.js"></script>
+    <!-- Carrusel de Servicios Agrícolas JS -->
+    <script src="js/servicios-carousel.js?v=1"></script>
     <!-- App JS -->
     <script src="js/app.js?v=ofertas-api-completa"></script>
 

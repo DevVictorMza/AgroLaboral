@@ -1,0 +1,1035 @@
+/**
+ * CARRUSEL DE SERVICIOS AGRÍCOLAS - AgroLaboral
+ * ============================================
+ * Carrusel profesional con tema agrícola para mostrar servicios
+ * Diseño responsivo con navegación automática y manual
+ */
+
+/* ===================================
+   VARIABLES CSS TEMÁTICAS AGRÍCOLAS
+   =================================== */
+
+:root {
+    /* Paleta de colores agrícolas */
+    --agro-verde-primary: #6B8E23;
+    --agro-verde-oscuro: #556B2F;
+    --agro-verde-claro: #9ACD32;
+    --agro-tierra: #8B4513;
+    --agro-tierra-claro: #CD853F;
+    --agro-dorado: #DAA520;
+    --agro-dorado-claro: #FFD700;
+    --agro-beige: #F5F5DC;
+    --agro-crema: #FFF8DC;
+    --agro-marron: #A0522D;
+    
+    /* Nuevos colores marrón oscuro para header */
+    --agro-marron-oscuro: #4A2C17;
+    --agro-marron-medio: #5D3320;
+    --agro-marron-profundo: #3D1E0F;
+    --agro-marron-claro: #6B3A28;
+    --agro-marron-negro: #2F1608;
+    
+    /* Colores de servicios específicos */
+    --color-ubicacion: #27AE60;
+    --color-perfiles: #3498DB;
+    --color-trabajo: #E67E22;
+    --color-comunicacion: #9B59B6;
+    --color-pagos: #F39C12;
+    --color-horarios: #16A085;
+    
+    /* Sombras y efectos */
+    --agro-shadow-light: 0 4px 15px rgba(107, 142, 35, 0.15);
+    --agro-shadow-medium: 0 8px 25px rgba(107, 142, 35, 0.2);
+    --agro-shadow-heavy: 0 12px 35px rgba(107, 142, 35, 0.25);
+    --agro-shadow-marron: 0 12px 35px rgba(74, 44, 23, 0.3);
+    
+    /* Gradientes agrícolas */
+    --agro-gradient-bg: linear-gradient(135deg, 
+        rgba(245, 245, 220, 0.95) 0%, 
+        rgba(250, 240, 230, 0.98) 50%, 
+        rgba(255, 248, 220, 0.95) 100%);
+    --agro-gradient-card: linear-gradient(145deg, 
+        rgba(255, 255, 255, 0.9) 0%, 
+        rgba(248, 248, 240, 0.95) 100%);
+    --agro-gradient-marron: linear-gradient(145deg, 
+        #4A2C17 0%, 
+        #5D3320 25%, 
+        #3D1E0F 50%, 
+        #6B3A28 75%, 
+        #2F1608 100%);
+    
+    /* Transiciones suaves */
+    --agro-transition-fast: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --agro-transition-smooth: 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --agro-transition-bounce: 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ===================================
+   SECCIÓN PRINCIPAL DEL CARRUSEL
+   =================================== */
+
+#servicios-carousel {
+    background: var(--agro-gradient-bg);
+    position: relative;
+    overflow: hidden;
+    padding: 4rem 0 4rem 0;
+    margin: 0;
+    /* Separación elegante del banner */
+    border-top: 3px solid rgba(245, 245, 220, 0.3);
+    box-shadow: inset 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+#servicios-carousel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 20% 80%, rgba(107, 142, 35, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(139, 69, 19, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(218, 165, 32, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+/* Separador visual entre banner y servicios */
+#servicios-carousel::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 6px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(139, 115, 85, 0.6) 25%, 
+        rgba(201, 168, 117, 0.8) 50%, 
+        rgba(139, 115, 85, 0.6) 75%, 
+        transparent 100%);
+    border-radius: 3px;
+    box-shadow: 0 2px 8px rgba(139, 115, 85, 0.3);
+}
+}
+
+/* ===================================
+   HEADER DEL CARRUSEL
+   =================================== */
+
+.servicio-header-card {
+    background: linear-gradient(145deg, 
+        #4A2C17 0%, 
+        #5D3320 25%, 
+        #3D1E0F 50%, 
+        #6B3A28 75%, 
+        #2F1608 100%) !important;
+    border: 2px solid rgba(139, 69, 19, 0.28) !important;
+    border-radius: 24px;
+    padding: 2.5rem 2rem;
+    box-shadow: 
+        var(--agro-shadow-marron),
+        inset 0 1px 0 rgba(139, 69, 19, 0.28),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    position: relative;
+    overflow: hidden;
+    transform: translateY(0);
+    transition: all var(--agro-transition-smooth);
+}
+
+/* Asegurar color del texto en el header */
+.servicio-header-card .agro-title {
+    color: #F5F5DC !important; /* Beige claro para contraste con fondo marrón */
+}
+
+.servicio-header-card .agro-subtitle {
+    color: #FFF8DC !important; /* Crema claro para contraste con fondo marrón */
+}
+
+/* Forzar el fondo marrón con máxima especificidad */
+#servicios-carousel .servicio-header-card {
+    background: linear-gradient(145deg, 
+        #4A2C17 0%, 
+        #5D3320 25%, 
+        #3D1E0F 50%, 
+        #6B3A28 75%, 
+        #2F1608 100%) !important;
+}
+
+/* Sobreescribir regla global para títulos de servicios */
+#servicios-carousel h2.agro-title {
+    color: #F5F5DC !important;
+}
+
+#servicios-carousel p.agro-subtitle {
+    color: #FFF8DC !important;
+}
+
+/* Especificidad extra para asegurar que se aplique */
+.servicio-header-card .text-center .agro-title {
+    color: #F5F5DC !important;
+}
+
+.servicio-header-card .text-center .agro-subtitle {
+    color: #FFF8DC !important;
+}
+
+.servicio-header-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(139, 69, 19, 0.4), 
+        transparent);
+    transition: left 0.8s ease;
+}
+
+.servicio-header-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 
+        var(--agro-shadow-marron),
+        inset 0 1px 0 rgba(160, 82, 45, 0.4),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+        0 15px 40px rgba(74, 44, 23, 0.4);
+}
+
+.servicio-header-card:hover::before {
+    left: 100%;
+}
+
+.servicio-main-icon {
+    width: 110px;
+    height: 110px;
+    font-size: 2.8rem;
+    color: #9ACD32 !important; /* Verde claro agrícola para destacar en fondo marrón */
+    margin: 1.2rem auto 1.8rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all var(--agro-transition-smooth);
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.3),
+        0 4px 12px rgba(255, 255, 255, 0.15) inset,
+        0 2px 6px rgba(255, 255, 255, 0.2) inset;
+    border: 2px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: linear-gradient(135deg, 
+        var(--agro-verde-primary) 0%, 
+        var(--agro-dorado) 50%, 
+        var(--agro-verde-oscuro) 100%);
+}
+
+.servicio-header-card:hover .servicio-main-icon {
+    color: #FFD700 !important; /* Dorado en hover para efecto elegante */
+    transform: scale(1.08) translateY(-2px);
+    box-shadow:
+        0 12px 32px rgba(0, 0, 0, 0.35),
+        0 6px 16px rgba(255, 255, 255, 0.18) inset,
+        0 3px 8px rgba(255, 255, 255, 0.25) inset;
+    border-color: rgba(255, 255, 255, 0.28);
+}
+
+.agro-title {
+    color: #2C2416 !important;
+    font-family: 'Georgia', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.5);
+    letter-spacing: -0.5px;
+}
+
+.agro-subtitle {
+    color: #3D2F1F !important;
+    font-size: 1.1rem;
+    font-weight: 400;
+    line-height: 1.6;
+    margin: 0;
+    opacity: 1;
+    text-shadow: 0px 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+/* ===================================
+   CONTENEDOR DEL CARRUSEL
+   =================================== */
+
+.carousel-agro-container {
+    position: relative;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.carousel-track-container {
+    overflow: hidden;
+    border-radius: 15px;
+    position: relative;
+}
+
+.carousel-track {
+    display: flex;
+    transition: transform var(--agro-transition-smooth);
+    will-change: transform;
+}
+
+/* ===================================
+   CARDS DE SERVICIOS
+   =================================== */
+
+.servicio-slide {
+    min-width: 100%;
+    display: flex;
+    gap: 3rem;
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
+.servicio-card-agro {
+    /* Restaurar fondo marrón agrícola original pero con iconos optimizados */
+    flex: 1 1 0%;
+    background: var(--agro-gradient-marron);
+    border: 2px solid rgba(139, 69, 19, 0.28);
+    border-radius: 24px;
+    padding: 3.5rem 2.5rem;
+    text-align: center;
+    transition: all var(--agro-transition-smooth);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: var(--agro-shadow-marron),
+        inset 0 1px 0 rgba(139, 69, 19, 0.28),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.22);
+    height: 520px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* stack contents from top for consistent spacing */
+    align-items: center; /* center horizontally */
+}
+
+.servicio-card-agro::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(139, 69, 19, 0.4), 
+        transparent);
+    transition: left 0.8s ease;
+}
+
+.servicio-card-agro:hover {
+    transform: translateY(-5px) scale(1.02);
+    border-color: rgba(160, 82, 45, 0.6);
+    box-shadow: 
+        var(--agro-shadow-marron),
+        inset 0 1px 0 rgba(160, 82, 45, 0.4),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+        0 12px 30px rgba(74, 44, 23, 0.4);
+}
+
+.servicio-card-agro:hover::before {
+    left: 100%;
+}
+
+/* ===================================
+   ICONOS DE SERVICIOS
+   =================================== */
+
+.servicio-icon-agro {
+    /* Mantener tamaño optimizado pero restaurar estilo original con efectos */
+    width: 110px;
+    height: 110px;
+    margin: 1.2rem auto 1.8rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.8rem;
+    color: white;
+    position: relative;
+    transition: all var(--agro-transition-smooth);
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.3),
+        0 4px 12px rgba(255, 255, 255, 0.15) inset,
+        0 2px 6px rgba(255, 255, 255, 0.2) inset;
+    border: 2px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.servicio-icon-agro i {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    line-height: 1;
+    display: block;
+}
+
+.servicio-icon-agro::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0; /* keep aura inside the icon bounds to avoid being clipped by card */
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.18), rgba(255,255,255,0.06) 30%, rgba(0,0,0,0.02) 70%);
+    z-index: -1;
+    opacity: 0;
+    transform: scale(0.98);
+    transition: all var(--agro-transition-smooth);
+    filter: blur(0.6px);
+}
+
+.servicio-card-agro:hover .servicio-icon-agro::before {
+    opacity: 0.75;
+    transform: scale(1.04) rotate(160deg);
+    filter: blur(0px);
+}
+
+.servicio-card-agro:hover .servicio-icon-agro {
+    transform: scale(1.08) translateY(-2px);
+    box-shadow:
+        0 12px 32px rgba(0, 0, 0, 0.35),
+        0 6px 16px rgba(255, 255, 255, 0.18) inset,
+        0 3px 8px rgba(255, 255, 255, 0.25) inset;
+    border-color: rgba(255, 255, 255, 0.28);
+}
+
+/* Colores específicos para cada tipo de servicio */
+.servicio-icon-ubicacion { 
+    background: linear-gradient(135deg, 
+        var(--color-ubicacion) 0%, 
+        #2ECC71 50%, 
+        #27AE60 100%); 
+    box-shadow: 
+        0 8px 25px rgba(39, 174, 96, 0.3),
+        0 4px 15px rgba(46, 204, 113, 0.1) inset,
+        0 2px 8px rgba(255, 255, 255, 0.2) inset;
+}
+.servicio-icon-perfiles { 
+    background: linear-gradient(135deg, 
+        var(--color-perfiles) 0%, 
+        #5DADE2 50%, 
+        #3498DB 100%); 
+    box-shadow: 
+        0 8px 25px rgba(52, 152, 219, 0.3),
+        0 4px 15px rgba(93, 173, 226, 0.1) inset,
+        0 2px 8px rgba(255, 255, 255, 0.2) inset;
+}
+.servicio-icon-trabajo { 
+    background: linear-gradient(135deg, 
+        var(--color-trabajo) 0%, 
+        #F8C471 50%, 
+        #E67E22 100%); 
+    box-shadow: 
+        0 8px 25px rgba(230, 126, 34, 0.3),
+        0 4px 15px rgba(248, 196, 113, 0.1) inset,
+        0 2px 8px rgba(255, 255, 255, 0.2) inset;
+}
+.servicio-icon-comunicacion { 
+    background: linear-gradient(135deg, 
+        var(--color-comunicacion) 0%, 
+        #BB8FCE 50%, 
+        #9B59B6 100%); 
+    box-shadow: 
+        0 8px 25px rgba(155, 89, 182, 0.3),
+        0 4px 15px rgba(187, 143, 206, 0.1) inset,
+        0 2px 8px rgba(255, 255, 255, 0.2) inset;
+}
+.servicio-icon-pagos { 
+    background: linear-gradient(135deg, 
+        var(--color-pagos) 0%, 
+        #F7DC6F 50%, 
+        #F39C12 100%); 
+    box-shadow: 
+        0 8px 25px rgba(243, 156, 18, 0.3),
+        0 4px 15px rgba(247, 220, 111, 0.1) inset,
+        0 2px 8px rgba(255, 255, 255, 0.2) inset;
+}
+.servicio-icon-horarios { 
+    background: linear-gradient(135deg, 
+        var(--color-horarios) 0%, 
+        #48C9B0 50%, 
+        #16A085 100%); 
+    box-shadow: 
+        0 8px 25px rgba(22, 160, 133, 0.3),
+        0 4px 15px rgba(72, 201, 176, 0.1) inset,
+        0 2px 8px rgba(255, 255, 255, 0.2) inset;
+}
+.servicio-icon-funciona { 
+    background: linear-gradient(135deg, 
+        var(--agro-verde-primary) 0%, 
+        var(--agro-dorado) 50%, 
+        var(--agro-verde-oscuro) 100%); 
+    box-shadow: 
+        0 8px 25px rgba(107, 142, 35, 0.3),
+        0 4px 15px rgba(218, 165, 32, 0.1) inset,
+        0 2px 8px rgba(255, 255, 255, 0.2) inset;
+}
+
+/* ===================================
+   TEXTO DE LAS CARDS
+   =================================== */
+
+.servicio-card-agro h5 {
+    color: #FFFFFF;
+    font-family: 'Georgia', serif;
+    font-size: 2.6rem;
+    font-weight: 700;
+    margin-bottom: 1.6rem;
+    line-height: 1.3;
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+    transition: color var(--agro-transition-fast);
+    letter-spacing: 0.5px;
+}
+
+.servicio-card-agro:hover h5 {
+    color: #FFFFFF;
+    text-shadow: 0 6px 12px rgba(0, 0, 0, 0.9);
+}
+
+.servicio-card-agro p {
+    color: #F0F0F0;
+    font-size: 1.5rem;
+    line-height: 1.5;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+    transition: color var(--agro-transition-fast);
+    letter-spacing: 0.2px;
+}
+
+.servicio-card-agro:hover p {
+    color: #FFFFFF;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
+}
+
+/* ===================================
+   CONTROLES DE NAVEGACIÓN
+   =================================== */
+
+.carousel-nav {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 10;
+}
+
+.carousel-btn {
+    width: 50px;
+    height: 50px;
+    border: 2px solid rgba(107, 142, 35, 0.6);
+    border-radius: 50%;
+    background: var(--agro-gradient-card);
+    color: var(--agro-verde-primary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--agro-transition-fast);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: var(--agro-shadow-light);
+    pointer-events: auto;
+    position: relative;
+    overflow: hidden;
+}
+
+.carousel-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: var(--agro-verde-primary);
+    border-radius: 50%;
+    transition: all var(--agro-transition-fast);
+    transform: translate(-50%, -50%);
+}
+
+.carousel-btn:hover::before {
+    width: 100%;
+    height: 100%;
+}
+
+.carousel-btn:hover {
+    border-color: var(--agro-verde-primary);
+    color: white;
+    transform: scale(1.1);
+    box-shadow: var(--agro-shadow-medium);
+}
+
+.carousel-btn i {
+    position: relative;
+    z-index: 2;
+}
+
+.carousel-btn--prev {
+    left: -25px;
+}
+
+.carousel-btn--next {
+    right: -25px;
+}
+
+.carousel-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: scale(1);
+}
+
+/* ===================================
+   INDICADORES
+   =================================== */
+
+.carousel-indicators {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 2.5rem;
+}
+
+.carousel-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid rgba(107, 142, 35, 0.4);
+    background: transparent;
+    cursor: pointer;
+    transition: all var(--agro-transition-fast);
+    position: relative;
+}
+
+.carousel-indicator::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: var(--agro-verde-primary);
+    border-radius: 50%;
+    transition: all var(--agro-transition-smooth);
+    transform: translate(-50%, -50%);
+}
+
+.carousel-indicator.active::before {
+    width: 100%;
+    height: 100%;
+}
+
+.carousel-indicator.active {
+    border-color: var(--agro-verde-primary);
+    transform: scale(1.2);
+}
+
+/* ===================================
+   ANIMACIONES
+   =================================== */
+
+@keyframes rotateBorder {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.servicio-slide {
+    animation: slideInFromLeft 0.6s ease-out;
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+
+/* Tablets */
+@media (max-width: 992px) {
+    #servicios-carousel {
+        padding: 4rem 0;
+    }
+    
+    .carousel-agro-container {
+        max-width: 1200px; /* Reducir ligeramente el ancho para tablets */
+    }
+    
+    #servicios-carousel::after {
+        width: 85%;
+        height: 5px;
+    }
+    
+    .servicio-slide {
+        gap: 1.5rem;
+    }
+    
+    .carousel-btn--prev {
+        left: -20px;
+    }
+    
+    .carousel-btn--next {
+        right: -20px;
+    }
+    
+    .agro-title {
+        font-size: 2.2rem;
+    }
+}
+
+/* Móviles */
+@media (max-width: 768px) {
+    #servicios-carousel {
+        padding: 3rem 0 2.5rem 0;
+        border-top: 2px solid rgba(245, 245, 220, 0.4);
+    }
+    
+    #servicios-carousel::after {
+        top: -2px;
+        height: 4px;
+        width: 90%;
+    }
+    
+    .carousel-agro-container {
+        padding: 0 1rem;
+        max-width: 100%;
+    }
+    
+    .servicio-slide {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .servicio-card-agro {
+        height: 380px; /* Incrementado proporcionalmente de 320px */
+        padding: 3rem 2.2rem; /* Incrementado proporcionalmente de 2.5rem */
+    }
+    
+    .servicio-icon-agro {
+        width: 95px; /* Incrementado proporcionalmente de 80px */
+        height: 95px;
+        font-size: 2.4rem; /* Incrementado proporcionalmente de 2rem */
+        margin: 1.2rem auto 1.6rem;
+    }
+    
+    .servicio-card-agro h5 {
+        font-size: 2.2rem; /* Incrementado proporcionalmente */
+        margin-bottom: 1.4rem;
+    }
+    
+    .servicio-card-agro p {
+        font-size: 1.4rem; /* Incrementado proporcionalmente */
+    }
+    
+    .carousel-nav {
+        display: none; /* Ocultar flechas en móvil, usar solo swipe */
+    }
+    
+    .agro-title {
+        font-size: 1.8rem;
+    }
+    
+    .agro-subtitle {
+        font-size: 1rem;
+    }
+    
+    .servicio-header-card {
+        padding: 2rem 1.5rem;
+        background: linear-gradient(145deg, 
+            #4A2C17 0%, 
+            #5D3320 25%, 
+            #3D1E0F 50%, 
+            #6B3A28 75%, 
+            #2F1608 100%) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .servicio-icon-agro {
+        width: 85px; /* Incrementado proporcionalmente de 70px */
+        height: 85px;
+        font-size: 2.1rem; /* Incrementado proporcionalmente de 1.8rem */
+        margin: 1.2rem auto 1.5rem;
+        border: 2px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 
+            0 6px 18px rgba(0, 0, 0, 0.25),
+            0 3px 10px rgba(255, 255, 255, 0.12) inset,
+            0 1px 5px rgba(255, 255, 255, 0.15) inset;
+    }
+    
+    .servicio-card-agro {
+        height: 340px; /* Incrementado proporcionalmente de 280px */
+        padding: 2.8rem 2rem; /* Incrementado proporcionalmente de 2.2rem */
+    }
+    
+    .servicio-card-agro h5 {
+        font-size: 2rem; /* Incrementado proporcionalmente de 1.7rem */
+        margin-bottom: 1.3rem;
+    }
+    
+    .servicio-card-agro p {
+        font-size: 1.3rem; /* Incrementado proporcionalmente de 1.1rem */
+        line-height: 1.4;
+    }
+}
+
+/* ===================================
+   ESTILOS PARA "¿CÓMO FUNCIONA?"
+   =================================== */
+
+.como-funciona-wrapper {
+    width: 100%;
+    padding: 2rem;
+    background: var(--agro-gradient-card);
+    border-radius: 20px;
+    border: 2px solid rgba(107, 142, 35, 0.2);
+    box-shadow: var(--agro-shadow-medium);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.como-funciona-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.como-funciona-title {
+    color: var(--agro-verde-oscuro);
+    font-family: 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 1rem 0;
+    text-shadow: 1px 1px 2px rgba(107, 142, 35, 0.2);
+}
+
+.como-funciona-subtitle {
+    color: var(--agro-marron);
+    font-size: 1.1rem;
+    margin: 0;
+    opacity: 0.9;
+}
+
+.como-funciona-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+.como-funciona-card {
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 15px;
+    padding: 1.5rem;
+    border: 1px solid rgba(107, 142, 35, 0.3);
+    transition: all var(--agro-transition-smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+.como-funciona-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    transition: all var(--agro-transition-smooth);
+}
+
+.como-funciona-trabajadores::before {
+    background: linear-gradient(90deg, #27AE60, #2ECC71);
+}
+
+.como-funciona-empleadores::before {
+    background: linear-gradient(90deg, #3498DB, #5DADE2);
+}
+
+.como-funciona-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--agro-shadow-heavy);
+    border-color: rgba(107, 142, 35, 0.5);
+}
+
+.como-funciona-card-title {
+    color: var(--agro-verde-oscuro);
+    font-family: 'Georgia', serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+.como-funciona-trabajadores .como-funciona-card-title {
+    color: #27AE60;
+}
+
+.como-funciona-empleadores .como-funciona-card-title {
+    color: #3498DB;
+}
+
+.como-funciona-card-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 2px;
+    background: currentColor;
+    opacity: 0.7;
+}
+
+.como-funciona-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.como-funciona-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.5rem 0;
+}
+
+.como-funciona-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: white;
+    flex-shrink: 0;
+    margin-top: 2px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: all var(--agro-transition-fast);
+}
+
+.funciona-num-trabajador {
+    background: linear-gradient(135deg, #27AE60, #2ECC71);
+}
+
+.funciona-num-empleador {
+    background: linear-gradient(135deg, #3498DB, #5DADE2);
+}
+
+.como-funciona-step:hover .como-funciona-num {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.como-funciona-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    flex-grow: 1;
+}
+
+.como-funciona-step-title {
+    color: var(--agro-verde-oscuro);
+    font-weight: 600;
+    font-size: 0.95rem;
+    line-height: 1.3;
+}
+
+.como-funciona-step-desc {
+    color: var(--agro-marron);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    opacity: 0.8;
+}
+
+/* ===================================
+   RESPONSIVE PARA "¿CÓMO FUNCIONA?"
+   =================================== */
+
+@media (max-width: 992px) {
+    .como-funciona-cards {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .como-funciona-title {
+        font-size: 2rem;
+    }
+    
+    .como-funciona-wrapper {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .como-funciona-header {
+        margin-bottom: 2rem;
+    }
+    
+    .como-funciona-title {
+        font-size: 1.8rem;
+    }
+    
+    .como-funciona-subtitle {
+        font-size: 1rem;
+    }
+    
+    .como-funciona-wrapper {
+        padding: 1rem;
+    }
+    
+    .como-funciona-card {
+        padding: 1rem;
+    }
+    
+    .como-funciona-step {
+        gap: 0.8rem;
+    }
+    
+    .como-funciona-num {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .como-funciona-step-title {
+        font-size: 0.9rem;
+    }
+    
+    .como-funciona-step-desc {
+        font-size: 0.8rem;
+    }
+    
+    .como-funciona-card-title {
+        font-size: 1.2rem;
+    }
+}
