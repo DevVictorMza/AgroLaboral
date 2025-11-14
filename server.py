@@ -8,7 +8,7 @@ import http.server
 import socketserver
 
 # Puerto fijo para el servidor proxy
-PORT = 3000
+PORT = 5500
 import urllib.request
 import urllib.parse
 import json

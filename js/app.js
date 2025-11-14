@@ -11944,24 +11944,8 @@ async function inicializarModalPostulacion(idOferta) {
         // 3. Configurar validación en tiempo real
         configurarValidacionEnTiempoReal();
         
-        // 4. Configurar evento onChange de departamento
-        const selectDepartamento = document.getElementById('departamento-postulacion');
-        if (selectDepartamento) {
-            selectDepartamento.addEventListener('change', function(e) {
-                const idDepartamento = e.target.value;
-                
-                // Limpiar distrito
-                const selectDistrito = document.getElementById('distrito-postulacion');
-                selectDistrito.innerHTML = '<option value="">Seleccione primero un departamento</option>';
-                selectDistrito.disabled = true;
-                selectDistrito.classList.remove('is-valid', 'is-invalid');
-                
-                // Cargar distritos si hay departamento
-                if (idDepartamento) {
-                    cargarDistritosPostulacion(idDepartamento);
-                }
-            });
-        }
+        // 4. Configurar evento onChange de departamento (solo una vez)
+        configurarCambioDepartamento();
         
         // 5. Configurar búsqueda por DNI
         configurarBusquedaPorDNI();
@@ -12081,6 +12065,74 @@ async function cargarDistritosPostulacion(idDepartamento) {
     }
 }
 
+// Flag global para prevenir limpieza durante autocompletado
+window.bloqueandoAutocompletado = false;
+// Referencia al listener para poder removerlo
+window.departamentoChangeListener = null;
+
+/**
+ * Configurar cambio de departamento
+ */
+function configurarCambioDepartamento() {
+    const selectDepartamento = document.getElementById('departamento-postulacion');
+    
+    if (!selectDepartamento) {
+        console.warn('⚠️ Select de departamento no encontrado');
+        return;
+    }
+    
+    // Solo configurar una vez
+    if (selectDepartamento.dataset.listenerConfigured) {
+        return;
+    }
+    
+    selectDepartamento.dataset.listenerConfigured = 'true';
+    
+    // Definir el listener como función nombrada para poder removerlo
+    window.departamentoChangeListener = function(e) {
+        // BLOQUEAR si está en proceso de autocompletado
+        if (window.bloqueandoAutocompletado) {
+            console.log('🛡️ BLOQUEADO: Autocompletado en proceso, ignorando change');
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            return false;
+        }
+        
+        // CRÍTICO: Verificar múltiples condiciones para prevenir limpieza accidental
+        const isAutofilled = selectDepartamento.dataset.autofilled === 'true';
+        const distritoAutofilled = document.getElementById('distrito-postulacion').dataset.autofilled === 'true';
+        
+        // Si AMBOS están autocompletados, NO limpiar
+        if (isAutofilled && distritoAutofilled) {
+            console.log('🛡️ PROTECCIÓN: Ambos campos autocompletados, ignorando change');
+            delete selectDepartamento.dataset.autofilled;
+            delete document.getElementById('distrito-postulacion').dataset.autofilled;
+            return;
+        }
+        
+        const idDepartamento = e.target.value;
+        const selectDistrito = document.getElementById('distrito-postulacion');
+        
+        console.log('👤 Usuario cambió departamento manualmente');
+        
+        // Limpiar distrito cuando el usuario cambia manualmente
+        selectDistrito.innerHTML = '<option value="">Seleccione primero un departamento</option>';
+        selectDistrito.disabled = true;
+        selectDistrito.classList.remove('is-valid', 'is-invalid');
+        delete selectDistrito.dataset.autofilled;
+        
+        // Cargar distritos si hay departamento seleccionado
+        if (idDepartamento) {
+            cargarDistritosPostulacion(idDepartamento);
+        }
+    };
+    
+    selectDepartamento.addEventListener('change', window.departamentoChangeListener);
+    
+    console.log('✅ Listener de cambio de departamento configurado');
+}
+
 /**
  * Configurar búsqueda automática por DNI
  */
@@ -12091,6 +12143,14 @@ function configurarBusquedaPorDNI() {
         console.warn('⚠️ Campo DNI no encontrado');
         return;
     }
+    
+    // Solo configurar el listener una vez
+    if (inputDNI.dataset.listenerConfigured) {
+        console.log('✅ Búsqueda por DNI ya estaba configurada');
+        return;
+    }
+    
+    inputDNI.dataset.listenerConfigured = 'true';
     
     // Debounce para evitar múltiples llamadas
     let timeoutId = null;
@@ -12161,60 +12221,225 @@ async function buscarPersonaPorDNI(dni) {
  */
 async function autocompletarDatosPersona(persona) {
     try {
+        console.log('📋 Datos recibidos de la persona:', persona);
+        console.log('📮 Código Postal recibido:', persona.codigoPostal);
+        
         // Campos de texto simples
         const camposTexto = {
             'nombre-postulacion': persona.nombre,
             'apellido-postulacion': persona.apellido,
             'calle-postulacion': persona.calle,
             'numeracion-postulacion': persona.numeracion,
+            'codigoPostal-postulacion': persona.codigoPostal,
             'telefono-postulacion': persona.telefono
         };
         
         // Rellenar campos de texto
         for (const [idCampo, valor] of Object.entries(camposTexto)) {
             const campo = document.getElementById(idCampo);
+            console.log(`🔍 Campo: ${idCampo}, Valor: ${valor}, Elemento encontrado:`, campo !== null);
             if (campo && valor) {
                 campo.value = valor;
+                console.log(`✅ Campo ${idCampo} rellenado con: ${valor}`);
                 // Marcar como válido si tiene valor
                 campo.classList.remove('is-invalid');
                 campo.classList.add('is-valid');
+            } else if (campo && !valor) {
+                console.warn(`⚠️ Campo ${idCampo} encontrado pero sin valor`);
+            } else if (!campo) {
+                console.error(`❌ Campo ${idCampo} NO encontrado en el DOM`);
             }
         }
         
+        // ACTIVAR BLOQUEO para prevenir que el listener limpie el distrito
+        window.bloqueandoAutocompletado = true;
+        
+        // REMOVER el listener del departamento temporalmente
+        const selectDepartamento = document.getElementById('departamento-postulacion');
+        if (selectDepartamento && window.departamentoChangeListener) {
+            selectDepartamento.removeEventListener('change', window.departamentoChangeListener);
+            console.log('🔒 LISTENER REMOVIDO temporalmente');
+        }
+        
+        console.log('🔒 BLOQUEO ACTIVADO');
+        
         // Seleccionar departamento
+        console.log('🏛️ Intentando seleccionar departamento:', persona.nombreDepartamento);
         if (persona.nombreDepartamento) {
             const selectDepartamento = document.getElementById('departamento-postulacion');
             
+            if (!selectDepartamento) {
+                console.error('❌ Select de departamento no encontrado');
+                window.autocompletandoDatos = false;
+                return;
+            }
+            
+            console.log(`📋 Opciones disponibles en departamento:`, Array.from(selectDepartamento.options).map(opt => ({
+                value: opt.value,
+                text: opt.text
+            })));
+            
+            let departamentoEncontrado = false;
+            
             // Buscar la opción que coincida con el nombre
             for (let i = 0; i < selectDepartamento.options.length; i++) {
-                if (selectDepartamento.options[i].text.toUpperCase() === persona.nombreDepartamento.toUpperCase()) {
-                    selectDepartamento.selectedIndex = i;
+                const opcionTexto = selectDepartamento.options[i].text.toUpperCase().trim();
+                const nombreBuscado = persona.nombreDepartamento.toUpperCase().trim();
+                
+                console.log(`🔍 Comparando: "${opcionTexto}" vs "${nombreBuscado}"`);
+                
+                if (opcionTexto === nombreBuscado) {
+                    // Cambiar valor sin disparar evento change
+                    const valorAnterior = selectDepartamento.value;
+                    selectDepartamento.value = selectDepartamento.options[i].value;
+                    
+                    // Marcar como autocompletado para prevenir limpieza
+                    selectDepartamento.dataset.autofilled = 'true';
+                    
+                    // Si el valor no cambió (ya estaba seleccionado), no se dispara change
+                    // Marcar visualmente como válido
                     selectDepartamento.classList.remove('is-invalid');
                     selectDepartamento.classList.add('is-valid');
+                    departamentoEncontrado = true;
                     
-                    // Cargar distritos del departamento
+                    console.log(`✅ Departamento seleccionado: ${selectDepartamento.options[i].text} (valor: ${selectDepartamento.value})`);
+                    console.log('🏷️ Departamento marcado como autofilled');
+                    
+                    // Cargar distritos del departamento SOLO si no están ya cargados
                     const idDepartamento = selectDepartamento.value;
-                    if (idDepartamento) {
+                    const selectDistrito = document.getElementById('distrito-postulacion');
+                    const distritosYaCargados = selectDistrito.options.length > 1; // Más de la opción por defecto
+                    
+                    console.log(`🔄 Distritos ya cargados: ${distritosYaCargados} (${selectDistrito.options.length} opciones)`);
+                    
+                    if (idDepartamento && !distritosYaCargados) {
+                        console.log(`🔄 Cargando distritos para departamento ID: ${idDepartamento}`);
                         await cargarDistritosPostulacion(idDepartamento);
-                        
-                        // Esperar a que se carguen los distritos y luego seleccionar
-                        if (persona.nombreDistrito) {
-                            setTimeout(() => {
+                    } else if (distritosYaCargados) {
+                        console.log(`✅ Distritos ya están cargados, omitiendo recarga`);
+                    }
+                    
+                    // Seleccionar distrito (después de cargar o si ya están cargados)
+                    if (persona.nombreDistrito) {
+                        // Timeout para dar tiempo a que carguen los distritos (si fue necesario)
+                        setTimeout(() => {
                                 const selectDistrito = document.getElementById('distrito-postulacion');
+                                console.log('🏘️ Intentando seleccionar distrito:', persona.nombreDistrito);
+                                
+                                let distritoEncontrado = false;
                                 for (let j = 0; j < selectDistrito.options.length; j++) {
-                                    if (selectDistrito.options[j].text.toUpperCase() === persona.nombreDistrito.toUpperCase()) {
-                                        selectDistrito.selectedIndex = j;
+                                    const distritoTexto = selectDistrito.options[j].text.toUpperCase().trim();
+                                    const distritoNombre = persona.nombreDistrito.toUpperCase().trim();
+                                    
+                                    if (distritoTexto === distritoNombre) {
+                                        // Cambiar valor sin disparar evento change
+                                        selectDistrito.value = selectDistrito.options[j].value;
+                                        
+                                        // VERIFICAR que el valor se asignó correctamente
+                                        if (selectDistrito.value === selectDistrito.options[j].value) {
+                                            console.log(`✅ Valor de distrito asignado correctamente: ${selectDistrito.value}`);
+                                        } else {
+                                            console.error(`❌ ERROR: No se pudo asignar el valor del distrito`);
+                                            console.error(`Intenté asignar: ${selectDistrito.options[j].value}, pero el valor actual es: ${selectDistrito.value}`);
+                                        }
+                                        
+                                        // Marcar como autocompletado para prevenir limpieza
+                                        selectDistrito.dataset.autofilled = 'true';
+                                        
                                         selectDistrito.classList.remove('is-invalid');
                                         selectDistrito.classList.add('is-valid');
+                                        selectDistrito.disabled = false; // Asegurar que no esté deshabilitado
+                                        
+                                        distritoEncontrado = true;
+                                        console.log(`✅ Distrito seleccionado: ${selectDistrito.options[j].text} (valor: ${selectDistrito.value})`);
+                                        console.log('🏷️ Distrito marcado como autofilled');
                                         break;
                                     }
                                 }
-                            }, 300);
+                                
+                                if (!distritoEncontrado) {
+                                    console.warn(`⚠️ No se encontró el distrito "${persona.nombreDistrito}" en las opciones`);
+                                } else {
+                                    // AGREGAR OBSERVER AGRESIVO para detectar CUALQUIER cambio
+                                    let valorOriginalDistrito = selectDistrito.value;
+                                    let valorOriginalDepartamento = selectDepartamento.value;
+                                    
+                                    console.log('🛡️ PROTECCIÓN ACTIVADA - Valores guardados:');
+                                    console.log('  - Departamento:', valorOriginalDepartamento);
+                                    console.log('  - Distrito:', valorOriginalDistrito);
+                                    
+                                    // Observer para DISTRITO
+                                    const observerDistrito = new MutationObserver(function(mutations) {
+                                        if (selectDistrito.value !== valorOriginalDistrito) {
+                                            console.error('🚨 ALERTA ROJA: Valor del distrito CAMBIÓ');
+                                            console.error('  - Valor anterior:', valorOriginalDistrito);
+                                            console.error('  - Valor nuevo:', selectDistrito.value);
+                                            console.error('  - Stack trace:', new Error().stack);
+                                        }
+                                    });
+                                    
+                                    observerDistrito.observe(selectDistrito, {
+                                        attributes: true,
+                                        childList: true,
+                                        subtree: true,
+                                        characterData: true
+                                    });
+                                    
+                                    // Observer para DEPARTAMENTO
+                                    const observerDepartamento = new MutationObserver(function(mutations) {
+                                        if (selectDepartamento.value !== valorOriginalDepartamento) {
+                                            console.error('🚨 ALERTA ROJA: Valor del departamento CAMBIÓ');
+                                            console.error('  - Valor anterior:', valorOriginalDepartamento);
+                                            console.error('  - Valor nuevo:', selectDepartamento.value);
+                                            console.error('  - Stack trace:', new Error().stack);
+                                        }
+                                    });
+                                    
+                                    observerDepartamento.observe(selectDepartamento, {
+                                        attributes: true,
+                                        childList: true,
+                                        subtree: true,
+                                        characterData: true
+                                    });
+                                    
+                                    // Polling adicional cada 200ms
+                                    let checkCount = 0;
+                                    const intervalId = setInterval(() => {
+                                        checkCount++;
+                                        if (selectDistrito.value !== valorOriginalDistrito) {
+                                            console.error(`🚨 POLLING DETECTÓ CAMBIO (check #${checkCount}):`, selectDistrito.value);
+                                        }
+                                        if (selectDepartamento.value !== valorOriginalDepartamento) {
+                                            console.error(`🚨 POLLING DETECTÓ CAMBIO DEPTO (check #${checkCount}):`, selectDepartamento.value);
+                                        }
+                                        if (checkCount >= 50) { // 10 segundos
+                                            clearInterval(intervalId);
+                                            observerDistrito.disconnect();
+                                            observerDepartamento.disconnect();
+                                        }
+                                    }, 200);
+                                    
+                                    // Verificar estado después de 2 segundos
+                                    setTimeout(() => {
+                                        console.log('🔍 VERIFICACIÓN POST-AUTOCOMPLETADO (2s):');
+                                        console.log('  - Valor distrito:', selectDistrito.value);
+                                        console.log('  - Índice seleccionado:', selectDistrito.selectedIndex);
+                                        console.log('  - Autofilled:', selectDistrito.dataset.autofilled);
+                                        console.log('  - Clases:', selectDistrito.className);
+                                    }, 2000);
+                                }
+                            }, 400);
                         }
-                    }
+                    
                     break;
                 }
             }
+            
+            if (!departamentoEncontrado) {
+                console.warn(`⚠️ No se encontró el departamento "${persona.nombreDepartamento}" en las opciones del select`);
+            }
+        } else {
+            console.warn('⚠️ persona.nombreDepartamento no tiene valor');
         }
         
         // Colocar marcador en el mapa si hay coordenadas
@@ -12227,8 +12452,20 @@ async function autocompletarDatosPersona(persona) {
         
         console.log('✅ Campos autocompletados correctamente');
         
+        // RESTAURAR el listener del departamento después de un delay
+        setTimeout(() => {
+            const selectDepartamento = document.getElementById('departamento-postulacion');
+            if (selectDepartamento && window.departamentoChangeListener) {
+                selectDepartamento.addEventListener('change', window.departamentoChangeListener);
+                console.log('🔓 LISTENER RESTAURADO');
+            }
+            window.bloqueandoAutocompletado = false;
+            console.log('🔓 BLOQUEO DESACTIVADO');
+        }, 2000);
+        
     } catch (error) {
         console.error('❌ Error autocompletando datos:', error);
+        window.bloqueandoAutocompletado = false;
     }
 }
 
@@ -12243,6 +12480,7 @@ function limpiarCamposPostulacion(dni) {
         'apellido-postulacion',
         'calle-postulacion',
         'numeracion-postulacion',
+        'codigoPostal-postulacion',
         'telefono-postulacion'
     ];
     
@@ -12488,6 +12726,14 @@ function validarCampo(campo) {
             
         case 'departamento':
         case 'distrito':
+            // LOG ADICIONAL para debugging
+            if (campo.id === 'distrito-postulacion') {
+                console.log('🔍 VALIDANDO DISTRITO en validarCampo:');
+                console.log('  - Valor actual:', campo.value);
+                console.log('  - Texto seleccionado:', campo.selectedIndex >= 0 ? campo.options[campo.selectedIndex].text : 'ninguno');
+                console.log('  - Autofilled:', campo.dataset.autofilled);
+                console.log('  - Clases:', campo.className);
+            }
             esValido = valor !== '';
             mensajeError = `Debe seleccionar un ${nombre}`;
             break;
@@ -12599,8 +12845,45 @@ function construirDatosPostulacion() {
 async function enviarPostulacion() {
     console.log('🚀 Iniciando envío de postulación...');
     
+    // GUARDAR valores de departamento y distrito ANTES de cualquier cosa
+    const selectDistrito = document.getElementById('distrito-postulacion');
+    const selectDepartamento = document.getElementById('departamento-postulacion');
+    
+    const valorDepartamentoGuardado = selectDepartamento.value;
+    const valorDistritoGuardado = selectDistrito.value;
+    const deptoAutofilled = selectDepartamento.dataset.autofilled === 'true';
+    const distritoAutofilled = selectDistrito.dataset.autofilled === 'true';
+    
+    console.log('💾 VALORES GUARDADOS:');
+    console.log('  - Departamento:', valorDepartamentoGuardado, 'Autofilled:', deptoAutofilled);
+    console.log('  - Distrito:', valorDistritoGuardado, 'Autofilled:', distritoAutofilled);
+    
     // 1. Validar formulario
-    if (!validarFormularioCompleto()) {
+    const esValido = validarFormularioCompleto();
+    
+    // RESTAURAR valores si fueron autocompletados y se borraron
+    if (deptoAutofilled && selectDepartamento.value === '' && valorDepartamentoGuardado !== '') {
+        console.log('🔄 RESTAURANDO departamento:', valorDepartamentoGuardado);
+        selectDepartamento.value = valorDepartamentoGuardado;
+        selectDepartamento.classList.remove('is-invalid');
+        selectDepartamento.classList.add('is-valid');
+    }
+    
+    if (distritoAutofilled && selectDistrito.value === '' && valorDistritoGuardado !== '') {
+        console.log('🔄 RESTAURANDO distrito:', valorDistritoGuardado);
+        selectDistrito.value = valorDistritoGuardado;
+        selectDistrito.classList.remove('is-invalid');
+        selectDistrito.classList.add('is-valid');
+    }
+    
+    // Validar nuevamente si restauramos valores
+    if (!esValido && (deptoAutofilled || distritoAutofilled)) {
+        console.log('🔄 RE-VALIDANDO después de restaurar...');
+        if (!validarFormularioCompleto()) {
+            showMessage('Por favor, corrija los errores en el formulario', 'error');
+            return;
+        }
+    } else if (!esValido) {
         showMessage('Por favor, corrija los errores en el formulario', 'error');
         return;
     }
@@ -12636,6 +12919,7 @@ async function enviarPostulacion() {
             let errorMsg = 'Error al enviar la postulación';
             try {
                 const errorData = await response.json();
+                console.log('📋 Datos de error del backend:', errorData);
                 errorMsg = errorData.message || errorData.error || errorMsg;
             } catch (e) {
                 // Si no se puede parsear, usar mensaje genérico basado en código HTTP
@@ -12652,8 +12936,9 @@ async function enviarPostulacion() {
                 throw new Error('La oferta laboral no existe o fue eliminada');
                 
             } else if (response.status === 409) {
-                // Conflict - Postulación duplicada
-                throw new Error('Ya existe una postulación suya para esta oferta laboral');
+                // Conflict - Postulación duplicada (IllegalStateBusinessException)
+                console.warn('⚠️ Postulación duplicada detectada');
+                throw new Error(errorMsg || 'Ya se encuentra postulado a esta oferta laboral');
                 
             } else if (response.status >= 500) {
                 // Server Error - Error del servidor
@@ -13972,6 +14257,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function debounce(fn, wait=DEBOUNCE_MS) { let t; return function(...args){ clearTimeout(t); t = setTimeout(()=>fn.apply(this,args), wait); }; }
 
     function initDniModule() {
+        // DESACTIVADO - Conflicto con autocompletarDatosPersona()
+        console.log('⚠️ Módulo DNI alternativo DESACTIVADO para evitar conflictos');
+        return;
+        
         const dniEl = findDniInput(); if (!dniEl) { console.log('DNI lookup: campo no encontrado'); return; }
         createHelperElements(dniEl);
         const doSearch = debounce((e)=>{ const v = (e.target.value||'').trim(); if (!v) return; if (!validateDniFormat(v)) { showInlineMessage('DNI inválido (7-8 dígitos)'); return; } buscarYAutocompletar(v); }, DEBOUNCE_MS);
