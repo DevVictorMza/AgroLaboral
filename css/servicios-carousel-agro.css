@@ -124,19 +124,23 @@
         #3D1E0F 50%, 
         #6B3A28 75%, 
         #2F1608 100%) !important;
-    border: 2px solid rgba(139, 69, 19, 0.28) !important;
-    border-radius: 12px;
-    padding: 2.5rem 2rem 3rem 2rem;
+    border: 1px solid rgba(139, 115, 85, 0.35) !important;
+    border-radius: 20px;
+    padding: 3.5rem 3rem 4rem 3rem;
     box-shadow: 
-        var(--agro-shadow-marron),
-        inset 0 1px 0 rgba(139, 69, 19, 0.28),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.22);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+        0 8px 32px rgba(0, 0, 0, 0.25),
+        0 4px 16px rgba(74, 44, 23, 0.3),
+        inset 0 1px 2px rgba(218, 165, 32, 0.15),
+        inset 0 -1px 1px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     position: relative;
     overflow: hidden;
     transform: translateY(0);
     transition: all var(--agro-transition-smooth);
+    outline: 1px solid transparent;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* Asegurar color del texto en el header */
@@ -156,7 +160,8 @@
         #3D1E0F 50%, 
         #6B3A28 75%, 
         #2F1608 100%) !important;
-    border-radius: 12px !important;
+    border-radius: 20px !important;
+    padding: 3.5rem 3rem 4rem 3rem !important;
 }
 
 /* Sobreescribir regla global para títulos de servicios */
@@ -192,12 +197,14 @@
 }
 
 .servicio-header-card:hover {
-    transform: translateY(-3px);
+    transform: translateY(-4px);
+    border-color: rgba(218, 165, 32, 0.45) !important;
     box-shadow: 
-        var(--agro-shadow-marron),
-        inset 0 1px 0 rgba(160, 82, 45, 0.4),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.4),
-        0 15px 40px rgba(74, 44, 23, 0.4);
+        0 12px 48px rgba(0, 0, 0, 0.3),
+        0 6px 24px rgba(74, 44, 23, 0.35),
+        0 20px 60px rgba(218, 165, 32, 0.15),
+        inset 0 1px 2px rgba(218, 165, 32, 0.25),
+        inset 0 -1px 1px rgba(0, 0, 0, 0.2);
 }
 
 .servicio-header-card:hover::before {
@@ -209,7 +216,7 @@
     height: 110px;
     font-size: 2.8rem;
     color: #9ACD32 !important; /* Verde claro agrícola para destacar en fondo marrón */
-    margin: 1.2rem auto 1.8rem;
+    margin: 0 auto 2rem;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -217,26 +224,30 @@
     position: relative;
     transition: all var(--agro-transition-smooth);
     box-shadow:
-        0 8px 24px rgba(0, 0, 0, 0.3),
-        0 4px 12px rgba(255, 255, 255, 0.15) inset,
-        0 2px 6px rgba(255, 255, 255, 0.2) inset;
-    border: 2px solid rgba(255, 255, 255, 0.18);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+        0 10px 30px rgba(0, 0, 0, 0.25),
+        0 5px 15px rgba(107, 142, 35, 0.2),
+        inset 0 1px 3px rgba(255, 255, 255, 0.25),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 248, 220, 0.25);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     background: linear-gradient(135deg, 
         var(--agro-verde-primary) 0%, 
         var(--agro-dorado) 50%, 
         var(--agro-verde-oscuro) 100%);
+    outline: 1px solid transparent;
+    -webkit-font-smoothing: antialiased;
 }
 
 .servicio-header-card:hover .servicio-main-icon {
     color: #FFD700 !important; /* Dorado en hover para efecto elegante */
-    transform: scale(1.08) translateY(-2px);
+    transform: scale(1.1) translateY(-3px) rotate(5deg);
     box-shadow:
-        0 12px 32px rgba(0, 0, 0, 0.35),
-        0 6px 16px rgba(255, 255, 255, 0.18) inset,
-        0 3px 8px rgba(255, 255, 255, 0.25) inset;
-    border-color: rgba(255, 255, 255, 0.28);
+        0 15px 45px rgba(0, 0, 0, 0.3),
+        0 8px 20px rgba(218, 165, 32, 0.35),
+        inset 0 2px 4px rgba(255, 255, 255, 0.3),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.15);
+    border-color: rgba(255, 215, 0, 0.4);
 }
 
 .agro-title {
@@ -244,7 +255,9 @@
     font-family: 'Georgia', serif;
     font-size: 2.5rem;
     font-weight: 700;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    margin-top: 0.5rem;
+    padding: 0 1rem;
     text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.5);
     letter-spacing: -0.5px;
 }
@@ -255,6 +268,7 @@
     font-weight: 400;
     line-height: 1.6;
     margin: 0;
+    padding: 0 1.5rem;
     opacity: 1;
     text-shadow: 0px 1px 2px rgba(255, 255, 255, 0.3);
 }
@@ -351,62 +365,87 @@
    =================================== */
 
 .servicio-icon-agro {
-    /* Mantener tamaño optimizado pero restaurar estilo original con efectos */
-    width: 110px;
-    height: 110px;
-    margin: 1.2rem auto 1.8rem;
+    /* Tamaño profesional optimizado */
+    width: 120px;
+    height: 120px;
+    margin: 0.5rem auto 2.5rem;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.8rem;
+    font-size: 3rem;
     color: white;
     position: relative;
     transition: all var(--agro-transition-smooth);
+    
+    /* Sombras multicapa profesionales */
     box-shadow:
-        0 8px 24px rgba(0, 0, 0, 0.3),
-        0 4px 12px rgba(255, 255, 255, 0.15) inset,
-        0 2px 6px rgba(255, 255, 255, 0.2) inset;
-    border: 2px solid rgba(255, 255, 255, 0.18);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+        0 10px 35px rgba(0, 0, 0, 0.25),
+        0 5px 18px rgba(0, 0, 0, 0.15),
+        inset 0 2px 5px rgba(255, 255, 255, 0.3),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.2);
+    
+    /* Borde doble con efecto de profundidad */
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    outline: 1px solid rgba(255, 255, 255, 0.1);
+    outline-offset: -1px;
+    
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    
+    /* Anti-aliasing para bordes suaves */
+    -webkit-font-smoothing: antialiased;
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 .servicio-icon-agro i {
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 
+        0 3px 6px rgba(0, 0, 0, 0.4),
+        0 1px 2px rgba(0, 0, 0, 0.2);
     line-height: 1;
     display: block;
+    position: relative;
+    z-index: 2;
 }
 
 .servicio-icon-agro::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0; /* keep aura inside the icon bounds to avoid being clipped by card */
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
     border-radius: 50%;
-    background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.18), rgba(255,255,255,0.06) 30%, rgba(0,0,0,0.02) 70%);
-    z-index: -1;
+    background: radial-gradient(
+        circle at 35% 25%, 
+        rgba(255, 255, 255, 0.25), 
+        rgba(255, 255, 255, 0.12) 30%, 
+        rgba(255, 255, 255, 0.05) 50%,
+        rgba(0, 0, 0, 0.08) 80%,
+        transparent 100%
+    );
+    z-index: 1;
     opacity: 0;
-    transform: scale(0.98);
+    transform: scale(0.95) rotate(0deg);
     transition: all var(--agro-transition-smooth);
-    filter: blur(0.6px);
+    filter: blur(1px);
 }
 
 .servicio-card-agro:hover .servicio-icon-agro::before {
-    opacity: 0.75;
-    transform: scale(1.04) rotate(160deg);
+    opacity: 1;
+    transform: scale(1.05) rotate(180deg);
     filter: blur(0px);
 }
 
 .servicio-card-agro:hover .servicio-icon-agro {
-    transform: scale(1.08) translateY(-2px);
+    transform: scale(1.12) translateY(-4px) rotate(-3deg);
     box-shadow:
-        0 12px 32px rgba(0, 0, 0, 0.35),
-        0 6px 16px rgba(255, 255, 255, 0.18) inset,
-        0 3px 8px rgba(255, 255, 255, 0.25) inset;
-    border-color: rgba(255, 255, 255, 0.28);
+        0 18px 50px rgba(0, 0, 0, 0.35),
+        0 10px 25px rgba(0, 0, 0, 0.2),
+        inset 0 3px 8px rgba(255, 255, 255, 0.35),
+        inset 0 -4px 10px rgba(0, 0, 0, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
 }
 
 /* Colores específicos para cada tipo de servicio */
@@ -416,9 +455,10 @@
         #2ECC71 50%, 
         #27AE60 100%); 
     box-shadow: 
-        0 8px 25px rgba(39, 174, 96, 0.3),
-        0 4px 15px rgba(46, 204, 113, 0.1) inset,
-        0 2px 8px rgba(255, 255, 255, 0.2) inset;
+        0 12px 40px rgba(39, 174, 96, 0.4),
+        0 6px 20px rgba(46, 204, 113, 0.25),
+        inset 0 2px 5px rgba(255, 255, 255, 0.3),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.2);
 }
 .servicio-icon-perfiles { 
     background: linear-gradient(135deg, 
@@ -426,9 +466,10 @@
         #5DADE2 50%, 
         #3498DB 100%); 
     box-shadow: 
-        0 8px 25px rgba(52, 152, 219, 0.3),
-        0 4px 15px rgba(93, 173, 226, 0.1) inset,
-        0 2px 8px rgba(255, 255, 255, 0.2) inset;
+        0 12px 40px rgba(52, 152, 219, 0.4),
+        0 6px 20px rgba(93, 173, 226, 0.25),
+        inset 0 2px 5px rgba(255, 255, 255, 0.3),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.2);
 }
 .servicio-icon-trabajo { 
     background: linear-gradient(135deg, 
@@ -436,9 +477,10 @@
         #F8C471 50%, 
         #E67E22 100%); 
     box-shadow: 
-        0 8px 25px rgba(230, 126, 34, 0.3),
-        0 4px 15px rgba(248, 196, 113, 0.1) inset,
-        0 2px 8px rgba(255, 255, 255, 0.2) inset;
+        0 12px 40px rgba(230, 126, 34, 0.4),
+        0 6px 20px rgba(248, 196, 113, 0.25),
+        inset 0 2px 5px rgba(255, 255, 255, 0.3),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.2);
 }
 .servicio-icon-comunicacion { 
     background: linear-gradient(135deg, 
@@ -446,9 +488,10 @@
         #BB8FCE 50%, 
         #9B59B6 100%); 
     box-shadow: 
-        0 8px 25px rgba(155, 89, 182, 0.3),
-        0 4px 15px rgba(187, 143, 206, 0.1) inset,
-        0 2px 8px rgba(255, 255, 255, 0.2) inset;
+        0 12px 40px rgba(155, 89, 182, 0.4),
+        0 6px 20px rgba(187, 143, 206, 0.25),
+        inset 0 2px 5px rgba(255, 255, 255, 0.3),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.2);
 }
 .servicio-icon-pagos { 
     background: linear-gradient(135deg, 
@@ -456,9 +499,10 @@
         #F7DC6F 50%, 
         #F39C12 100%); 
     box-shadow: 
-        0 8px 25px rgba(243, 156, 18, 0.3),
-        0 4px 15px rgba(247, 220, 111, 0.1) inset,
-        0 2px 8px rgba(255, 255, 255, 0.2) inset;
+        0 12px 40px rgba(243, 156, 18, 0.4),
+        0 6px 20px rgba(247, 220, 111, 0.25),
+        inset 0 2px 5px rgba(255, 255, 255, 0.3),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.2);
 }
 .servicio-icon-horarios { 
     background: linear-gradient(135deg, 
@@ -466,9 +510,10 @@
         #48C9B0 50%, 
         #16A085 100%); 
     box-shadow: 
-        0 8px 25px rgba(22, 160, 133, 0.3),
-        0 4px 15px rgba(72, 201, 176, 0.1) inset,
-        0 2px 8px rgba(255, 255, 255, 0.2) inset;
+        0 12px 40px rgba(22, 160, 133, 0.4),
+        0 6px 20px rgba(72, 201, 176, 0.25),
+        inset 0 2px 5px rgba(255, 255, 255, 0.3),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.2);
 }
 .servicio-icon-funciona { 
     background: linear-gradient(135deg, 
@@ -476,9 +521,10 @@
         var(--agro-dorado) 50%, 
         var(--agro-verde-oscuro) 100%); 
     box-shadow: 
-        0 8px 25px rgba(107, 142, 35, 0.3),
-        0 4px 15px rgba(218, 165, 32, 0.1) inset,
-        0 2px 8px rgba(255, 255, 255, 0.2) inset;
+        0 12px 40px rgba(107, 142, 35, 0.4),
+        0 6px 20px rgba(218, 165, 32, 0.25),
+        inset 0 2px 5px rgba(255, 255, 255, 0.3),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.2);
 }
 
 /* ===================================
@@ -877,11 +923,11 @@
 }
 
 .como-funciona-trabajadores .como-funciona-card-title {
-    color: #27AE60;
+    color: #000000 !important;
 }
 
 .como-funciona-empleadores .como-funciona-card-title {
-    color: #3498DB;
+    color: #000000 !important;
 }
 
 .como-funciona-card-title::after {
@@ -905,37 +951,111 @@
 .como-funciona-step {
     display: flex;
     align-items: flex-start;
-    gap: 1rem;
-    padding: 0.5rem 0;
+    gap: 1.5rem;
+    padding: 1rem 0;
+    transition: all var(--agro-transition-fast);
 }
 
 .como-funciona-num {
-    width: 32px;
-    height: 32px;
+    /* Tamaño profesional aumentado */
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.9rem;
-    font-weight: bold;
+    font-size: 1.5rem;
+    font-weight: 700;
     color: white;
     flex-shrink: 0;
-    margin-top: 2px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    transition: all var(--agro-transition-fast);
+    margin-top: 0;
+    transition: all var(--agro-transition-smooth);
+    
+    /* Sombras multicapa profesionales */
+    box-shadow:
+        0 10px 35px rgba(0, 0, 0, 0.25),
+        0 5px 18px rgba(0, 0, 0, 0.15),
+        inset 0 2px 5px rgba(255, 255, 255, 0.3),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.2);
+    
+    /* Borde doble con efecto de profundidad */
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    outline: 1px solid rgba(255, 255, 255, 0.1);
+    outline-offset: -1px;
+    
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    
+    /* Anti-aliasing para bordes suaves */
+    -webkit-font-smoothing: antialiased;
+    transform: translateZ(0);
+    will-change: transform;
+    
+    /* Text shadow para profundidad */
+    text-shadow: 
+        0 3px 6px rgba(0, 0, 0, 0.4),
+        0 1px 2px rgba(0, 0, 0, 0.2);
+    
+    position: relative;
+    z-index: 1;
+}
+
+/* Efecto de brillo interno para los números */
+.como-funciona-num::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle at 35% 25%, 
+        rgba(255, 255, 255, 0.25), 
+        rgba(255, 255, 255, 0.12) 30%, 
+        rgba(255, 255, 255, 0.05) 50%,
+        rgba(0, 0, 0, 0.08) 80%,
+        transparent 100%
+    );
+    z-index: -1;
+    opacity: 0;
+    transform: scale(0.95) rotate(0deg);
+    transition: all var(--agro-transition-smooth);
+    filter: blur(1px);
+}
+
+.como-funciona-step:hover .como-funciona-num::before {
+    opacity: 1;
+    transform: scale(1.05) rotate(180deg);
+    filter: blur(0px);
 }
 
 .funciona-num-trabajador {
-    background: linear-gradient(135deg, #27AE60, #2ECC71);
+    background: linear-gradient(135deg, #27AE60 0%, #2ECC71 50%, #27AE60 100%);
+    box-shadow:
+        0 12px 40px rgba(39, 174, 96, 0.4),
+        0 6px 20px rgba(46, 204, 113, 0.25),
+        inset 0 2px 5px rgba(255, 255, 255, 0.3),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.2);
 }
 
 .funciona-num-empleador {
-    background: linear-gradient(135deg, #3498DB, #5DADE2);
+    background: linear-gradient(135deg, #3498DB 0%, #5DADE2 50%, #3498DB 100%);
+    box-shadow:
+        0 12px 40px rgba(52, 152, 219, 0.4),
+        0 6px 20px rgba(93, 173, 226, 0.25),
+        inset 0 2px 5px rgba(255, 255, 255, 0.3),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.2);
 }
 
 .como-funciona-step:hover .como-funciona-num {
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transform: scale(1.15) translateY(-3px) rotate(-5deg);
+    box-shadow:
+        0 18px 50px rgba(0, 0, 0, 0.35),
+        0 10px 25px rgba(0, 0, 0, 0.2),
+        inset 0 3px 8px rgba(255, 255, 255, 0.35),
+        inset 0 -4px 10px rgba(0, 0, 0, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
 }
 
 .como-funciona-content {

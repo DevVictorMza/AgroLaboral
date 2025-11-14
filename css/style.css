@@ -624,12 +624,20 @@ input#calle::placeholder {
     transition: transform 0.2s;
 }
 .funciona-num-trabajador {
-    background: linear-gradient(135deg, var(--success-green), var(--light-green));
-    box-shadow: 0 4px 15px rgba(39, 174, 96, 0.25);
+    background: linear-gradient(135deg, #27AE60 0%, #2ECC71 50%, #27AE60 100%);
+    box-shadow:
+        0 12px 40px rgba(39, 174, 96, 0.4),
+        0 6px 20px rgba(46, 204, 113, 0.25),
+        inset 0 2px 5px rgba(255, 255, 255, 0.3),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.2);
 }
 .funciona-num-empleador {
-    background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
-    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.25);
+    background: linear-gradient(135deg, #3498DB 0%, #5DADE2 50%, #3498DB 100%);
+    box-shadow:
+        0 12px 40px rgba(52, 152, 219, 0.4),
+        0 6px 20px rgba(93, 173, 226, 0.25),
+        inset 0 2px 5px rgba(255, 255, 255, 0.3),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.2);
 }
 .funciona-num:hover {
     transform: scale(1.08) rotate(-6deg);
@@ -978,9 +986,9 @@ body::before {
      * IMAGEN DE PORTADA - Cambiar aquí por tu imagen
      * Para usar una imagen local: url('../img/tu-imagen.jpg')
      * Para usar una imagen externa: url('https://...')
-     * Imagen actual: Trabajadores agrícolas en campos de cultivo
+     * Imagen actual: banner-agricola.jpg
      */
-    background-image: url('https://images.unsplash.com/photo-1574943320219-553eb213f72d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80');
+    background-image: url('../img/banner-agricola.jpg');
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
@@ -1075,32 +1083,48 @@ body::before {
 .banner-text-content {
     position: relative;
     z-index: 10;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
-    padding: 3rem 4rem;
-    color: #333;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: linear-gradient(135deg, 
+        rgba(0, 0, 0, 0.75) 0%, 
+        rgba(20, 20, 20, 0.65) 50%, 
+        rgba(0, 0, 0, 0.75) 100%);
+    border-radius: 25px;
+    padding: 3.5rem 4.5rem;
+    color: #ffffff;
+    box-shadow: 
+        0 25px 70px rgba(0, 0, 0, 0.5),
+        0 10px 30px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     text-align: center;
-    max-width: 800px;
+    max-width: 850px;
     margin: 0 auto;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .banner-text-content h1 {
-    color: #000000;
-    font-weight: 700;
+    color: #ffffff;
+    font-weight: 800;
     margin-bottom: 1.5rem;
     font-size: 3.5rem;
-    text-shadow: 2px 2px 4px rgba(255,255,255,0.3);
+    text-shadow: 
+        0 2px 10px rgba(0, 0, 0, 0.8),
+        0 4px 20px rgba(0, 0, 0, 0.5),
+        0 0 30px rgba(255, 255, 255, 0.1);
+    letter-spacing: 1px;
 }
 
 .banner-text-content p {
-    color: #5a6c57;
+    color: rgba(255, 255, 255, 0.92);
     font-size: 1.4rem;
-    font-weight: 500;
+    font-weight: 400;
     margin-bottom: 0;
     line-height: 1.6;
+    text-shadow: 
+        0 2px 8px rgba(0, 0, 0, 0.7),
+        0 1px 3px rgba(0, 0, 0, 0.5);
+    letter-spacing: 0.5px;
 }
 
 .banner-icon {
@@ -1645,18 +1669,19 @@ main h2 {
 
 /* ===== EFECTOS PARA EL TÍTULO PRINCIPAL ===== */
 
-/* Título negro elegante */
+/* Título blanco brillante profesional */
 .title-gradient {
-    color: #000000 !important;
+    color: #ffffff !important;
     text-shadow: 
-        1px 1px 3px rgba(255, 255, 255, 0.8),
-        2px 2px 6px rgba(255, 255, 255, 0.6),
-        0 0 15px rgba(255, 255, 255, 0.4);
+        0 3px 12px rgba(0, 0, 0, 0.9),
+        0 6px 25px rgba(0, 0, 0, 0.6),
+        0 0 35px rgba(255, 255, 255, 0.15),
+        0 1px 3px rgba(0, 0, 0, 1);
     letter-spacing: 2px;
     position: relative;
     display: inline-block;
     margin-bottom: 1.5rem;
-    font-weight: 700;
+    font-weight: 800;
 }
 
 /* Animación de entrada del título */
@@ -1669,17 +1694,20 @@ main h2 {
 .title-gradient:hover {
     transform: scale(1.03);
     transition: all 0.3s ease;
-    color: #000000 !important;
+    color: #ffffff !important;
     text-shadow: 
-        1px 1px 4px rgba(255, 255, 255, 0.9),
-        2px 2px 8px rgba(255, 255, 255, 0.7),
-        0 0 20px rgba(255, 255, 255, 0.6);
+        0 3px 15px rgba(0, 0, 0, 1),
+        0 6px 30px rgba(0, 0, 0, 0.7),
+        0 0 50px rgba(255, 255, 255, 0.25),
+        0 0 80px rgba(107, 142, 35, 0.2);
 }
 
 /* Subtítulo mejorado */
 .subtitle-enhanced {
-    color: rgba(255, 255, 255, 0.95);
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+    color: rgba(255, 255, 255, 0.94);
+    text-shadow: 
+        0 2px 10px rgba(0, 0, 0, 0.8),
+        0 1px 4px rgba(0, 0, 0, 0.6);
     font-size: 1.3rem;
     font-weight: 400;
     letter-spacing: 1px;
