@@ -21,33 +21,19 @@ body {
    =================================== */
 
 #page-wrapper {
-    max-width: 1680px; /* Ancho máximo profesional - más estrecho */
+    max-width: 100%; /* Ancho completo */
     margin: 0 auto;
     background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
     min-height: 100vh;
-    box-shadow: 
-        -20px 0 40px rgba(0, 0, 0, 0.5),
-        20px 0 40px rgba(0, 0, 0, 0.5);
+    box-shadow: none;
     position: relative;
 }
 
-/* Bordes laterales sutiles para definir el contenedor */
+/* Bordes laterales deshabilitados para ancho completo */
 #page-wrapper::before,
 #page-wrapper::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background: linear-gradient(
-        to bottom,
-        transparent 0%,
-        rgba(74, 144, 226, 0.1) 20%,
-        rgba(74, 144, 226, 0.2) 50%,
-        rgba(74, 144, 226, 0.1) 80%,
-        transparent 100%
-    );
-    z-index: 1000;
+    display: none;
+}
 }
 
 #page-wrapper::before {
@@ -65,28 +51,28 @@ body {
 /* Pantallas Extra Grandes (2560px+) */
 @media (min-width: 2560px) {
     #page-wrapper {
-        max-width: 2200px;
+        max-width: 100%;
     }
 }
 
 /* Pantallas Muy Grandes (1920px - 2559px) */
 @media (min-width: 1920px) and (max-width: 2559px) {
     #page-wrapper {
-        max-width: 1680px;
+        max-width: 100%;
     }
 }
 
 /* Pantallas Grandes (1600px - 1919px) */
 @media (min-width: 1600px) and (max-width: 1919px) {
     #page-wrapper {
-        max-width: 1580px;
+        max-width: 100%;
     }
 }
 
 /* Pantallas Medianas-Grandes (1400px - 1599px) */
 @media (min-width: 1400px) and (max-width: 1599px) {
     #page-wrapper {
-        max-width: 1500px;
+        max-width: 100%;
     }
 }
 
@@ -126,20 +112,11 @@ body {
     z-index: 1;
 }
 
-/* Navbar FUERA del wrapper - centrado sobre el contenido */
+/* Navbar FUERA del wrapper - ancho completo */
 .navbar.fixed-top {
-    max-width: 1680px;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-/* Responsive: Navbar ocupa 100% en pantallas pequeñas */
-@media (max-width: 1679px) {
-    .navbar.fixed-top {
-        max-width: 100%;
-        left: 0;
-        transform: none;
-    }
+    max-width: 100%;
+    left: 0;
+    transform: none;
 }
 
 /* Banner - NO modificar sus márgenes/padding originales */
