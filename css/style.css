@@ -59,6 +59,41 @@
     --text-muted: #CCCCCC;
     --shadow-blue: rgba(74, 144, 226, 0.3);
     --shadow-dark: rgba(0, 0, 0, 0.8);
+    
+    /* Colores de uva para el mapa */
+    --uva-morada: #722F37;
+    --uva-violeta: #8B4F8B;
+    --uva-purpura: #663399;
+    --uva-bordeaux: #800020;
+    --uva-madura: #4B0E2E;
+    --uva-clara: #9B7FAE;
+    --vino-tinto: #5D1A33;
+    --vino-rosado: #BC8F8F;
+    
+    /* Gradientes de uva */
+    --gradient-uva-principal: linear-gradient(135deg, 
+        var(--uva-morada) 0%, 
+        var(--uva-violeta) 25%, 
+        var(--uva-purpura) 50%, 
+        var(--uva-bordeaux) 75%, 
+        var(--uva-madura) 100%);
+    
+    --gradient-uva-suave: linear-gradient(145deg, 
+        rgba(114, 47, 55, 0.95) 0%, 
+        rgba(139, 79, 139, 0.9) 30%, 
+        rgba(102, 51, 153, 0.85) 60%, 
+        rgba(128, 0, 32, 0.9) 100%);
+    
+    --gradient-uva-overlay: linear-gradient(180deg, 
+        rgba(114, 47, 55, 0.1) 0%, 
+        rgba(139, 79, 139, 0.15) 50%, 
+        rgba(75, 14, 46, 0.2) 100%);
+    
+    /* Sombras de uva */
+    --sombra-uva-ligera: 0 4px 15px rgba(114, 47, 55, 0.3);
+    --sombra-uva-media: 0 8px 25px rgba(139, 79, 139, 0.4);
+    --sombra-uva-intensa: 0 12px 35px rgba(75, 14, 46, 0.5);
+    --sombra-uva-interna: inset 0 2px 8px rgba(114, 47, 55, 0.2);
 }
 
 /* ===========================
@@ -784,25 +819,138 @@ input#calle::placeholder {
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
-/* Ícono específico para la tarjeta del mapa */
+/* Ícono específico para la tarjeta del mapa con tema de uva */
 .servicio-icon-mapa {
-    background: linear-gradient(135deg, #FF6B35, #F7931E);
-    color: white;
-    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
-}
-
-.servicio-card-mapa {
-    background: var(--card-bg) !important;
-    border: 1px solid #444444;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border-radius: 12px;
+    background: var(--gradient-uva-principal) !important;
+    border: 3px solid var(--uva-clara) !important;
+    box-shadow: var(--sombra-uva-media), 
+                inset 0 2px 4px rgba(255, 255, 255, 0.1) !important;
+    color: #FFFFFF !important;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 2rem;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    position: relative;
     overflow: hidden;
 }
 
+.servicio-icon-mapa::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(from 45deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.1), 
+        transparent);
+    animation: rotate-shine-uva 3s linear infinite;
+}
+
+@keyframes rotate-shine-uva {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.servicio-card-mapa {
+    background: var(--gradient-uva-principal) !important;
+    border: 2px solid var(--uva-bordeaux) !important;
+    box-shadow: var(--sombra-uva-intensa) !important;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+    border-radius: 12px;
+}
+
+.servicio-card-mapa::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--gradient-uva-overlay);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.servicio-card-mapa::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, 
+        rgba(139, 79, 139, 0.1) 0%, 
+        transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    z-index: 0;
+}
+
 .servicio-card-mapa:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(255, 107, 53, 0.2);
-    border-color: #FF6B35;
+    transform: translateY(-8px) scale(1.02) !important;
+    box-shadow: var(--sombra-uva-intensa), 
+                0 20px 40px rgba(114, 47, 55, 0.4) !important;
+    border-color: var(--uva-violeta) !important;
+}
+
+.servicio-card-mapa:hover::after {
+    opacity: 1;
+}
+
+.servicio-card-mapa:hover .servicio-icon-mapa {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: var(--sombra-uva-intensa), 
+                inset 0 3px 6px rgba(255, 255, 255, 0.2),
+                0 0 20px rgba(139, 79, 139, 0.6);
+}
+
+.servicio-card-mapa .card-body {
+    position: relative;
+    z-index: 2;
+    background: transparent !important;
+    color: #FFFFFF !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    padding: 2rem;
+}
+
+.servicio-card-mapa h2 {
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.servicio-card-mapa h2::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, 
+        var(--uva-clara) 0%, 
+        #FFD700 50%, 
+        var(--uva-clara) 100%);
+    border-radius: 2px;
+}
+
+.servicio-card-mapa p {
+    color: rgba(255, 255, 255, 0.95) !important;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* Ícono específico para la tarjeta de servicios */
@@ -865,9 +1013,38 @@ input#calle::placeholder {
 }
 
 
+/* Tema vino para elementos seleccionados - SOLO TEXTO */
+h2.fw-bold {
+    background: transparent !important;
+    color: #ffffff !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+    box-shadow: none !important;
+    border: none !important;
+    position: relative !important;
+    overflow: visible !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+h2.fw-bold::before {
+    display: none !important;
+}
+
+h2.fw-bold:hover::before {
+    display: none !important;
+}
+
+h2.fw-bold:hover {
+    transform: none !important;
+    box-shadow: none !important;
+    border-color: transparent !important;
+}
+
 /* Tema agrícola con imagen de fondo */
 body {
-    background: linear-gradient(135deg, #C9A875 0%, #B8956A 50%, #8B7355 100%) !important;
+    background: linear-gradient(135deg, #DCC4A0 0%, #D1B896 50%, #B8A085 100%) !important;
     color: #2C2416 !important;
     min-height: 100vh;
     position: relative;
@@ -3789,6 +3966,16 @@ main:has(#main-map) {
 #btn-ordenar-cercania {
     transition: all 0.3s ease;
     position: relative;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Botón limpiar filtros */
+#btn-limpiar-filtros {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
 #btn-ordenar-fecha.active,

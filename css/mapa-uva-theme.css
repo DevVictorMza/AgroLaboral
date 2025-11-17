@@ -1,0 +1,427 @@
+/**
+ * TEMA MORADO UVA - MAPA INTERACTIVO
+ * ===================================
+ * Diseño glassmorphism premium con gradientes morado uva
+ * para la tarjeta del Mapa Interactivo de Establecimientos
+ * Autor: AgroLaboral Development Team
+ * Version: 1.0.0
+ */
+
+/* ===================================
+   VARIABLES CSS - PALETA UVA
+   =================================== */
+
+:root {
+    /* Paleta Rojo Vino Profundo - Basada en #5F021C */
+    --uva-morado-oscuro: #5F021C;        /* Rojo vino base */
+    --uva-morado-profundo: #4A0115;      /* Rojo vino muy oscuro */
+    --uva-morado-medio: #8B0329;         /* Rojo vino medio */
+    --uva-morado-claro: #A0173A;         /* Rojo vino claro */
+    --uva-violeta: #C7284E;              /* Rojo vino rosado */
+    --uva-lila-suave: #E85A7B;           /* Tono rosa suave */
+    
+    /* Gradientes Rojo Vino Profundo */
+    --uva-gradient-primary: linear-gradient(145deg, 
+        #5F021C 0%,      /* Rojo vino base */
+        #8B0329 25%,     /* Rojo vino medio */
+        #A0173A 50%,     /* Rojo vino claro */
+        #8B0329 75%,     /* Rojo vino medio */
+        #4A0115 100%     /* Rojo vino muy oscuro */
+    );
+    
+    --uva-gradient-glass: linear-gradient(135deg,
+        rgba(95, 2, 28, 0.85) 0%,
+        rgba(139, 3, 41, 0.75) 50%,
+        rgba(160, 23, 58, 0.85) 100%
+    );
+    
+    --uva-gradient-overlay: radial-gradient(circle at 30% 20%,
+        rgba(232, 90, 123, 0.25) 0%,
+        rgba(199, 40, 78, 0.15) 50%,
+        transparent 100%
+    );
+    
+    /* Sombras Rojo Vino Profundo */
+    --uva-shadow-soft: 0 4px 20px rgba(95, 2, 28, 0.25);
+    --uva-shadow-medium: 0 8px 32px rgba(95, 2, 28, 0.35);
+    --uva-shadow-heavy: 0 12px 40px rgba(74, 1, 21, 0.45);
+    --uva-shadow-glow: 0 0 30px rgba(139, 3, 41, 0.4);
+    --uva-shadow-inset: inset 0 2px 8px rgba(255, 255, 255, 0.15);
+    
+    /* Efectos y Transiciones */
+    --uva-transition-smooth: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --uva-transition-bounce: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --uva-blur-glass: 15px;
+    --uva-blur-strong: 20px;
+}
+
+/* ===================================
+   TARJETA PRINCIPAL - MAPA UVA
+   =================================== */
+
+.servicio-card-mapa-uva {
+    /* Gradiente vino #5F021C completo */
+    background: linear-gradient(145deg, #5F021C 0%, #8B0329 25%, #A0173A 50%, #8B0329 75%, #4A0115 100%) !important;
+    
+    /* Efecto Glassmorphism */
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    
+    /* Border con brillo dorado */
+    border: 2px solid rgba(160, 23, 58, 0.4) !important;
+    box-shadow: 
+        0 12px 40px rgba(95, 2, 28, 0.45),
+        inset 0 2px 8px rgba(255, 255, 255, 0.15),
+        0 4px 16px rgba(74, 1, 21, 0.25);
+    
+    /* Border radius suave */
+    border-radius: 16px !important;
+    
+    /* Overflow para pseudo-elementos */
+    position: relative;
+    overflow: hidden;
+    
+    /* Transición suave */
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    
+    /* Optimización de performance */
+    will-change: transform, box-shadow;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* Overlay de gradiente sutil */
+.servicio-card-mapa-uva::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: radial-gradient(circle at 30% 20%, rgba(232, 90, 123, 0.25) 0%, rgba(199, 40, 78, 0.15) 50%, transparent 100%) !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+    opacity: 0.8;
+    transition: opacity var(--uva-transition-smooth);
+}
+
+/* Efecto de brillo en esquina superior */
+.servicio-card-mapa-uva::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle,
+        rgba(255, 255, 255, 0.15) 0%,
+        rgba(255, 255, 255, 0.08) 25%,
+        transparent 50%
+    );
+    pointer-events: none;
+    z-index: 2;
+    transform: rotate(-15deg);
+    opacity: 0.6;
+}
+
+/* ===================================
+   ESTADO HOVER - INTERACTIVIDAD
+   =================================== */
+
+.servicio-card-mapa-uva:hover {
+    /* Elevación dramática */
+    transform: translateY(-10px) scale(1.02) translateZ(0);
+    
+    /* Sombra más pronunciada vino */
+    box-shadow: 
+        0 20px 60px rgba(95, 2, 28, 0.7),
+        0 0 30px rgba(139, 3, 41, 0.4),
+        inset 0 2px 8px rgba(255, 255, 255, 0.15),
+        0 8px 25px rgba(74, 1, 21, 0.35);
+    
+    /* Border dorado brillante */
+    border-color: rgba(255, 215, 0, 0.6) !important;
+    
+    /* Blur más intenso */
+    -webkit-backdrop-filter: blur(25px);
+    backdrop-filter: blur(25px);
+}
+
+/* Aumentar brillo del overlay en hover */
+.servicio-card-mapa-uva:hover::before {
+    opacity: 1;
+}
+
+/* Efecto de brillo rotativo en hover */
+.servicio-card-mapa-uva:hover::after {
+    animation: uva-shine-rotate 3s linear infinite;
+}
+
+@keyframes uva-shine-rotate {
+    0% {
+        transform: rotate(-15deg);
+    }
+    100% {
+        transform: rotate(345deg);
+    }
+}
+
+/* ===================================
+   CONTENIDO DE LA TARJETA
+   =================================== */
+
+.servicio-card-mapa-uva .card-body {
+    position: relative;
+    z-index: 3;
+    padding: 2.5rem 2rem !important;
+}
+
+/* Texto principal - Máximo contraste */
+.servicio-card-mapa-uva h2,
+.servicio-card-mapa-uva .fw-bold {
+    color: #FFFFFF !important;
+    text-shadow: 
+        0 3px 6px rgba(0, 0, 0, 0.6),
+        0 1px 3px rgba(95, 2, 28, 0.5);
+    font-weight: 700 !important;
+    letter-spacing: 0.5px;
+    position: relative !important;
+    z-index: 2 !important;
+}
+
+/* Texto descriptivo */
+.servicio-card-mapa-uva p {
+    color: rgba(255, 255, 255, 0.95) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    position: relative !important;
+    z-index: 2 !important;
+}
+
+/* ===================================
+   ÍCONO DEL MAPA
+   =================================== */
+
+.servicio-card-mapa-uva .servicio-icon-mapa {
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 1.5rem auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Fondo dorado con gradiente */
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    
+    /* Borde brillante */
+    border: 3px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    
+    /* Sombra y profundidad */
+    box-shadow: 
+        0 6px 20px rgba(255, 215, 0, 0.4),
+        inset 0 2px 6px rgba(255, 255, 255, 0.3),
+        inset 0 -2px 6px rgba(0, 0, 0, 0.2);
+    
+    /* Transición suave */
+    transition: all var(--uva-transition-bounce);
+    
+    /* Optimización */
+    position: relative;
+    z-index: 4;
+}
+
+/* Ícono dentro del círculo */
+.servicio-card-mapa-uva .servicio-icon-mapa i {
+    font-size: 2.5rem;
+    color: #5F021C !important;
+    text-shadow: 0 2px 4px rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+/* Hover effect del ícono */
+.servicio-card-mapa-uva:hover .servicio-icon-mapa {
+    transform: scale(1.15) rotate(5deg);
+    box-shadow: 
+        0 8px 30px rgba(255, 215, 0, 0.6),
+        inset 0 3px 8px rgba(255, 255, 255, 0.4),
+        inset 0 -3px 8px rgba(0, 0, 0, 0.25);
+}
+
+.servicio-card-mapa-uva:hover .servicio-icon-mapa i {
+    transform: scale(1.1);
+    color: #4A0115 !important;
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+
+/* Tablets y dispositivos medianos */
+@media (max-width: 992px) {
+    .servicio-card-mapa-uva {
+        border-radius: 16px !important;
+    }
+    
+    .servicio-card-mapa-uva .card-body {
+        padding: 2rem 1.5rem !important;
+    }
+    
+    .servicio-card-mapa-uva .servicio-icon-mapa {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .servicio-card-mapa-uva .servicio-icon-mapa i {
+        font-size: 2.2rem;
+    }
+}
+
+/* Móviles */
+@media (max-width: 768px) {
+    .servicio-card-mapa-uva {
+        /* Reducir blur para mejor performance */
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 14px !important;
+    }
+    
+    .servicio-card-mapa-uva .card-body {
+        padding: 1.75rem 1.25rem !important;
+    }
+    
+    .servicio-card-mapa-uva h2 {
+        font-size: 1.5rem !important;
+    }
+    
+    .servicio-card-mapa-uva p {
+        font-size: 0.95rem;
+    }
+    
+    .servicio-card-mapa-uva .servicio-icon-mapa {
+        width: 70px;
+        height: 70px;
+        margin-bottom: 1.25rem;
+    }
+    
+    .servicio-card-mapa-uva .servicio-icon-mapa i {
+        font-size: 2rem;
+    }
+    
+    /* Simplificar hover en móviles */
+    .servicio-card-mapa-uva:hover {
+        transform: translateY(-5px) translateZ(0);
+    }
+}
+
+/* Móviles pequeños */
+@media (max-width: 576px) {
+    .servicio-card-mapa-uva {
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-radius: 12px !important;
+    }
+    
+    .servicio-card-mapa-uva .card-body {
+        padding: 1.5rem 1rem !important;
+    }
+    
+    .servicio-card-mapa-uva h2 {
+        font-size: 1.3rem !important;
+    }
+    
+    .servicio-card-mapa-uva .servicio-icon-mapa {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .servicio-card-mapa-uva .servicio-icon-mapa i {
+        font-size: 1.75rem;
+    }
+}
+
+/* ===================================
+   FALLBACK PARA NAVEGADORES SIN SOPORTE
+   =================================== */
+
+@supports not (backdrop-filter: blur(15px)) {
+    .servicio-card-mapa-uva {
+        /* Fondo sólido rojo vino si no hay soporte para blur */
+        background: linear-gradient(145deg, 
+            rgba(95, 2, 28, 0.95) 0%,
+            rgba(139, 3, 41, 0.95) 50%,
+            rgba(74, 1, 21, 0.95) 100%
+        ) !important;
+    }
+}
+
+/* ===================================
+   ACCESIBILIDAD
+   =================================== */
+
+/* Reducir animaciones para usuarios con preferencia */
+@media (prefers-reduced-motion: reduce) {
+    .servicio-card-mapa-uva,
+    .servicio-card-mapa-uva::before,
+    .servicio-card-mapa-uva::after,
+    .servicio-card-mapa-uva .servicio-icon-mapa,
+    .servicio-card-mapa-uva .servicio-icon-mapa i {
+        transition: none !important;
+        animation: none !important;
+    }
+    
+    .servicio-card-mapa-uva:hover {
+        transform: none !important;
+    }
+}
+
+/* Focus para navegación por teclado */
+.servicio-card-mapa-uva:focus-within {
+    outline: 3px solid rgba(255, 215, 0, 0.8);
+    outline-offset: 4px;
+}
+
+/* ===================================
+   OPTIMIZACIÓN DE PERFORMANCE
+   =================================== */
+
+/* Utilizar GPU para animaciones */
+.servicio-card-mapa-uva,
+.servicio-card-mapa-uva::before,
+.servicio-card-mapa-uva::after {
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+/* Mejorar rendering en Safari */
+@supports (-webkit-appearance: none) {
+    .servicio-card-mapa-uva {
+        -webkit-transform: translateZ(0);
+        -webkit-backface-visibility: hidden;
+        -webkit-perspective: 1000px;
+    }
+}
+
+/* ===================================
+   PRINT STYLES
+   =================================== */
+
+@media print {
+    .servicio-card-mapa-uva {
+        background: white !important;
+        border: 2px solid #5F021C !important;
+        box-shadow: none !important;
+    }
+    
+    .servicio-card-mapa-uva::before,
+    .servicio-card-mapa-uva::after {
+        display: none !important;
+    }
+    
+    .servicio-card-mapa-uva h2,
+    .servicio-card-mapa-uva p {
+        color: #000000 !important;
+        text-shadow: none !important;
+    }
+}
