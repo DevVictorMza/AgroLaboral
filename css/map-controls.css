@@ -223,12 +223,12 @@
 #mapa-establecimientos .leaflet-control-attribution,
 #map .leaflet-control-attribution,
 #mapFinca .leaflet-control-attribution {
-    background: rgba(30, 42, 56, 0.9) !important;
-    color: #adb5bd !important;
+    background: #FFFFFF !important;
+    color: #333333 !important;
     font-size: 10px !important;
     border-radius: 6px 0 0 0 !important;
     padding: 4px 8px !important;
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(0, 0, 0, 0.15) !important;
     border-right: none !important;
     border-bottom: none !important;
 }

@@ -24,6 +24,43 @@
     padding-right: 1rem;
 }
 
+/* Ancho 95vw para el row del card de ofertas */
+#ofertas-disponibles .container-fluid > .row.justify-content-center.mb-4 {
+    width: 95vw;
+    max-width: 95vw;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Ancho 95vw para la columna del card de ofertas */
+/* SOLUCIÓN DEFINITIVA - 95% de ancho para ofertas */
+main#ofertas-disponibles.container-fluid.py-5 {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 2.5vw !important;
+    padding-right: 2.5vw !important;
+    margin: 0 !important;
+}
+
+main#ofertas-disponibles.container-fluid.py-5 > .row.justify-content-center.mb-4 {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+}
+
+main#ofertas-disponibles.container-fluid.py-5 > .row.justify-content-center.mb-4 > .col-12 {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    flex: none !important;
+}
+
+main#ofertas-disponibles.container-fluid.py-5 > .row.justify-content-center.mb-4 > .col-12 > .card.card-ancho-95 {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+}
+
 /* ===================================
    TARJETAS Y CONTENIDO
    =================================== */

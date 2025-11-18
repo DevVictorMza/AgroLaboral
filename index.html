@@ -859,28 +859,30 @@
     </main>
 
     <!-- Ofertas Disponibles -->
-    <section id="ofertas-disponibles" class="py-5">
-        <div class="container-fluid">
-            <div class="row justify-content-center mb-4">
-                <div class="col-12">
-                    <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-ofertas card-ancho-95">
-                        <div class="card-body text-center">
-                            <div class="mb-1 servicio-icon servicio-icon-ofertas"><i class="fas fa-briefcase"></i></div>
-                            <h2 class="fw-bold">Ofertas Disponibles</h2>
-                            <p class="mb-0">Descubre oportunidades laborales en el sector agrícola</p>
-                            <div class="mt-1">
-                                <span id="contador-ofertas-publicas" class="badge bg-success fs-6">Cargando ofertas...</span>
-                            </div>
+    <main id="ofertas-disponibles" class="container-fluid py-5">
+        <div class="row justify-content-center mb-4">
+            <div class="col-12">
+                <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-ofertas card-ancho-95">
+                    <div class="card-body text-center">
+                        <div class="mb-1 servicio-icon servicio-icon-ofertas"><i class="fas fa-briefcase"></i></div>
+                        <h2 class="fw-bold">Ofertas Disponibles</h2>
+                        <p class="mb-0">Descubre oportunidades laborales en el sector agrícola</p>
+                        <div class="mt-1">
+                            <span id="contador-ofertas-publicas" class="badge bg-success fs-6">Cargando ofertas...</span>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
         
         <!-- Filtros de Ofertas Públicas -->
         <div class="row justify-content-center mb-4">
             <div class="col-lg-10 col-xl-9">
                 <div class="card shadow-sm border-0 ofertas-filtros-container">
                     <div class="card-body">
+                        <h4 class="text-center mb-4 fw-bold">
+                            <i class="fas fa-filter me-2"></i>BUSCAR POR
+                        </h4>
                         <div class="row g-3 align-items-end">
                             <!-- Filtro por Puesto -->
                             <div class="col-md-5">
@@ -943,9 +945,9 @@
                 </div>
             </div>
         </div>        <!-- Container de Ofertas -->
-        <div class="row justify-content-center">
+        <div class="row justify-content-center" style="width: 95%; margin: 0 auto;">
             <div class="col-12">
-                <div class="row g-4" id="ofertas-publicas-container">
+                <div class="row" id="ofertas-publicas-container">
                     <!-- Las ofertas se cargarán aquí dinámicamente -->
                     <div class="col-12 text-center py-5 ofertas-loading-container">
                         <div class="spinner-border text-primary" role="status" aria-label="Cargando ofertas">
@@ -958,7 +960,7 @@
             </div>
         </div>
         </div>
-    </section>
+    </main>
 
     <!-- Main Content -->
     </div> <!-- Fin de public-view -->

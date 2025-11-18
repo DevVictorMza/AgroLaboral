@@ -2514,7 +2514,7 @@ function generarHtmlEstablecimientos(establecimientos) {
             <div class="establecimiento-info-principal">
                 <div class="establecimiento-nombre">
                     <i class="fas fa-warehouse" style="font-size: 0.9rem; color: #27AE60;"></i>
-                    <h6>${est.nombreEstablecimiento}</h6>
+                    <h6>${est.nombreEstablecimiento.toUpperCase()}</h6>
                 </div>
                 <div class="establecimiento-detalles-inline">
                     <span class="detalle-item">
@@ -3382,7 +3382,7 @@ async function verDetalleEstablecimiento(idEstablecimiento) {
                                     <i class="fas fa-building"></i>
                                 </div>
                                 <div class="header-ubicacion-text">
-                                    <h5 class="modal-title">${establecimiento.nombreEstablecimiento}</h5>
+                                    <h5 class="modal-title">${establecimiento.nombreEstablecimiento.toUpperCase()}</h5>
                                     ${establecimiento.especies && establecimiento.especies.length > 0 ? `
                                         <span class="especies-contador-badge">
                                             <i class="fas fa-seedling me-1"></i>
@@ -3406,7 +3406,7 @@ async function verDetalleEstablecimiento(idEstablecimiento) {
                                         </div>
                                         <div class="info-item">
                                             <span class="info-label">Nombre</span>
-                                            <span class="info-value">${establecimiento.nombreEstablecimiento}</span>
+                                            <span class="info-value">${establecimiento.nombreEstablecimiento.toUpperCase()}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -4082,7 +4082,7 @@ function actualizarDashboardConFinca(finca) {
                     <div class="finca-card p-3 border border-success rounded">
                         <h6 class="text-success mb-2">
                             <i class="fas fa-check-circle me-2"></i>
-                            ${finca.nombreEstablecimiento || finca.nombre}
+                            ${(finca.nombreEstablecimiento || finca.nombre).toUpperCase()}
                         </h6>
                         <p class="text-muted small mb-2">
                             <i class="fas fa-map-marker-alt me-1"></i>
@@ -5454,7 +5454,7 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 					
 					const popupContent = `
 						<div class="establecimiento-popup">
-							<h6><strong>${establecimiento.nombre}</strong></h6>
+							<h6><strong>${establecimiento.nombre.toUpperCase()}</strong></h6>
 							<p><strong>Especie principal:</strong> ${establecimiento.especie_principal}</p>
 							<p><strong>Ofertas laborales activas:</strong></p>
 							<div class="ofertas-container">
@@ -8789,7 +8789,7 @@ function crearPopupEstablecimiento(establecimiento) {
         <div class="popup-establecimiento" style="font-family: Arial, sans-serif; font-size: 14px; max-width: 300px;">
             <h6 style="margin: 0 0 8px 0; font-weight: bold; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 4px;">
                 <i class="fas fa-map-marker-alt" style="color: #e74c3c; margin-right: 5px;"></i>
-                ${establecimiento.nombreEstablecimiento}
+                ${establecimiento.nombreEstablecimiento.toUpperCase()}
             </h6>
             
             <div style="margin-bottom: 8px;">
@@ -9928,7 +9928,7 @@ function renderizarOfertas(ofertas) {
                         
                         <div class="oferta-establecimiento">
                             <i class="fas fa-building"></i>
-                            <span>${escapeHtml(oferta.nombreEstablecimiento)}</span>
+                            <span>${escapeHtml(oferta.nombreEstablecimiento).toUpperCase()}</span>
                         </div>
                         
                         <!-- Grid de información -->
@@ -11250,7 +11250,7 @@ function crearPopupOferta(oferta) {
             <div class="popup-header">
                 <h6 class="mb-1 text-primary">
                     <i class="fas fa-building me-1"></i>
-                    ${oferta.nombreEstablecimiento}
+                    ${oferta.nombreEstablecimiento.toUpperCase()}
                 </h6>
                 <span class="badge bg-primary">${oferta.nombreEspecie}</span>
             </div>
@@ -11413,75 +11413,82 @@ function renderizarOfertasPublicas(ofertas) {
         const headerColor = oferta.vacantes >= 5 ? 'bg-success' : oferta.vacantes >= 3 ? 'bg-primary' : 'bg-warning';
         
         return `
-            <div class="col-lg-6 col-xl-4 mb-4">
-                <div class="card h-100 shadow-sm border-0 oferta-publica-card" data-oferta-id="${oferta.idOfertaEmpleo}" data-lat="${oferta.latitud}" data-lng="${oferta.longitud}" style="position: relative;">
-                    <div class="card-header ${headerColor} text-white" style="position: relative;">
-                        <h5 class="card-title mb-0">
-                            <i class="fas fa-briefcase me-2"></i>
-                            ${oferta.nombrePuestoTrabajo || 'Puesto no especificado'}
-                        </h5>
-                        <small class="opacity-75">
-                            <i class="fas fa-seedling me-1"></i>
-                            ${oferta.nombreEspecie || 'Especie no especificada'}
-                        </small>
-                        ${oferta.distancia !== undefined && oferta.distancia !== null ? `
-                            <div class="oferta-distancia-badge">
-                                <i class="fas fa-location-arrow"></i>
-                                <span>${formatearDistancia(oferta.distancia)}</span>
+            <div class="col-12 mb-3">
+                <div class="card shadow-sm border-0 oferta-publica-card oferta-publica-card-horizontal" data-oferta-id="${oferta.idOfertaEmpleo}" data-lat="${oferta.latitud}" data-lng="${oferta.longitud}">
+                    <div class="oferta-card-content">
+                        <!-- Sección Icono/Estado -->
+                        <div class="oferta-icon-section">
+                            <div class="oferta-icon-wrapper ${headerColor}">
+                                <i class="fas fa-briefcase"></i>
                             </div>
-                        ` : ''}
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <h6 class="fw-bold text-primary mb-2">
-                                <i class="fas fa-building me-1"></i>
-                                ${oferta.nombreEmpresa || 'Empresa no especificada'}
-                            </h6>
-                            <p class="text-muted small mb-0">
-                                <i class="fas fa-map-pin me-1"></i>
-                                ${oferta.nombreEstablecimiento || 'Establecimiento no especificado'}
-                            </p>
+                            <div class="oferta-badge-container">
+                                ${oferta.distancia !== undefined && oferta.distancia !== null ? `
+                                    <div class="oferta-distancia-badge-horizontal">
+                                        <i class="fas fa-location-arrow"></i>
+                                        <span>${formatearDistancia(oferta.distancia)}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
                         </div>
                         
-                        <div class="row g-2 mb-3">
-                            <div class="col-6">
-                                <small class="text-muted">
-                                    <i class="fas fa-users me-1"></i>
-                                    Vacantes
-                                </small>
-                                <div class="fw-bold ${oferta.vacantes >= 3 ? 'text-success' : 'text-warning'}">
-                                    ${oferta.vacantes || 1} ${oferta.vacantes === 1 ? 'puesto' : 'puestos'}
-                                </div>
+                        <!-- Sección Información Principal -->
+                        <div class="oferta-info-section">
+                            <div class="oferta-header-horizontal">
+                                <h5 class="oferta-titulo">
+                                    ${oferta.nombrePuestoTrabajo || 'Puesto no especificado'}
+                                </h5>
+                                <span class="oferta-especie">
+                                    <i class="fas fa-seedling me-1"></i>
+                                    ${oferta.nombreEspecie || 'Especie no especificada'}
+                                </span>
                             </div>
-                            <div class="col-6">
-                                <small class="text-muted">
-                                    <i class="fas fa-map-marker-alt me-1"></i>
-                                    Ubicación
-                                </small>
-                                <div class="fw-bold small">
+                            
+                            <div class="oferta-empresa-horizontal">
+                                <h6 class="fw-bold text-primary mb-1">
+                                    <i class="fas fa-building me-1"></i>
+                                    ${oferta.nombreEmpresa || 'Empresa no especificada'}
+                                </h6>
+                                <p class="text-muted small mb-0">
+                                    <i class="fas fa-map-pin me-1"></i>
+                                    ${(oferta.nombreEstablecimiento || 'Establecimiento no especificado').toUpperCase()}
+                                </p>
+                            </div>
+                            
+                            <div class="oferta-detalles-horizontal">
+                                <div class="oferta-detalle-item">
+                                    <small class="text-muted">
+                                        <i class="fas fa-users me-1"></i>
+                                        Vacantes
+                                    </small>
+                                    <div class="fw-bold ${oferta.vacantes >= 3 ? 'text-success' : 'text-warning'}">
+                                        ${oferta.vacantes || 1} ${oferta.vacantes === 1 ? 'puesto' : 'puestos'}
+                                    </div>
+                                </div>
+                                <div class="oferta-detalle-item">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar-times me-1"></i>
+                                        Fecha de cierre
+                                    </small>
+                                    <div class="fw-bold ${urgenciaClase}">
+                                        ${fechaCierre}
+                                        ${diasRestantes > 0 ? `<small class="ms-1">(${diasRestantes} días)</small>` : '<small class="ms-1">(Vencida)</small>'}
+                                    </div>
+                                </div>
+                                <div class="oferta-detalle-item">
                                     <button class="btn btn-link p-0 text-info fw-bold" onclick="verEnMapa('${oferta.idOfertaEmpleo}')" title="Ver ubicación en mapa">
-                                        <i class="fas fa-location-dot me-1"></i>Ver ubicación
+                                        <i class="fas fa-location-dot me-1"></i>Ver en mapa
                                     </button>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="mb-3">
-                            <small class="text-muted">
-                                <i class="fas fa-calendar-times me-1"></i>
-                                Fecha de cierre
-                            </small>
-                            <div class="fw-bold ${urgenciaClase}">
-                                ${fechaCierre}
-                                ${diasRestantes > 0 ? `<small class="ms-1">(${diasRestantes} días)</small>` : '<small class="ms-1">(Vencida)</small>'}
-                            </div>
+                        <!-- Sección Acciones -->
+                        <div class="oferta-actions-section">
+                            <button class="btn btn-primary btn-postularse" onclick="contactarEmpresa('${oferta.idOfertaEmpleo}')">
+                                <i class="fas fa-paper-plane me-2"></i>
+                                Postularse
+                            </button>
                         </div>
-                    </div>
-                    <div class="card-footer bg-light d-flex gap-2">
-                        <button class="btn btn-primary btn-sm flex-fill" onclick="contactarEmpresa('${oferta.idOfertaEmpleo}')">
-                            <i class="fas fa-phone me-1"></i>
-                            Postularse
-                        </button>
                     </div>
                 </div>
             </div>
@@ -13124,7 +13131,7 @@ function buscarYDestacarUbicacion(latitud, longitud, nombreEstablecimiento) {
         // Crear un marcador temporal para la ubicación
         const marcadorTemporal = L.marker([latitud, longitud])
             .addTo(mapaPrincipal.instancia)
-            .bindPopup(`<strong>${nombreEstablecimiento}</strong><br>Ubicación de oferta laboral`)
+            .bindPopup(`<strong>${nombreEstablecimiento.toUpperCase()}</strong><br>Ubicación de oferta laboral`)
             .openPopup();
             
         // Agregar efecto de bounce
@@ -13342,7 +13349,7 @@ function mostrarPopupMejorado(marcador, oferta) {
             <div class="popup-body">
                 <p class="mb-2">
                     <i class="fas fa-building me-2 text-muted"></i>
-                    <strong>${oferta.nombreEstablecimiento}</strong>
+                    <strong>${oferta.nombreEstablecimiento.toUpperCase()}</strong>
                 </p>
                 <p class="mb-2">
                     <i class="fas fa-map-marker-alt me-2 text-danger"></i>

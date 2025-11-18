@@ -10,7 +10,7 @@
    =================================== */
 
 body {
-    background: linear-gradient(135deg, #DCC4A0 0%, #D1B896 50%, #B8A085 100%) !important;
+    background: #DCC4A0 !important;
     margin: 0;
     padding: 0;
     overflow-x: hidden;
@@ -23,7 +23,7 @@ body {
 #page-wrapper {
     max-width: 100%; /* Ancho completo */
     margin: 0 auto;
-    background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+    background: transparent;
     min-height: 100vh;
     box-shadow: none;
     position: relative;
@@ -143,37 +143,10 @@ body {
 
 /* Sombras laterales para efecto de profundidad */
 @media (min-width: 1680px) {
+    /* Pseudo-elementos eliminados para pantallas anchas */
     body::before,
     body::after {
-        content: '';
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        width: calc((100vw - 1680px) / 2);
-        background: linear-gradient(
-            to right,
-            rgba(0, 0, 0, 1) 0%,
-            rgba(0, 0, 0, 0.9) 30%,
-            rgba(0, 0, 0, 0.5) 70%,
-            rgba(0, 0, 0, 0) 100%
-        );
-        z-index: 999;
-        pointer-events: none;
-    }
-    
-    body::before {
-        left: 0;
-    }
-    
-    body::after {
-        right: 0;
-        background: linear-gradient(
-            to left,
-            rgba(0, 0, 0, 1) 0%,
-            rgba(0, 0, 0, 0.9) 30%,
-            rgba(0, 0, 0, 0.5) 70%,
-            rgba(0, 0, 0, 0) 100%
-        );
+        display: none;
     }
 }
 
