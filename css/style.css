@@ -1,3 +1,42 @@
+.leaflet-control-layers-toggle {
+    background: #fff !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12) !important;
+    border: 1px solid #e0e0e0 !important;
+    width: 44px !important;
+    height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+}
+.leaflet-control-layers-toggle img, .leaflet-control-layers-toggle svg, .leaflet-control-layers-toggle i {
+    filter: none !important;
+    opacity: 1 !important;
+    width: 24px !important;
+    height: 24px !important;
+    margin: 0 !important;
+}
+/* Quitar fondo negro del botón de capas Leaflet y mostrar iconos */
+.leaflet-control-layers-toggle {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+.leaflet-control-layers-toggle img, .leaflet-control-layers-toggle svg, .leaflet-control-layers-toggle i {
+    filter: none !important;
+    opacity: 1 !important;
+}
+/* Tarjeta con 95% de ancho centrada */
+.card-ancho-95 {
+    width: 95% !important;
+    margin: 0 auto !important;
+}
+/* Tarjeta con 90% de ancho centrada */
+.card-ancho-90 {
+    width: 90% !important;
+    margin: 0 auto !important;
+}
 .leaflet-control-layers .leaflet-control-layers-list label,
 .leaflet-control-layers label,
 .leaflet-control-layers-base label,
@@ -743,11 +782,6 @@ input#calle::placeholder {
     overflow: hidden;
 }
 
-.servicio-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    border-color: var(--primary-blue);
-}
 
 .servicio-card .card-body {
     padding: 2rem;
@@ -814,16 +848,12 @@ input#calle::placeholder {
     box-shadow: 0 4px 15px rgba(30, 144, 255, 0.3);
 }
 
-.servicio-card:hover .servicio-icon {
-    transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-}
 
-/* Ícono específico para la tarjeta del mapa con tema de uva */
+/* Ícono específico para la tarjeta del mapa con tema borgoña */
 .servicio-icon-mapa {
-    background: var(--gradient-uva-principal) !important;
-    border: 3px solid var(--uva-clara) !important;
-    box-shadow: var(--sombra-uva-media), 
+    background: linear-gradient(135deg, #5F021C 0%, #8B0329 50%, #A0173A 100%) !important;
+    border: 3px solid #BC8F8F !important;
+    box-shadow: 0 8px 25px rgba(95, 2, 28, 0.4), 
                 inset 0 2px 4px rgba(255, 255, 255, 0.1) !important;
     color: #FFFFFF !important;
     width: 80px;
@@ -859,9 +889,9 @@ input#calle::placeholder {
 }
 
 .servicio-card-mapa {
-    background: var(--gradient-uva-principal) !important;
-    border: 2px solid var(--uva-bordeaux) !important;
-    box-shadow: var(--sombra-uva-intensa) !important;
+    background: linear-gradient(145deg, #5F021C 0%, #8B0329 25%, #A0173A 50%, #8B0329 75%, #4A0115 100%) !important;
+    border: 2px solid rgba(160, 23, 58, 0.4) !important;
+    box-shadow: 0 12px 40px rgba(95, 2, 28, 0.45) !important;
     position: relative;
     overflow: hidden;
     transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
@@ -875,7 +905,10 @@ input#calle::placeholder {
     left: 0;
     right: 0;
     bottom: 0;
-    background: var(--gradient-uva-overlay);
+    background: linear-gradient(180deg, 
+        rgba(95, 2, 28, 0.1) 0%, 
+        rgba(139, 3, 41, 0.15) 50%, 
+        rgba(74, 1, 21, 0.2) 100%);
     pointer-events: none;
     z-index: 1;
 }
@@ -896,23 +929,6 @@ input#calle::placeholder {
     z-index: 0;
 }
 
-.servicio-card-mapa:hover {
-    transform: translateY(-8px) scale(1.02) !important;
-    box-shadow: var(--sombra-uva-intensa), 
-                0 20px 40px rgba(114, 47, 55, 0.4) !important;
-    border-color: var(--uva-violeta) !important;
-}
-
-.servicio-card-mapa:hover::after {
-    opacity: 1;
-}
-
-.servicio-card-mapa:hover .servicio-icon-mapa {
-    transform: scale(1.1) rotate(5deg);
-    box-shadow: var(--sombra-uva-intensa), 
-                inset 0 3px 6px rgba(255, 255, 255, 0.2),
-                0 0 20px rgba(139, 79, 139, 0.6);
-}
 
 .servicio-card-mapa .card-body {
     position: relative;
@@ -968,11 +984,7 @@ input#calle::placeholder {
     overflow: hidden;
 }
 
-.servicio-card-servicios:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(74, 144, 226, 0.2);
-    border-color: #4A90E2;
-}
+
 
 /* Ícono específico para la tarjeta de cómo funciona */
 .servicio-icon-funciona {
@@ -989,11 +1001,7 @@ input#calle::placeholder {
     overflow: hidden;
 }
 
-.servicio-card-funciona:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(39, 174, 96, 0.2);
-    border-color: #27AE60;
-}
+
 
 /* Stat cards íconos */
 .stat-icon { color: #7E57C2; }
@@ -1632,13 +1640,13 @@ main h2 {
     padding: 0.75rem 1.5rem;
     margin: 0 0.25rem;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: linear-gradient(145deg, rgba(95, 2, 28, 0.3) 0%, rgba(139, 3, 41, 0.25) 50%, rgba(160, 23, 58, 0.3) 100%);
+    border: 1px solid rgba(160, 23, 58, 0.4);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     position: relative;
     overflow: hidden;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2),
+    box-shadow: 0 3px 10px rgba(95, 2, 28, 0.2),
                 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
@@ -1657,9 +1665,9 @@ main h2 {
     color: #ffffff !important;
     transform: translateY(-3px) scale(1.05);
     text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8);
-    background: rgba(255, 255, 255, 0.25);
-    border-color: rgba(74, 144, 226, 0.6);
-    box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4),
+    background: linear-gradient(145deg, rgba(139, 3, 41, 0.5) 0%, rgba(160, 23, 58, 0.6) 50%, rgba(139, 3, 41, 0.5) 100%);
+    border-color: rgba(160, 23, 58, 0.7);
+    box-shadow: 0 6px 20px rgba(95, 2, 28, 0.4),
                 0 3px 10px rgba(0, 0, 0, 0.4),
                 inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
@@ -1672,33 +1680,33 @@ main h2 {
     color: #ffffff !important;
     font-weight: 700;
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
-    background: rgba(74, 144, 226, 0.3);
-    border-color: rgba(74, 144, 226, 0.7);
-    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.5),
+    background: linear-gradient(145deg, rgba(95, 2, 28, 0.6) 0%, rgba(160, 23, 58, 0.5) 50%, rgba(95, 2, 28, 0.6) 100%);
+    border-color: rgba(160, 23, 58, 0.8);
+    box-shadow: 0 4px 15px rgba(95, 2, 28, 0.5),
                 0 2px 8px rgba(0, 0, 0, 0.3),
                 inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 /* Estilos específicos para los botones de acción (Login y Registro) */
 #transparent-navbar #public-buttons .nav-link {
-    background: linear-gradient(135deg, rgba(74, 144, 226, 0.9) 0%, rgba(53, 122, 189, 0.8) 100%) !important;
+    background: linear-gradient(145deg, #5F021C 0%, #8B0329 25%, #A0173A 50%, #8B0329 75%, #4A0115 100%) !important;
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(74, 144, 226, 0.5) !important;
+    border: 2px solid rgba(160, 23, 58, 0.4) !important;
     color: #ffffff !important;
     font-weight: 600 !important;
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
-    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3),
+    box-shadow: 0 4px 15px rgba(95, 2, 28, 0.3),
                 inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 #transparent-navbar #public-buttons .nav-link:hover {
-    background: linear-gradient(135deg, rgba(74, 144, 226, 1) 0%, rgba(53, 122, 189, 0.9) 100%) !important;
-    border-color: rgba(74, 144, 226, 0.7) !important;
+    background: linear-gradient(145deg, #8B0329 0%, #A0173A 50%, #8B0329 100%) !important;
+    border-color: rgba(160, 23, 58, 0.6) !important;
     transform: translateY(-3px) !important;
     color: #ffffff !important;
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
-    box-shadow: 0 6px 20px rgba(74, 144, 226, 0.5),
+    box-shadow: 0 6px 20px rgba(95, 2, 28, 0.4),
                 0 3px 10px rgba(0, 0, 0, 0.3),
                 inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
 }

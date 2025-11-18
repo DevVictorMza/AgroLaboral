@@ -103,22 +103,28 @@
 #mapa-establecimientos .leaflet-control-layers-toggle,
 #map .leaflet-control-layers-toggle,
 #mapFinca .leaflet-control-layers-toggle {
-    background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%) !important;
-    width: 40px !important;
-    height: 40px !important;
-    border-radius: 10px !important;
-    background-size: 60% !important;
+    background: #FFFFFF !important;
+    width: 46px !important;
+    height: 46px !important;
+    border-radius: 12px !important;
     transition: all 0.3s ease !important;
-    filter: brightness(0) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    border: 2px solid #5F021C !important;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%235F021C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>') !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 24px 24px !important;
 }
 
 .leaflet-control-layers-toggle:hover,
 #mapa-establecimientos .leaflet-control-layers-toggle:hover,
 #map .leaflet-control-layers-toggle:hover,
 #mapFinca .leaflet-control-layers-toggle:hover {
-    background: linear-gradient(145deg, #e9ecef 0%, #dee2e6 100%) !important;
-    transform: scale(1.05) !important;
-    filter: brightness(0.3) !important;
+    background-color: #5F021C !important;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>') !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 16px rgba(95, 2, 28, 0.3), 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+    border-color: #8B0329 !important;
 }
 
 /* Contenido expandido del control de capas */

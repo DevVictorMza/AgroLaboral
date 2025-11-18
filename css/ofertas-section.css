@@ -113,17 +113,7 @@
     z-index: 0;
 }
 
-.servicio-card-ofertas:hover {
-    transform: translateY(-8px) scale(1.02) !important;
-    box-shadow: 0 20px 60px rgba(95, 2, 28, 0.7) !important;
-    border-color: rgba(255, 215, 0, 0.6) !important;
-    -webkit-backdrop-filter: blur(25px) !important;
-    backdrop-filter: blur(25px) !important;
-}
 
-.servicio-card-ofertas:hover::after {
-    left: 100% !important;
-}
 
 .servicio-card-ofertas::after {
     content: '' !important;
@@ -191,22 +181,8 @@
 .servicio-icon-ofertas {
     font-size: 2rem !important;
     color: #FFD700 !important;
-    text-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 4px 8px rgba(0,0,0,0.5) !important;
-    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8)) !important;
     position: relative !important;
     z-index: 2 !important;
-    animation: iconPulse 2s ease-in-out infinite;
-}
-
-@keyframes iconPulse {
-    0%, 100% { 
-        transform: scale(1);
-        filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
-    }
-    50% { 
-        transform: scale(1.05);
-        filter: drop-shadow(0 0 15px rgba(255,255,255,0.5));
-    }
 }
 
 .servicio-card-ofertas h2 {

@@ -474,7 +474,7 @@
                 <!-- Botones públicos (antes del registro) - Estilo nav-link -->
                 <ul class="navbar-nav" id="public-buttons">
                     <li class="nav-item">
-                        <a class="nav-link" href="#" id="btn-login" data-bs-toggle="modal" data-bs-target="#modalLogin" onclick="return false;">Login</a>
+                        <a class="nav-link" href="#" id="btn-login" data-bs-toggle="modal" data-bs-target="#modalLogin" onclick="return false;">Ingresar a mi cuenta</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#modalRegistroEmpleador" id="btn-registro" onclick="return false;">Registro Empleador</a>
@@ -623,11 +623,11 @@
     
     <!-- Carrusel de Servicios Agrícolas -->
     <section id="servicios-carousel" aria-label="Nuestros Servicios Agrícolas">
-        <div class="container">
+        <div class="container-fluid">
             <!-- Header del Carrusel -->
             <div class="row justify-content-center mb-4">
-                <div class="col-lg-8">
-                    <div class="servicio-header-card">
+                <div class="col-12">
+                    <div class="servicio-header-card card-ancho-95">
                         <div class="text-center">
                             <div class="servicio-main-icon">
                                 <i class="fas fa-seedling"></i>
@@ -825,9 +825,9 @@
     <!-- Mapa Interactivo de Establecimientos/Fincas -->
     <main class="container-fluid py-5">
         <div class="row justify-content-center mb-4">
-            <div class="col-lg-10">
-                <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-mapa servicio-card-mapa-uva">
-                    <div class="card-body text-center">
+            <div class="col-12">
+                <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-mapa servicio-card-mapa-uva card-ancho-95">
+                    <div class="card-body text-center card-ancho-95">
                         <div class="mb-3 servicio-icon servicio-icon-mapa"><i class="fas fa-map-marked-alt"></i></div>
                         <h2 class="fw-bold">Mapa Interactivo de Establecimientos/Fincas</h2>
                         <p class="mb-0">Explora la ubicación de todas las fincas y establecimientos agrícolas registrados en nuestra plataforma</p>
@@ -838,8 +838,8 @@
         
         <!-- Mapa Principal de Establecimientos -->
         <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <div id="main-map" class="my-3">
+            <div class="col-12">
+                <div id="main-map" class="my-3 card-ancho-95">
                     <!-- El mapa se cargará aquí -->
                     <div id="map-loading">
                         <div class="spinner-border text-primary" role="status">
@@ -863,7 +863,7 @@
         <div class="container-fluid">
             <div class="row justify-content-center mb-4">
                 <div class="col-12">
-                    <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-ofertas">
+                    <div class="card h-100 shadow-sm border-0 servicio-card servicio-card-ofertas card-ancho-95">
                         <div class="card-body text-center">
                             <div class="mb-1 servicio-icon servicio-icon-ofertas"><i class="fas fa-briefcase"></i></div>
                             <h2 class="fw-bold">Ofertas Disponibles</h2>
@@ -924,12 +924,12 @@
                             <!-- Botones de ordenamiento -->
                             <div class="col-md-12 mt-3">
                                 <div class="d-flex gap-2 flex-wrap">
-                                    <button type="button" class="btn btn-outline-primary flex-fill" id="btn-ordenar-fecha">
+                                    <button type="button" class="btn btn-outline-dark flex-fill" id="btn-ordenar-fecha">
                                         <i class="fas fa-calendar-alt me-1"></i>
                                         Ordenar por fecha
                                         <i class="fas fa-sort ms-1"></i>
                                     </button>
-                                    <button type="button" class="btn btn-outline-success flex-fill" id="btn-ordenar-cercania">
+                                    <button type="button" class="btn btn-outline-dark flex-fill" id="btn-ordenar-cercania">
                                         <i class="fas fa-map-marker-alt me-1"></i>
                                         Ordenar por cercanía
                                     </button>
