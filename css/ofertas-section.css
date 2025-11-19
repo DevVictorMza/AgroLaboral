@@ -313,10 +313,20 @@
     max-width: 100% !important;
 }
 
+/* Espaciado para card de título con padding adicional */
+#ofertas-disponibles .servicio-card-ofertas {
+    margin-bottom: 5rem !important;
+    padding-bottom: 1.5rem !important;
+}
+
 .ofertas-filtros-container {
     background: linear-gradient(145deg, #5F021C 0%, #8B0329 25%, #A0173A 50%, #8B0329 75%, #4A0115 100%) !important;
     border: 2px solid rgba(160, 23, 58, 0.4) !important;
     border-radius: 16px !important;
+    margin-bottom: 6rem !important;
+    margin-top: 2rem !important;
+    padding-bottom: 1.5rem !important;
+    box-shadow: 0 12px 40px rgba(95, 2, 28, 0.45), 0 0 0 1px rgba(160, 23, 58, 0.2) !important;
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     box-shadow: 0 12px 40px rgba(95, 2, 28, 0.45) !important;
@@ -520,6 +530,12 @@
     position: relative;
     animation: fadeInUp 0.6s ease-out both;
     box-shadow: 0 8px 25px rgba(95, 2, 28, 0.4) !important;
+    margin-bottom: 1.5rem !important;
+}
+
+/* Contenedor de cada oferta con mejor espaciado */
+#ofertas-publicas-container > .col-12 {
+    padding-bottom: 0.5rem !important;
 }
 
 .oferta-publica-card:nth-child(1) { animation-delay: 0.1s; }
