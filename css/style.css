@@ -98,6 +98,14 @@
     --text-light: #FFFFFF;
     --text-muted: #CCCCCC;
     --shadow-blue: rgba(74, 144, 226, 0.3);
+    
+    /* Variables para Modal de Login - Gama Verde */
+    --login-verde-primary: #2A4B3A;
+    --login-verde-dark: #1F3A2E;
+    --login-verde-medium: #3D6B54;
+    --login-verde-light: #4A7C59;
+    --login-verde-text: #E8F5E9;
+    --login-verde-placeholder: #81C784;
     --shadow-dark: rgba(0, 0, 0, 0.8);
     
     /* Colores de uva para el mapa */
@@ -1383,6 +1391,110 @@ body::before {
     color: var(--text-muted) !important;
     opacity: 0.7 !important;
 }
+
+/* ========================================
+   ESTILOS ESPECÍFICOS MODAL LOGIN - GAMA VERDE
+   ======================================== */
+
+/* Modal Content - Fondo verde oscuro */
+#modalLogin .modal-content {
+    background: var(--login-verde-primary) !important;
+    border: 1px solid var(--login-verde-medium) !important;
+    box-shadow: 0 8px 32px rgba(42, 75, 58, 0.6) !important;
+}
+
+/* Modal Header - Degradado verde */
+#modalLogin .modal-header {
+    background: linear-gradient(135deg, var(--login-verde-primary) 0%, var(--login-verde-dark) 100%) !important;
+    border-bottom: 1px solid var(--login-verde-medium) !important;
+}
+
+#modalLogin .modal-title {
+    color: #FFFFFF !important;
+}
+
+/* Modal Body */
+#modalLogin .modal-body {
+    background: var(--login-verde-primary) !important;
+}
+
+/* Form Labels - Verde claro para legibilidad */
+#modalLogin .form-label {
+    color: var(--login-verde-text) !important;
+    font-weight: 500 !important;
+}
+
+/* Form Inputs - Verde oscuro con borde medio */
+#modalLogin .form-control {
+    background: var(--login-verde-dark) !important;
+    border: 1px solid var(--login-verde-medium) !important;
+    color: #FFFFFF !important;
+}
+
+#modalLogin .form-control:focus {
+    background: var(--login-verde-dark) !important;
+    border-color: var(--login-verde-light) !important;
+    box-shadow: 0 0 0 0.25rem rgba(74, 124, 89, 0.25) !important;
+    color: #FFFFFF !important;
+}
+
+#modalLogin .form-control:hover {
+    border-color: var(--login-verde-light) !important;
+}
+
+#modalLogin .form-control::placeholder {
+    color: var(--login-verde-placeholder) !important;
+    opacity: 0.8 !important;
+}
+
+/* Botón Cerrar - Blanco para contraste */
+#modalLogin .btn-close {
+    filter: brightness(0) invert(1) !important;
+}
+
+#modalLogin .btn-close:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    opacity: 1 !important;
+}
+
+/* Alert de Error - Fondo rojo transparente */
+#modalLogin #login-error {
+    background: rgba(244, 67, 54, 0.2) !important;
+    border: 1px solid #F44336 !important;
+    color: #FFCDD2 !important;
+}
+
+#modalLogin #login-error i {
+    color: #FFCDD2 !important;
+}
+
+/* Botón Iniciar Sesión - Mantener color azul actual */
+#modalLogin #btn-iniciar-sesion {
+    /* Mantener estilos por defecto de Bootstrap */
+    background: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: #FFFFFF !important;
+}
+
+#modalLogin #btn-iniciar-sesion:hover {
+    background: #0b5ed7 !important;
+    border-color: #0a58ca !important;
+}
+
+#modalLogin #btn-iniciar-sesion:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.5) !important;
+}
+
+/* Backdrop del modal - Verde semi-transparente */
+#modalLogin.modal {
+    backdrop-filter: blur(2px);
+}
+
+.modal-backdrop.show {
+    opacity: 0.7 !important;
+}
+
+/* ======================================== */
 
 /* Estilos específicos para campo de calle (mayúsculas y límite de caracteres) */
 #calle {
