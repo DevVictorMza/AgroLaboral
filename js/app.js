@@ -921,6 +921,38 @@ function generarDashboard(perfil) {
                 padding: 2rem;
             }
             
+            /* Animación para marcadores destacados */
+            .marcador-pulsando {
+                animation: pulsar 1.5s ease-in-out 3;
+            }
+            
+            @keyframes pulsar {
+                0%, 100% { 
+                    transform: scale(1); 
+                    opacity: 1;
+                }
+                50% { 
+                    transform: scale(1.3); 
+                    opacity: 0.8;
+                }
+            }
+            
+            /* Estilos para marcador temporal */
+            .custom-marker-temp {
+                animation: aparecer 0.5s ease-out;
+            }
+            
+            @keyframes aparecer {
+                0% { 
+                    transform: scale(0) translateY(-20px); 
+                    opacity: 0;
+                }
+                100% { 
+                    transform: scale(1) translateY(0); 
+                    opacity: 1;
+                }
+            }
+            
             /* Estilos para controles de filtrado de ofertas */
             .ofertas-filter-controls {
                 display: flex;
@@ -2533,10 +2565,6 @@ function generarHtmlEstablecimientos(establecimientos) {
             </div>
             
             <div class="establecimiento-acciones">
-                <button class="btn-accion-compacto btn-ver-mapa" onclick="verEnMapa(${est.latitud}, ${est.longitud})" title="Ver en mapa">
-                    <i class="fas fa-map-marked-alt"></i>
-                    <span>Ubicación</span>
-                </button>
                 <button class="btn-accion-compacto btn-crear-oferta" onclick="crearOfertaLaboral(${est.idEstablecimiento})" title="Crear oferta">
                     <i class="fas fa-briefcase"></i>
                     <span>Nueva Oferta</span>
@@ -2881,15 +2909,130 @@ function eliminarEstablecimiento(idEstablecimiento) {
 }
 
 /**
- * Ver establecimiento en el mapa
+ * Ver establecimiento en el mapa - Abre Google Maps
  * @param {number} latitud - Latitud del establecimiento
  * @param {number} longitud - Longitud del establecimiento
  */
 function verEnMapa(latitud, longitud) {
     console.log(`🗺️ Ver en mapa: ${latitud}, ${longitud}`);
-    // TODO: Implementar vista de mapa
     window.open(`https://www.google.com/maps?q=${latitud},${longitud}`, '_blank');
 }
+
+/**
+ * Centrar el mapa de establecimientos en coordenadas específicas (ELIMINADA - era parte de verEnMapa compleja)
+ * @deprecated
+ */
+function centrarMapaEnCoordenadas(latitud, longitud) {
+    return new Promise((resolve, reject) => {
+        console.log('🎯 Centrando mapa en:', latitud, longitud);
+        
+        // Verificar que el mapa esté inicializado
+        if (!mapEstablecimientos) {
+            console.log('🔄 Inicializando mapa de establecimientos...');
+            inicializarMapaEstablecimientos()
+                .then(() => {
+                    setTimeout(() => {
+                        centrarMapaEnCoordenadas(latitud, longitud).then(resolve).catch(reject);
+                    }, 500);
+                })
+                .catch(error => {
+                    console.error('❌ Error inicializando mapa:', error);
+                    showMessage('Error al inicializar el mapa', 'error');
+                    reject(error);
+                });
+            return;
+        }
+        
+        try {
+            // Centrar el mapa en las coordenadas con zoom y animación mejorada
+            mapEstablecimientos.setView([latitud, longitud], 16, {
+                animate: true,
+                duration: 1.5,
+                easeLinearity: 0.25
+            });
+            
+            // Esperar a que termine la animación
+            setTimeout(() => {
+                // Buscar si existe un marcador en esas coordenadas y abrirlo
+                let marcadorEncontrado = false;
+                let mejorMarcador = null;
+                let menorDistancia = Infinity;
+                
+                marcadoresEstablecimientos.forEach(marcador => {
+                    const markerLatLng = marcador.getLatLng();
+                    const distanciaLat = Math.abs(markerLatLng.lat - latitud);
+                    const distanciaLng = Math.abs(markerLatLng.lng - longitud);
+                    const distanciaTotal = distanciaLat + distanciaLng;
+                    
+                    // Tolerancia aumentada a 0.001 grados (aprox 110 metros)
+                    if (distanciaLat < 0.001 && distanciaLng < 0.001) {
+                        if (distanciaTotal < menorDistancia) {
+                            menorDistancia = distanciaTotal;
+                            mejorMarcador = marcador;
+                            marcadorEncontrado = true;
+                        }
+                    }
+                });
+                
+                if (marcadorEncontrado && mejorMarcador) {
+                    console.log('✅ Marcador encontrado y popup abierto');
+                    
+                    // Abrir popup
+                    mejorMarcador.openPopup();
+                    
+                    // Agregar animación de pulso al marcador
+                    const iconElement = mejorMarcador._icon;
+                    if (iconElement) {
+                        iconElement.classList.add('marcador-pulsando');
+                        
+                        // Remover clase después de la animación (4.5s = 3 ciclos de 1.5s)
+                        setTimeout(() => {
+                            iconElement.classList.remove('marcador-pulsando');
+                        }, 4500);
+                    }
+                    
+                    resolve(true);
+                } else {
+                    console.log('ℹ️ No se encontró marcador cercano, creando marcador temporal');
+                    
+                    // Crear un marcador temporal si no existe
+                    const marcadorTemporal = L.marker([latitud, longitud], {
+                        icon: L.divIcon({
+                            className: 'custom-marker-temp',
+                            html: '<i class="fas fa-map-marker-alt" style="color: #dc3545; font-size: 2rem;"></i>',
+                            iconSize: [30, 42],
+                            iconAnchor: [15, 42]
+                        })
+                    }).addTo(mapEstablecimientos);
+                    
+                    marcadorTemporal.bindPopup(`
+                        <div class="p-2">
+                            <strong>📍 Ubicación del establecimiento</strong><br>
+                            <small>Lat: ${latitud.toFixed(6)}</small><br>
+                            <small>Lng: ${longitud.toFixed(6)}</small><br>
+                            <small class="text-muted mt-1 d-block">Marcador temporal</small>
+                        </div>
+                    `).openPopup();
+                    
+                    // Agregar animación al marcador temporal
+                    const iconElement = marcadorTemporal._icon;
+                    if (iconElement) {
+                        iconElement.classList.add('marcador-pulsando');
+                    }
+                    
+                    resolve(false);
+                }
+            }, 1600); // Esperar un poco más que la duración de la animación
+            
+        } catch (error) {
+            console.error('❌ Error centrando mapa:', error);
+            reject(error);
+        }
+    });
+}
+
+// Exponer función verEnMapa globalmente
+window.verEnMapa = verEnMapa;
 
 /**
  * Crear oferta laboral con API integrada
@@ -3270,15 +3413,43 @@ async function guardarOfertaLaboral(idEstablecimiento) {
         
         // Cerrar modal
         const modal = bootstrap.Modal.getInstance(document.getElementById('modalCrearOferta'));
-        modal.hide();
+        if (modal) {
+            modal.hide();
+        }
         
-        // Limpiar modal del DOM después de un breve delay
-        setTimeout(() => {
-            const modalElement = document.getElementById('modalCrearOferta');
-            if (modalElement) {
-                modalElement.remove();
+        // Esperar a que el modal se cierre completamente
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Limpiar modal del DOM
+        const modalElement = document.getElementById('modalCrearOferta');
+        if (modalElement) {
+            modalElement.remove();
+        }
+        
+        // Recargar ofertas automáticamente para mostrar la nueva oferta
+        console.log('🔄 [ACTUALIZACIÓN AUTOMÁTICA] Iniciando recarga de ofertas...');
+        try {
+            // Verificar que la función existe
+            if (typeof cargarOfertasEmpleo === 'function') {
+                console.log('✅ Función cargarOfertasEmpleo encontrada, ejecutando...');
+                await cargarOfertasEmpleo(true); // Cargar solo ofertas vigentes
+                console.log('✅ [ACTUALIZACIÓN AUTOMÁTICA] Ofertas recargadas exitosamente');
+                
+                // Scroll suave hacia la sección de ofertas
+                const ofertasSection = document.querySelector('#ofertas-content') || 
+                                      document.querySelector('.ofertas-container');
+                if (ofertasSection) {
+                    ofertasSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+                
+                showMessage('✅ Nueva oferta visible en la lista', 'success');
+            } else {
+                console.error('❌ Función cargarOfertasEmpleo no encontrada');
             }
-        }, 500);
+        } catch (error) {
+            console.error('❌ [ACTUALIZACIÓN AUTOMÁTICA] Error al recargar ofertas:', error);
+            showMessage('⚠️ Oferta creada. Recargue la página para verla.', 'warning');
+        }
         
     } catch (error) {
         console.error('❌ Error guardando oferta laboral:', error);
@@ -4153,6 +4324,27 @@ function actualizarDashboardConEstablecimiento(establecimiento) {
             console.log('🔄 Recargando lista de establecimientos...');
             await inicializarEstablecimientos();
             console.log('✅ Lista de establecimientos recargada exitosamente');
+            
+            // Actualizar el mapa de establecimientos si existe
+            if (mapEstablecimientos) {
+                console.log('🗺️ Actualizando mapa de establecimientos...');
+                try {
+                    await agregarMarcadoresEstablecimientos(window.establecimientosCache || []);
+                    console.log('✅ Mapa de establecimientos actualizado');
+                    
+                    // Si el establecimiento tiene coordenadas, centrarlo en el mapa
+                    if (establecimiento.latitud && establecimiento.longitud) {
+                        setTimeout(() => {
+                            centrarMapaEnCoordenadas(establecimiento.latitud, establecimiento.longitud);
+                        }, 500);
+                    }
+                } catch (mapError) {
+                    console.error('❌ Error actualizando mapa:', mapError);
+                }
+            } else {
+                console.log('ℹ️ Mapa de establecimientos no inicializado aún');
+            }
+            
         } catch (error) {
             console.error('❌ Error recargando establecimientos:', error);
             // En caso de error, mostrar feedback básico
