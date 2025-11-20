@@ -128,6 +128,9 @@
 
 /* Compatibilidad con Safari para backdrop-filter */
 .dashboard-card {
+    background: #2E2517 !important;
+    border: 2px solid rgba(46, 37, 23, 0.8) !important;
+    box-shadow: 0 8px 24px rgba(46, 37, 23, 0.4) !important;
     -webkit-backdrop-filter: blur(15px);
     backdrop-filter: blur(15px);
 }
@@ -288,9 +291,11 @@
 }
 
 /* Estilos para el modal de nueva oferta */
+.modal-content,
 .modal-content.bg-dark {
-    background-color: #1a1a1a !important;
-    border: 1px solid #444444 !important;
+    background: #428F61 !important;
+    border: 2px solid rgba(66, 143, 97, 0.8) !important;
+    box-shadow: 0 8px 32px rgba(66, 143, 97, 0.4) !important;
 }
 
 .modal-header.border-secondary {

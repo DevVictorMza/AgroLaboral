@@ -658,11 +658,11 @@ function generarDashboard(perfil) {
                 padding: 2rem;
             }
             .dashboard-card {
-                background: #2A2A2A;
-                border: 1px solid #444444;
-                border-radius: 8px;
+                background: #2E2517 !important;
+                border: 2px solid rgba(46, 37, 23, 0.8) !important;
+                border-radius: 12px;
                 color: #FFFFFF;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+                box-shadow: 0 8px 24px rgba(46, 37, 23, 0.4) !important;
             }
             .btn-primary-custom {
                 background: linear-gradient(135deg, #4A90E2, #357ABD);
@@ -687,13 +687,13 @@ function generarDashboard(perfil) {
                =================================== */
             .profile-header-modern {
                 position: relative;
-                background: linear-gradient(135deg, #1a2332 0%, #263341 100%);
-                border: 1px solid rgba(255, 255, 255, 0.1);
+                background: #2E2517 !important;
+                border: 2px solid rgba(46, 37, 23, 0.8) !important;
                 border-radius: 16px;
                 padding: 0;
                 margin-bottom: 2rem;
                 overflow: hidden;
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+                box-shadow: 0 8px 24px rgba(46, 37, 23, 0.4) !important;
             }
             
             .profile-backdrop {
@@ -702,8 +702,8 @@ function generarDashboard(perfil) {
                 left: 0;
                 right: 0;
                 height: 120px;
-                background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
-                opacity: 0.15;
+                background: linear-gradient(135deg, rgba(46, 37, 23, 0.3) 0%, rgba(46, 37, 23, 0.2) 100%);
+                opacity: 1;
             }
             
             .profile-content {
@@ -1038,14 +1038,16 @@ function generarDashboard(perfil) {
             
             /* Modal */
             #modalPostulacion .modal-content {
-                background: #1a1a1a;
+                background: #428F61 !important;
                 color: #ffffff;
-                border: 1px solid #333;
+                border: 2px solid rgba(66, 143, 97, 0.8) !important;
+                box-shadow: 0 8px 32px rgba(66, 143, 97, 0.4) !important;
             }
             
             #modalPostulacion .modal-header,
             #modalPostulacion .modal-footer {
-                border-color: #444;
+                background: rgba(66, 143, 97, 0.2) !important;
+                border-color: rgba(255, 255, 255, 0.2) !important;
             }
             
             /* Formulario */
@@ -7052,9 +7054,9 @@ function actualizarInterfazLogin(autenticado) {
 		const usuario = obtenerUsuario();
 		const nombreUsuario = usuario ? usuario.razonSocial || usuario.cuit : 'Usuario';
 		
-		// Ocultar el botón de login
-		if (btnLogin) {
-			btnLogin.style.display = 'none';
+		// Ocultar el botón de login (el <li> completo)
+		if (btnLogin && btnLogin.parentElement) {
+			btnLogin.parentElement.style.display = 'none';
 		}
 		
 		// Reemplazar el botón "Registro Empleador" con el dropdown del usuario
@@ -7110,9 +7112,9 @@ function actualizarInterfazLogin(autenticado) {
 		}
 		
 	} else {
-		// Mostrar el botón de login
-		if (btnLogin) {
-			btnLogin.style.display = 'block';
+		// Mostrar el botón de login (el <li> completo)
+		if (btnLogin && btnLogin.parentElement) {
+			btnLogin.parentElement.style.display = 'block';
 		}
 		
 		// Restaurar botón de "Registro Empleador"

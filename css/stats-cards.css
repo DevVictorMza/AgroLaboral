@@ -389,6 +389,22 @@
    UTILIDADES
    ========================================= */
 
+/* Estados de selección con color #2E2517 */
+.stats-card-moderna.selected,
+.stats-card.selected {
+    background: #2E2517 !important;
+    border-color: rgba(46, 37, 23, 0.8) !important;
+    box-shadow: 0 8px 25px rgba(46, 37, 23, 0.4) !important;
+}
+
+/* Estados de selección con color #2E2517 */
+.stats-card-moderna.selected,
+.stats-card.selected {
+    background: #2E2517 !important;
+    border-color: rgba(46, 37, 23, 0.8) !important;
+    box-shadow: 0 8px 25px rgba(46, 37, 23, 0.4) !important;
+}
+
 /* Para ocultar trends en mobile si es necesario */
 @media (max-width: 576px) {
     .stats-trend.hide-mobile {

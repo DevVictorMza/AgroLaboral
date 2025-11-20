@@ -15,6 +15,9 @@
 
 /* Contenido del modal */
 #wizardFincaModal .modal-content {
+    background: #428F61 !important;
+    border: 2px solid rgba(66, 143, 97, 0.8) !important;
+    box-shadow: 0 8px 32px rgba(66, 143, 97, 0.4) !important;
     background: var(--card-bg-primary);
     border: 1px solid var(--card-border);
     border-radius: 12px;
