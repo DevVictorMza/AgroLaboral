@@ -43,6 +43,8 @@
     <link rel="stylesheet" href="css/servicios-carousel-agro.css?v=agro-claro-unificado">
     <!-- Tema Morado Uva - Mapa Interactivo CSS -->
     <link rel="stylesheet" href="css/mapa-uva-theme.css?v=vino-total-5F021C">
+    <!-- Profile Empresarial CSS - ÚLTIMO PARA MÁXIMA PRIORIDAD -->
+    <link rel="stylesheet" href="css/profile-empresarial.css?v=2E2517">
     
     <!-- Estilos mínimos inline para optimización -->
     <style>
@@ -67,6 +69,22 @@
         
         .bg-black {
             background-color: #000000 !important;
+        }
+        
+        /* FONDO PRINCIPAL MARRÓN OSCURO - FORZADO */
+        html, body, #page-wrapper {
+            background: #4B382A !important;
+            background-color: #4B382A !important;
+        }
+        
+        /* Forzar todos los contenedores principales */
+        .container-fluid, main, section {
+            background: transparent !important;
+        }
+        
+        /* Sobrescribir cualquier otro fondo */
+        body::before, body::after {
+            display: none !important;
         }
         
         /* DASHBOARD MODAL FULLSCREEN ESTILOS PROFESIONALES */
@@ -104,7 +122,7 @@
             height: 100vh !important;
             border: none !important;
             border-radius: 0 !important;
-            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%) !important;
+            background: #428F61 !important;
             overflow: hidden !important;
         }
         
@@ -125,7 +143,7 @@
             padding: 0 !important;
             height: calc(100vh - 80px) !important;
             overflow-y: auto !important;
-            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%) !important;
+            background: #428F61 !important;
         }
         
         #dashboardOffcanvas .dashboard-container {
@@ -359,13 +377,80 @@
         }
         
         /* PROFILE HEADER MEJORADO */
-        #dashboardOffcanvas .profile-header {
-            background: linear-gradient(135deg, var(--card-bg-primary), var(--card-bg-secondary)) !important;
-            border: 1px solid var(--card-border) !important;
-            border-radius: 12px !important;
-            box-shadow: var(--card-shadow-default) !important;
-            padding: 2rem !important;
+        #dashboardOffcanvas .profile-header,
+        #dashboardOffcanvas .profile-header-modern,
+        .dashboard-container .profile-header-modern {
+            background: #2E2517 !important;
+            border: 2px solid rgba(46, 37, 23, 0.8) !important;
+            border-radius: 16px !important;
+            box-shadow: 0 8px 24px rgba(46, 37, 23, 0.4) !important;
+            padding: 0 !important;
             margin-bottom: 2rem !important;
+        }
+        
+        #dashboardOffcanvas .profile-content,
+        .dashboard-container .profile-content {
+            background: transparent !important;
+            padding: 2rem !important;
+        }
+        
+        #dashboardOffcanvas .profile-backdrop,
+        .dashboard-container .profile-backdrop {
+            background: linear-gradient(135deg, rgba(46, 37, 23, 0.3) 0%, rgba(46, 37, 23, 0.2) 100%) !important;
+        }
+        
+        /* DASHBOARD CARDS - GESTIÓN DE FINCAS */
+        #dashboardOffcanvas .dashboard-card,
+        .dashboard-container .dashboard-card {
+            background: #2E2517 !important;
+            border: 2px solid rgba(46, 37, 23, 0.8) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 8px 24px rgba(46, 37, 23, 0.4) !important;
+        }
+        
+        #dashboardOffcanvas .dashboard-card:hover {
+            box-shadow: 0 12px 32px rgba(46, 37, 23, 0.6) !important;
+        }
+        
+        /* MODALES - COLOR VERDE #428F61 */
+        .modal-content,
+        .modal .modal-content,
+        .modal-dialog .modal-content {
+            background: #428F61 !important;
+            border: 2px solid rgba(66, 143, 97, 0.8) !important;
+            box-shadow: 0 8px 32px rgba(66, 143, 97, 0.4) !important;
+            color: #FFFFFF !important;
+        }
+        
+        .modal-content.bg-dark,
+        .modal-content.bg-black,
+        #dashboardOffcanvas .modal-content.bg-black,
+        #dashboardOffcanvas .modal-content,
+        .modal-dialog .modal-content.bg-black {
+            background: #428F61 !important;
+            border: 2px solid rgba(66, 143, 97, 0.8) !important;
+            box-shadow: 0 8px 32px rgba(66, 143, 97, 0.4) !important;
+        }
+        
+        #dashboardOffcanvas .modal-body.bg-black,
+        #dashboardOffcanvas .modal-body {
+            background: transparent !important;
+        }
+        
+        .modal-header {
+            background: rgba(66, 143, 97, 0.2) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+        
+        .modal-footer {
+            background: rgba(66, 143, 97, 0.2) !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+        
+        /* Proteger tarjetas marrones dentro de modales */
+        .modal-content .dashboard-card,
+        .modal-content .profile-header-modern {
+            background: #2E2517 !important;
         }
         
         /* RESPONSIVE ADICIONAL PARA MODAL */

@@ -280,15 +280,10 @@
 }
 
 .servicio-card-agro {
-    /* Fondo borgoña para tarjetas de servicios */
+    /* Fondo #2E2517 para tarjetas de servicios */
     flex: 1 1 0%;
-    background: linear-gradient(145deg, 
-        #5F021C 0%, 
-        #8B0329 25%, 
-        #A0173A 50%, 
-        #8B0329 75%, 
-        #4A0115 100%);
-    border: 2px solid rgba(160, 23, 58, 0.4);
+    background: #2E2517 !important;
+    border: 2px solid rgba(46, 37, 23, 0.6);
     border-radius: 12px;
     padding: 3.5rem 2.5rem;
     text-align: center;
@@ -859,10 +854,10 @@
 }
 
 .como-funciona-card {
-    background: #000000;
+    background: #2E2517 !important;
     border-radius: 15px;
     padding: 1.5rem;
-    border: 1px solid rgba(188, 143, 143, 0.3);
+    border: 1px solid rgba(46, 37, 23, 0.6);
     transition: all var(--agro-transition-smooth);
     position: relative;
     overflow: hidden;

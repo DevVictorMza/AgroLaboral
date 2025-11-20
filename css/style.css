@@ -108,6 +108,26 @@
     --login-verde-placeholder: #81C784;
     --shadow-dark: rgba(0, 0, 0, 0.8);
     
+    /* Variables para Dashboard Modal - Gama Verde #1A2E23 */
+    --dashboard-verde-primary: #1A2E23;
+    --dashboard-verde-dark: #0F1A15;
+    --dashboard-verde-medium: #243D32;
+    --dashboard-verde-light: #2E4D3F;
+    --dashboard-gradient-main: linear-gradient(135deg, #1A2E23 0%, #243D32 50%, #1A2E23 100%);
+    --dashboard-gradient-subtle: linear-gradient(180deg, #0F1A15 0%, #1A2E23 100%);
+    --dashboard-shadow-green: rgba(26, 46, 35, 0.6);
+    
+    /* Variables para Dashboard Cards - Gama Marrón #2E221A */
+    --card-marron-primary: #2E221A;
+    --card-marron-dark: #1F160F;
+    --card-marron-medium: #3D2E22;
+    --card-marron-light: #4A3A2E;
+    --card-marron-border: #544033;
+    --card-gradient-main: linear-gradient(135deg, #2E221A 0%, #3D2E22 50%, #2E221A 100%);
+    --card-gradient-hover: linear-gradient(135deg, #3D2E22 0%, #4A3A2E 100%);
+    --card-shadow-marron: rgba(46, 34, 26, 0.5);
+    --card-border-marron: rgba(84, 64, 51, 0.4);
+    
     /* Colores de uva para el mapa */
     --uva-morada: #722F37;
     --uva-violeta: #8B4F8B;
@@ -726,6 +746,59 @@ input#calle::placeholder {
     transform: scale(1.08) rotate(-6deg);
 }
 
+/* Profile header específico para dashboard empresarial */
+.profile-header,
+#dashboardOffcanvas .profile-header,
+.dashboard-container .profile-header,
+.profile-header-modern,
+#dashboardOffcanvas .profile-header-modern,
+.dashboard-container .profile-header-modern {
+    background: #2E2517 !important;
+    border: 2px solid rgba(46, 37, 23, 0.8) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 24px rgba(46, 37, 23, 0.4) !important;
+    color: #FFFFFF !important;
+}
+
+/* Profile content dentro del header */
+.profile-content,
+#dashboardOffcanvas .profile-content,
+.dashboard-container .profile-content {
+    background: transparent !important;
+    color: #FFFFFF !important;
+}
+
+/* Backdrop del perfil con tono tierra */
+.profile-backdrop,
+#dashboardOffcanvas .profile-backdrop {
+    background: linear-gradient(135deg, rgba(46, 37, 23, 0.3) 0%, rgba(46, 37, 23, 0.2) 100%) !important;
+    opacity: 1 !important;
+}
+
+/* Dashboard Cards - Gestión de Fincas y secciones */
+.dashboard-card,
+#dashboardOffcanvas .dashboard-card,
+.dashboard-container .dashboard-card {
+    background: #2E2517 !important;
+    border: 2px solid rgba(46, 37, 23, 0.8) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 24px rgba(46, 37, 23, 0.4) !important;
+    color: #FFFFFF !important;
+}
+
+.dashboard-card:hover {
+    box-shadow: 0 12px 32px rgba(46, 37, 23, 0.6) !important;
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+/* Asegurar que el menú principal no se vea afectado */
+.navbar,
+#transparent-navbar,
+.navbar-nav {
+    background: transparent !important;
+}
+
 /* Tarjeta moderna para sección cómo funciona */
 .funciona-card {
     background: var(--card-bg) !important;
@@ -784,8 +857,8 @@ input#calle::placeholder {
 }
 /* Servicios - Estilo Dashboard Moderno */
 .servicio-card {
-    background: var(--card-bg) !important;
-    border: 1px solid #444444;
+    background: #2E2517 !important;
+    border: 1px solid rgba(46, 37, 23, 0.6);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: 12px;
     overflow: hidden;
@@ -898,9 +971,9 @@ input#calle::placeholder {
 }
 
 .servicio-card-mapa {
-    background: linear-gradient(145deg, #5F021C 0%, #8B0329 25%, #A0173A 50%, #8B0329 75%, #4A0115 100%) !important;
-    border: 2px solid rgba(160, 23, 58, 0.4) !important;
-    box-shadow: 0 12px 40px rgba(95, 2, 28, 0.45) !important;
+    background: #2E2517 !important;
+    border: 2px solid rgba(46, 37, 23, 0.6) !important;
+    box-shadow: 0 12px 40px rgba(46, 37, 23, 0.45) !important;
     position: relative;
     overflow: hidden;
     transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
@@ -1060,11 +1133,26 @@ h2.fw-bold:hover {
 }
 
 /* Tema agrícola con imagen de fondo */
+html {
+    background: #4B382A !important;
+    background-color: #4B382A !important;
+}
+
 body {
-    background: #DCC4A0 !important;
+    background: #4B382A !important;
+    background-color: #4B382A !important;
     color: #2C2416 !important;
     min-height: 100vh;
     position: relative;
+}
+
+* {
+    background-color: inherit;
+}
+
+#page-wrapper {
+    background: #4B382A !important;
+    background-color: #4B382A !important;
 }
 
 /* Pseudo-elemento eliminado para fondo limpio */
@@ -1328,11 +1416,11 @@ body::before {
 
 /* Preservar modales y formularios */
 .modal-content {
-    background: var(--card-bg) !important;
-    color: var(--text-light) !important;
-    border: 1px solid #444444 !important;
+    background: #428F61 !important;
+    color: #FFFFFF !important;
+    border: 2px solid rgba(66, 143, 97, 0.8) !important;
     border-radius: 12px !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+    box-shadow: 0 8px 32px rgba(66, 143, 97, 0.4) !important;
 }
 
 .modal-header {
@@ -2941,6 +3029,51 @@ main h2 {
     max-width: 800px !important;
 }
 
+/* ========================================
+   DASHBOARD MODAL - GAMA VERDE #428F61
+   ======================================== */
+
+/* Override para modal-content con clase bg-black */
+#dashboardOffcanvas .modal-content.bg-black,
+#dashboardOffcanvas .modal-content {
+    background: #428F61 !important;
+    border: 2px solid rgba(66, 143, 97, 0.8) !important;
+    box-shadow: 0 8px 32px rgba(66, 143, 97, 0.4) !important;
+}
+
+/* Override para modal-body con clase bg-black */
+#dashboardOffcanvas .modal-body.bg-black,
+#dashboardOffcanvas .modal-body {
+    background: transparent !important;
+}
+
+/* Asegurar contraste de texto */
+#dashboardOffcanvas .text-white {
+    color: #FFFFFF !important;
+}
+
+/* Loading container con fondo coherente */
+#dashboardOffcanvas .loading-container {
+    background: transparent !important;
+}
+
+#dashboardOffcanvas .loading-container {
+    background: transparent !important;
+}
+
+/* Spinner con color verde claro */
+#dashboardOffcanvas .spinner-border.text-primary {
+    color: #4A7C59 !important;
+    border-color: #4A7C59 transparent #4A7C59 transparent !important;
+}
+
+/* Texto muted coherente con paleta verde */
+#dashboardOffcanvas .text-muted {
+    color: #81C784 !important;
+}
+
+/* ======================================== */
+
 /* Estilos para contenedores de carga */
 .loading-container {
     display: flex;
@@ -3042,9 +3175,9 @@ main h2 {
 }
 
 .especie-card.selected {
-    background: rgba(74, 144, 226, 0.2);
-    border-color: #4A90E2;
-    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.3);
+    background: #2E2517 !important;
+    border-color: rgba(46, 37, 23, 0.8);
+    box-shadow: 0 0 0 2px rgba(46, 37, 23, 0.6);
 }
 
 .especie-card.disabled {

@@ -1,0 +1,217 @@
+/* ===================================================================
+   PROFILE EMPRESARIAL - COLOR #2E2517
+   Estilos específicos para el header del perfil empresarial
+   Sin interferir con el menú principal de navegación
+   =================================================================== */
+
+/* Profile Header Moderno - Máxima especificidad */
+.profile-header-modern,
+#dashboardOffcanvas .profile-header-modern,
+.dashboard-container .profile-header-modern,
+div.profile-header-modern {
+    background: #2E2517 !important;
+    border: 2px solid rgba(46, 37, 23, 0.8) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 24px rgba(46, 37, 23, 0.4) !important;
+    overflow: hidden !important;
+}
+
+/* Profile Content - Contenido dentro del header */
+.profile-content,
+#dashboardOffcanvas .profile-content,
+.dashboard-container .profile-content,
+div.profile-content {
+    background: transparent !important;
+    color: #FFFFFF !important;
+    position: relative !important;
+    z-index: 2 !important;
+}
+
+/* Profile Backdrop - Capa decorativa */
+.profile-backdrop,
+#dashboardOffcanvas .profile-backdrop,
+.dashboard-container .profile-backdrop,
+div.profile-backdrop {
+    background: linear-gradient(135deg, rgba(46, 37, 23, 0.3) 0%, rgba(46, 37, 23, 0.2) 100%) !important;
+    opacity: 1 !important;
+}
+
+/* Company Info - Información de la empresa */
+.company-info,
+.company-header,
+.company-name {
+    color: #FFFFFF !important;
+}
+
+/* Company Status Badge */
+.company-status-badge {
+    background: rgba(46, 37, 23, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Avatar Circle */
+.avatar-circle {
+    background: rgba(46, 37, 23, 0.5) !important;
+    border: 3px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Company Details Grid */
+.company-details-grid {
+    background: rgba(46, 37, 23, 0.3) !important;
+    border-radius: 12px !important;
+}
+
+.detail-item {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.detail-label {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.detail-value {
+    color: #FFFFFF !important;
+}
+
+/* ===================================================================
+   DASHBOARD CARDS - GESTIÓN DE FINCAS Y OTRAS SECCIONES
+   =================================================================== */
+
+/* Dashboard Card - Tarjetas de sección */
+.dashboard-card,
+#dashboardOffcanvas .dashboard-card,
+.dashboard-container .dashboard-card,
+div.dashboard-card {
+    background: #2E2517 !important;
+    border: 2px solid rgba(46, 37, 23, 0.8) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 24px rgba(46, 37, 23, 0.4) !important;
+    color: #FFFFFF !important;
+}
+
+.dashboard-card:hover {
+    box-shadow: 0 12px 32px rgba(46, 37, 23, 0.6) !important;
+    transform: translateY(-2px);
+}
+
+/* Títulos dentro de dashboard-card */
+.dashboard-card h5,
+.dashboard-card h6 {
+    color: #FFFFFF !important;
+}
+
+/* Empty state dentro de gestión de fincas */
+.empty-state {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.empty-state i {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.text-muted-custom {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* ===================================================================
+   MODALES - COLOR VERDE #428F61
+   Solo background del modal, sin afectar tarjetas marrones
+   =================================================================== */
+
+/* Modal Content - Background verde */
+.modal-content,
+.modal .modal-content,
+.modal-dialog .modal-content,
+div.modal-content {
+    background: #428F61 !important;
+    border: 2px solid rgba(66, 143, 97, 0.8) !important;
+    box-shadow: 0 8px 32px rgba(66, 143, 97, 0.4) !important;
+    color: #FFFFFF !important;
+}
+
+/* Modal con bg-dark */
+.modal-content.bg-dark,
+.modal-content.bg-black {
+    background: #428F61 !important;
+}
+
+/* Modal Headers y Footers */
+.modal-header {
+    background: rgba(66, 143, 97, 0.2) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.modal-footer {
+    background: rgba(66, 143, 97, 0.2) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Modal Body */
+.modal-body {
+    background: transparent !important;
+    color: #FFFFFF !important;
+}
+
+/* Modal Titles */
+.modal-title {
+    color: #FFFFFF !important;
+}
+
+/* Proteger las tarjetas marrones dentro de modales */
+.modal-content .dashboard-card,
+.modal-content .profile-header-modern,
+.modal-content .establecimiento-card {
+    background: #2E2517 !important;
+    border: 2px solid rgba(46, 37, 23, 0.8) !important;
+}
+
+/* ===================================================================
+   PROTECCIÓN DEL MENÚ PRINCIPAL
+   Asegurar que el navbar no se vea afectado
+   =================================================================== */
+
+/* Navbar principal - mantener transparente */
+.navbar,
+#transparent-navbar,
+.navbar-light,
+.navbar-expand-lg {
+    background: transparent !important;
+}
+
+.navbar-nav,
+.nav-link,
+.navbar-toggler {
+    background: transparent !important;
+}
+
+/* Evitar conflictos con dropdown del navbar */
+.navbar .dropdown-menu {
+    background: var(--card-bg, #2A2A2A) !important;
+}
+
+/* ===================================================================
+   RESPONSIVE - Mantener consistencia en móviles
+   =================================================================== */
+
+@media (max-width: 768px) {
+    .profile-header-modern {
+        border-radius: 12px !important;
+        margin: 0 0.5rem 1.5rem !important;
+    }
+    
+    .profile-content {
+        padding: 1.5rem !important;
+        flex-direction: column !important;
+        gap: 1rem !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .profile-header-modern {
+        border-radius: 8px !important;
+    }
+    
+    .company-details-grid {
+        grid-template-columns: 1fr !important;
+    }
+}

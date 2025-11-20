@@ -222,11 +222,12 @@ function generarDashboard(perfil) {
                 color: #CCCCCC !important;
             }
             .profile-header {
-                background: linear-gradient(135deg, #4A90E2, #357ABD);
-                border-radius: 8px;
+                background: #2E2517 !important;
+                border: 2px solid rgba(46, 37, 23, 0.6) !important;
+                border-radius: 12px;
                 padding: 2rem;
                 margin-bottom: 2rem;
-                text-align: center;
+                box-shadow: 0 8px 25px rgba(46, 37, 23, 0.4);
             }
             .stats-card {
                 background: #2A2A2A;
