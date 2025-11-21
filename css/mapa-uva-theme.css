@@ -1,0 +1,284 @@
+/* ===================================================================
+   MAPA UVA THEME - COLOR MARRÓN #4B382A
+   Estilos específicos para la tarjeta del mapa interactivo
+   Sin interferir con otros elementos de la aplicación
+   =================================================================== */
+
+/* ===================================
+   TARJETA MAPA INTERACTIVO PRINCIPAL
+   =================================== */
+
+/* Servicio Card Mapa - Máxima especificidad */
+.servicio-card-mapa,
+.servicio-card-mapa-uva,
+div.servicio-card-mapa,
+.card.servicio-card-mapa,
+main .servicio-card-mapa {
+    background: var(--agro-gradient-bg) !important;
+    border: 2px solid rgba(95, 2, 28, 0.8) !important;
+    box-shadow: none !important;
+    color: #FFFFFF !important;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Hover effect */
+.servicio-card-mapa:hover,
+.servicio-card-mapa-uva:hover {
+    box-shadow: none !important;
+    transform: translateY(-3px);
+    border-color: rgba(75, 56, 42, 1) !important;
+}
+
+/* ===================================
+   EFECTOS DE OVERLAY Y GRADIENTES
+   =================================== */
+
+/* Gradiente superpuesto - ELIMINADO */
+.servicio-card-mapa::before,
+.servicio-card-mapa-uva::before {
+    content: none;
+    display: none;
+}
+
+/* Efecto hover radial - ELIMINADO */
+.servicio-card-mapa::after,
+.servicio-card-mapa-uva::after {
+    content: none;
+    display: none;
+}
+
+.servicio-card-mapa:hover::after,
+.servicio-card-mapa-uva:hover::after {
+    content: none;
+    display: none;
+}
+
+/* ===================================
+   CONTENIDO DE LA TARJETA
+   =================================== */
+
+/* Card Body */
+.servicio-card-mapa .card-body,
+.servicio-card-mapa-uva .card-body,
+.servicio-card-mapa > .card-body {
+    background: transparent !important;
+    color: #FFFFFF !important;
+    position: relative;
+    z-index: 2;
+    padding: 2rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Títulos H2 */
+.servicio-card-mapa h2,
+.servicio-card-mapa-uva h2,
+.servicio-card-mapa .card-body h2 {
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+/* Línea decorativa debajo del título */
+.servicio-card-mapa h2::after,
+.servicio-card-mapa-uva h2::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, 
+        rgba(218, 165, 32, 0.8) 0%, 
+        #FFD700 50%, 
+        rgba(218, 165, 32, 0.8) 100%);
+    border-radius: 2px;
+}
+
+/* Títulos H3 */
+.servicio-card-mapa h3,
+.servicio-card-mapa-uva h3 {
+    color: #FFFFFF !important;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Párrafos y texto */
+.servicio-card-mapa p,
+.servicio-card-mapa-uva p {
+    color: rgba(255, 255, 255, 0.95) !important;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* ===================================
+   ÍCONO DE SERVICIO
+   =================================== */
+
+/* Contenedor del ícono */
+.servicio-card-mapa .servicio-icon,
+.servicio-card-mapa-uva .servicio-icon,
+.servicio-icon-mapa {
+    background: rgba(75, 56, 42, 0.3) !important;
+    border: 2px solid rgba(255, 255, 255, 0.2) !important;
+    color: #FFFFFF !important;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2rem;
+    box-shadow: none;
+    transition: all 0.3s ease;
+}
+
+.servicio-card-mapa:hover .servicio-icon,
+.servicio-card-mapa-uva:hover .servicio-icon,
+.servicio-card-mapa:hover .servicio-icon-mapa {
+    transform: scale(1.1);
+    box-shadow: none;
+    background: rgba(75, 56, 42, 0.5) !important;
+}
+
+/* Ícono FontAwesome */
+.servicio-card-mapa .servicio-icon i,
+.servicio-card-mapa-uva .servicio-icon i,
+.servicio-icon-mapa i {
+    color: #FFFFFF !important;
+}
+
+/* ===================================
+   PROTECCIONES - Evitar conflictos
+   =================================== */
+
+/* Asegurar que otros elementos no se vean afectados */
+.servicio-card:not(.servicio-card-mapa):not(.servicio-card-mapa-uva):not(.servicio-card-ofertas) {
+    background: #2E2517 !important;
+}
+
+/* Proteger cards de servicios y funciona con color marrón */
+.servicio-card-servicios,
+.servicio-card-funciona {
+    background: #2E2517 !important;
+    border: 2px solid rgba(46, 37, 23, 0.8) !important;
+}
+
+/* Tarjeta Ofertas - Color Borgoña #5F021C */
+.servicio-card-ofertas {
+    background: linear-gradient(145deg, #5F021C 0%, #8B0329 25%, #A0173A 50%, #8B0329 75%, #4A0115 100%) !important;
+    border: 2px solid rgba(95, 2, 28, 0.8) !important;
+    box-shadow: none !important;
+}
+
+/* Proteger dashboard cards */
+.dashboard-card:not(.servicio-card-mapa) {
+    background: #2E2517 !important;
+}
+
+/* Proteger profile header */
+.profile-header-modern {
+    background: #2E2517 !important;
+}
+
+/* Proteger modales - mantener verde */
+.modal-content {
+    background: #428F61 !important;
+}
+
+/* ===================================
+   RESPONSIVE - Ajustes móviles
+   =================================== */
+
+@media (max-width: 768px) {
+    .servicio-card-mapa,
+    .servicio-card-mapa-uva {
+        border-radius: 8px;
+        margin: 0 0.5rem;
+    }
+    
+    .servicio-card-mapa .card-body,
+    .servicio-card-mapa-uva .card-body {
+        padding: 1.5rem;
+    }
+    
+    .servicio-card-mapa h2,
+    .servicio-card-mapa-uva h2 {
+        font-size: 1.5rem;
+    }
+    
+    .servicio-card-mapa .servicio-icon,
+    .servicio-card-mapa-uva .servicio-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .servicio-card-mapa,
+    .servicio-card-mapa-uva {
+        margin: 0 0.25rem;
+    }
+    
+    .servicio-card-mapa .card-body,
+    .servicio-card-mapa-uva .card-body {
+        padding: 1rem;
+    }
+    
+    .servicio-card-mapa h2,
+    .servicio-card-mapa-uva h2 {
+        font-size: 1.3rem;
+    }
+    
+    .servicio-card-mapa p,
+    .servicio-card-mapa-uva p {
+        font-size: 1rem;
+    }
+}
+
+/* ===================================
+   ANIMACIONES Y TRANSICIONES
+   =================================== */
+
+/* Animación de entrada */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.servicio-card-mapa,
+.servicio-card-mapa-uva {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Animación del ícono */
+@keyframes pulseIcon {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.servicio-card-mapa:hover .servicio-icon,
+.servicio-card-mapa-uva:hover .servicio-icon {
+    animation: pulseIcon 1.5s ease-in-out infinite;
+}
+
+/* ===================================================================
+   FIN MAPA UVA THEME
+   =================================================================== */

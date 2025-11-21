@@ -849,6 +849,37 @@ input#calle::placeholder {
     line-height: 1.4;
 }
 
+/* ===================================================================
+   PROTECCIÓN: Asegurar que solo servicio-card-mapa tenga #5F021C
+   =================================================================== */
+
+/* Proteger otras tarjetas de servicio */
+.servicio-card:not(.servicio-card-mapa):not(.servicio-card-ofertas) {
+    background: #2E2517 !important;
+}
+
+.servicio-card-servicios,
+.servicio-card-funciona {
+    background: #2E2517 !important;
+}
+
+/* Tarjeta Ofertas - Color Borgoña #5F021C */
+.servicio-card-ofertas {
+    background: linear-gradient(145deg, #5F021C 0%, #8B0329 25%, #A0173A 50%, #8B0329 75%, #4A0115 100%) !important;
+    border: 2px solid rgba(95, 2, 28, 0.8) !important;
+    box-shadow: none !important;
+}
+
+/* Proteger dashboard cards */
+.dashboard-card:not(.servicio-card-mapa) {
+    background: #2E2517 !important;
+}
+
+/* Proteger profile header */
+.profile-header-modern:not(.servicio-card-mapa) {
+    background: #2E2517 !important;
+}
+
 .funciona-card .text-muted {
     color: var(--text-muted) !important;
     font-size: 0.95rem;
@@ -971,9 +1002,9 @@ input#calle::placeholder {
 }
 
 .servicio-card-mapa {
-    background: #2E2517 !important;
-    border: 2px solid rgba(46, 37, 23, 0.6) !important;
-    box-shadow: 0 12px 40px rgba(46, 37, 23, 0.45) !important;
+    background: var(--agro-gradient-bg) !important;
+    border: 2px solid rgba(75, 56, 42, 0.8) !important;
+    box-shadow: none !important;
     position: relative;
     overflow: hidden;
     transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
@@ -981,34 +1012,13 @@ input#calle::placeholder {
 }
 
 .servicio-card-mapa::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(180deg, 
-        rgba(95, 2, 28, 0.1) 0%, 
-        rgba(139, 3, 41, 0.15) 50%, 
-        rgba(74, 1, 21, 0.2) 100%);
-    pointer-events: none;
-    z-index: 1;
+    content: none;
+    display: none;
 }
 
 .servicio-card-mapa::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle at center, 
-        rgba(139, 79, 139, 0.1) 0%, 
-        transparent 70%);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    pointer-events: none;
-    z-index: 0;
+    content: none;
+    display: none;
 }
 
 
@@ -3480,7 +3490,7 @@ main h2 {
 
 /* Sección principal del mapa con estilo agrícola - ancho completo */
 main:has(#main-map) {
-    background: var(--agro-gradient-bg) !important;
+    background: #4B382A !important;
     position: relative;
     overflow: hidden;
     padding: 4rem 0 !important;

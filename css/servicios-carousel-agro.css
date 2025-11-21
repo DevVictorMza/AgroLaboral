@@ -44,10 +44,7 @@
     --agro-shadow-marron: 0 12px 35px rgba(74, 44, 23, 0.3);
     
     /* Gradientes agrícolas */
-    --agro-gradient-bg: linear-gradient(135deg, 
-        rgba(220, 196, 160, 0.92) 0%, 
-        rgba(209, 184, 150, 0.95) 50%, 
-        rgba(184, 160, 133, 0.92) 100%);
+    --agro-gradient-bg: linear-gradient(135deg, #5F021C 0%, #8B0329 50%, #5F021C 100%);
     --agro-gradient-card: linear-gradient(145deg, 
         rgba(255, 255, 255, 0.9) 0%, 
         rgba(248, 248, 240, 0.95) 100%);
@@ -69,7 +66,7 @@
    =================================== */
 
 #servicios-carousel {
-    background: var(--agro-gradient-bg);
+    background: #4B382A;
     position: relative;
     overflow: hidden;
     padding: 4rem 0 4rem 0;
@@ -118,13 +115,8 @@
    =================================== */
 
 .servicio-header-card {
-    background: linear-gradient(145deg, 
-        #5F021C 0%, 
-        #8B0329 25%, 
-        #A0173A 50%, 
-        #8B0329 75%, 
-        #4A0115 100%) !important;
-    border: 2px solid rgba(160, 23, 58, 0.4) !important;
+    background: var(--agro-gradient-bg) !important;
+    border: 2px solid rgba(95, 2, 28, 0.8) !important;
     border-radius: 20px;
     padding: 3.5rem 3rem 4rem 3rem;
     box-shadow: 
@@ -154,12 +146,7 @@
 
 /* Forzar el fondo borgoña con máxima especificidad */
 #servicios-carousel .servicio-header-card {
-    background: linear-gradient(145deg, 
-        #5F021C 0%, 
-        #8B0329 25%, 
-        #A0173A 50%, 
-        #8B0329 75%, 
-        #4A0115 100%) !important;
+    background: var(--agro-gradient-bg) !important;
     border-radius: 20px !important;
     padding: 3.5rem 3rem 4rem 3rem !important;
 }

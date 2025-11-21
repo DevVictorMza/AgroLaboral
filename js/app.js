@@ -683,6 +683,38 @@ function generarDashboard(perfil) {
             }
             
             /* ===================================
+               TARJETA MAPA INTERACTIVO - BORGOÑA #5F021C
+               =================================== */
+            .servicio-card-mapa,
+            .servicio-card-mapa-uva {
+                background: #5F021C !important;
+                border: 2px solid rgba(95, 2, 28, 0.8) !important;
+                box-shadow: none !important;
+            }
+            .servicio-card-mapa .card-body,
+            .servicio-card-mapa-uva .card-body {
+                background: transparent !important;
+                color: #FFFFFF !important;
+            }
+            
+            /* ===================================
+               TARJETA OFERTAS DISPONIBLES - BORGOÑA #5F021C
+               =================================== */
+            .servicio-card-ofertas {
+                background: linear-gradient(145deg, #5F021C 0%, #8B0329 25%, #A0173A 50%, #8B0329 75%, #4A0115 100%) !important;
+                border: 2px solid rgba(95, 2, 28, 0.8) !important;
+                box-shadow: none !important;
+            }
+            .servicio-card-ofertas .card-body {
+                background: transparent !important;
+                color: #FFFFFF !important;
+            }
+            .servicio-card-ofertas h2,
+            .servicio-card-ofertas p {
+                color: #FFFFFF !important;
+            }
+            
+            /* ===================================
                PROFILE HEADER MODERNO
                =================================== */
             .profile-header-modern {
@@ -9645,8 +9677,8 @@ let filtroActualOfertas = null; // null = todas, true = vigentes
  * @type {Object}
  */
 window.estadoOrdenamiento = {
-    tipo: null,              // null | 'fecha' | 'cercania'
-    direccion: 'desc',       // 'asc' | 'desc'
+    tipo: 'fecha',           // null | 'fecha' | 'cercania' - Por defecto ordenar por fecha
+    direccion: 'desc',       // 'asc' | 'desc' - Descendente para mostrar más recientes primero
     ubicacionUsuario: null   // {lat, lng} | null
 };
 
@@ -10092,10 +10124,10 @@ function renderizarOfertas(ofertas) {
         const fechaCierre = formatearFechaArgentina(oferta.fechaCierre);
         
         html += `
-            <div class="col-md-6 col-lg-4 mb-4" data-vigente="${oferta.vigente}">
-                <div class="oferta-card-moderna ${esVigente ? 'vigente' : 'cerrada'}" style="position: relative;">
-                    <!-- Header de la card -->
-                    <div class="oferta-card-header">
+            <div class="col-12 mb-3" data-vigente="${oferta.vigente}">
+                <div class="oferta-card-moderna ${esVigente ? 'vigente' : 'cerrada'}">
+                    <!-- Estado e Información Secundaria -->
+                    <div class="oferta-section-badges">
                         <div class="oferta-estado-badge ${esVigente ? 'vigente' : 'cerrada'}">
                             <i class="${estadoBadge.icon}"></i>
                             <span>${estadoBadge.label}</span>
@@ -10114,58 +10146,48 @@ function renderizarOfertas(ofertas) {
                         ` : ''}
                     </div>
                     
-                    <!-- Contenido principal -->
-                    <div class="oferta-card-body">
+                    <!-- Información Principal del Puesto -->
+                    <div class="oferta-section-main">
                         <h5 class="oferta-titulo" title="${escapeHtml(oferta.nombrePuesto)}">
-                            ${escapeHtml(oferta.nombrePuesto)}
+                            <i class="fas fa-briefcase me-2"></i>${escapeHtml(oferta.nombrePuesto)}
                         </h5>
-                        
                         <div class="oferta-establecimiento">
-                            <i class="fas fa-building"></i>
+                            <i class="fas fa-building me-1"></i>
                             <span>${escapeHtml(oferta.nombreEstablecimiento).toUpperCase()}</span>
                         </div>
-                        
-                        <!-- Grid de información -->
-                        <div class="oferta-info-grid">
-                            <div class="oferta-info-item">
-                                <div class="info-icon">
-                                    <i class="fas fa-users"></i>
-                                </div>
-                                <div class="info-content">
-                                    <span class="info-label">Vacantes</span>
-                                    <span class="info-value">${oferta.vacantes}</span>
-                                </div>
+                    </div>
+                    
+                    <!-- Detalles de la Oferta -->
+                    <div class="oferta-section-info">
+                        <div class="oferta-info-item-horizontal">
+                            <i class="fas fa-users text-primary"></i>
+                            <div class="info-content-horizontal">
+                                <span class="info-label-horizontal">Vacantes</span>
+                                <span class="info-value-horizontal">${oferta.vacantes}</span>
                             </div>
-                            
-                            <div class="oferta-info-item">
-                                <div class="info-icon">
-                                    <i class="fas fa-calendar-times"></i>
-                                </div>
-                                <div class="info-content">
-                                    <span class="info-label">Cierre</span>
-                                    <span class="info-value">${fechaCierre}</span>
-                                </div>
+                        </div>
+                        <div class="oferta-info-item-horizontal">
+                            <i class="fas fa-calendar-times text-danger"></i>
+                            <div class="info-content-horizontal">
+                                <span class="info-label-horizontal">Fecha Cierre</span>
+                                <span class="info-value-horizontal">${fechaCierre}</span>
                             </div>
-                            
-                            <div class="oferta-info-item full-width">
-                                <div class="info-icon">
-                                    <i class="fas fa-calendar-plus"></i>
-                                </div>
-                                <div class="info-content">
-                                    <span class="info-label">Publicada</span>
-                                    <span class="info-value">${fechaAlta}</span>
-                                </div>
+                        </div>
+                        <div class="oferta-info-item-horizontal">
+                            <i class="fas fa-calendar-plus text-success"></i>
+                            <div class="info-content-horizontal">
+                                <span class="info-label-horizontal">Publicada</span>
+                                <span class="info-value-horizontal">${fechaAlta}</span>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Footer con acciones -->
-                    <div class="oferta-card-footer">
+                    <!-- Sección Acciones (Derecha) -->
+                    <div class="oferta-section-actions">
                         <button class="btn-oferta btn-oferta-postulaciones" 
                                 onclick="abrirModalPostulaciones(${oferta.idOfertaEmpleo})" 
                                 title="Ver postulaciones recibidas"
                                 data-oferta-id="${oferta.idOfertaEmpleo}">
-                            <i class="fas fa-users"></i>
                             <span>Postulaciones</span>
                             <span class="badge badge-postulaciones" 
                                   id="badge-oferta-${oferta.idOfertaEmpleo}"
@@ -10174,11 +10196,10 @@ function renderizarOfertas(ofertas) {
                             </span>
                         </button>
                         <button class="btn-oferta btn-oferta-editar" onclick="editarOferta(${oferta.idOfertaEmpleo})" title="Editar oferta">
-                            <i class="fas fa-edit"></i>
                             <span>Editar</span>
                         </button>
                         <button class="btn-oferta btn-oferta-eliminar" onclick="eliminarOferta(${oferta.idOfertaEmpleo})" title="Eliminar oferta">
-                            <i class="fas fa-trash-alt"></i>
+                            <span>Eliminar</span>
                         </button>
                     </div>
                 </div>

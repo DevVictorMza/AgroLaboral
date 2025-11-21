@@ -166,6 +166,104 @@ div.modal-content {
 }
 
 /* ===================================================================
+   TARJETA MAPA INTERACTIVO - COLOR BORGOÑA #5F021C
+   Aplicar solo a la tarjeta del mapa sin afectar otros elementos
+   =================================================================== */
+
+/* Servicio Card Mapa - Máxima especificidad */
+.servicio-card-mapa,
+.servicio-card-mapa-uva,
+div.servicio-card-mapa,
+.card.servicio-card-mapa {
+    background: var(--agro-gradient-bg) !important;
+    border: 2px solid rgba(75, 56, 42, 0.8) !important;
+    box-shadow: none !important;
+    color: #FFFFFF !important;
+}
+
+.servicio-card-mapa:hover {
+    box-shadow: none !important;
+    transform: translateY(-3px);
+}
+
+/* Card Body del Mapa */
+.servicio-card-mapa .card-body,
+.servicio-card-mapa-uva .card-body {
+    background: transparent !important;
+    color: #FFFFFF !important;
+}
+
+/* Títulos del Mapa */
+.servicio-card-mapa h2,
+.servicio-card-mapa-uva h2,
+.servicio-card-mapa h3,
+.servicio-card-mapa-uva h3 {
+    color: #FFFFFF !important;
+}
+
+/* Párrafos y texto del Mapa */
+.servicio-card-mapa p,
+.servicio-card-mapa-uva p {
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Ícono del Mapa */
+.servicio-card-mapa .servicio-icon,
+.servicio-card-mapa-uva .servicio-icon {
+    background: rgba(95, 2, 28, 0.3) !important;
+    border: 2px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* ===================================================================
+   TARJETA OFERTAS DISPONIBLES - COLOR BORGOÑA #5F021C
+   Aplicar solo a la tarjeta de ofertas sin afectar otros elementos
+   =================================================================== */
+
+/* Servicio Card Ofertas - Máxima especificidad */
+.servicio-card-ofertas,
+div.servicio-card-ofertas,
+.card.servicio-card-ofertas {
+    background: linear-gradient(145deg, #5F021C 0%, #8B0329 25%, #A0173A 50%, #8B0329 75%, #4A0115 100%) !important;
+    border: 2px solid rgba(95, 2, 28, 0.8) !important;
+    box-shadow: none !important;
+    color: #FFFFFF !important;
+}
+
+.servicio-card-ofertas:hover {
+    box-shadow: none !important;
+    transform: translateY(-3px);
+}
+
+/* Card Body de Ofertas */
+.servicio-card-ofertas .card-body {
+    background: transparent !important;
+    color: #FFFFFF !important;
+}
+
+/* Títulos de Ofertas */
+.servicio-card-ofertas h2,
+.servicio-card-ofertas h3 {
+    color: #FFFFFF !important;
+}
+
+/* Párrafos y texto de Ofertas */
+.servicio-card-ofertas p {
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Ícono de Ofertas */
+.servicio-card-ofertas .servicio-icon,
+.servicio-icon-ofertas {
+    color: #FFD700 !important;
+}
+
+/* Badge de contador */
+.servicio-card-ofertas .badge {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%) !important;
+    color: #4A0115 !important;
+}
+
+/* ===================================================================
    PROTECCIÓN DEL MENÚ PRINCIPAL
    Asegurar que el navbar no se vea afectado
    =================================================================== */
