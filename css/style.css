@@ -1826,14 +1826,11 @@ main h2 {
     padding: 0.75rem 1.5rem;
     margin: 0 0.25rem;
     border-radius: 8px;
-    background: linear-gradient(145deg, rgba(95, 2, 28, 0.3) 0%, rgba(139, 3, 41, 0.25) 50%, rgba(160, 23, 58, 0.3) 100%);
-    border: 1px solid rgba(160, 23, 58, 0.4);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    background: #5F021C !important;
+    border: 1px solid #5F021C !important;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 3px 10px rgba(95, 2, 28, 0.2),
-                0 1px 3px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
 }
 
 #transparent-navbar .navbar-nav .nav-link::before {
@@ -1851,8 +1848,8 @@ main h2 {
     color: #ffffff !important;
     transform: translateY(-3px) scale(1.05);
     text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8);
-    background: linear-gradient(145deg, rgba(139, 3, 41, 0.5) 0%, rgba(160, 23, 58, 0.6) 50%, rgba(139, 3, 41, 0.5) 100%);
-    border-color: rgba(160, 23, 58, 0.7);
+    background: #5F021C !important;
+    border-color: #5F021C !important;
     box-shadow: 0 6px 20px rgba(95, 2, 28, 0.4),
                 0 3px 10px rgba(0, 0, 0, 0.4),
                 inset 0 1px 0 rgba(255, 255, 255, 0.2);
@@ -1866,8 +1863,8 @@ main h2 {
     color: #ffffff !important;
     font-weight: 700;
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
-    background: linear-gradient(145deg, rgba(95, 2, 28, 0.6) 0%, rgba(160, 23, 58, 0.5) 50%, rgba(95, 2, 28, 0.6) 100%);
-    border-color: rgba(160, 23, 58, 0.8);
+    background: #5F021C !important;
+    border-color: #5F021C !important;
     box-shadow: 0 4px 15px rgba(95, 2, 28, 0.5),
                 0 2px 8px rgba(0, 0, 0, 0.3),
                 inset 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -1875,26 +1872,22 @@ main h2 {
 
 /* Estilos específicos para los botones de acción (Login y Registro) */
 #transparent-navbar #public-buttons .nav-link {
-    background: linear-gradient(145deg, #5F021C 0%, #8B0329 25%, #A0173A 50%, #8B0329 75%, #4A0115 100%) !important;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(160, 23, 58, 0.4) !important;
+    background: #5F021C !important;
+    border: 2px solid #5F021C !important;
     color: #ffffff !important;
     font-weight: 600 !important;
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
-    box-shadow: 0 4px 15px rgba(95, 2, 28, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 #transparent-navbar #public-buttons .nav-link:hover {
-    background: linear-gradient(145deg, #8B0329 0%, #A0173A 50%, #8B0329 100%) !important;
-    border-color: rgba(160, 23, 58, 0.6) !important;
+    background: #5F021C !important;
+    border-color: #5F021C !important;
     transform: translateY(-3px) !important;
     color: #ffffff !important;
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
-    box-shadow: 0 6px 20px rgba(95, 2, 28, 0.4),
-                0 3px 10px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4),
+                0 3px 10px rgba(0, 0, 0, 0.3) !important;
 }
 
 #transparent-navbar #public-buttons .nav-link::before {
