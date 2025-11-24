@@ -99,7 +99,7 @@
 
 /* ===== SECCIÓN PRINCIPAL ===== */
 #ofertas-disponibles {
-    background: var(--ofertas-bg-primary) !important;
+    background: #4B382A !important;
     color: var(--ofertas-text-primary) !important;
     position: relative;
     overflow: hidden;
@@ -306,38 +306,29 @@
 }
 
 .ofertas-filtros-container {
-    background: linear-gradient(145deg, #5F021C 0%, #8B0329 25%, #A0173A 50%, #8B0329 75%, #4A0115 100%) !important;
-    border: 2px solid rgba(160, 23, 58, 0.4) !important;
-    border-radius: 16px !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
     margin-bottom: 6rem !important;
     margin-top: 2rem !important;
     padding-bottom: 1.5rem !important;
-    box-shadow: 0 12px 40px rgba(95, 2, 28, 0.45), 0 0 0 1px rgba(160, 23, 58, 0.2) !important;
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
-    box-shadow: 0 12px 40px rgba(95, 2, 28, 0.45) !important;
-    overflow: hidden;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    overflow: visible;
     position: relative;
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+    transition: none !important;
 }
 
 .ofertas-filtros-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(circle at 30% 20%, rgba(232, 90, 123, 0.25) 0%, rgba(199, 40, 78, 0.15) 50%, transparent 100%);
-    pointer-events: none;
-    z-index: 0;
+    display: none;
 }
 
 .ofertas-filtros-container .card-body {
     padding: 2rem !important;
     position: relative;
     z-index: 2;
-    background: rgba(74, 1, 21, 0.3) !important;
+    background: #5F021C !important;
     border-radius: 12px !important;
 }
 
