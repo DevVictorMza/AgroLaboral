@@ -8,7 +8,7 @@ import http.server
 import socketserver
 
 # Puerto fijo para el servidor proxy
-PORT = 3000
+PORT = 5501
 import urllib.request
 import urllib.parse
 import json
@@ -16,11 +16,34 @@ import os
 from urllib.error import HTTPError, URLError
 
 class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
+    # Extensiones de archivos y sus tipos MIME correctos
+    extensions_map = {
+        '.html': 'text/html',
+        '.css': 'text/css',
+        '.js': 'application/javascript',
+        '.json': 'application/json',
+        '.png': 'image/png',
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.gif': 'image/gif',
+        '.svg': 'image/svg+xml',
+        '.ico': 'image/x-icon',
+        '.woff': 'font/woff',
+        '.woff2': 'font/woff2',
+        '.ttf': 'font/ttf',
+        '.eot': 'application/vnd.ms-fontobject',
+        '': 'application/octet-stream',
+    }
+    
     def end_headers(self):
         # Agregar headers CORS para permitir solicitudes desde cualquier origen
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        # Cache control para desarrollo
+        self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
+        self.send_header('Pragma', 'no-cache')
+        self.send_header('Expires', '0')
         super().end_headers()
 
     def do_OPTIONS(self):

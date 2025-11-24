@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; script-src 'self' https: 'unsafe-inline' 'unsafe-eval'; style-src 'self' https: 'unsafe-inline'; font-src 'self' https: data:; img-src 'self' https: data: blob:; connect-src 'self' https: http://localhost:8080 http://localhost:3000 http://localhost:3001 ws://localhost:*;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; script-src 'self' https: 'unsafe-inline' 'unsafe-eval'; style-src 'self' https: 'unsafe-inline'; font-src 'self' https: data:; img-src 'self' https: data: blob:; connect-src 'self' https: http://localhost:8080 http://localhost:5501 http://localhost:3001 ws://localhost:*;">
   <title>Agro Laboral - Mendoza</title>
     <!-- Page Wrapper CSS - DEBE IR PRIMERO -->
     <link rel="stylesheet" href="css/page-wrapper.css?v=agro-claro-unificado">
@@ -79,13 +79,7 @@
         
         /* Forzar todos los contenedores principales */
         .container-fluid, main, section {
-            background: #4B382A !important;
-        }
-        
-        /* MÁXIMA ESPECIFICIDAD PARA EL FONDO */
-        body, html, #page-wrapper, main, section, .container-fluid {
-            background: #4B382A !important;
-            background-color: #4B382A !important;
+            background: transparent !important;
         }
         
         /* Sobrescribir cualquier otro fondo */
@@ -456,7 +450,7 @@
         /* TARJETA MAPA INTERACTIVO - COLOR BORGOÑA #5F021C */
         .servicio-card-mapa,
         .servicio-card-mapa-uva {
-            background: var(--agro-gradient-bg) !important;
+            background: #5F021C !important;
             border: 2px solid rgba(95, 2, 28, 0.8) !important;
             box-shadow: none !important;
         }
@@ -1213,7 +1207,7 @@
     <!-- Carrusel de Servicios Agrícolas JS -->
     <script src="js/servicios-carousel.js?v=1"></script>
     <!-- App JS -->
-    <script src="js/app.js?v=ofertas-api-completa"></script>
+    <script src="js/app.js?v=proxy-5501-fix"></script>
 
     <!-- Modal para Crear/Editar Oferta de Trabajo -->
     <div class="modal fade" id="modalOfertaTrabajo" tabindex="-1" aria-labelledby="modalOfertaTrabajoLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">

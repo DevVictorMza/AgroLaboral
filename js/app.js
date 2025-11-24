@@ -8338,34 +8338,21 @@ async function buscarUbicacion() {
 
 // Función para detectar servidor correcto con proxy
 async function detectarServidorProxy() {
-    // Usar puerto 3000 para el proxy/servidor combinado
-    const PROXY_PORT = 3000;
+    // Usar puerto 5501 para el proxy/servidor combinado
+    const PROXY_PORT = 5501;
     
     try {
-        // Primero verificar que el servidor responda
-        const testResponse = await fetch(`http://localhost:${PROXY_PORT}/`, {
-            method: 'HEAD',
-            signal: AbortSignal.timeout(2000)
+        // Verificar directamente el endpoint de API (más confiable que HEAD)
+        const apiResponse = await fetch(`http://localhost:${PROXY_PORT}/api/geocoding?q=test`, {
+            method: 'GET',
+            signal: AbortSignal.timeout(5000)
         });
         
-        if (testResponse.ok) {
-            console.log(`✅ Servidor encontrado en puerto ${PROXY_PORT}`);
-            // Ahora verificar que el endpoint de API existe
-            try {
-                const apiResponse = await fetch(`http://localhost:${PROXY_PORT}/api/geocoding?q=test`, {
-                    method: 'GET',
-                    signal: AbortSignal.timeout(5000)
-                });
-                
-                if (apiResponse.ok || apiResponse.status === 400) {
-                    console.log(`✅ API de geocodificación disponible en puerto ${PROXY_PORT}`);
-                    return `http://localhost:${PROXY_PORT}`;
-                }
-            } catch (apiError) {
-                console.log(`⚠️ Servidor encontrado pero API no disponible:`, apiError.message);
-                // Aún así devolvemos la URL del servidor
-                return `http://localhost:${PROXY_PORT}`;
-            }
+        // El servidor responde con 400 si falta el parámetro, pero está funcionando
+        if (apiResponse.ok || apiResponse.status === 400) {
+            console.log(`✅ Servidor proxy encontrado en puerto ${PROXY_PORT}`);
+            console.log(`✅ API de geocodificación disponible`);
+            return `http://localhost:${PROXY_PORT}`;
         }
     } catch (error) {
         console.log(`❌ Servidor no disponible en puerto ${PROXY_PORT}:`, error.message);
@@ -8480,7 +8467,7 @@ function mostrarInstruccionesServidor() {
 				<strong>Servidor Proxy Requerido:</strong><br>
 				1. Abra una terminal en VS Code<br>
 				2. Ejecute: <code>python server.py</code><br>
-				3. Acceda a: <code>http://localhost:3001</code>
+				3. Acceda a: <code>http://localhost:5501</code>
 			</div>
 			<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
 		</div>
