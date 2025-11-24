@@ -9,6 +9,7 @@ const BACKEND_CONFIG = {
         REGISTER_COMPANY: '/publico/empresas/registro',
         LOGIN: '/publico/login',
         PROFILE: '/privado/empresas/perfil',
+        UPDATE_EMPRESA: '/privado/empresas',
         // Endpoints para fincas/establecimientos
         REGISTER_FINCA: '/privado/establecimientos/registro',
         GET_ESTABLECIMIENTOS: '/privado/establecimientos',
@@ -643,6 +644,225 @@ function mostrarErrorPerfil(mensaje) {
     document.body.appendChild(errorContainer);
 }
 
+// ============= FUNCIONES PARA EDITAR EMPRESA =============
+
+function abrirModalEditarEmpresa() {
+    console.log('🔧 Abriendo modal de edición de empresa');
+    
+    try {
+        // Obtener los datos actuales del perfil desde localStorage
+        const perfilJSON = localStorage.getItem('perfil_empresa');
+        
+        if (!perfilJSON) {
+            showMessage('No se pudo cargar la información de la empresa', 'error');
+            return;
+        }
+        
+        const perfilActual = JSON.parse(perfilJSON);
+        console.log('📋 Perfil cargado:', perfilActual);
+        
+        // Prellenar el formulario con la razón social actual
+        const inputRazonSocial = document.getElementById('editRazonSocial');
+        if (inputRazonSocial) {
+            inputRazonSocial.value = perfilActual.razonSocial || '';
+        }
+        
+        // Limpiar campos de contraseña
+        const inputContrasenia = document.getElementById('editContrasenia');
+        const inputContraseniaConfirmar = document.getElementById('editContraseniaConfirmar');
+        
+        if (inputContrasenia) inputContrasenia.value = '';
+        if (inputContraseniaConfirmar) inputContraseniaConfirmar.value = '';
+        
+        // Remover validaciones previas
+        const form = document.getElementById('formEditarEmpresa');
+        if (form) {
+            form.classList.remove('was-validated');
+            // Limpiar mensajes de validación personalizados
+            if (inputContraseniaConfirmar) {
+                inputContraseniaConfirmar.setCustomValidity('');
+            }
+        }
+        
+        // Mostrar el modal
+        const modalElement = document.getElementById('modalEditarEmpresa');
+        if (modalElement) {
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        } else {
+            console.error('❌ No se encontró el elemento del modal');
+            showMessage('Error al abrir el modal de edición', 'error');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error al abrir modal de edición:', error);
+        showMessage('Error al cargar los datos de la empresa', 'error');
+    }
+}
+
+async function guardarEdicionEmpresa() {
+    console.log('💾 Guardando edición de empresa');
+    
+    const form = document.getElementById('formEditarEmpresa');
+    const razonSocial = document.getElementById('editRazonSocial').value.trim();
+    const contrasenia = document.getElementById('editContrasenia').value;
+    const contraseniaConfirmar = document.getElementById('editContraseniaConfirmar').value;
+    
+    // Validar que los campos no estén vacíos
+    if (!razonSocial) {
+        showMessage('La razón social es obligatoria', 'error');
+        form.classList.add('was-validated');
+        return;
+    }
+    
+    if (!contrasenia) {
+        showMessage('La contraseña es obligatoria', 'error');
+        form.classList.add('was-validated');
+        return;
+    }
+    
+    // Validar longitud de razón social
+    if (razonSocial.length > 255) {
+        showMessage('La razón social no puede exceder los 255 caracteres', 'error');
+        form.classList.add('was-validated');
+        return;
+    }
+    
+    // Validar longitud de contraseña
+    if (contrasenia.length < 6) {
+        showMessage('La contraseña debe tener al menos 6 caracteres', 'error');
+        form.classList.add('was-validated');
+        return;
+    }
+    
+    // Validar que las contraseñas coincidan
+    if (contrasenia !== contraseniaConfirmar) {
+        const inputConfirmar = document.getElementById('editContraseniaConfirmar');
+        if (inputConfirmar) {
+            inputConfirmar.setCustomValidity('Las contraseñas no coinciden');
+        }
+        form.classList.add('was-validated');
+        showMessage('Las contraseñas no coinciden', 'error');
+        return;
+    } else {
+        const inputConfirmar = document.getElementById('editContraseniaConfirmar');
+        if (inputConfirmar) {
+            inputConfirmar.setCustomValidity('');
+        }
+    }
+    
+    // Validar formulario completo
+    if (!form.checkValidity()) {
+        form.classList.add('was-validated');
+        showMessage('Por favor, complete todos los campos correctamente', 'error');
+        return;
+    }
+    
+    try {
+        // Obtener el token de autenticación usando la clave correcta
+        const token = localStorage.getItem(AUTH_CONFIG.storage.tokenKey);
+        if (!token) {
+            showMessage('Sesión expirada. Por favor, inicie sesión nuevamente.', 'error');
+            setTimeout(() => {
+                cerrarSesion();
+            }, 2000);
+            return;
+        }
+        
+        // Preparar el DTO según el backend espera
+        const empresaEdicionDTO = {
+            razonSocial: razonSocial,
+            contrasenia: contrasenia
+        };
+        
+        console.log('📤 Enviando actualización completa:', empresaEdicionDTO);
+        console.log('📤 DTO en JSON:', JSON.stringify(empresaEdicionDTO));
+        
+        // Construir la URL usando la configuración del backend
+        const url = buildURL(BACKEND_CONFIG.ENDPOINTS.UPDATE_EMPRESA);
+        console.log('🔗 URL de actualización:', url);
+        
+        // Realizar la petición PUT
+        const response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(empresaEdicionDTO)
+        });
+        
+        console.log('📥 Respuesta del servidor:', response.status);
+        
+        // Manejar respuestas de error
+        if (!response.ok) {
+            if (response.status === 401) {
+                showMessage('Sesión expirada. Redirigiendo al login...', 'error');
+                setTimeout(() => {
+                    cerrarSesion();
+                }, 2000);
+                return;
+            }
+            
+            if (response.status === 400) {
+                const errorData = await response.json().catch(() => ({}));
+                console.error('❌ Error 400 del servidor:', errorData);
+                const mensajeError = errorData.message || 'Datos inválidos. Verifique los campos.';
+                throw new Error(mensajeError);
+            }
+            
+            if (response.status === 500) {
+                // Intentar obtener más detalles del error 500
+                const errorData = await response.json().catch(() => null);
+                console.error('❌ Error 500 del servidor:', errorData);
+                const mensajeError = errorData?.message || errorData?.error || 'Error en el servidor. Intente nuevamente más tarde.';
+                throw new Error(mensajeError);
+            }
+            
+            const errorData = await response.json().catch(() => ({}));
+            console.error('❌ Error del servidor:', errorData);
+            throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+        }
+        
+        // Procesar respuesta exitosa
+        const empresaActualizada = await response.json();
+        console.log('✅ Respuesta completa del servidor:', empresaActualizada);
+        console.log('✅ Razón social recibida:', empresaActualizada.razonSocial);
+        
+        // Actualizar localStorage con los nuevos datos
+        localStorage.setItem('perfil_empresa', JSON.stringify(empresaActualizada));
+        console.log('💾 LocalStorage actualizado con:', empresaActualizada);
+        
+        // Cerrar el modal
+        const modalElement = document.getElementById('modalEditarEmpresa');
+        if (modalElement) {
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) {
+                modal.hide();
+            }
+        }
+        
+        // Mostrar mensaje de éxito
+        showMessage('✅ Datos de la empresa actualizados correctamente', 'success');
+        
+        // Recargar el perfil para reflejar los cambios en la interfaz
+        setTimeout(async () => {
+            await cargarPerfilEmpresa();
+            // Si el dashboard está visible, regenerarlo
+            const dashboardContent = document.getElementById('dashboard-content');
+            if (dashboardContent && dashboardContent.innerHTML.trim() !== '') {
+                generarDashboard(empresaActualizada);
+            }
+        }, 500);
+        
+    } catch (error) {
+        console.error('❌ Error al actualizar empresa:', error);
+        showMessage(error.message || 'Error al actualizar los datos de la empresa', 'error');
+    }
+}
+
+// ============= FIN FUNCIONES EDITAR EMPRESA =============
+
 // Función para generar el contenido completo del dashboard
 function generarDashboard(perfil) {
     console.log('🔄 Iniciando generación del dashboard...', perfil);
@@ -1181,10 +1401,15 @@ function generarDashboard(perfil) {
                     <div class="company-info">
                         <div class="company-header">
                             <h2 class="company-name">${perfil.razonSocial}</h2>
-                            <span class="company-status-badge active">
-                                <i class="fas fa-circle"></i>
-                                Activa
-                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="company-status-badge active">
+                                    <i class="fas fa-circle"></i>
+                                    Activa
+                                </span>
+                                <button type="button" class="btn btn-success btn-sm" onclick="abrirModalEditarEmpresa()">
+                                    <i class="fas fa-edit me-1"></i>Editar
+                                </button>
+                            </div>
                         </div>
                         
                         <div class="company-meta">

@@ -1207,7 +1207,70 @@
     <!-- Carrusel de Servicios Agrícolas JS -->
     <script src="js/servicios-carousel.js?v=1"></script>
     <!-- App JS -->
-    <script src="js/app.js?v=proxy-5501-fix"></script>
+    <script src="js/app.js?v=editar-empresa-debug-v2"></script>
+
+    <!-- Modal para Editar Empresa -->
+    <div class="modal fade" id="modalEditarEmpresa" tabindex="-1" aria-labelledby="modalEditarEmpresaLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title text-white" id="modalEditarEmpresaLabel">
+                        <i class="fas fa-building me-2 text-success"></i>
+                        Editar Datos de la Empresa
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEditarEmpresa" novalidate>
+                        <!-- Razón Social -->
+                        <div class="mb-3">
+                            <label for="editRazonSocial" class="form-label text-white">
+                                <i class="fas fa-building me-2"></i>Razón Social
+                            </label>
+                            <input type="text" class="form-control bg-dark text-white border-secondary" 
+                                   id="editRazonSocial" name="razonSocial" 
+                                   placeholder="Ingrese la razón social" 
+                                   maxlength="255" required>
+                            <div class="invalid-feedback">La razón social es obligatoria (máx. 255 caracteres).</div>
+                        </div>
+
+                        <!-- Nueva Contraseña -->
+                        <div class="mb-3">
+                            <label for="editContrasenia" class="form-label text-white">
+                                <i class="fas fa-lock me-2"></i>Nueva Contraseña
+                            </label>
+                            <input type="password" class="form-control bg-dark text-white border-secondary" 
+                                   id="editContrasenia" name="contrasenia" 
+                                   placeholder="Ingrese la nueva contraseña" 
+                                   minlength="6" required>
+                            <div class="invalid-feedback">La contraseña debe tener al menos 6 caracteres.</div>
+                            <small class="form-text text-muted">Mínimo 6 caracteres.</small>
+                        </div>
+
+                        <!-- Confirmar Contraseña -->
+                        <div class="mb-3">
+                            <label for="editContraseniaConfirmar" class="form-label text-white">
+                                <i class="fas fa-lock me-2"></i>Confirmar Contraseña
+                            </label>
+                            <input type="password" class="form-control bg-dark text-white border-secondary" 
+                                   id="editContraseniaConfirmar" 
+                                   placeholder="Confirme la nueva contraseña" 
+                                   minlength="6" required>
+                            <div class="invalid-feedback">Las contraseñas deben coincidir.</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="guardarEdicionEmpresa()">
+                        <i class="fas fa-save me-2"></i>Guardar Cambios
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal para Crear/Editar Oferta de Trabajo -->
     <div class="modal fade" id="modalOfertaTrabajo" tabindex="-1" aria-labelledby="modalOfertaTrabajoLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
