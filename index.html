@@ -1207,7 +1207,7 @@
     <!-- Carrusel de Servicios Agrícolas JS -->
     <script src="js/servicios-carousel.js?v=1"></script>
     <!-- App JS -->
-    <script src="js/app.js?v=editar-empresa-debug-v2"></script>
+    <script src="js/app.js?v=editar-empresa-opcional"></script>
 
     <!-- Modal para Editar Empresa -->
     <div class="modal fade" id="modalEditarEmpresa" tabindex="-1" aria-labelledby="modalEditarEmpresaLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
@@ -1229,9 +1229,9 @@
                             </label>
                             <input type="text" class="form-control bg-dark text-white border-secondary" 
                                    id="editRazonSocial" name="razonSocial" 
-                                   placeholder="Ingrese la razón social" 
-                                   maxlength="255" required>
-                            <div class="invalid-feedback">La razón social es obligatoria (máx. 255 caracteres).</div>
+                                   placeholder="Deje en blanco si no desea cambiar" 
+                                   maxlength="255">
+                            <small class="form-text text-muted">Opcional. Máximo 255 caracteres.</small>
                         </div>
 
                         <!-- Nueva Contraseña -->
@@ -1241,10 +1241,10 @@
                             </label>
                             <input type="password" class="form-control bg-dark text-white border-secondary" 
                                    id="editContrasenia" name="contrasenia" 
-                                   placeholder="Ingrese la nueva contraseña" 
-                                   minlength="6" required>
+                                   placeholder="Deje en blanco si no desea cambiar" 
+                                   minlength="6">
                             <div class="invalid-feedback">La contraseña debe tener al menos 6 caracteres.</div>
-                            <small class="form-text text-muted">Mínimo 6 caracteres.</small>
+                            <small class="form-text text-muted">Opcional. Mínimo 6 caracteres si la ingresa.</small>
                         </div>
 
                         <!-- Confirmar Contraseña -->
@@ -1255,7 +1255,7 @@
                             <input type="password" class="form-control bg-dark text-white border-secondary" 
                                    id="editContraseniaConfirmar" 
                                    placeholder="Confirme la nueva contraseña" 
-                                   minlength="6" required>
+                                   minlength="6">
                             <div class="invalid-feedback">Las contraseñas deben coincidir.</div>
                         </div>
                     </form>

@@ -708,53 +708,35 @@ async function guardarEdicionEmpresa() {
     const contrasenia = document.getElementById('editContrasenia').value;
     const contraseniaConfirmar = document.getElementById('editContraseniaConfirmar').value;
     
-    // Validar que los campos no estén vacíos
-    if (!razonSocial) {
-        showMessage('La razón social es obligatoria', 'error');
-        form.classList.add('was-validated');
+    // Validar que al menos un campo tenga valor
+    if (!razonSocial && !contrasenia) {
+        showMessage('Debe modificar al menos un campo (razón social o contraseña)', 'warning');
         return;
     }
     
-    if (!contrasenia) {
-        showMessage('La contraseña es obligatoria', 'error');
-        form.classList.add('was-validated');
-        return;
-    }
-    
-    // Validar longitud de razón social
-    if (razonSocial.length > 255) {
+    // Validar longitud de razón social si se proporcionó
+    if (razonSocial && razonSocial.length > 255) {
         showMessage('La razón social no puede exceder los 255 caracteres', 'error');
-        form.classList.add('was-validated');
         return;
     }
     
-    // Validar longitud de contraseña
-    if (contrasenia.length < 6) {
-        showMessage('La contraseña debe tener al menos 6 caracteres', 'error');
-        form.classList.add('was-validated');
-        return;
-    }
-    
-    // Validar que las contraseñas coincidan
-    if (contrasenia !== contraseniaConfirmar) {
-        const inputConfirmar = document.getElementById('editContraseniaConfirmar');
-        if (inputConfirmar) {
-            inputConfirmar.setCustomValidity('Las contraseñas no coinciden');
+    // Validar contraseña si se proporcionó
+    if (contrasenia) {
+        if (contrasenia.length < 6) {
+            showMessage('La contraseña debe tener al menos 6 caracteres', 'error');
+            return;
         }
-        form.classList.add('was-validated');
-        showMessage('Las contraseñas no coinciden', 'error');
-        return;
-    } else {
-        const inputConfirmar = document.getElementById('editContraseniaConfirmar');
-        if (inputConfirmar) {
-            inputConfirmar.setCustomValidity('');
+        
+        // Validar que las contraseñas coincidan solo si se ingresó contraseña
+        if (contrasenia !== contraseniaConfirmar) {
+            showMessage('Las contraseñas no coinciden', 'error');
+            return;
         }
     }
     
-    // Validar formulario completo
-    if (!form.checkValidity()) {
-        form.classList.add('was-validated');
-        showMessage('Por favor, complete todos los campos correctamente', 'error');
+    // Validar que si se ingresó confirmación de contraseña, también se haya ingresado la contraseña
+    if (contraseniaConfirmar && !contrasenia) {
+        showMessage('Debe ingresar la nueva contraseña', 'error');
         return;
     }
     
@@ -769,13 +751,18 @@ async function guardarEdicionEmpresa() {
             return;
         }
         
-        // Preparar el DTO según el backend espera
-        const empresaEdicionDTO = {
-            razonSocial: razonSocial,
-            contrasenia: contrasenia
-        };
+        // Preparar el DTO solo con los campos que tienen valor
+        const empresaEdicionDTO = {};
         
-        console.log('📤 Enviando actualización completa:', empresaEdicionDTO);
+        if (razonSocial) {
+            empresaEdicionDTO.razonSocial = razonSocial;
+        }
+        
+        if (contrasenia) {
+            empresaEdicionDTO.contrasenia = contrasenia;
+        }
+        
+        console.log('📤 Enviando actualización:', empresaEdicionDTO);
         console.log('📤 DTO en JSON:', JSON.stringify(empresaEdicionDTO));
         
         // Construir la URL usando la configuración del backend
