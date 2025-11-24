@@ -1505,7 +1505,9 @@
                                            pattern="[0-9]{7,8}" 
                                            required 
                                            placeholder="Sin puntos ni guiones"
-                                           maxlength="8">
+                                           maxlength="8"
+                                           inputmode="numeric"
+                                           oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                                     <div class="invalid-feedback"></div>
                                 </div>
                                 
@@ -1518,7 +1520,10 @@
                                            name="apellido" 
                                            required 
                                            minlength="2"
-                                           placeholder="Ingrese su apellido">
+                                           placeholder="Ingrese su apellido"
+                                           pattern="[A-ZÁÉÍÓÚÑ]+"
+                                           style="text-transform: uppercase;"
+                                           oninput="this.value = this.value.replace(/[^a-záéíóúñA-ZÁÉÍÓÚÑ]/g, '').toUpperCase()">
                                     <div class="invalid-feedback"></div>
                                 </div>
                                 
@@ -1531,7 +1536,10 @@
                                            name="nombre" 
                                            required 
                                            minlength="2"
-                                           placeholder="Ingrese su nombre">
+                                           placeholder="Ingrese su nombre"
+                                           pattern="[A-ZÁÉÍÓÚÑ]+"
+                                           style="text-transform: uppercase;"
+                                           oninput="this.value = this.value.replace(/[^a-záéíóúñA-ZÁÉÍÓÚÑ]/g, '').toUpperCase()">
                                     <div class="invalid-feedback"></div>
                                 </div>
                                 
@@ -1543,7 +1551,10 @@
                                            id="telefono-postulacion" 
                                            name="telefono" 
                                            required 
-                                           placeholder="Ej: +54 261 123-4567">
+                                           placeholder="Ej: +54 261 123-4567"
+                                           maxlength="12"
+                                           inputmode="numeric"
+                                           oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                                     <div class="invalid-feedback"></div>
                                 </div>
                                 
@@ -1587,7 +1598,9 @@
                                            required 
                                            pattern="[0-9]{4}"
                                            maxlength="4"
-                                           placeholder="5500">
+                                           placeholder="5500"
+                                           inputmode="numeric"
+                                           oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                                     <div class="invalid-feedback"></div>
                                 </div>
                                 

@@ -298,6 +298,17 @@
     box-shadow: 0 8px 32px rgba(66, 143, 97, 0.4) !important;
 }
 
+/* Estilos específicos para el modal de postulación */
+#modalPostulacion .modal-content {
+    background: #011807 !important;
+    border: 2px solid rgba(1, 24, 7, 0.8) !important;
+    box-shadow: 0 8px 32px rgba(1, 24, 7, 0.4) !important;
+}
+
+#modalPostulacion .modal-body {
+    background: #011807 !important;
+}
+
 .modal-header.border-secondary {
     border-bottom: 1px solid #444444 !important;
 }
@@ -315,9 +326,27 @@
 
 .form-control.bg-dark:focus {
     background-color: #2A2A2A !important;
-    border-color: #007bff !important;
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+    border-color: #444444 !important;
+    box-shadow: none !important;
     color: #FFFFFF !important;
+}
+
+/* Estilos específicos para inputs del modal de postulación */
+#modalPostulacion .form-control:focus {
+    background-color: #2A2A2A !important;
+    border-color: #444444 !important;
+    box-shadow: none !important;
+    color: #FFFFFF !important;
+}
+
+#modalPostulacion .form-control:hover {
+    background-color: #2A2A2A !important;
+    border-color: #444444 !important;
+}
+
+#modalPostulacion .form-select:hover {
+    background-color: #2A2A2A !important;
+    border-color: #444444 !important;
 }
 
 .form-control.bg-dark::placeholder {
