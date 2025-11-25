@@ -15,7 +15,14 @@
 /* Marcadores personalizados */
 .custom-marker-oferta {
     background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
     border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 .marker-oferta-publica {
@@ -30,6 +37,10 @@
     border: 3px solid white;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+    background-clip: padding-box;
+    -webkit-background-clip: padding-box;
 }
 
 .marker-oferta-publica:hover {
@@ -134,8 +145,13 @@
 
 /* Controles del mapa */
 .leaflet-control-layers {
-    border-radius: 8px !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    overflow: visible !important;
 }
 
 .leaflet-control-scale {

@@ -27,10 +27,22 @@
 /* Efectos de transición para marcadores */
 .leaflet-marker-icon {
     transition: all 0.3s ease-in-out;
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    backdrop-filter: none !important;
+    background-color: transparent !important;
+    background-image: none !important;
 }
 
 .leaflet-marker-icon:hover {
     transform: scale(1.05);
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
 }
 
 /* Estilos para popup destacado */
@@ -73,6 +85,30 @@
 .marker-selected {
     filter: drop-shadow(0 0 10px #ff6b6b);
     transform: scale(1.15);
+}
+
+/* Eliminar cualquier sombra de marcador de Leaflet */
+.leaflet-marker-shadow {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+/* Asegurar que todos los marcadores de Leaflet no tengan fondos blancos */
+.leaflet-marker-pane .leaflet-marker-icon {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Eliminar cualquier efecto de imagen de fondo en marcadores */
+.leaflet-marker-icon img {
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 /* Estilos para marcador de ubicación del usuario */

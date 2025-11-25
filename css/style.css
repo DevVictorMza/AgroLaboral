@@ -1,31 +1,31 @@
+/* Control de capas de Leaflet - Solo icono sin background */
 .leaflet-control-layers-toggle {
-    background: #fff !important;
-    border-radius: 12px !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12) !important;
-    border: 1px solid #e0e0e0 !important;
-    width: 44px !important;
-    height: 44px !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border-radius: 0 !important;
+    -webkit-box-shadow: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    outline: none !important;
+    width: auto !important;
+    height: auto !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     padding: 0 !important;
+    overflow: visible !important;
 }
 .leaflet-control-layers-toggle img, .leaflet-control-layers-toggle svg, .leaflet-control-layers-toggle i {
     filter: none !important;
     opacity: 1 !important;
-    width: 24px !important;
-    height: 24px !important;
     margin: 0 !important;
-}
-/* Quitar fondo negro del botón de capas Leaflet y mostrar iconos */
-.leaflet-control-layers-toggle {
+    padding: 0 !important;
     background: transparent !important;
-    box-shadow: none !important;
     border: none !important;
-}
-.leaflet-control-layers-toggle img, .leaflet-control-layers-toggle svg, .leaflet-control-layers-toggle i {
-    filter: none !important;
-    opacity: 1 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
 }
 /* Tarjeta con 95% de ancho centrada */
 .card-ancho-95 {
@@ -79,6 +79,64 @@
 .leaflet-control-layers-base label,
 .leaflet-control-layers-overlays label {
     color: #111 !important;
+}
+
+/* Eliminar fondos blancos del contenedor del control de capas */
+.leaflet-control-layers {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Sección expandida del control de capas sin fondo */
+.leaflet-control-layers-expanded {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    outline: none !important;
+    -webkit-box-shadow: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+/* Eliminar fondos blancos de la lista de capas */
+.leaflet-control-layers-list {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+/* Eliminar fondos blancos de las secciones base y overlays */
+.leaflet-control-layers-base,
+.leaflet-control-layers-overlays {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+/* Eliminar fondos blancos de los separadores */
+.leaflet-control-layers-separator {
+    background: transparent !important;
+    border: none !important;
+}
+
+/* Eliminar pseudo-elementos que puedan causar desperfectos detrás del icono */
+.leaflet-control-layers-toggle::before,
+.leaflet-control-layers-toggle::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* Asegurar que el icono no tenga bordes o fondos innecesarios detrás */
+.leaflet-control-layers-toggle > * {
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
 }
 /* Variables del Dashboard */
 :root {

@@ -1033,7 +1033,24 @@ function generarDashboard(perfil) {
             
             .company-status-badge i {
                 font-size: 0.7rem;
+            }
+            
+            .company-status-badge.active i {
                 animation: pulse 2s ease-in-out infinite;
+            }
+            
+            .company-edit-badge {
+                background: rgba(39, 174, 96, 0.15);
+                border: 1px solid rgba(39, 174, 96, 0.3);
+                color: #27AE60;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+            
+            .company-edit-badge:hover {
+                background: rgba(39, 174, 96, 0.25);
+                border-color: rgba(39, 174, 96, 0.5);
+                transform: translateY(-2px);
             }
             
             @keyframes pulse {
@@ -1053,15 +1070,15 @@ function generarDashboard(perfil) {
                 align-items: flex-start;
                 gap: 1rem;
                 padding: 1rem;
-                background: rgba(255, 255, 255, 0.03);
-                border: 1px solid rgba(255, 255, 255, 0.08);
+                background: transparent;
+                border: none;
                 border-radius: 12px;
                 transition: all 0.3s ease;
             }
             
             .meta-item:hover {
-                background: rgba(255, 255, 255, 0.05);
-                border-color: rgba(74, 144, 226, 0.3);
+                background: transparent;
+                border: none;
                 transform: translateY(-2px);
             }
             
@@ -1094,6 +1111,9 @@ function generarDashboard(perfil) {
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
+                text-shadow: none;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
             }
             
             /* Responsive */
@@ -1393,8 +1413,9 @@ function generarDashboard(perfil) {
                                     <i class="fas fa-circle"></i>
                                     Activa
                                 </span>
-                                <button type="button" class="btn btn-success btn-sm" onclick="abrirModalEditarEmpresa()">
-                                    <i class="fas fa-edit me-1"></i>Editar
+                                <button type="button" class="company-status-badge company-edit-badge" onclick="abrirModalEditarEmpresa()">
+                                    <i class="fas fa-edit"></i>
+                                    Editar
                                 </button>
                             </div>
                         </div>
@@ -6972,7 +6993,7 @@ async function autenticarUsuario(cuit, contrasenia) {
 			};
 		} else if (response.status === 401) {
 			console.log('❌ Credenciales inválidas (401)');
-			return { exito: false, mensaje: 'DNI o contraseña incorrectos' };
+			return { exito: false, mensaje: 'CUIT o contraseña incorrectos' };
 		} else if (response.status === 404) {
 			console.log('❌ Usuario no encontrado (404)');
 			return { exito: false, mensaje: 'El usuario no existe' };
@@ -14303,6 +14324,8 @@ async function recalcularContadorGlobal() {
                 if (cached) {
                     const vistas = obtenerPostulacionesNoVistas(idOferta);
                     const countNuevas = vistas ? Math.max(0, cached.count - vistas.viewedPostulaciones.length) : cached.count;
+                    
+                    console.log(`📊 Oferta ${idOferta}: ${cached.count} postulaciones (${countNuevas} nuevas)`);
                     
                     totalPostulaciones += cached.count;
                     totalNuevas += countNuevas;

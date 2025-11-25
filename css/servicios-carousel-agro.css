@@ -539,10 +539,10 @@
 .carousel-btn {
     width: 50px;
     height: 50px;
-    border: 2px solid rgba(107, 142, 35, 0.6);
+    border: 2px solid rgba(95, 2, 28, 0.6);
     border-radius: 50%;
     background: var(--agro-gradient-card);
-    color: var(--agro-verde-primary);
+    color: #5F021C;
     font-size: 1.2rem;
     cursor: pointer;
     display: flex;
@@ -551,7 +551,7 @@
     transition: all var(--agro-transition-fast);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    box-shadow: var(--agro-shadow-light);
+    box-shadow: 0 4px 15px rgba(95, 2, 28, 0.15);
     pointer-events: auto;
     position: relative;
     overflow: hidden;
@@ -564,7 +564,7 @@
     left: 50%;
     width: 0;
     height: 0;
-    background: var(--agro-verde-primary);
+    background: #5F021C;
     border-radius: 50%;
     transition: all var(--agro-transition-fast);
     transform: translate(-50%, -50%);
@@ -576,10 +576,10 @@
 }
 
 .carousel-btn:hover {
-    border-color: var(--agro-verde-primary);
+    border-color: #5F021C;
     color: white;
     transform: scale(1.1);
-    box-shadow: var(--agro-shadow-medium);
+    box-shadow: 0 8px 25px rgba(95, 2, 28, 0.3);
 }
 
 .carousel-btn i {
@@ -588,11 +588,13 @@
 }
 
 .carousel-btn--prev {
-    left: -25px;
+    left: -70px;
+    transform: translateY(0);
 }
 
 .carousel-btn--next {
-    right: -25px;
+    right: -15px;
+    transform: translateY(0);
 }
 
 .carousel-btn:disabled {
