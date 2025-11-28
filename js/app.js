@@ -703,14 +703,17 @@ function abrirModalEditarEmpresa() {
 async function guardarEdicionEmpresa() {
     console.log('💾 Guardando edición de empresa');
     
-    const form = document.getElementById('formEditarEmpresa');
-    const razonSocial = document.getElementById('editRazonSocial').value.trim();
-    const contrasenia = document.getElementById('editContrasenia').value;
-    const contraseniaConfirmar = document.getElementById('editContraseniaConfirmar').value;
+    const razonSocialInput = document.getElementById('editRazonSocial');
+    const contraseniaInput = document.getElementById('editContrasenia');
+    const contraseniaConfirmarInput = document.getElementById('editContraseniaConfirmar');
+    
+    const razonSocial = razonSocialInput ? razonSocialInput.value.trim() : '';
+    const contrasenia = contraseniaInput ? contraseniaInput.value.trim() : '';
+    const contraseniaConfirmar = contraseniaConfirmarInput ? contraseniaConfirmarInput.value.trim() : '';
     
     // Validar que al menos un campo tenga valor
     if (!razonSocial && !contrasenia) {
-        showMessage('Debe modificar al menos un campo (razón social o contraseña)', 'warning');
+        showMessage('Debe modificar al menos un campo', 'warning');
         return;
     }
     
@@ -720,34 +723,27 @@ async function guardarEdicionEmpresa() {
         return;
     }
     
-    // Validar contraseña si se proporcionó
+    // Validar contraseña SOLO si se proporcionó
     if (contrasenia) {
         if (contrasenia.length < 6) {
             showMessage('La contraseña debe tener al menos 6 caracteres', 'error');
             return;
         }
         
-        // Validar que las contraseñas coincidan solo si se ingresó contraseña
-        if (contrasenia !== contraseniaConfirmar) {
+        // Validar que las contraseñas coincidan solo si ambos campos existen
+        if (contraseniaConfirmarInput && contrasenia !== contraseniaConfirmar) {
             showMessage('Las contraseñas no coinciden', 'error');
             return;
         }
     }
     
-    // Validar que si se ingresó confirmación de contraseña, también se haya ingresado la contraseña
-    if (contraseniaConfirmar && !contrasenia) {
-        showMessage('Debe ingresar la nueva contraseña', 'error');
-        return;
-    }
-    
     try {
-        // Obtener el token de autenticación usando la clave correcta
-        const token = localStorage.getItem(AUTH_CONFIG.storage.tokenKey);
-        if (!token) {
-            showMessage('Sesión expirada. Por favor, inicie sesión nuevamente.', 'error');
-            setTimeout(() => {
-                cerrarSesion();
-            }, 2000);
+        // Obtener el perfil de empresa del localStorage
+        const perfilEmpresa = JSON.parse(localStorage.getItem('perfil_empresa') || '{}');
+        const idEmpresa = perfilEmpresa.idEmpresa;
+        
+        if (!idEmpresa) {
+            showMessage('Error: No se encontró el ID de la empresa', 'error');
             return;
         }
         
@@ -765,16 +761,15 @@ async function guardarEdicionEmpresa() {
         console.log('📤 Enviando actualización:', empresaEdicionDTO);
         console.log('📤 DTO en JSON:', JSON.stringify(empresaEdicionDTO));
         
-        // Construir la URL usando la configuración del backend
-        const url = buildURL(BACKEND_CONFIG.ENDPOINTS.UPDATE_EMPRESA);
+        // Construir la URL del endpoint
+        const url = 'http://localhost:8080/privado/empresas';
         console.log('🔗 URL de actualización:', url);
         
-        // Realizar la petición PUT
-        const response = await fetch(url, {
+        // Realizar la petición PUT usando fetchWithAuth
+        const response = await fetchWithAuth(url, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(empresaEdicionDTO)
         });
