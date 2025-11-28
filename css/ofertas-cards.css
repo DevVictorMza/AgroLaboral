@@ -527,6 +527,35 @@
     }
 }
 
+/* Ofertas Inactivas/Dadas de Baja */
+.oferta-inactiva {
+    background: linear-gradient(145deg, rgba(95, 2, 28, 0.15) 0%, rgba(95, 2, 28, 0.25) 100%) !important;
+    border: 1px solid rgba(95, 2, 28, 0.4) !important;
+    opacity: 0.85;
+}
+
+.oferta-inactiva:hover {
+    background: linear-gradient(145deg, rgba(95, 2, 28, 0.2) 0%, rgba(95, 2, 28, 0.3) 100%) !important;
+    border-color: rgba(95, 2, 28, 0.6) !important;
+}
+
+.oferta-inactiva-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(95, 2, 28, 0.9);
+    color: #ffffff;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.oferta-inactiva-badge i {
+    font-size: 0.9rem;
+}
+
 /* Mobile pequeño */
 @media (max-width: 576px) {
     .oferta-card-moderna {
@@ -545,5 +574,10 @@
     .oferta-especie-tag {
         font-size: 0.7rem;
         padding: 0.25rem 0.5rem;
+    }
+    
+    .oferta-inactiva-badge {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.8rem;
     }
 }

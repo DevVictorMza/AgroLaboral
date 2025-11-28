@@ -10539,12 +10539,99 @@ function renderizarOfertas(ofertas) {
 }
 
 /**
- * Función para calcular estadísticas de ofertas basada en la estructura real del backend
+ * Dar de baja una oferta de empleo
+ * @param {number} idOferta - ID de la oferta
  */
-function calcularEstadisticasOfertasReales(ofertas) {
-
-    html += '</div>';
-    contentDiv.innerHTML = html;
+async function eliminarOferta(idOferta) {
+    console.log('🚫 Dando de baja oferta:', idOferta);
+    
+    // Confirmar la acción
+    const confirmar = confirm('¿Está seguro que desea dar de baja esta oferta de empleo?\n\nLa oferta quedará inactiva y no será visible para los postulantes.');
+    
+    if (!confirmar) {
+        console.log('❌ Operación cancelada por el usuario');
+        return;
+    }
+    
+    try {
+        showMessage('Procesando baja de la oferta...', 'info');
+        
+        // Construir la URL del endpoint
+        const url = `http://localhost:8080/privado/ofertas-empleo/${idOferta}/baja`;
+        console.log('🔗 URL:', url);
+        
+        // Realizar la petición PUT usando fetchWithAuth
+        const response = await fetchWithAuth(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        console.log('📥 Respuesta del servidor:', response.status);
+        
+        // Manejar respuestas de error
+        if (!response.ok) {
+            if (response.status === 401) {
+                showMessage('Sesión expirada. Redirigiendo al login...', 'error');
+                setTimeout(() => {
+                    cerrarSesion();
+                }, 2000);
+                return;
+            }
+            
+            if (response.status === 403) {
+                showMessage('No tiene permisos para dar de baja esta oferta', 'error');
+                return;
+            }
+            
+            if (response.status === 404) {
+                showMessage('Oferta no encontrada', 'error');
+                return;
+            }
+            
+            if (response.status === 400) {
+                const errorData = await response.json().catch(() => ({}));
+                console.error('❌ Error 400 del servidor:', errorData);
+                const mensajeError = errorData.message || 'No se pudo procesar la solicitud';
+                showMessage(mensajeError, 'error');
+                return;
+            }
+            
+            if (response.status >= 500) {
+                const errorData = await response.json().catch(() => null);
+                console.error('❌ Error 500 del servidor:', errorData);
+                showMessage('Error del servidor. Intente nuevamente más tarde.', 'error');
+                return;
+            }
+            
+            const errorData = await response.json().catch(() => ({}));
+            console.error('❌ Error del servidor:', errorData);
+            showMessage(errorData.message || `Error ${response.status}`, 'error');
+            return;
+        }
+        
+        // El endpoint retorna 204 No Content, no hay body que parsear
+        console.log('✅ Oferta dada de baja exitosamente');
+        
+        // Mostrar mensaje de éxito
+        showMessage('Oferta dada de baja correctamente', 'success');
+        
+        // Recargar las ofertas del dashboard y ofertas públicas
+        setTimeout(async () => {
+            // Recargar ofertas del dashboard (solo vigentes - sin las dadas de baja)
+            await cargarOfertasEmpleo(true);
+            
+            // Recargar ofertas públicas (todas, incluyendo las dadas de baja con estilo diferente)
+            await cargarOfertasPublicas();
+            
+            console.log('✅ Ofertas actualizadas correctamente');
+        }, 1000);
+        
+    } catch (error) {
+        console.error('❌ Error al dar de baja oferta:', error);
+        showMessage(error.message || 'Error al dar de baja la oferta', 'error');
+    }
 }
 
 /**
