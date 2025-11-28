@@ -1647,7 +1647,7 @@ function generarDashboard(perfil) {
 
         <!-- Modal Wizard Agregar Finca -->
         <div class="modal fade" id="wizardFincaModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content bg-dark text-white">
                     <div class="modal-header border-secondary">
                         <h5 class="modal-title">
@@ -8245,7 +8245,14 @@ function actualizarInterfazLogin(autenticado) {
 	
 	if (autenticado) {
 		const usuario = obtenerUsuario();
-		const nombreUsuario = usuario ? usuario.razonSocial || usuario.cuit : 'Usuario';
+		// Intentar obtener la razón social del perfil almacenado
+		let nombreUsuario = 'Usuario';
+		try {
+			const perfilEmpresa = JSON.parse(localStorage.getItem('perfil_empresa') || '{}');
+			nombreUsuario = perfilEmpresa.razonSocial || usuario?.razonSocial || usuario?.cuit || 'Usuario';
+		} catch (error) {
+			nombreUsuario = usuario ? (usuario.razonSocial || usuario.cuit) : 'Usuario';
+		}
 		
 		// Ocultar el botón de login (el <li> completo)
 		if (btnLogin && btnLogin.parentElement) {

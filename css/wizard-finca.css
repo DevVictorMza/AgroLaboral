@@ -8,9 +8,19 @@
    MODAL WIZARD - TAMAÑO Y ESTRUCTURA
    =================================== */
 
-/* Modal con ancho controlado */
-#wizardFincaModal .modal-dialog {
-    max-width: 900px !important;
+/* Modal con ancho controlado y desplazado hacia la izquierda */
+#wizardFincaModal.modal.fade .modal-dialog,
+#wizardFincaModal.modal.show .modal-dialog {
+    max-width: 1200px !important;
+    width: 1200px !important;
+    margin-left: 10% !important;
+    margin-right: auto !important;
+    margin-top: 1.75rem !important;
+    margin-bottom: 1.75rem !important;
+    position: relative !important;
+    left: 0 !important;
+    right: 0 !important;
+    transform: translateX(-100px) !important;
 }
 
 /* Contenido del modal */
@@ -418,9 +428,16 @@
 
 /* Tablets */
 @media (max-width: 991px) {
-    #wizardFincaModal .modal-dialog {
-        max-width: 90%;
-        margin: 1rem auto;
+    #wizardFincaModal.modal.fade .modal-dialog,
+    #wizardFincaModal.modal.show .modal-dialog {
+        max-width: 85% !important;
+        width: 85% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        margin-top: 1rem !important;
+        margin-bottom: 1rem !important;
+        left: 0 !important;
+        right: 0 !important;
     }
     
     #wizardFincaModal .modal-body {
@@ -438,9 +455,16 @@
 
 /* Móviles */
 @media (max-width: 767px) {
-    #wizardFincaModal .modal-dialog {
-        max-width: 95%;
-        margin: 0.5rem auto;
+    #wizardFincaModal.modal.fade .modal-dialog,
+    #wizardFincaModal.modal.show .modal-dialog {
+        max-width: 95% !important;
+        width: 95% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        margin-top: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+        left: 0 !important;
+        right: 0 !important;
     }
     
     #wizardFincaModal .modal-body {
