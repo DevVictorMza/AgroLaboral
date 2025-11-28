@@ -2831,6 +2831,10 @@ function generarHtmlEstablecimientos(establecimientos) {
                     <i class="fas fa-briefcase"></i>
                     <span>Nueva Oferta</span>
                 </button>
+                <button class="btn-accion-compacto btn-dar-baja" onclick="darBajaEstablecimiento(${est.idEstablecimiento})" title="Dar de baja">
+                    <i class="fas fa-times-circle"></i>
+                    <span>Dar de Baja</span>
+                </button>
             </div>
         </div>
     `).join('');
@@ -3043,6 +3047,18 @@ function generarHtmlEstablecimientos(establecimientos) {
             .btn-crear-oferta:hover {
                 background: linear-gradient(135deg, #27AE60, #229954);
                 border-color: #27AE60;
+                color: white;
+            }
+            
+            .btn-dar-baja {
+                background: linear-gradient(135deg, rgba(231, 76, 60, 0.1), rgba(192, 57, 43, 0.1));
+                border: 1px solid rgba(231, 76, 60, 0.3);
+                color: #E74C3C;
+            }
+            
+            .btn-dar-baja:hover {
+                background: linear-gradient(135deg, #E74C3C, #C0392B);
+                border-color: #E74C3C;
                 color: white;
             }
             
@@ -3295,6 +3311,97 @@ function centrarMapaEnCoordenadas(latitud, longitud) {
 
 // Exponer función verEnMapa globalmente
 window.verEnMapa = verEnMapa;
+
+/**
+ * Dar de baja un establecimiento
+ * @param {number} idEstablecimiento - ID del establecimiento
+ */
+async function darBajaEstablecimiento(idEstablecimiento) {
+    console.log('🚫 Dando de baja establecimiento:', idEstablecimiento);
+    
+    // Confirmar la acción
+    const confirmar = confirm('¿Está seguro que desea dar de baja este establecimiento?\n\nEsta acción establecerá una fecha de baja y el establecimiento quedará inactivo.');
+    
+    if (!confirmar) {
+        console.log('❌ Operación cancelada por el usuario');
+        return;
+    }
+    
+    try {
+        showMessage('Procesando baja del establecimiento...', 'info');
+        
+        // Construir la URL del endpoint
+        const url = `http://localhost:8080/privado/establecimientos/${idEstablecimiento}/estado`;
+        console.log('🔗 URL:', url);
+        
+        // Realizar la petición PUT usando fetchWithAuth
+        const response = await fetchWithAuth(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        console.log('📥 Respuesta del servidor:', response.status);
+        
+        // Manejar respuestas de error
+        if (!response.ok) {
+            if (response.status === 401) {
+                showMessage('Sesión expirada. Redirigiendo al login...', 'error');
+                setTimeout(() => {
+                    cerrarSesion();
+                }, 2000);
+                return;
+            }
+            
+            if (response.status === 403) {
+                showMessage('No tiene permisos para dar de baja este establecimiento', 'error');
+                return;
+            }
+            
+            if (response.status === 404) {
+                showMessage('Establecimiento no encontrado', 'error');
+                return;
+            }
+            
+            if (response.status === 400) {
+                const errorData = await response.json().catch(() => ({}));
+                console.error('❌ Error 400 del servidor:', errorData);
+                const mensajeError = errorData.message || 'No se pudo procesar la solicitud';
+                showMessage(mensajeError, 'error');
+                return;
+            }
+            
+            if (response.status >= 500) {
+                const errorData = await response.json().catch(() => null);
+                console.error('❌ Error 500 del servidor:', errorData);
+                showMessage('Error del servidor. Intente nuevamente más tarde.', 'error');
+                return;
+            }
+            
+            const errorData = await response.json().catch(() => ({}));
+            console.error('❌ Error del servidor:', errorData);
+            showMessage(errorData.message || `Error ${response.status}`, 'error');
+            return;
+        }
+        
+        // Procesar respuesta exitosa
+        const establecimientoActualizado = await response.json();
+        console.log('✅ Establecimiento dado de baja exitosamente:', establecimientoActualizado);
+        
+        // Mostrar mensaje de éxito
+        showMessage('Establecimiento dado de baja correctamente', 'success');
+        
+        // Recargar la lista de establecimientos
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
+        
+    } catch (error) {
+        console.error('❌ Error al dar de baja establecimiento:', error);
+        showMessage(error.message || 'Error al dar de baja el establecimiento', 'error');
+    }
+}
 
 /**
  * Crear oferta laboral con API integrada
