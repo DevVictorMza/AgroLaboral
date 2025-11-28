@@ -4322,3 +4322,24 @@ main:has(#main-map) {
     height: 1rem;
     border-width: 0.15em;
 }
+
+/* ===================================
+   LEAFLET ZOOM - SIGNOS BLANCOS
+   =================================== */
+a.leaflet-control-zoom-in,
+a.leaflet-control-zoom-out,
+.leaflet-control-zoom a,
+.leaflet-bar a {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* ===================================
+   ELIMINAR PUNTA DE POPUPS
+   =================================== */
+.leaflet-popup-tip,
+div.leaflet-popup-tip {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}

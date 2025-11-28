@@ -1689,10 +1689,8 @@ function generarDashboard(perfil) {
                         </div>
                         
                         <!-- Empty State -->
-                        <div id="postulaciones-empty" class="d-none text-center py-5">
-                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                            <h6 class="text-white">No hay postulaciones aún</h6>
-                            <p class="text-muted">Las postulaciones de los candidatos aparecerán aquí</p>
+                        <div id="postulaciones-empty" class="d-none text-center py-4">
+                            <p class="text-white mb-1 fs-5">No hay postulaciones aún - Las postulaciones de los candidatos aparecerán aquí</p>
                         </div>
                         
                         <!-- Error State -->
@@ -1956,20 +1954,40 @@ function cargarPaso1() {
 
                 <!-- Especies -->
                 <div class="col-12 mb-3">
-                    <label for="especiesSelector" class="form-label">
+                    <label class="form-label">
                         Especies Cultivadas <span class="text-danger">*</span>
                     </label>
-                    <button type="button" class="btn btn-outline-secondary w-100 text-start" 
+                    <button type="button" class="btn btn-outline-secondary w-100 text-start especies-collapse-btn" 
                             id="especiesSelector"
-                            onclick="console.log('🖱️ Click en especies selector detectado'); if(typeof abrirModalEspecies === 'function') abrirModalEspecies(); else console.error('abrirModalEspecies no disponible');"
-                            style="background: #404040; border-color: #666666; color: white; min-height: 50px;">
+                            data-bs-toggle="collapse" 
+                            data-bs-target="#especiesCollapse"
+                            aria-expanded="false"
+                            aria-controls="especiesCollapse"
+                            style="background: #000000; border-color: #666666; color: white; min-height: 50px;">
                         <div class="d-flex justify-content-between align-items-center">
                             <span id="especiesSelectorText">Seleccione las especies que cultiva...</span>
-                            <i class="fas fa-chevron-down"></i>
+                            <i class="fas fa-chevron-down especies-chevron" style="transition: transform 0.3s ease;"></i>
                         </div>
                     </button>
-                    <div class="field-feedback"></div>
-                    <small class="text-muted">Puede seleccionar hasta 5 especies diferentes</small>
+                    
+                    <!-- Collapse con Grid de Especies -->
+                    <div class="collapse mt-3" id="especiesCollapse">
+                        <div class="especies-collapse-container" style="background: rgba(0,0,0,0.3); border: 1px solid #444; border-radius: 8px; padding: 1.5rem;">
+                            <div class="mb-3 text-center">
+                                <small class="text-info d-block" id="especiesCollapseCounter">
+                                    <i class="fas fa-info-circle me-1"></i>Seleccione hasta 5 especies (0/5 seleccionadas)
+                                </small>
+                            </div>
+                            <div class="especies-grid" id="especiesGridCollapse" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.75rem;">
+                                <div class="text-center p-3">
+                                    <div class="spinner-border spinner-border-sm text-success" role="status"></div>
+                                    <p class="mt-2 mb-0 small text-muted">Cargando especies...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="field-feedback" style="margin-top: 0.5rem;"></div>
                 </div>
             </div>
 
@@ -2041,13 +2059,18 @@ function cargarPaso1() {
 
     // Cargar datos iniciales
     cargarDepartamentos();
-    // cargarEspecies(); // Ahora se carga automáticamente en el modal de especies
     
     // Configurar eventos
     configurarEventosPaso1();
     
-    // Configurar modal de especies después de crear el wizard
-    if (typeof configurarModalEspecies === 'function') {
+    // Configurar collapse de especies (sistema inline)
+    if (typeof configurarCollapseEspecies === 'function') {
+        console.log('🔧 Configurando collapse de especies desde wizard...');
+        setTimeout(() => configurarCollapseEspecies(), 200);
+    }
+    
+    // NO configurar modal de especies (deshabilitado)
+    if (false && typeof configurarModalEspecies === 'function') {
         setTimeout(() => {
             configurarModalEspecies();
         }, 100);

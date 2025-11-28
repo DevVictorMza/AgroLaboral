@@ -76,6 +76,7 @@
 }
 
 .establecimiento-popup-container .leaflet-popup-tip {
+    display: none !important;
     background: white !important;
 }
 

@@ -1163,7 +1163,7 @@
     </style>
     
     <!-- Modal Selección de Especies -->
-    <div class="modal fade" id="especiesModal" tabindex="-1" aria-labelledby="especiesModalLabel" aria-hidden="true">
+    <div class="modal fade" id="especiesModal" tabindex="-1" aria-labelledby="especiesModalLabel" aria-hidden="true" style="display: none !important;">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark text-white">
                 <div class="modal-header border-secondary">
@@ -1297,7 +1297,8 @@
                             <input type="text" class="form-control bg-dark text-white border-secondary" 
                                    id="editEstabNombre" name="nombreEstablecimiento" 
                                    placeholder="Ej: Finca Los Olivos" 
-                                   maxlength="25" required>
+                                   maxlength="25" required
+                                   style="text-transform: uppercase;">
                             <div class="invalid-feedback">El nombre es obligatorio (máx. 25 caracteres).</div>
                         </div>
 
@@ -1310,7 +1311,8 @@
                             <input type="text" class="form-control bg-dark text-white border-secondary" 
                                    id="editEstabCalle" name="calle" 
                                    placeholder="Ej: Ruta Provincial 82" 
-                                   maxlength="25" required>
+                                   maxlength="25" required
+                                   style="text-transform: uppercase;">
                             <div class="invalid-feedback">La calle es obligatoria (máx. 25 caracteres).</div>
                         </div>
 
@@ -1322,8 +1324,10 @@
                             </label>
                             <input type="text" class="form-control bg-dark text-white border-secondary" 
                                    id="editEstabNumeracion" name="numeracion" 
-                                   placeholder="Ej: Km 15" 
-                                   maxlength="5" required>
+                                   placeholder="Ej: 15" 
+                                   maxlength="5" required
+                                   pattern="[0-9]+"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                             <div class="invalid-feedback">La numeración es obligatoria (máx. 5 caracteres).</div>
                         </div>
 
@@ -1336,7 +1340,8 @@
                             <input type="text" class="form-control bg-dark text-white border-secondary" 
                                    id="editEstabCodigoPostal" name="codigoPostal" 
                                    placeholder="Ej: 5505" 
-                                   maxlength="4" pattern="[0-9]{4}" required>
+                                   maxlength="4" pattern="[0-9]{4}" required
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                             <div class="invalid-feedback">Debe ser exactamente 4 dígitos.</div>
                         </div>
 

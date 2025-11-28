@@ -12,15 +12,15 @@ async function cargarEspecies() {
     try {
         console.log('🌱 Cargando especies desde /privado/especies...');
         
-        // Mostrar loading
-        const grid = document.getElementById('especiesGrid');
+        // Mostrar loading (soporta collapse o modal)
+        let grid = document.getElementById('especiesGridCollapse') || document.getElementById('especiesGrid');
         if (grid) {
             grid.innerHTML = `
                 <div class="text-center p-3">
-                    <div class="spinner-border text-primary" role="status">
+                    <div class="spinner-border spinner-border-sm text-success" role="status">
                         <span class="visually-hidden">Cargando especies...</span>
                     </div>
-                    <p class="mt-2 text-muted">Cargando especies...</p>
+                    <p class="mt-2 mb-0 small text-muted">Cargando especies...</p>
                 </div>
             `;
         }
@@ -113,9 +113,16 @@ function usarDatosRespaldo() {
     renderizarEspeciesGrid();
 }
 
-// Renderizar el grid de especies
+// Renderizar el grid de especies (funciona con modal o collapse)
 function renderizarEspeciesGrid() {
-    const grid = document.getElementById('especiesGrid');
+    // Intentar con el collapse primero (nuevo sistema)
+    let grid = document.getElementById('especiesGridCollapse');
+    
+    // Fallback al modal viejo si existe
+    if (!grid) {
+        grid = document.getElementById('especiesGrid');
+    }
+    
     if (!grid) return;
     
     if (especiesDisponibles.length === 0) {
@@ -158,17 +165,20 @@ function toggleEspecie(idEspecie, nombreEspecie) {
     }
     
     renderizarEspeciesGrid();
+    actualizarTextoSelector();
+    validarCampoEspecies();
     console.log('🌱 Especies seleccionadas:', especiesSeleccionadas);
 }
 
 // Actualizar contador de especies
 function actualizarContadorEspecies() {
-    const counter = document.getElementById('especiesModalCounter');
+    // Intentar con collapse primero
+    let counter = document.getElementById('especiesCollapseCounter') || document.getElementById('especiesModalCounter');
     if (counter) {
-        counter.textContent = `Seleccione hasta 5 especies (${especiesSeleccionadas.length}/5 seleccionadas)`;
+        counter.innerHTML = `<i class="fas fa-info-circle me-1"></i>Seleccione hasta 5 especies (${especiesSeleccionadas.length}/5 seleccionadas)`;
         
         // Cambiar color según cantidad
-        counter.className = especiesSeleccionadas.length >= maxEspecies ? 'text-warning' : 'text-info';
+        counter.className = especiesSeleccionadas.length >= maxEspecies ? 'text-warning d-block' : 'text-info d-block';
     }
 }
 
@@ -212,53 +222,18 @@ function mostrarErrorEspecies() {
     }
 }
 
-// Configurar eventos del modal de especies
+// Configurar eventos del modal de especies (DESHABILITADO - Ahora se usa collapse)
 function configurarModalEspecies() {
-    console.log('🔧 Configurando modal de especies...');
-    
-    // Buscar el selector cada vez que se llama esta función
-    const selector = document.getElementById('especiesSelector');
-    if (selector) {
-        console.log('✅ Botón especiesSelector encontrado, configurando evento...');
-        
-        // Remover eventos previos para evitar duplicados
-        selector.removeEventListener('click', abrirModalEspecies);
-        selector.addEventListener('click', abrirModalEspecies);
-        
-        console.log('✅ Evento click configurado en especiesSelector');
-    } else {
-        console.log('❌ Botón especiesSelector no encontrado en el DOM');
-    }
-    
-    // Configurar botón de confirmación
-    const confirmarBtn = document.getElementById('confirmarEspecies');
-    if (confirmarBtn) {
-        confirmarBtn.removeEventListener('click', confirmarSeleccionEspecies);
-        confirmarBtn.addEventListener('click', confirmarSeleccionEspecies);
-        console.log('✅ Botón confirmar especies configurado');
-    }
+    console.log('⚠️ configurarModalEspecies deshabilitado - usando collapse inline');
+    // No hacer nada, el collapse se configura con configurarCollapseEspecies()
+    return;
 }
 
-// Función separada para abrir el modal
+// Función separada para abrir el modal (DESHABILITADO - Ahora se usa collapse)
 function abrirModalEspecies() {
-    console.log('🌱 Abriendo modal de especies...');
-    
-    const modalElement = document.getElementById('especiesModal');
-    if (modalElement) {
-        const modal = new bootstrap.Modal(modalElement);
-        modal.show();
-        
-        // Cargar especies si no se han cargado aún
-        if (especiesDisponibles.length === 0) {
-            console.log('🔄 Cargando especies por primera vez...');
-            cargarEspecies();
-        } else {
-            console.log('✅ Especies ya cargadas, renderizando grid...');
-            renderizarEspeciesGrid();
-        }
-    } else {
-        console.error('❌ Modal especiesModal no encontrado');
-    }
+    console.log('⚠️ abrirModalEspecies deshabilitado - usando collapse inline');
+    // No abrir modal, el collapse se maneja automáticamente con Bootstrap
+    return false;
 }
 
 // Función separada para confirmar selección
@@ -398,23 +373,60 @@ function mostrarToast(mensaje, tipo = 'info') {
     });
 }
 
+// Configurar collapse de especies
+function configurarCollapseEspecies() {
+    console.log('🔧 Configurando collapse de especies...');
+    
+    const collapseElement = document.getElementById('especiesCollapse');
+    if (!collapseElement) {
+        console.warn('⚠️ Collapse especiesCollapse no encontrado');
+        return;
+    }
+    
+    // Evento cuando se muestra el collapse
+    collapseElement.addEventListener('show.bs.collapse', function () {
+        console.log('📂 Abriendo collapse de especies...');
+        
+        // Rotar chevron
+        const chevron = document.querySelector('.especies-chevron');
+        if (chevron) chevron.style.transform = 'rotate(180deg)';
+        
+        // Cargar especies si no se han cargado
+        if (especiesDisponibles.length === 0) {
+            cargarEspecies();
+        } else {
+            renderizarEspeciesGrid();
+        }
+    });
+    
+    // Evento cuando se oculta el collapse
+    collapseElement.addEventListener('hide.bs.collapse', function () {
+        console.log('📁 Cerrando collapse de especies...');
+        
+        // Restaurar chevron
+        const chevron = document.querySelector('.especies-chevron');
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+    });
+    
+    console.log('✅ Collapse de especies configurado');
+}
+
 // Configurar especies al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🌱 DOM cargado, intentando configurar modal de especies...');
+    console.log('🌱 DOM cargado, configurando collapse de especies...');
     
-    // Intentar configurar inmediatamente
-    configurarModalEspecies();
+    // Solo configurar collapse, NO modal
+    configurarCollapseEspecies();
     
-    // También intentar después de un delay
+    // Reintentos por si el wizard se carga dinámicamente
     setTimeout(() => {
-        console.log('🔄 Reintentando configurar modal de especies...');
-        configurarModalEspecies();
+        console.log('🔄 Reintentando configurar collapse...');
+        configurarCollapseEspecies();
     }, 500);
     
-    // Y después de más tiempo por si el wizard se carga dinámicamente
     setTimeout(() => {
-        console.log('🔄 Último intento de configurar modal de especies...');
-        configurarModalEspecies();
+        console.log('🔄 Último intento configurar collapse...');
+        configurarCollapseEspecies();
     }, 1000);
 });
 
@@ -427,3 +439,4 @@ window.restaurarEspeciesSeleccionadas = restaurarEspeciesSeleccionadas;
 window.validarCampoEspecies = validarCampoEspecies;
 window.configurarModalEspecies = configurarModalEspecies;
 window.abrirModalEspecies = abrirModalEspecies;
+window.configurarCollapseEspecies = configurarCollapseEspecies;

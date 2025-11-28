@@ -52,6 +52,7 @@
 }
 
 .leaflet-popup.popup-destacado .leaflet-popup-tip {
+    display: none !important;
     border-top-color: #ff6b6b;
 }
 
