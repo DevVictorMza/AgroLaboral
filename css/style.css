@@ -1671,6 +1671,7 @@ body::before {
     text-transform: uppercase !important;
     letter-spacing: 0.5px !important;
     font-weight: 600 !important;
+    max-width: 450px !important;
 }
 
 #nombreEstablecimiento::placeholder {

@@ -1880,6 +1880,9 @@ function cargarPaso1() {
                     </label>
                     <input type="text" class="form-control text-white" 
                            id="numeracion" required>
+                    <small class="form-text text-muted d-block mt-1" style="font-size: 0.8rem;">
+                        <i class="fas fa-info-circle me-1"></i>Si no tiene número colocar 0 y ubicar de forma manual en el mapa
+                    </small>
                     <div class="field-feedback"></div>
                 </div>
 

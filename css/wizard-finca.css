@@ -204,8 +204,8 @@
 /* Inputs y selects */
 #finca-form .form-control,
 #finca-form .form-select {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #000000 !important;
+    border: 1px solid #6c757d !important;
     color: var(--text-light);
     padding: 0.75rem 1rem;
     border-radius: 8px;
@@ -214,9 +214,9 @@
 
 #finca-form .form-control:focus,
 #finca-form .form-select:focus {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: #27AE60;
-    box-shadow: 0 0 0 0.25rem rgba(39, 174, 96, 0.15);
+    background: #000000 !important;
+    border-color: #6c757d !important;
+    box-shadow: none !important;
     color: white;
 }
 
@@ -253,15 +253,15 @@
 /* Inputs válidos */
 #finca-form .form-control.is-valid,
 #finca-form .form-select.is-valid {
-    border-color: #2ECC71;
-    background: rgba(46, 204, 113, 0.05);
+    border-color: #6c757d !important;
+    background: #000000 !important;
 }
 
 /* Inputs inválidos */
 #finca-form .form-control.is-invalid,
 #finca-form .form-select.is-invalid {
-    border-color: #E74C3C;
-    background: rgba(231, 76, 60, 0.05);
+    border-color: #E74C3C !important;
+    background: #000000 !important;
 }
 
 /* ===================================
@@ -301,16 +301,20 @@
    MAPA Y UBICACIÓN
    =================================== */
 
-#map-container-wizard {
+#map-container-wizard,
+.map-container {
     border-radius: 8px;
     overflow: hidden;
     border: 2px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    background: #000000 !important;
+    padding: 1rem;
 }
 
 #mapa-finca {
     height: 350px;
     width: 100%;
+    background: #000000 !important;
 }
 
 /* Controles del mapa */
@@ -326,6 +330,24 @@
     flex: 1;
     padding: 0.75rem;
     font-size: 0.9rem;
+}
+
+/* Controles de zoom de Leaflet - Signos negros con máxima prioridad */
+#mapa-finca .leaflet-control-zoom a,
+#mapa-finca .leaflet-control-zoom-in,
+#mapa-finca .leaflet-control-zoom-out,
+#mapa-finca .leaflet-control-zoom a span {
+    color: #000000 !important;
+    text-shadow: none !important;
+}
+
+.leaflet-container .leaflet-control-zoom a {
+    color: #000000 !important;
+    text-decoration: none !important;
+}
+
+.leaflet-container .leaflet-control-zoom a:hover {
+    color: #000000 !important;
 }
 
 /* Coordenadas display */
