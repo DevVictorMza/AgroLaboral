@@ -1272,6 +1272,164 @@
         </div>
     </div>
 
+    <!-- Modal para Editar Establecimiento -->
+    <div class="modal fade" id="editarEstablecimientoModal" tabindex="-1" aria-labelledby="editarEstablecimientoModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content bg-dark border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title text-white" id="editarEstablecimientoModalLabel">
+                        <i class="fas fa-edit me-2 text-warning"></i>
+                        Editar Establecimiento
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEditarEstablecimiento" novalidate>
+                        <!-- Hidden input para ID -->
+                        <input type="hidden" id="editEstabIdEstablecimiento" name="idEstablecimiento">
+
+                        <!-- Nombre del Establecimiento -->
+                        <div class="mb-3">
+                            <label for="editEstabNombre" class="form-label text-white">
+                                <i class="fas fa-warehouse me-2"></i>Nombre del Establecimiento
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control bg-dark text-white border-secondary" 
+                                   id="editEstabNombre" name="nombreEstablecimiento" 
+                                   placeholder="Ej: Finca Los Olivos" 
+                                   maxlength="25" required>
+                            <div class="invalid-feedback">El nombre es obligatorio (máx. 25 caracteres).</div>
+                        </div>
+
+                        <!-- Calle -->
+                        <div class="mb-3">
+                            <label for="editEstabCalle" class="form-label text-white">
+                                <i class="fas fa-road me-2"></i>Calle
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control bg-dark text-white border-secondary" 
+                                   id="editEstabCalle" name="calle" 
+                                   placeholder="Ej: Ruta Provincial 82" 
+                                   maxlength="25" required>
+                            <div class="invalid-feedback">La calle es obligatoria (máx. 25 caracteres).</div>
+                        </div>
+
+                        <!-- Numeración -->
+                        <div class="mb-3">
+                            <label for="editEstabNumeracion" class="form-label text-white">
+                                <i class="fas fa-hashtag me-2"></i>Numeración
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control bg-dark text-white border-secondary" 
+                                   id="editEstabNumeracion" name="numeracion" 
+                                   placeholder="Ej: Km 15" 
+                                   maxlength="5" required>
+                            <div class="invalid-feedback">La numeración es obligatoria (máx. 5 caracteres).</div>
+                        </div>
+
+                        <!-- Código Postal -->
+                        <div class="mb-3">
+                            <label for="editEstabCodigoPostal" class="form-label text-white">
+                                <i class="fas fa-mail-bulk me-2"></i>Código Postal
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control bg-dark text-white border-secondary" 
+                                   id="editEstabCodigoPostal" name="codigoPostal" 
+                                   placeholder="Ej: 5505" 
+                                   maxlength="4" pattern="[0-9]{4}" required>
+                            <div class="invalid-feedback">Debe ser exactamente 4 dígitos.</div>
+                        </div>
+
+                        <!-- Distrito -->
+                        <div class="mb-3">
+                            <label for="editEstabDistrito" class="form-label text-white">
+                                <i class="fas fa-map-marked-alt me-2"></i>Distrito
+                                <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select bg-dark text-white border-secondary" 
+                                    id="editEstabDistrito" name="idDistrito" required>
+                                <option value="">Cargando distritos...</option>
+                            </select>
+                            <div class="invalid-feedback">Debe seleccionar un distrito.</div>
+                        </div>
+
+                        <!-- Especies -->
+                        <div class="mb-3">
+                            <label class="form-label text-white">
+                                <i class="fas fa-seedling me-2"></i>Especies Cultivadas
+                                <span class="text-danger">*</span>
+                            </label>
+                            
+                            <!-- Hidden input to store selected species IDs -->
+                            <input type="hidden" id="editEstabEspeciesIds" name="idsEspecies" required>
+                            
+                            <!-- Button to toggle dropdown -->
+                            <button type="button" class="btn btn-success w-100 mb-2" 
+                                    onclick="toggleDropdownEspecies(event)" 
+                                    id="editEstabEspeciesBtn">
+                                <i class="fas fa-seedling me-2"></i>
+                                <span id="editEstabEspeciesBtnText">Seleccionar Especies (0/5)</span>
+                                <i class="fas fa-chevron-down ms-2" id="editEstabEspeciesChevron"></i>
+                            </button>
+                            
+                            <!-- Dropdown expandible (oculto por defecto) -->
+                            <div id="editEstabEspeciesDropdown" class="especies-dropdown" style="display: none;">
+                                <div class="especies-dropdown-grid" id="editEstabEspeciesGrid">
+                                    <div class="text-center p-3">
+                                        <div class="spinner-border spinner-border-sm text-success" role="status"></div>
+                                        <small class="d-block mt-2 text-muted">Cargando especies...</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Display de especies seleccionadas -->
+                            <div class="especies-seleccionadas mt-2" id="editEstabEspeciesDisplay">
+                                <small class="text-info">No hay especies seleccionadas</small>
+                            </div>
+                            
+                            <div class="invalid-feedback">Debe seleccionar al menos una especie.</div>
+                        </div>
+
+                        <!-- Ubicación -->
+                        <div class="mb-3">
+                            <label class="form-label text-white">
+                                <i class="fas fa-map-marker-alt me-2"></i>Ubicación Geográfica
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <input type="number" class="form-control bg-dark text-white border-secondary" 
+                                           id="editEstabLatitud" name="latitud" 
+                                           placeholder="Latitud" 
+                                           step="0.000001" min="-90" max="90" required>
+                                    <div class="invalid-feedback">Latitud entre -90 y 90.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="number" class="form-control bg-dark text-white border-secondary" 
+                                           id="editEstabLongitud" name="longitud" 
+                                           placeholder="Longitud" 
+                                           step="0.000001" min="-180" max="180" required>
+                                    <div class="invalid-feedback">Longitud entre -180 y 180.</div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-info mt-2" onclick="usarUbicacionActualParaEdicion()">
+                                <i class="fas fa-location-arrow me-2"></i>Usar mi ubicación actual
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="guardarEdicionEstablecimiento()">
+                        <i class="fas fa-save me-2"></i>Guardar Cambios
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal para Crear/Editar Oferta de Trabajo -->
     <div class="modal fade" id="modalOfertaTrabajo" tabindex="-1" aria-labelledby="modalOfertaTrabajoLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">

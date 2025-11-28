@@ -10,7 +10,7 @@ const maxEspecies = 5;
 // Función para cargar especies desde el backend
 async function cargarEspecies() {
     try {
-        console.log('🌱 Cargando especies...');
+        console.log('🌱 Cargando especies desde /privado/especies...');
         
         // Mostrar loading
         const grid = document.getElementById('especiesGrid');
@@ -26,14 +26,26 @@ async function cargarEspecies() {
         }
         
         try {
-            const response = await fetch('http://localhost:8080/publico/especies');
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.warn('⚠️ No hay token de autenticación');
+                throw new Error('No autenticado');
+            }
+            
+            const response = await fetch('http://localhost:8080/privado/especies', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
             
             if (!response.ok) {
                 throw new Error(`Error HTTP: ${response.status}`);
             }
             
             const especies = await response.json();
-            console.log('✅ Especies cargadas desde servidor:', especies);
+            console.log('✅ Especies cargadas desde servidor:', especies.length, 'especies');
             
             especiesDisponibles = especies;
             renderizarEspeciesGrid();

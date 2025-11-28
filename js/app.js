@@ -2831,6 +2831,10 @@ function generarHtmlEstablecimientos(establecimientos) {
                     <i class="fas fa-briefcase"></i>
                     <span>Nueva Oferta</span>
                 </button>
+                <button class="btn-accion-compacto btn-editar" onclick="abrirModalEditarEstablecimiento(${est.idEstablecimiento})" title="Editar">
+                    <i class="fas fa-edit"></i>
+                    <span>Editar</span>
+                </button>
                 <button class="btn-accion-compacto btn-dar-baja" onclick="darBajaEstablecimiento(${est.idEstablecimiento})" title="Dar de baja">
                     <i class="fas fa-times-circle"></i>
                     <span>Dar de Baja</span>
@@ -3047,6 +3051,18 @@ function generarHtmlEstablecimientos(establecimientos) {
             .btn-crear-oferta:hover {
                 background: linear-gradient(135deg, #27AE60, #229954);
                 border-color: #27AE60;
+                color: white;
+            }
+            
+            .btn-editar {
+                background: linear-gradient(135deg, rgba(243, 156, 18, 0.1), rgba(230, 126, 34, 0.1));
+                border: 1px solid rgba(243, 156, 18, 0.3);
+                color: #F39C12;
+            }
+            
+            .btn-editar:hover {
+                background: linear-gradient(135deg, #F39C12, #E67E22);
+                border-color: #F39C12;
                 color: white;
             }
             
@@ -3401,6 +3417,594 @@ async function darBajaEstablecimiento(idEstablecimiento) {
         console.error('❌ Error al dar de baja establecimiento:', error);
         showMessage(error.message || 'Error al dar de baja el establecimiento', 'error');
     }
+}
+
+/**
+ * Abre el modal para editar un establecimiento
+ * @param {number} idEstablecimiento - ID del establecimiento a editar
+ */
+async function abrirModalEditarEstablecimiento(idEstablecimiento) {
+    console.log('✏️ Abriendo modal de edición para establecimiento:', idEstablecimiento);
+    
+    try {
+        // Mostrar carga
+        showMessage('Cargando datos del establecimiento...', 'info');
+        
+        // Cargar todos los establecimientos
+        const establecimientos = await cargarEstablecimientos();
+        
+        if (!establecimientos) {
+            showMessage('Error al cargar establecimientos', 'error');
+            return;
+        }
+        
+        // Buscar el establecimiento específico
+        const establecimiento = establecimientos.find(est => est.idEstablecimiento === idEstablecimiento);
+        
+        if (!establecimiento) {
+            showMessage('Establecimiento no encontrado', 'error');
+            return;
+        }
+        
+        console.log('📥 Establecimiento encontrado:', establecimiento);
+        
+        // Cargar distritos y especies en paralelo
+        const [distritos, especies] = await Promise.all([
+            obtenerTodosLosDistritos(),
+            obtenerTodasLasEspecies()
+        ]);
+        
+        console.log('📊 Distritos cargados:', distritos ? distritos.length : 0);
+        console.log('📊 Especies cargadas:', especies ? especies.length : 0);
+        
+        // Llenar campos del formulario
+        document.getElementById('editEstabIdEstablecimiento').value = establecimiento.idEstablecimiento;
+        document.getElementById('editEstabNombre').value = establecimiento.nombreEstablecimiento || '';
+        document.getElementById('editEstabCalle').value = establecimiento.calle || '';
+        document.getElementById('editEstabNumeracion').value = establecimiento.numeracion || '';
+        document.getElementById('editEstabCodigoPostal').value = establecimiento.codigoPostal || '';
+        document.getElementById('editEstabLatitud').value = establecimiento.latitud || '';
+        document.getElementById('editEstabLongitud').value = establecimiento.longitud || '';
+        
+        // Poblar select de distritos
+        const selectDistrito = document.getElementById('editEstabDistrito');
+        selectDistrito.innerHTML = '<option value="">Seleccione un distrito</option>';
+        if (distritos && distritos.length > 0) {
+            distritos.forEach(distrito => {
+                const option = document.createElement('option');
+                option.value = distrito.idDistrito;
+                option.textContent = distrito.nombreDistrito;
+                // Pre-seleccionar usando idDistrito o nombreDistrito
+                if (distrito.idDistrito === establecimiento.idDistrito || 
+                    distrito.nombreDistrito === establecimiento.nombreDistrito) {
+                    option.selected = true;
+                }
+                selectDistrito.appendChild(option);
+            });
+        }
+        
+        // Pre-cargar especies seleccionadas para el dropdown
+        const especiesIdsInput = document.getElementById('editEstabEspeciesIds');
+        const displayDiv = document.getElementById('editEstabEspeciesDisplay');
+        const btnText = document.getElementById('editEstabEspeciesBtnText');
+        
+        if (establecimiento.especies && Array.isArray(establecimiento.especies) && establecimiento.especies.length > 0) {
+            // Obtener IDs de las especies del establecimiento
+            const especiesIds = establecimiento.especies.map(e => e.idEspecie);
+            
+            // Actualizar hidden input
+            if (especiesIdsInput) {
+                especiesIdsInput.value = especiesIds.join(',');
+                console.log('📝 Especies pre-cargadas:', especiesIdsInput.value);
+            }
+            
+            // Actualizar display con badges
+            if (displayDiv) {
+                displayDiv.innerHTML = establecimiento.especies.map(especie => `
+                    <span class="badge bg-success me-2 mb-2">
+                        <i class="fas fa-seedling me-1"></i>${especie.nombreEspecie}
+                        <i class="fas fa-times ms-1" style="cursor: pointer;" 
+                           onclick="quitarEspecieSeleccionada(${especie.idEspecie})"></i>
+                    </span>
+                `).join('');
+            }
+            
+            // Actualizar texto del botón
+            if (btnText) {
+                btnText.textContent = `Seleccionar Especies (${especiesIds.length}/5)`;
+            }
+            
+            console.log(`✅ ${especiesIds.length} especie(s) pre-cargada(s):`, establecimiento.especies.map(e => e.nombreEspecie).join(', '));
+        } else {
+            // No hay especies, limpiar campos
+            if (especiesIdsInput) especiesIdsInput.value = '';
+            if (displayDiv) displayDiv.innerHTML = '<small class="text-info">No hay especies seleccionadas</small>';
+            if (btnText) btnText.textContent = 'Seleccionar Especies (0/5)';
+            console.log('ℹ️ No hay especies pre-seleccionadas');
+        }
+        
+        console.log('✅ Formulario cargado con datos del establecimiento');
+        
+        // Abrir modal
+        const modal = new bootstrap.Modal(document.getElementById('editarEstablecimientoModal'));
+        modal.show();
+        
+        console.log('✅ Modal de edición abierto correctamente');
+        
+    } catch (error) {
+        console.error('❌ Error al abrir modal de edición:', error);
+        showMessage('Error al cargar los datos del establecimiento', 'error');
+    }
+}
+
+/**
+ * Carga todos los distritos del backend sin modificar DOM
+ * @returns {Promise<Array>} Array de distritos
+ */
+async function obtenerTodosLosDistritos() {
+    try {
+        // Primero obtener todos los departamentos
+        const responseDep = await fetchWithConfig(buildURL(BACKEND_CONFIG.ENDPOINTS.DEPARTAMENTOS));
+        if (!responseDep.ok) {
+            throw new Error('Error al cargar departamentos');
+        }
+        const departamentos = await responseDep.json();
+        
+        // Cargar distritos de todos los departamentos en paralelo
+        const promesasDistritos = departamentos.map(dep => 
+            fetchWithConfig(buildURL(BACKEND_CONFIG.ENDPOINTS.DISTRITOS, `/${dep.idDepartamento}`))
+                .then(res => res.ok ? res.json() : [])
+                .catch(() => [])
+        );
+        
+        const resultados = await Promise.all(promesasDistritos);
+        const todosLosDistritos = resultados.flat();
+        
+        console.log('📊 Total distritos cargados:', todosLosDistritos.length);
+        return todosLosDistritos;
+        
+    } catch (error) {
+        console.error('❌ Error al obtener distritos:', error);
+        return [];
+    }
+}
+
+/**
+ * Carga todas las especies del backend sin modificar DOM
+ * @returns {Promise<Array>} Array de especies
+ */
+async function obtenerTodasLasEspecies() {
+    try {
+        console.log('🔐 Obteniendo especies con autenticación...');
+        const response = await fetchWithAuth('http://localhost:8080/privado/especies');
+        if (!response.ok) {
+            console.error('❌ Error HTTP al cargar especies:', response.status, response.statusText);
+            throw new Error(`Error al cargar especies: ${response.status}`);
+        }
+        const especies = await response.json();
+        console.log('✅ Especies cargadas correctamente:', especies.length);
+        return especies;
+    } catch (error) {
+        console.error('❌ Error al obtener especies:', error);
+        showMessage('Error al cargar especies del servidor', 'error');
+        return [];
+    }
+}
+
+/**
+ * Función auxiliar para usar ubicación actual en el modal de edición
+ */
+function usarUbicacionActualParaEdicion() {
+    if (!navigator.geolocation) {
+        showMessage('Tu navegador no soporta geolocalización', 'error');
+        return;
+    }
+    
+    showMessage('Obteniendo tu ubicación...', 'info');
+    
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            document.getElementById('editEstabLatitud').value = position.coords.latitude;
+            document.getElementById('editEstabLongitud').value = position.coords.longitude;
+            showMessage('Ubicación obtenida correctamente', 'success');
+        },
+        (error) => {
+            console.error('❌ Error al obtener ubicación:', error);
+            showMessage('No se pudo obtener tu ubicación. Verifica los permisos del navegador.', 'error');
+        }
+    );
+}
+
+/**
+ * Valida el formulario de edición de establecimiento
+ * @returns {Object|null} - Retorna el DTO si es válido, null si hay errores
+ */
+function validarFormularioEstablecimiento() {
+    const nombre = document.getElementById('editEstabNombre').value.trim();
+    const calle = document.getElementById('editEstabCalle').value.trim();
+    const numeracion = document.getElementById('editEstabNumeracion').value.trim();
+    const codigoPostal = document.getElementById('editEstabCodigoPostal').value.trim();
+    const latitud = parseFloat(document.getElementById('editEstabLatitud').value);
+    const longitud = parseFloat(document.getElementById('editEstabLongitud').value);
+    const idDistrito = parseInt(document.getElementById('editEstabDistrito').value);
+    
+    // Leer especies desde el hidden input (nuevo sistema visual)
+    const especiesIdsInput = document.getElementById('editEstabEspeciesIds');
+    const especiesIdsStr = especiesIdsInput ? especiesIdsInput.value.trim() : '';
+    const idsEspecies = especiesIdsStr 
+        ? especiesIdsStr.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id))
+        : [];
+    
+    // Validaciones
+    if (!nombre || nombre.length > 25) {
+        showMessage('El nombre del establecimiento es obligatorio y no puede exceder 25 caracteres', 'error');
+        return null;
+    }
+    
+    if (!calle || calle.length > 25) {
+        showMessage('La calle es obligatoria y no puede exceder 25 caracteres', 'error');
+        return null;
+    }
+    
+    if (!numeracion || numeracion.length > 5) {
+        showMessage('La numeración es obligatoria y no puede exceder 5 caracteres', 'error');
+        return null;
+    }
+    
+    if (!codigoPostal || !/^\d{4}$/.test(codigoPostal)) {
+        showMessage('El código postal debe ser exactamente 4 dígitos', 'error');
+        return null;
+    }
+    
+    if (isNaN(latitud) || latitud < -90 || latitud > 90) {
+        showMessage('La latitud debe estar entre -90 y 90', 'error');
+        return null;
+    }
+    
+    if (isNaN(longitud) || longitud < -180 || longitud > 180) {
+        showMessage('La longitud debe estar entre -180 y 180', 'error');
+        return null;
+    }
+    
+    if (!idDistrito) {
+        showMessage('Debe seleccionar un distrito', 'error');
+        return null;
+    }
+    
+    if (idsEspecies.length === 0) {
+        showMessage('Debe seleccionar al menos una especie', 'error');
+        return null;
+    }
+    
+    // Construir DTO
+    return {
+        nombreEstablecimiento: nombre,
+        calle: calle,
+        numeracion: numeracion,
+        codigoPostal: codigoPostal,
+        latitud: latitud,
+        longitud: longitud,
+        idDistrito: idDistrito,
+        idsEspecies: idsEspecies
+    };
+}
+
+/**
+ * Guarda los cambios del establecimiento editado
+ */
+async function guardarEdicionEstablecimiento() {
+    console.log('💾 Guardando edición de establecimiento...');
+    
+    try {
+        // Obtener ID del establecimiento
+        const idEstablecimiento = parseInt(document.getElementById('editEstabIdEstablecimiento').value);
+        
+        if (!idEstablecimiento) {
+            showMessage('Error: No se pudo identificar el establecimiento', 'error');
+            return;
+        }
+        
+        // Validar formulario
+        const dto = validarFormularioEstablecimiento();
+        if (!dto) {
+            return; // Los errores ya se mostraron en la validación
+        }
+        
+        console.log('📤 DTO a enviar:', dto);
+        
+        // Mostrar mensaje de procesamiento
+        showMessage('Guardando cambios...', 'info');
+        
+        // Enviar solicitud PUT al backend
+        const response = await fetchWithAuth(`http://localhost:8080/privado/establecimientos/${idEstablecimiento}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(dto)
+        });
+        
+        console.log('📥 Respuesta del servidor:', response.status);
+        
+        // Manejar errores
+        if (!response.ok) {
+            if (response.status === 400) {
+                const errorData = await response.json().catch(() => ({}));
+                console.error('❌ Error 400 - Validación:', errorData);
+                const mensajeError = errorData.message || 'Error de validación. Verifique los datos ingresados.';
+                showMessage(mensajeError, 'error');
+                return;
+            }
+            
+            if (response.status === 401) {
+                showMessage('Sesión expirada. Redirigiendo al login...', 'error');
+                setTimeout(() => cerrarSesion(), 2000);
+                return;
+            }
+            
+            if (response.status === 403) {
+                showMessage('No tiene permisos para editar este establecimiento', 'error');
+                return;
+            }
+            
+            if (response.status === 404) {
+                showMessage('Establecimiento no encontrado', 'error');
+                return;
+            }
+            
+            if (response.status >= 500) {
+                const errorData = await response.json().catch(() => null);
+                console.error('❌ Error 500 del servidor:', errorData);
+                showMessage('Error del servidor. Intente nuevamente más tarde.', 'error');
+                return;
+            }
+            
+            throw new Error(`Error ${response.status}`);
+        }
+        
+        // Procesar respuesta exitosa
+        const establecimientoActualizado = await response.json();
+        console.log('✅ Establecimiento actualizado:', establecimientoActualizado);
+        
+        // Cerrar modal
+        const modalElement = document.getElementById('editarEstablecimientoModal');
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        if (modal) {
+            modal.hide();
+        }
+        
+        // Mostrar mensaje de éxito
+        showMessage('Establecimiento actualizado correctamente', 'success');
+        
+        // Recargar establecimientos
+        setTimeout(async () => {
+            const establecimientos = await cargarEstablecimientos();
+            if (establecimientos) {
+                renderizarEstablecimientos(establecimientos);
+                console.log('✅ Lista de establecimientos actualizada');
+            }
+        }, 1000);
+        
+    } catch (error) {
+        console.error('❌ Error al guardar establecimiento:', error);
+        showMessage(error.message || 'Error al guardar los cambios', 'error');
+    }
+}
+
+/**
+ * Toggle dropdown de especies (inline, sin modal secundario)
+ */
+function toggleDropdownEspecies(event) {
+    console.log('🎯 Toggle dropdown especies called');
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const dropdown = document.getElementById('editEstabEspeciesDropdown');
+    const chevron = document.getElementById('editEstabEspeciesChevron');
+    
+    if (!dropdown) {
+        console.error('❌ Dropdown no encontrado');
+        return;
+    }
+    
+    if (!chevron) {
+        console.error('❌ Chevron no encontrado');
+    }
+    
+    console.log('📊 Estado actual dropdown:', dropdown.style.display);
+    
+    if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+        // Abrir dropdown
+        console.log('🔓 Abriendo dropdown...');
+        dropdown.style.display = 'block';
+        if (chevron) {
+            chevron.classList.remove('fa-chevron-down');
+            chevron.classList.add('fa-chevron-up');
+        }
+        
+        // Cargar especies
+        console.log('📞 Llamando a cargarEspeciesParaDropdown...');
+        cargarEspeciesParaDropdown();
+    } else {
+        // Cerrar dropdown
+        console.log('🔒 Cerrando dropdown...');
+        dropdown.style.display = 'none';
+        if (chevron) {
+            chevron.classList.remove('fa-chevron-up');
+            chevron.classList.add('fa-chevron-down');
+        }
+    }
+}
+
+/**
+ * Cargar especies en el dropdown inline
+ */
+async function cargarEspeciesParaDropdown() {
+    const grid = document.getElementById('editEstabEspeciesGrid');
+    
+    if (!grid) {
+        console.error('❌ Grid de especies no encontrado');
+        return;
+    }
+    
+    try {
+        console.log('🔄 Iniciando carga de especies para dropdown...');
+        
+        // Mostrar loading
+        grid.innerHTML = `
+            <div class="text-center p-3">
+                <div class="spinner-border spinner-border-sm text-success" role="status"></div>
+                <small class="d-block mt-2 text-muted">Cargando especies...</small>
+            </div>
+        `;
+        
+        // Obtener especies del backend
+        console.log('📡 Llamando a obtenerTodasLasEspecies()...');
+        const especies = await obtenerTodasLasEspecies();
+        console.log('📦 Especies recibidas:', especies);
+        
+        if (!especies || especies.length === 0) {
+            console.warn('⚠️ No hay especies disponibles');
+            grid.innerHTML = '<p class="text-center text-muted p-3">No hay especies disponibles</p>';
+            return;
+        }
+        
+        // Obtener especies actualmente seleccionadas
+        const especiesIdsInput = document.getElementById('editEstabEspeciesIds');
+        const especiesSeleccionadas = especiesIdsInput.value 
+            ? especiesIdsInput.value.split(',').map(id => parseInt(id.trim()))
+            : [];
+        
+        console.log('✅ Renderizando', especies.length, 'especies. Seleccionadas:', especiesSeleccionadas);
+        
+        // Renderizar grid de checkboxes
+        grid.innerHTML = especies.map(especie => {
+            const isChecked = especiesSeleccionadas.includes(especie.idEspecie);
+            return `
+                <label class="especie-checkbox-card ${isChecked ? 'checked' : ''}" 
+                       data-especie-id="${especie.idEspecie}">
+                    <input type="checkbox" 
+                           value="${especie.idEspecie}" 
+                           ${isChecked ? 'checked' : ''}
+                           onchange="toggleEspecieSeleccion(${especie.idEspecie}, '${especie.nombreEspecie.replace(/'/g, "\\'")}')">
+                    <div class="check-mark">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="especie-icon-wrapper">
+                        <i class="fas fa-seedling"></i>
+                    </div>
+                    <span class="especie-name-text">${especie.nombreEspecie}</span>
+                </label>
+            `;
+        }).join('');
+        
+        console.log('✅ Especies cargadas en dropdown:', especies.length);
+        
+    } catch (error) {
+        console.error('❌ Error al cargar especies:', error);
+        console.error('Error completo:', error.stack);
+        grid.innerHTML = `<p class="text-center text-danger p-3">Error al cargar especies<br><small>${error.message}</small></p>`;
+    }
+}
+
+/**
+ * Toggle selección de una especie (checkbox)
+ */
+function toggleEspecieSeleccion(idEspecie, nombreEspecie) {
+    const especiesIdsInput = document.getElementById('editEstabEspeciesIds');
+    const card = document.querySelector(`.especie-checkbox-card[data-especie-id="${idEspecie}"]`);
+    const checkbox = card.querySelector('input[type="checkbox"]');
+    
+    // Obtener especies actualmente seleccionadas
+    let especiesSeleccionadas = especiesIdsInput.value 
+        ? especiesIdsInput.value.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id))
+        : [];
+    
+    if (checkbox.checked) {
+        // Validar límite de 5 especies
+        if (especiesSeleccionadas.length >= 5) {
+            checkbox.checked = false;
+            showMessage('⚠️ Máximo 5 especies permitidas', 'warning');
+            return;
+        }
+        
+        // Agregar especie
+        if (!especiesSeleccionadas.includes(idEspecie)) {
+            especiesSeleccionadas.push(idEspecie);
+            card.classList.add('checked');
+        }
+    } else {
+        // Quitar especie
+        especiesSeleccionadas = especiesSeleccionadas.filter(id => id !== idEspecie);
+        card.classList.remove('checked');
+    }
+    
+    // Actualizar hidden input
+    especiesIdsInput.value = especiesSeleccionadas.join(',');
+    
+    // Actualizar UI
+    actualizarDisplayEspecies(especiesSeleccionadas);
+    actualizarEstadoLimiteEspecies(especiesSeleccionadas.length);
+    
+    console.log('🌱 Especies seleccionadas:', especiesSeleccionadas);
+}
+
+/**
+ * Actualizar display visual de especies seleccionadas
+ */
+async function actualizarDisplayEspecies(especiesIds) {
+    const displayDiv = document.getElementById('editEstabEspeciesDisplay');
+    const btnText = document.getElementById('editEstabEspeciesBtnText');
+    
+    if (especiesIds.length === 0) {
+        displayDiv.innerHTML = '<small class="text-info">No hay especies seleccionadas</small>';
+        btnText.textContent = 'Seleccionar Especies (0/5)';
+        return;
+    }
+    
+    // Obtener todas las especies para encontrar nombres
+    const todasLasEspecies = await obtenerTodasLasEspecies();
+    const especiesSeleccionadas = todasLasEspecies.filter(e => especiesIds.includes(e.idEspecie));
+    
+    // Crear badges
+    displayDiv.innerHTML = especiesSeleccionadas.map(especie => `
+        <span class="badge bg-success me-2 mb-2">
+            <i class="fas fa-seedling me-1"></i>${especie.nombreEspecie}
+            <i class="fas fa-times ms-1" style="cursor: pointer;" 
+               onclick="quitarEspecieSeleccionada(${especie.idEspecie})"></i>
+        </span>
+    `).join('');
+    
+    // Actualizar texto del botón
+    btnText.textContent = `Seleccionar Especies (${especiesIds.length}/5)`;
+}
+
+/**
+ * Quitar una especie desde el badge
+ */
+function quitarEspecieSeleccionada(idEspecie) {
+    const checkbox = document.querySelector(`.especie-checkbox-card[data-especie-id="${idEspecie}"] input[type="checkbox"]`);
+    if (checkbox) {
+        checkbox.checked = false;
+        toggleEspecieSeleccion(idEspecie, '');
+    }
+}
+
+/**
+ * Actualizar estado de cards cuando se alcanza el límite
+ */
+function actualizarEstadoLimiteEspecies(cantidadSeleccionada) {
+    const cards = document.querySelectorAll('.especie-checkbox-card');
+    
+    cards.forEach(card => {
+        const checkbox = card.querySelector('input[type="checkbox"]');
+        
+        if (cantidadSeleccionada >= 5 && !checkbox.checked) {
+            card.classList.add('disabled');
+        } else {
+            card.classList.remove('disabled');
+        }
+    });
 }
 
 /**

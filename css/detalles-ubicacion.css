@@ -309,6 +309,230 @@
     line-height: 1.4;
 }
 
+/* Estilos para especies-modal.js */
+/* Checkbox dentro de especie-card */
+.especie-card input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Ícono de especie en tarjeta */
+.especie-card .especie-icon {
+    font-size: 2rem;
+    color: #27AE60;
+}
+
+/* Nombre de especie en tarjeta */
+.especie-card .especie-name {
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+/* Check mark (oculto por defecto) */
+.especie-card .especie-check {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    color: #27AE60;
+    font-size: 1.2rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Estado seleccionado */
+.especie-card.selected {
+    border-color: #27AE60;
+    background: linear-gradient(145deg, #1e3a2a 0%, #2a4636 100%);
+    box-shadow: 0 0 20px rgba(39, 174, 96, 0.4);
+}
+
+.especie-card.selected::before {
+    opacity: 1;
+}
+
+.especie-card.selected .especie-check {
+    opacity: 1;
+}
+
+.especie-card.selected .especie-icon {
+    color: #2ECC71;
+}
+
+/* Estado deshabilitado (cuando se alcanza el límite) */
+.especie-card.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Cursor pointer para tarjetas interactivas */
+.especie-card:not(.disabled) {
+    cursor: pointer;
+}
+
+/* ===================================
+   DROPDOWN DE ESPECIES (INLINE)
+   =================================== */
+
+.especies-dropdown {
+    background: rgba(30, 42, 56, 0.95);
+    border: 1px solid rgba(46, 204, 113, 0.3);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-top: 0.5rem;
+    max-height: 400px;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.especies-dropdown-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.75rem;
+}
+
+.especie-checkbox-card {
+    background: linear-gradient(145deg, #1e2a38 0%, #263341 100%);
+    border: 2px solid rgba(46, 204, 113, 0.2);
+    border-radius: 10px;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.especie-checkbox-card:hover {
+    border-color: rgba(46, 204, 113, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.2);
+}
+
+.especie-checkbox-card input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.especie-checkbox-card .especie-icon-wrapper {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #27AE60 0%, #2ECC71 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.especie-checkbox-card .especie-icon-wrapper i {
+    font-size: 1.5rem;
+    color: white;
+}
+
+.especie-checkbox-card .especie-name-text {
+    color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.especie-checkbox-card .check-mark {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    background: #27AE60;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.3s ease;
+}
+
+.especie-checkbox-card .check-mark i {
+    color: white;
+    font-size: 0.7rem;
+}
+
+/* Estado checked */
+.especie-checkbox-card.checked {
+    border-color: #27AE60;
+    background: linear-gradient(145deg, #1e3a2a 0%, #2a4636 100%);
+    box-shadow: 0 0 15px rgba(39, 174, 96, 0.4);
+}
+
+.especie-checkbox-card.checked .check-mark {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.especie-checkbox-card.checked .especie-icon-wrapper {
+    background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%);
+}
+
+/* Estado disabled (límite alcanzado) */
+.especie-checkbox-card.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Scrollbar personalizado */
+.especies-dropdown::-webkit-scrollbar {
+    width: 8px;
+}
+
+.especies-dropdown::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.especies-dropdown::-webkit-scrollbar-thumb {
+    background: rgba(46, 204, 113, 0.5);
+    border-radius: 4px;
+}
+
+.especies-dropdown::-webkit-scrollbar-thumb:hover {
+    background: rgba(46, 204, 113, 0.7);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .especies-dropdown-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 0.5rem;
+    }
+    
+    .especies-dropdown {
+        max-height: 300px;
+    }
+}
+
 /* =========================================
    FOOTER DEL MODAL
    ========================================= */
