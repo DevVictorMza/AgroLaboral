@@ -15325,8 +15325,14 @@ async function recalcularContadorGlobal() {
     console.log('🔄 Recalculando contador global de postulaciones...');
     
     try {
-        // Obtener todas las ofertas del cache
-        const ofertasElements = document.querySelectorAll('[data-oferta-id]');
+        // Obtener solo las ofertas del contenedor "Ofertas de Trabajo Disponibles"
+        const ofertasContent = document.getElementById('ofertas-content');
+        if (!ofertasContent) {
+            console.log('⚠️ No se encontró el contenedor ofertas-content');
+            return;
+        }
+        
+        const ofertasElements = ofertasContent.querySelectorAll('[data-oferta-id]');
         const idsOfertas = Array.from(ofertasElements).map(el => el.getAttribute('data-oferta-id'));
         
         let totalPostulaciones = 0;
@@ -15350,15 +15356,8 @@ async function recalcularContadorGlobal() {
             }
         }
         
-        // Actualizar stats card
-        actualizarStatsCardSolicitudes(totalNuevas, totalPostulaciones);
-        
-        // Mostrar/ocultar banner
-        if (totalNuevas > 0 && !esBannerDismissed()) {
-            mostrarBannerPostulaciones(totalNuevas);
-        } else {
-            ocultarBannerPostulaciones();
-        }
+        // Actualizar stats card con el total de postulaciones
+        actualizarStatsCardSolicitudes(totalPostulaciones, totalNuevas);
         
         console.log(`✅ Contador global actualizado: ${totalPostulaciones} total, ${totalNuevas} nuevas`);
         
@@ -15373,16 +15372,16 @@ async function recalcularContadorGlobal() {
 /**
  * Actualizar stats card de solicitudes
  */
-function actualizarStatsCardSolicitudes(countNuevas, countTotal = null) {
+function actualizarStatsCardSolicitudes(countTotal, countNuevas = null) {
     const contadorElement = document.querySelector('[data-contador="solicitudes"]');
     if (contadorElement) {
-        // Animar el contador
-        animarContador(contadorElement, parseInt(contadorElement.textContent) || 0, countNuevas);
+        // Animar el contador con el total de postulaciones
+        animarContador(contadorElement, parseInt(contadorElement.textContent) || 0, countTotal);
         
-        // Agregar clase de pulsación si hay nuevas
+        // Agregar clase de pulsación si hay nuevas postulaciones
         const statsCard = contadorElement.closest('.stats-card-moderna');
         if (statsCard) {
-            if (countNuevas > 0) {
+            if (countNuevas !== null && countNuevas > 0) {
                 statsCard.classList.add('stats-card-pulse');
             } else {
                 statsCard.classList.remove('stats-card-pulse');
@@ -15410,126 +15409,7 @@ function animarContador(element, desde, hasta) {
     }, 16);
 }
 
-/**
- * Mostrar banner de postulaciones nuevas
- */
-function mostrarBannerPostulaciones(count) {
-    let banner = document.getElementById('banner-postulaciones');
-    
-    if (!banner) {
-        // Crear banner si no existe
-        banner = crearBannerPostulaciones();
-    }
-    
-    // Actualizar contador
-    const countElement = document.getElementById('banner-count');
-    if (countElement) {
-        countElement.textContent = count;
-    }
-    
-    // Mostrar banner
-    banner.style.display = 'block';
-}
 
-/**
- * Crear banner de notificaciones
- */
-function crearBannerPostulaciones() {
-    const banner = document.createElement('div');
-    banner.id = 'banner-postulaciones';
-    banner.className = 'alert alert-postulaciones-nuevas alert-dismissible fade show';
-    banner.innerHTML = `
-        <div class="d-flex align-items-center">
-            <i class="fas fa-bell fa-2x text-warning me-3 bell-animated"></i>
-            <div class="flex-grow-1">
-                <h6 class="alert-heading mb-1 text-white">
-                    ¡Tienes <strong id="banner-count">0</strong> postulaciones nuevas!
-                </h6>
-                <p class="mb-0 small text-white-50">
-                    Revisa las solicitudes de empleo pendientes
-                </p>
-            </div>
-            <button class="btn btn-warning btn-sm me-3" onclick="scrollToOfertas()">
-                <i class="fas fa-arrow-down me-1"></i>Ver Ofertas
-            </button>
-        </div>
-        <button type="button" class="btn-close btn-close-white" onclick="dismissBannerPostulaciones()"></button>
-    `;
-    
-    // Insertar después del header de perfil en el dashboard
-    const dashboardContent = document.getElementById('dashboard-content');
-    if (dashboardContent) {
-        dashboardContent.insertBefore(banner, dashboardContent.firstChild);
-    }
-    
-    return banner;
-}
-
-/**
- * Ocultar banner de postulaciones
- */
-function ocultarBannerPostulaciones() {
-    const banner = document.getElementById('banner-postulaciones');
-    if (banner) {
-        banner.style.display = 'none';
-    }
-}
-
-/**
- * Dismiss banner de postulaciones
- */
-function dismissBannerPostulaciones() {
-    ocultarBannerPostulaciones();
-    
-    // Guardar estado en localStorage
-    try {
-        const estado = {
-            dismissed: true,
-            lastDismissed: new Date().toISOString()
-        };
-        localStorage.setItem('notificaciones_banner', JSON.stringify(estado));
-    } catch (error) {
-        console.error('Error guardando estado de banner:', error);
-    }
-}
-
-/**
- * Verificar si el banner fue dismissed
- */
-function esBannerDismissed() {
-    try {
-        const estado = JSON.parse(localStorage.getItem('notificaciones_banner') || '{}');
-        
-        // Si fue dismissed hace menos de 24 horas, no mostrar
-        if (estado.dismissed && estado.lastDismissed) {
-            const lastDismissed = new Date(estado.lastDismissed);
-            const ahora = new Date();
-            const diffHours = (ahora - lastDismissed) / 3600000;
-            
-            return diffHours < 24;
-        }
-        
-        return false;
-    } catch (error) {
-        console.error('Error verificando estado de banner:', error);
-        return false;
-    }
-}
-
-/**
- * Scroll to ofertas section
- */
-function scrollToOfertas() {
-    const ofertasSection = document.getElementById('ofertas-content');
-    if (ofertasSection) {
-        ofertasSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        
-        // Dismiss banner después de scroll
-        setTimeout(() => {
-            dismissBannerPostulaciones();
-        }, 500);
-    }
-}
 
 /**
  * Cargar contadores de postulaciones para todas las ofertas
