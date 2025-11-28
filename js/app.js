@@ -3525,17 +3525,55 @@ async function abrirModalEditarEstablecimiento(idEstablecimiento) {
         
         console.log('✅ Formulario cargado con datos del establecimiento');
         
+        // Configurar listeners para actualización del mapa
+        configurarListenersMapaEdicion();
+        
         // Abrir modal
-        const modal = new bootstrap.Modal(document.getElementById('editarEstablecimientoModal'));
+        const modalElement = document.getElementById('editarEstablecimientoModal');
+        const modal = new bootstrap.Modal(modalElement);
         modal.show();
         
+        // Configurar limpieza del mapa al cerrar el modal (solo una vez)
+        modalElement.removeEventListener('hidden.bs.modal', limpiarMapaEdicion);
+        modalElement.addEventListener('hidden.bs.modal', limpiarMapaEdicion);
+        
         console.log('✅ Modal de edición abierto correctamente');
+        
+        // Inicializar mapa después de que el modal se muestre
+        setTimeout(() => {
+            try {
+                inicializarMapaEdicion();
+                
+                // Si hay coordenadas válidas, actualizar marcador
+                const lat = parseFloat(establecimiento.latitud);
+                const lng = parseFloat(establecimiento.longitud);
+                
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    actualizarMarcadorEstablecimiento(lat, lng, {
+                        nombre: establecimiento.nombreEstablecimiento,
+                        calle: establecimiento.calle,
+                        numeracion: establecimiento.numeracion,
+                        codigoPostal: establecimiento.codigoPostal,
+                        distrito: establecimiento.nombreDistrito || establecimiento.distrito?.nombreDistrito
+                    });
+                }
+            } catch (error) {
+                console.error('❌ Error al inicializar mapa:', error);
+            }
+        }, 300);
         
     } catch (error) {
         console.error('❌ Error al abrir modal de edición:', error);
         showMessage('Error al cargar los datos del establecimiento', 'error');
     }
 }
+
+// ===================================
+// VARIABLES GLOBALES PARA MAPA DE EDICIÓN
+// ===================================
+let mapaEditarEstablecimiento = null;
+let marcadorEditarEstablecimiento = null;
+let timeoutMapaActualizacion = null;
 
 /**
  * Carga todos los distritos del backend sin modificar DOM
@@ -3607,12 +3645,196 @@ function usarUbicacionActualParaEdicion() {
             document.getElementById('editEstabLatitud').value = position.coords.latitude;
             document.getElementById('editEstabLongitud').value = position.coords.longitude;
             showMessage('Ubicación obtenida correctamente', 'success');
+            
+            // Actualizar mapa si está inicializado
+            if (mapaEditarEstablecimiento) {
+                const nombre = document.getElementById('editEstabNombre').value;
+                const calle = document.getElementById('editEstabCalle').value;
+                const numeracion = document.getElementById('editEstabNumeracion').value;
+                const codigoPostal = document.getElementById('editEstabCodigoPostal').value;
+                const distrito = document.getElementById('editEstabDistrito').selectedOptions[0]?.text || '';
+                
+                actualizarMarcadorEstablecimiento(position.coords.latitude, position.coords.longitude, {
+                    nombre: nombre,
+                    calle: calle,
+                    numeracion: numeracion,
+                    codigoPostal: codigoPostal,
+                    distrito: distrito
+                });
+            }
         },
         (error) => {
             console.error('❌ Error al obtener ubicación:', error);
             showMessage('No se pudo obtener tu ubicación. Verifica los permisos del navegador.', 'error');
         }
     );
+}
+
+/**
+ * Inicializa el mapa de Leaflet para el modal de edición
+ * Si ya existe, lo destruye y lo recrea
+ */
+function inicializarMapaEdicion() {
+    console.log('🗺️ Inicializando mapa de edición...');
+    
+    // Si el mapa ya existe, destruirlo
+    if (mapaEditarEstablecimiento) {
+        mapaEditarEstablecimiento.remove();
+        mapaEditarEstablecimiento = null;
+    }
+    
+    // Crear nuevo mapa centrado en Mendoza, Argentina
+    const mendozaCenter = [-32.8895, -68.8458];
+    
+    try {
+        mapaEditarEstablecimiento = L.map('mapEditarEstablecimiento', {
+            center: mendozaCenter,
+            zoom: 13,
+            zoomControl: true,
+            attributionControl: true
+        });
+        
+        // Agregar capa de tiles de OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(mapaEditarEstablecimiento);
+        
+        console.log('✅ Mapa de edición inicializado');
+        return mapaEditarEstablecimiento;
+    } catch (error) {
+        console.error('❌ Error al inicializar mapa:', error);
+        return null;
+    }
+}
+
+/**
+ * Actualiza el marcador en el mapa con los datos del establecimiento
+ * @param {number} lat - Latitud
+ * @param {number} lng - Longitud
+ * @param {Object} datos - Datos del establecimiento
+ */
+function actualizarMarcadorEstablecimiento(lat, lng, datos) {
+    if (!mapaEditarEstablecimiento) {
+        console.warn('⚠️ Mapa no inicializado');
+        return;
+    }
+    
+    console.log('📍 Actualizando marcador:', lat, lng);
+    
+    // Remover marcador anterior si existe
+    if (marcadorEditarEstablecimiento) {
+        mapaEditarEstablecimiento.removeLayer(marcadorEditarEstablecimiento);
+    }
+    
+    // Crear icono personalizado verde
+    const iconoEstablecimiento = L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+    
+    // Crear popup con información
+    const popupContent = `
+        <div style="min-width: 200px;">
+            <h6 style="color: #2ECC71; margin-bottom: 8px; font-weight: bold;">
+                <i class="fas fa-warehouse"></i> ${datos.nombre || 'Establecimiento'}
+            </h6>
+            <div style="font-size: 0.85rem; line-height: 1.6;">
+                <div><i class="fas fa-map-marker-alt" style="color: #3498db; width: 16px;"></i> ${datos.calle || 'N/A'} ${datos.numeracion || ''}</div>
+                <div><i class="fas fa-envelope" style="color: #e67e22; width: 16px;"></i> CP: ${datos.codigoPostal || 'N/A'}</div>
+                <div><i class="fas fa-map" style="color: #9b59b6; width: 16px;"></i> ${datos.distrito || 'N/A'}</div>
+                <div style="margin-top: 8px; color: #95a5a6; font-size: 0.75rem;">
+                    <i class="fas fa-crosshairs"></i> ${lat.toFixed(6)}, ${lng.toFixed(6)}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Crear y agregar marcador
+    marcadorEditarEstablecimiento = L.marker([lat, lng], { icon: iconoEstablecimiento })
+        .bindPopup(popupContent)
+        .addTo(mapaEditarEstablecimiento);
+    
+    // Centrar mapa en el marcador con zoom apropiado
+    mapaEditarEstablecimiento.setView([lat, lng], 16);
+    
+    // Abrir popup automáticamente
+    marcadorEditarEstablecimiento.openPopup();
+    
+    console.log('✅ Marcador actualizado');
+}
+
+/**
+ * Actualiza el mapa cuando se modifican manualmente las coordenadas
+ */
+function actualizarMapaDesdeFormulario() {
+    const latInput = document.getElementById('editEstabLatitud');
+    const lngInput = document.getElementById('editEstabLongitud');
+    
+    if (!latInput || !lngInput) return;
+    
+    const lat = parseFloat(latInput.value);
+    const lng = parseFloat(lngInput.value);
+    
+    // Validar coordenadas
+    if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+        return;
+    }
+    
+    // Obtener datos actuales del formulario
+    const datos = {
+        nombre: document.getElementById('editEstabNombre').value,
+        calle: document.getElementById('editEstabCalle').value,
+        numeracion: document.getElementById('editEstabNumeracion').value,
+        codigoPostal: document.getElementById('editEstabCodigoPostal').value,
+        distrito: document.getElementById('editEstabDistrito').selectedOptions[0]?.text || ''
+    };
+    
+    actualizarMarcadorEstablecimiento(lat, lng, datos);
+}
+
+/**
+ * Configura listeners para actualización del mapa desde campos de coordenadas
+ */
+function configurarListenersMapaEdicion() {
+    const latInput = document.getElementById('editEstabLatitud');
+    const lngInput = document.getElementById('editEstabLongitud');
+    
+    [latInput, lngInput].forEach(input => {
+        if (input) {
+            // Remover listeners anteriores
+            input.removeEventListener('input', handleMapaInputChange);
+            // Agregar nuevo listener
+            input.addEventListener('input', handleMapaInputChange);
+        }
+    });
+}
+
+function handleMapaInputChange() {
+    clearTimeout(timeoutMapaActualizacion);
+    timeoutMapaActualizacion = setTimeout(actualizarMapaDesdeFormulario, 800);
+}
+
+/**
+ * Limpia el mapa de edición al cerrar el modal
+ */
+function limpiarMapaEdicion() {
+    console.log('🧹 Limpiando mapa de edición...');
+    
+    if (marcadorEditarEstablecimiento) {
+        marcadorEditarEstablecimiento = null;
+    }
+    
+    if (mapaEditarEstablecimiento) {
+        mapaEditarEstablecimiento.remove();
+        mapaEditarEstablecimiento = null;
+    }
+    
+    console.log('✅ Mapa limpiado');
 }
 
 /**
