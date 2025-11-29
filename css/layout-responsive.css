@@ -9,6 +9,11 @@
    CONTENEDORES PRINCIPALES
    =================================== */
 
+/* Sección del Mapa de Establecimientos - Primera main */
+#public-view > main.container-fluid.py-5:first-of-type {
+    background: #E8C39E !important;
+}
+
 /* Sección de Ofertas Disponibles - Control de ancho */
 #ofertas-disponibles {
     width: 100%;

@@ -733,6 +733,20 @@ input#calle::placeholder {
 .py-5, .container {
     background: #E8C39E !important;
 }
+
+/* Excepción: Dashboard Offcanvas - mantener fondo marrón oscuro */
+#dashboardOffcanvas .py-5,
+#dashboardOffcanvas .container,
+#dashboardOffcanvas .empty-state,
+#dashboardOffcanvas .row:not(.stats-cards-container),
+#dashboardOffcanvas .col-12:not(:has(.stats-card-moderna)) {
+    background: transparent !important;
+}
+
+#dashboardOffcanvas .dashboard-card {
+    background: #2E2517 !important;
+}
+
 .btn-outline-primary:hover, .btn-success:hover, .btn-outline-secondary:hover {
     box-shadow: 0 2px 8px rgba(60,60,100,0.10);
 }
@@ -1202,8 +1216,8 @@ h2.fw-bold:hover {
 
 /* Tema agrícola con imagen de fondo */
 html {
-    background: #4B382A !important;
-    background-color: #4B382A !important;
+    background: #E8C39E !important;
+    background-color: #E8C39E !important;
 }
 
 body {

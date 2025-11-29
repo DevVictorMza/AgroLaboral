@@ -290,23 +290,111 @@
     font-size: 3rem !important;
 }
 
-/* Estilos para el modal de nueva oferta */
-.modal-content,
-.modal-content.bg-dark {
-    background: #428F61 !important;
-    border: 2px solid rgba(66, 143, 97, 0.8) !important;
-    box-shadow: 0 8px 32px rgba(66, 143, 97, 0.4) !important;
+/* Estilos para el modal de nueva oferta - #modalCrearOferta */
+#modalCrearOferta .modal-content,
+#modalCrearOferta .modal-content.bg-dark {
+    background: #004225 !important;
+    border: 2px solid #006837 !important;
+    box-shadow: 0 8px 32px rgba(0, 66, 37, 0.5) !important;
+}
+
+#modalCrearOferta .modal-header {
+    background: #004225 !important;
+    border-bottom: 1px solid #006837 !important;
+}
+
+#modalCrearOferta .modal-body {
+    background: #004225 !important;
+}
+
+#modalCrearOferta .modal-footer {
+    background: #004225 !important;
+    border-top: 1px solid #006837 !important;
+}
+
+#modalCrearOferta .form-control,
+#modalCrearOferta .form-select {
+    background: #181101 !important;
+    background-color: #181101 !important;
+    color: #FFFFFF !important;
+    border: 1px solid #006837 !important;
+}
+
+#modalCrearOferta .form-control:focus,
+#modalCrearOferta .form-select:focus {
+    background: #181101 !important;
+    border-color: #00A651 !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 104, 55, 0.3) !important;
 }
 
 /* Estilos específicos para el modal de postulación */
 #modalPostulacion .modal-content {
-    background: #011807 !important;
-    border: 2px solid rgba(1, 24, 7, 0.8) !important;
-    box-shadow: 0 8px 32px rgba(1, 24, 7, 0.4) !important;
+    background: #004225 !important;
+    border: 2px solid #006837 !important;
+    box-shadow: 0 8px 32px rgba(0, 66, 37, 0.5) !important;
 }
 
 #modalPostulacion .modal-body {
-    background: #011807 !important;
+    background: #004225 !important;
+}
+
+#modalPostulacion .modal-header {
+    background: #004225 !important;
+    border-bottom: 1px solid #006837 !important;
+}
+
+#modalPostulacion .modal-footer {
+    background: #004225 !important;
+    border-top: 1px solid #006837 !important;
+}
+
+/* Estilos específicos para el modal de lista de postulaciones */
+#modalPostulaciones .modal-content {
+    background: #004225 !important;
+    border: 2px solid #006837 !important;
+    box-shadow: 0 8px 32px rgba(0, 66, 37, 0.5) !important;
+}
+
+#modalPostulaciones .modal-header {
+    background: #004225 !important;
+    border-bottom: 1px solid #006837 !important;
+}
+
+#modalPostulaciones .modal-body {
+    background: #004225 !important;
+}
+
+#modalPostulaciones .modal-footer {
+    background: #004225 !important;
+    border-top: 1px solid #006837 !important;
+}
+
+#modalPostulaciones .table thead th {
+    background: #003319 !important;
+    color: #FFFFFF !important;
+    border-bottom: 2px solid #006837 !important;
+}
+
+#modalPostulaciones .table tbody tr {
+    background: #004225 !important;
+    border-bottom: 1px solid #006837 !important;
+}
+
+#modalPostulaciones .table tbody tr:hover {
+    background: rgba(0, 104, 55, 0.3) !important;
+}
+
+/* Botón de postulaciones en ofertas */
+.btn-oferta-postulaciones {
+    background: #004225 !important;
+    border-color: #006837 !important;
+    color: #FFFFFF !important;
+}
+
+.btn-oferta-postulaciones:hover {
+    background: #005530 !important;
+    border-color: #00A651 !important;
+    color: #FFFFFF !important;
 }
 
 .modal-header.border-secondary {
@@ -379,6 +467,294 @@
     background-color: #2A2A2A !important;
     border-color: #444444 !important;
     box-shadow: none !important;
+    color: #FFFFFF !important;
+    outline: none !important;
+}
+
+/* Modal de registro empleador - Fondo verde oscuro #004225 */
+#modalRegistroEmpleador .modal-content {
+    background-color: #004225 !important;
+    background: #004225 !important;
+    border: 1px solid #006837 !important;
+    border-radius: 12px !important;
+}
+
+#modalRegistroEmpleador .modal-header {
+    background-color: #004225 !important;
+    border-bottom: 1px solid #006837 !important;
+}
+
+#modalRegistroEmpleador .modal-body {
+    background-color: #004225 !important;
+    background: #004225 !important;
+}
+
+#modalRegistroEmpleador .modal-footer {
+    background-color: #004225 !important;
+    border-top: 1px solid #006837 !important;
+}
+
+#modalRegistroEmpleador .modal-title,
+#modalRegistroEmpleador .modal-header h5,
+#modalRegistroEmpleador .modal-body h5,
+#modalRegistroEmpleador label,
+#modalRegistroEmpleador .form-label {
+    color: #FFFFFF !important;
+}
+
+#modalRegistroEmpleador .btn-close {
+    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat !important;
+    opacity: 1 !important;
+    filter: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    width: 1em !important;
+    height: 1em !important;
+}
+
+#modalRegistroEmpleador .btn-close:hover,
+#modalRegistroEmpleador .btn-close:focus,
+#modalRegistroEmpleador .btn-close:active {
+    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat !important;
+    opacity: 1 !important;
+    filter: none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+/* Eliminar color beige #E8C39E de todos los elementos dentro del modal */
+#modalRegistroEmpleador .dashboard-card {
+    background: #2E2517 !important;
+}
+
+#modalRegistroEmpleador .empty-state {
+    background: #2E2517 !important;
+}
+
+#modalRegistroEmpleador .dashboard-container {
+    background: transparent !important;
+}
+
+#modalRegistroEmpleador .py-5,
+#modalRegistroEmpleador .container,
+#modalRegistroEmpleador .container-fluid,
+#modalRegistroEmpleador main,
+#modalRegistroEmpleador .row,
+#modalRegistroEmpleador .col,
+#modalRegistroEmpleador div:not(.modal-content):not(.modal-header):not(.modal-body):not(.modal-footer):not(.dashboard-card):not(.form-control):not(.btn) {
+    background-color: transparent !important;
+    background: transparent !important;
+}
+
+/* Modal Editar Empresa - Fondo verde oscuro #004225 */
+#modalEditarEmpresa .modal-content {
+    background-color: #004225 !important;
+    background: #004225 !important;
+    border-color: #006837 !important;
+}
+
+#modalEditarEmpresa .modal-header {
+    background-color: #004225 !important;
+    border-bottom-color: #006837 !important;
+}
+
+#modalEditarEmpresa .modal-body {
+    background-color: #004225 !important;
+}
+
+#modalEditarEmpresa .modal-footer {
+    background-color: #004225 !important;
+    border-top-color: #006837 !important;
+}
+
+#modalEditarEmpresa .text-muted,
+#modalEditarEmpresa .form-text,
+#modalEditarEmpresa small {
+    color: #FFFFFF !important;
+}
+
+#modalEditarEmpresa .btn-close {
+    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat !important;
+    opacity: 1 !important;
+    filter: none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+#modalEditarEmpresa .btn-close:hover,
+#modalEditarEmpresa .btn-close:focus,
+#modalEditarEmpresa .btn-close:active {
+    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat !important;
+    opacity: 1 !important;
+    filter: none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+/* Modal Wizard Finca - Fondo verde oscuro #004225 */
+#wizardFincaModal .modal-content {
+    background-color: #004225 !important;
+    background: #004225 !important;
+    border-color: #006837 !important;
+}
+
+#wizardFincaModal .modal-header {
+    background-color: #004225 !important;
+    border-bottom-color: #006837 !important;
+}
+
+#wizardFincaModal .modal-body,
+#wizardFincaModal #wizard-content {
+    background-color: #004225 !important;
+    background: #004225 !important;
+}
+
+#wizardFincaModal .modal-footer {
+    background-color: #004225 !important;
+    border-top-color: #006837 !important;
+}
+
+/* Eliminar cualquier fondo verde claro en el wizard */
+#wizardFincaModal .modal-dialog,
+#wizardFincaModal .modal-content *:not(.especies-collapse-container):not(.especie-card),
+#wizardFincaModal div:not(.step):not(.step-number):not(.btn):not(.form-control):not(.form-select):not(.spinner-border):not(.especies-collapse-container):not(.especie-card) {
+    background-color: transparent !important;
+}
+
+#wizardFincaModal .modal-content,
+#wizardFincaModal .modal-header,
+#wizardFincaModal .modal-body,
+#wizardFincaModal #wizard-content {
+    background-color: #004225 !important;
+}
+
+#wizardFincaModal .wizard-progress .step {
+    background: #2A2A2A !important;
+}
+
+#wizardFincaModal .wizard-progress .step.active {
+    background: linear-gradient(135deg, #4A90E2, #357ABD) !important;
+}
+
+#wizardFincaModal .especies-collapse-container,
+#wizardFincaModal .modal-body .especies-collapse-container,
+#wizardFincaModal #wizard-content .especies-collapse-container,
+div.especies-collapse-container,
+.collapse .especies-collapse-container {
+    background-color: #181101 !important;
+    background: #181101 !important;
+    border: 1px solid #444 !important;
+    border-radius: 8px !important;
+}
+
+/* Tarjetas de especies - fondo oscuro */
+#wizardFincaModal .especie-card,
+.especies-collapse-container .especie-card {
+    background: #2E2517 !important;
+    border: 2px solid #555 !important;
+}
+
+#wizardFincaModal .especie-card:hover:not(.disabled) {
+    background: #3D3220 !important;
+    border-color: #777 !important;
+}
+
+#wizardFincaModal .especie-card.selected {
+    background: rgba(40, 167, 69, 0.25) !important;
+    border-color: #28a745 !important;
+}
+
+#wizardFincaModal .text-muted,
+#wizardFincaModal .form-text,
+#wizardFincaModal small {
+    color: #FFFFFF !important;
+}
+
+#wizardFincaModal .btn-close {
+    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat !important;
+    opacity: 1 !important;
+    filter: none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+#wizardFincaModal .btn-close:hover,
+#wizardFincaModal .btn-close:focus,
+#wizardFincaModal .btn-close:active {
+    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat !important;
+    opacity: 1 !important;
+    filter: none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+/* Quitar efecto verde en modal de registro empleador - Inputs */
+html body #modalRegistroEmpleador .form-control,
+html body #modalRegistroEmpleador .form-select,
+html body #modalRegistroEmpleador input.form-control,
+html body #modalRegistroEmpleador textarea.form-control,
+html body #modalRegistroEmpleador input[type="text"],
+html body #modalRegistroEmpleador input[type="password"],
+html body #modalRegistroEmpleador input[type="email"],
+html body #modalRegistroEmpleador input[type="tel"],
+html body div#modalRegistroEmpleador input,
+html body div#modalRegistroEmpleador select,
+html body div#modalRegistroEmpleador textarea {
+    background-color: #2A2A2A !important;
+    background: #2A2A2A !important;
+    border-color: #444444 !important;
+    color: #FFFFFF !important;
+    transition: none !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+html body #modalRegistroEmpleador .form-control:hover,
+html body #modalRegistroEmpleador .form-select:hover,
+html body #modalRegistroEmpleador input.form-control:hover,
+html body #modalRegistroEmpleador textarea.form-control:hover,
+html body #modalRegistroEmpleador input[type="text"]:hover,
+html body #modalRegistroEmpleador input[type="password"]:hover,
+html body #modalRegistroEmpleador input[type="email"]:hover,
+html body #modalRegistroEmpleador input[type="tel"]:hover,
+html body #modalRegistroEmpleador select.form-control:hover,
+html body #modalRegistroEmpleador select.form-select:hover,
+html body div#modalRegistroEmpleador .form-control:hover,
+html body div#modalRegistroEmpleador input:hover,
+html body div#modalRegistroEmpleador select:hover,
+html body div#modalRegistroEmpleador textarea:hover,
+#modalRegistroEmpleador.modal .form-control:hover,
+#modalRegistroEmpleador.modal .form-select:hover,
+#modalRegistroEmpleador.modal input:hover,
+#modalRegistroEmpleador.modal select:hover,
+#modalRegistroEmpleador.modal textarea:hover {
+    background-color: #2A2A2A !important;
+    background: #2A2A2A !important;
+    border-color: #444444 !important;
+    color: #FFFFFF !important;
+    box-shadow: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+}
+
+#modalRegistroEmpleador .form-control:focus,
+#modalRegistroEmpleador .form-select:focus,
+#modalRegistroEmpleador input.form-control:focus,
+#modalRegistroEmpleador textarea.form-control:focus {
+    background-color: #2A2A2A !important;
+    border-color: #86b7fe !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+    color: #FFFFFF !important;
+    outline: none !important;
+}
+
+#modalRegistroEmpleador .form-control:focus-visible,
+#modalRegistroEmpleador .form-select:focus-visible,
+#modalRegistroEmpleador input.form-control:focus-visible,
+#modalRegistroEmpleador textarea.form-control:focus-visible {
+    background-color: #2A2A2A !important;
+    border-color: #86b7fe !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
     color: #FFFFFF !important;
     outline: none !important;
 }

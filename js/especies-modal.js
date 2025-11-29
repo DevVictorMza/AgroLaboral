@@ -281,15 +281,20 @@ function actualizarTextoSelector() {
 }
 
 // Validar campo de especies
-function validarCampoEspecies() {
+// showError = true solo cuando se envía el formulario, false durante selección
+function validarCampoEspecies(showError = false) {
     const selector = document.getElementById('especiesSelector');
     const feedback = selector?.parentElement?.querySelector('.field-feedback');
     
     if (!selector || !feedback) return true;
     
     if (especiesSeleccionadas.length === 0) {
-        selector.classList.add('is-invalid');
-        feedback.innerHTML = '<div class="text-danger"><i class="fas fa-exclamation-circle me-1"></i>Debe seleccionar al menos una especie</div>';
+        // Solo mostrar error si showError es true (al enviar formulario)
+        if (showError) {
+            selector.classList.add('is-invalid');
+            selector.classList.remove('is-valid');
+            feedback.innerHTML = '<div class="text-danger"><i class="fas fa-exclamation-circle me-1"></i>Debe seleccionar al menos una especie</div>';
+        }
         return false;
     } else {
         selector.classList.remove('is-invalid');

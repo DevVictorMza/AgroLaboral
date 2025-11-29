@@ -1292,32 +1292,36 @@ function generarDashboard(perfil) {
             
             /* Modal */
             #modalPostulacion .modal-content {
-                background: #428F61 !important;
+                background: #004225 !important;
                 color: #ffffff;
-                border: 2px solid rgba(66, 143, 97, 0.8) !important;
-                box-shadow: 0 8px 32px rgba(66, 143, 97, 0.4) !important;
+                border: 2px solid #006837 !important;
+                box-shadow: 0 8px 32px rgba(0, 66, 37, 0.5) !important;
             }
             
             #modalPostulacion .modal-header,
             #modalPostulacion .modal-footer {
-                background: rgba(66, 143, 97, 0.2) !important;
-                border-color: rgba(255, 255, 255, 0.2) !important;
+                background: #004225 !important;
+                border-color: #006837 !important;
+            }
+            
+            #modalPostulacion .modal-body {
+                background: #004225 !important;
             }
             
             /* Formulario */
             #form-postulacion .form-control,
             #form-postulacion .form-select {
-                background: #2a2a2a;
-                border: 1px solid #444;
+                background: #181101 !important;
+                border: 1px solid #006837;
                 color: #ffffff;
             }
             
             #form-postulacion .form-control:focus,
             #form-postulacion .form-select:focus {
-                background: #2a2a2a;
-                border-color: #4A90E2;
+                background: #181101 !important;
+                border-color: #00A651;
                 color: #ffffff;
-                box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+                box-shadow: 0 0 0 0.2rem rgba(0, 104, 55, 0.3);
             }
             
             #form-postulacion .form-control::placeholder {
@@ -1325,8 +1329,8 @@ function generarDashboard(perfil) {
             }
             
             #form-postulacion .form-control[readonly] {
-                background: #1a1a1a;
-                border-color: #555;
+                background: #0d0800 !important;
+                border-color: #006837;
                 cursor: not-allowed;
             }
             
@@ -1357,14 +1361,27 @@ function generarDashboard(perfil) {
             }
             
             .invalid-feedback {
-                display: none;
-                color: #dc3545;
-                font-size: 0.875rem;
-                margin-top: 0.25rem;
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                height: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
             
             .invalid-feedback.d-block {
+                display: none !important;
+                visibility: hidden !important;
+            }
+            
+            .invalid-feedback.show-error {
                 display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                height: auto !important;
+                color: #ff6b6b !important;
+                font-size: 0.875rem;
+                margin-top: 0.25rem !important;
             }
             
             /* Mapa */
@@ -1819,8 +1836,9 @@ function cargarPaso1() {
                     <label for="nombreEstablecimiento" class="form-label">
                         Nombre del Establecimiento <span class="text-danger">*</span>
                     </label>
-                    <input type="text" class="form-control bg-secondary text-white border-secondary" 
-                           id="nombreEstablecimiento" required minlength="3">
+                    <input type="text" class="form-control text-white border-secondary" 
+                           id="nombreEstablecimiento" name="nombreEstablecimiento" required minlength="3"
+                           style="background-color: #181101 !important;">
                     <div class="field-feedback"></div>
                 </div>
 
@@ -1830,7 +1848,8 @@ function cargarPaso1() {
                         Departamento <span class="text-danger">*</span>
                     </label>
                     <select class="form-select text-white" 
-                            id="idDepartamento" required>
+                            id="idDepartamento" required
+                            style="background-color: #181101 !important;">
                         <option value="">Seleccione un departamento...</option>
                     </select>
                     <div class="field-feedback"></div>
@@ -1842,7 +1861,8 @@ function cargarPaso1() {
                         Distrito <span class="text-danger">*</span>
                     </label>
                     <select class="form-select text-white" 
-                            id="idDistrito" required disabled>
+                            id="idDistrito" required disabled
+                            style="background-color: #181101 !important;">
                         <option value="">Primero seleccione un departamento</option>
                     </select>
                     <div class="field-feedback"></div>
@@ -1854,7 +1874,8 @@ function cargarPaso1() {
                         Calle <span class="text-danger">*</span>
                     </label>
                     <input type="text" class="form-control text-white" 
-                           id="calle" required>
+                           id="calle" required
+                           style="background-color: #181101 !important;">
                     <div class="field-feedback"></div>
                 </div>
                 <div class="col-md-4 mb-3">
@@ -1862,7 +1883,8 @@ function cargarPaso1() {
                         Número <span class="text-danger">*</span>
                     </label>
                     <input type="text" class="form-control text-white" 
-                           id="numeracion" required>
+                           id="numeracion" required
+                           style="background-color: #181101 !important;">
                     <small class="form-text text-muted d-block mt-1" style="font-size: 0.8rem;">
                         <i class="fas fa-info-circle me-1"></i>Si no tiene número colocar 0 y ubicar de forma manual en el mapa
                     </small>
@@ -1875,7 +1897,8 @@ function cargarPaso1() {
                         Código Postal <span class="text-danger">*</span>
                     </label>
                     <input type="text" class="form-control text-white" 
-                           id="codigoPostal" required pattern="[0-9]{4,5}">
+                           id="codigoPostal" required pattern="[0-9]{4,5}"
+                           style="background-color: #181101 !important;">
                     <div class="field-feedback"></div>
                 </div>
                 <div class="col-md-4 mb-3">
@@ -1883,7 +1906,8 @@ function cargarPaso1() {
                         Longitud <span class="text-danger">*</span>
                     </label>
                     <input type="number" class="form-control text-white" 
-                           id="longitud" step="0.000001" min="-180" max="180" required>
+                           id="longitud" step="0.000001" min="-180" max="180" required
+                           style="background-color: #181101 !important;">
                     <div class="field-feedback"></div>
                 </div>
                 <div class="col-md-4 mb-3">
@@ -1891,7 +1915,8 @@ function cargarPaso1() {
                         Latitud <span class="text-danger">*</span>
                     </label>
                     <input type="number" class="form-control text-white" 
-                           id="latitud" step="0.000001" min="-90" max="90" required>
+                           id="latitud" step="0.000001" min="-90" max="90" required
+                           style="background-color: #181101 !important;">
                     <div class="field-feedback"></div>
                 </div>
 
@@ -1909,7 +1934,8 @@ function cargarPaso1() {
                                 <div class="d-flex gap-2">
                                     <!-- Botón Buscar Ubicación -->
                                     <button type="button" class="btn btn-search-location btn-sm" 
-                                            id="buscarUbicacionBtn" onclick="buscarUbicacion()" disabled>
+                                            id="buscarUbicacionBtn" onclick="buscarUbicacion()" disabled
+                                            style="background: #181101 !important; border-color: #28a745 !important; color: #fff !important;">
                                         <span class="btn-text">
                                             <i class="fas fa-search-location me-1"></i>Buscar
                                         </span>
@@ -1922,11 +1948,13 @@ function cargarPaso1() {
                                     <!-- Controles de vista del mapa -->
                                     <div class="btn-group" role="group">
                                         <button type="button" class="btn btn-outline-success btn-sm" 
-                                                id="mapSatellite" onclick="cambiarVistaMapaFinca('satellite')">
+                                                id="mapSatellite" onclick="cambiarVistaMapaFinca('satellite')"
+                                                style="background: #181101 !important; border-color: #555 !important; color: #fff !important;">
                                             <i class="fas fa-satellite me-1"></i>Satelital
                                         </button>
                                         <button type="button" class="btn btn-success btn-sm" 
-                                                id="mapClassic" onclick="cambiarVistaMapaFinca('classic')">
+                                                id="mapClassic" onclick="cambiarVistaMapaFinca('classic')"
+                                                style="background: #181101 !important; border-color: #28a745 !important; color: #fff !important;">
                                             <i class="fas fa-map me-1"></i>Clásico
                                         </button>
                                     </div>
@@ -1948,7 +1976,7 @@ function cargarPaso1() {
                             data-bs-target="#especiesCollapse"
                             aria-expanded="false"
                             aria-controls="especiesCollapse"
-                            style="background: #000000; border-color: #666666; color: white; min-height: 50px;">
+                            style="background: #181101 !important; background-color: #181101 !important; border-color: #666666; color: white; min-height: 50px;">
                         <div class="d-flex justify-content-between align-items-center">
                             <span id="especiesSelectorText">Seleccione las especies que cultiva...</span>
                             <i class="fas fa-chevron-down especies-chevron" style="transition: transform 0.3s ease;"></i>
@@ -1957,7 +1985,7 @@ function cargarPaso1() {
                     
                     <!-- Collapse con Grid de Especies -->
                     <div class="collapse mt-3" id="especiesCollapse">
-                        <div class="especies-collapse-container" style="background: rgba(0,0,0,0.3); border: 1px solid #444; border-radius: 8px; padding: 1.5rem;">
+                        <div class="especies-collapse-container" style="background-color: #181101 !important; background: #181101 !important; border: 1px solid #444 !important; border-radius: 8px !important; padding: 1.5rem;">
                             <div class="mb-3 text-center">
                                 <small class="text-info d-block" id="especiesCollapseCounter">
                                     <i class="fas fa-info-circle me-1"></i>Seleccione hasta 5 especies (0/5 seleccionadas)
@@ -2269,7 +2297,13 @@ function configurarEventosPaso1() {
                         campo.addEventListener(evento, function(e) {
                             console.log(`🎯 Evento ${evento} en ${campoId}:`, e.target.value);
                             
+                            // Marcar como tocado cuando el usuario interactúa
+                            if (evento === 'focus' || evento === 'input' || evento === 'change') {
+                                campo.classList.add('touched');
+                            }
+                            
                             if (evento === 'blur') {
+                                campo.classList.add('touched');
                                 validarCampo(campo);
                             } else if (evento === 'input' || evento === 'keyup') {
                                 // Limpiar errores mientras escribe
@@ -2444,8 +2478,8 @@ function validarYContinuarPaso2() {
         }
     });
 
-    // Validar especies
-    if (typeof validarCampoEspecies === 'function' && !validarCampoEspecies()) {
+    // Validar especies (showError = true para mostrar mensaje de error al enviar)
+    if (typeof validarCampoEspecies === 'function' && !validarCampoEspecies(true)) {
         todosValidos = false;
     }
 
@@ -2525,7 +2559,7 @@ function cargarPaso2() {
 
             <div class="row">
                 <div class="col-lg-8 mx-auto">
-                    <div class="confirmation-card p-4 mb-4">
+                    <div class="confirmation-card p-4 mb-4" style="background: #181101 !important; background-color: #181101 !important; border: 1px solid #444444; border-radius: 8px;">
                         <h5 class="border-bottom border-secondary pb-2 mb-3">
                             <i class="fas fa-building me-2 text-primary"></i>
                             Información del Establecimiento
@@ -2553,7 +2587,7 @@ function cargarPaso2() {
                         </div>
                     </div>
 
-                    <div class="confirmation-card p-4 mb-4">
+                    <div class="confirmation-card p-4 mb-4" style="background: #181101 !important; background-color: #181101 !important; border: 1px solid #444444; border-radius: 8px;">
                         <h5 class="border-bottom border-secondary pb-2 mb-3">
                             <i class="fas fa-map-marked-alt me-2 text-info"></i>
                             Ubicación Administrativa
@@ -2570,7 +2604,7 @@ function cargarPaso2() {
                         </div>
                     </div>
 
-                    <div class="confirmation-card p-4">
+                    <div class="confirmation-card p-4" style="background: #181101 !important; background-color: #181101 !important; border: 1px solid #444444; border-radius: 8px;">
                         <h5 class="border-bottom border-secondary pb-2 mb-3">
                             <i class="fas fa-seedling me-2 text-success"></i>
                             Especies Cultivadas (${datos.especies.length})
@@ -2598,13 +2632,15 @@ function cargarPaso2() {
 
         <style>
             .confirmation-card {
-                background: #2A2A2A;
+                background: #181101 !important;
+                background-color: #181101 !important;
                 border: 1px solid #444444;
                 border-radius: 8px;
                 transition: transform 0.3s ease;
             }
             .confirmation-card:hover {
                 transform: translateY(-2px);
+                background: #181101 !important;
             }
             .especies-list .badge {
                 font-size: 0.9rem;
@@ -4286,23 +4322,24 @@ async function crearOfertaLaboral(idEstablecimiento) {
         const modalHtml = `
         <div class="modal fade" id="modalCrearOferta" tabindex="-1" aria-labelledby="modalCrearOfertaLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content bg-dark border-secondary">
-                    <div class="modal-header border-secondary" style="background: #2c2c2c;">
+                <div class="modal-content border-secondary" style="background: #004225 !important;">
+                    <div class="modal-header border-secondary" style="background: #004225 !important;">
                         <h5 class="modal-title text-light fw-bold" id="modalCrearOfertaLabel">
                             <i class="fas fa-briefcase me-2 text-warning"></i>
                             Nueva Oferta Laboral
                         </h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body p-4" style="background: #1e1e1e;">
+                    <div class="modal-body p-4" style="background: #004225 !important;">
                         <form id="formOfertaLaboral">
                             <div class="row g-4">
                                 <div class="col-md-6">
                                     <label class="form-label text-light fw-semibold fs-6">
                                         <i class="fas fa-hammer me-2 text-primary"></i>Puesto de Trabajo *
                                     </label>
-                                    <select class="form-select form-select-lg bg-dark text-light border-secondary" 
-                                            id="idPuestoTrabajo" required>
+                                    <select class="form-select form-select-lg text-light border-secondary" 
+                                            id="idPuestoTrabajo" required
+                                            style="background: #181101 !important;">
                                         <option value="">Seleccionar puesto...</option>
                                     </select>
                                 </div>
@@ -4310,8 +4347,9 @@ async function crearOfertaLaboral(idEstablecimiento) {
                                     <label class="form-label text-light fw-semibold fs-6">
                                         <i class="fas fa-seedling me-2 text-success"></i>Especie (Opcional)
                                     </label>
-                                    <select class="form-select form-select-lg bg-dark text-light border-secondary" 
-                                            id="idEspecie">
+                                    <select class="form-select form-select-lg text-light border-secondary" 
+                                            id="idEspecie"
+                                            style="background: #181101 !important;">
                                         <option value="">No especifica especie</option>
                                     </select>
                                 </div>
@@ -4323,24 +4361,26 @@ async function crearOfertaLaboral(idEstablecimiento) {
                                         <i class="fas fa-calendar-times me-2 text-danger"></i>Fecha de Cierre *
                                     </label>
                                     <input type="text" 
-                                           class="form-control form-control-lg bg-dark text-light border-secondary" 
+                                           class="form-control form-control-lg text-light border-secondary" 
                                            id="fechaCierre" 
                                            placeholder="dd/mm/aaaa"
                                            pattern="\d{2}/\d{2}/\d{4}"
-                                           required>
-                                    <small class="text-muted">Formato: día/mes/año (ej: 15/12/2025)</small>
+                                           required
+                                           style="background: #181101 !important;">
+                                    <small class="text-muted" style="color: #CCCCCC !important;">Formato: día/mes/año (ej: 15/12/2025)</small>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label text-light fw-semibold fs-6">
                                         <i class="fas fa-users me-2 text-warning"></i>Vacantes Disponibles *
                                     </label>
-                                    <input type="number" class="form-control form-control-lg bg-dark text-light border-secondary" 
-                                           id="vacantes" min="1" value="1" required>
+                                    <input type="number" class="form-control form-control-lg text-light border-secondary" 
+                                           id="vacantes" min="1" value="1" required
+                                           style="background: #181101 !important;">
                                 </div>
                             </div>
                         </form>
                     </div>
-                    <div class="modal-footer border-secondary p-4" style="background: #1a1a1a;">
+                    <div class="modal-footer border-secondary p-4" style="background: #004225 !important;">
                         <button type="button" class="btn btn-secondary btn-lg px-4" data-bs-dismiss="modal">
                             <i class="fas fa-times me-2"></i>Cancelar
                         </button>
@@ -8743,7 +8783,7 @@ class WizardProgressManager {
             this.progressBar.style.background = `linear-gradient(90deg, 
                 var(--warning-orange) 0%, 
                 var(--light-orange) 100%)`;
-            this.progressBar.style.boxShadow = '0 0 20px rgba(243, 156, 18, 0.4)';
+            this.progressBar.style.boxShadow = '0 0 20px rgba(241, 152, 8, 0.4)';
         }
     }
     
@@ -9721,14 +9761,16 @@ function actualizarMapaConUbicacion(lat, lng, direccion) {
 		draggable: true
 	}).addTo(mapFinca);
 	
-	// Popup con información
+	// Popup con información - estilos inline para fondo negro
 	mapFincaMarker.bindPopup(`
-		<div class="popup-ubicacion">
-			<h6><i class="fas fa-map-marker-alt text-success"></i> Ubicación Encontrada</h6>
-			<p class="mb-1 small">${direccion}</p>
-			<small class="text-muted">Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}</small>
+		<div class="popup-ubicacion-wizard" style="background: #000000 !important; color: #FFFFFF !important; padding: 10px; border-radius: 8px;">
+			<h6 style="color: #FFFFFF !important; margin: 0 0 8px 0;"><i class="fas fa-map-marker-alt" style="color: #28a745;"></i> Ubicación Encontrada</h6>
+			<p class="mb-1 small" style="color: #FFFFFF !important;">${direccion}</p>
+			<small style="color: #CCCCCC !important;">Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}</small>
 		</div>
-	`).openPopup();
+	`, {
+		className: 'popup-wizard-finca-custom'
+	}).openPopup();
 	
 	// Evento cuando se arrastra el marcador
 	mapFincaMarker.on('dragend', function(e) {
@@ -11307,6 +11349,30 @@ function renderizarOfertas(ofertas) {
             { color: 'success', icon: 'fas fa-check-circle', label: 'Vigente' } :
             { color: 'secondary', icon: 'fas fa-times-circle', label: 'Cerrada' };
         
+        // Calcular días restantes para el cierre
+        let diasRestantes = 0;
+        let colorVigencia = 'success'; // Verde por defecto
+        let textoVigencia = '';
+        
+        if (fechaCierreDate && esVigente) {
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            const fechaCierreSinHora = new Date(fechaCierreDate);
+            fechaCierreSinHora.setHours(0, 0, 0, 0);
+            diasRestantes = Math.ceil((fechaCierreSinHora - hoy) / (1000 * 60 * 60 * 24));
+            
+            if (diasRestantes <= 2) {
+                colorVigencia = 'danger'; // Rojo - urgente
+                textoVigencia = diasRestantes <= 0 ? 'Cierra hoy' : `${diasRestantes} día${diasRestantes > 1 ? 's' : ''}`;
+            } else if (diasRestantes <= 5) {
+                colorVigencia = 'warning'; // Naranja - pronto
+                textoVigencia = `${diasRestantes} días`;
+            } else {
+                colorVigencia = 'success'; // Verde - tiempo suficiente
+                textoVigencia = `${diasRestantes} días`;
+            }
+        }
+        
         // Formatear fechas usando función segura
         const fechaAlta = formatearFechaArgentina(oferta.fechaAlta);
         const fechaCierre = formatearFechaArgentina(oferta.fechaCierre);
@@ -11337,10 +11403,9 @@ function renderizarOfertas(ofertas) {
                     <!-- Información Principal del Puesto -->
                     <div class="oferta-section-main">
                         <h5 class="oferta-titulo" title="${escapeHtml(oferta.nombrePuesto)}">
-                            <i class="fas fa-briefcase me-2"></i>${escapeHtml(oferta.nombrePuesto)}
+                            ${escapeHtml(oferta.nombrePuesto)}
                         </h5>
                         <div class="oferta-establecimiento">
-                            <i class="fas fa-building me-1"></i>
                             <span>${escapeHtml(oferta.nombreEstablecimiento).toUpperCase()}</span>
                         </div>
                     </div>
@@ -11348,21 +11413,20 @@ function renderizarOfertas(ofertas) {
                     <!-- Detalles de la Oferta -->
                     <div class="oferta-section-info">
                         <div class="oferta-info-item-horizontal">
-                            <i class="fas fa-users text-primary"></i>
                             <div class="info-content-horizontal">
                                 <span class="info-label-horizontal">Vacantes</span>
                                 <span class="info-value-horizontal">${oferta.vacantes}</span>
                             </div>
                         </div>
                         <div class="oferta-info-item-horizontal">
-                            <i class="fas fa-calendar-times text-danger"></i>
                             <div class="info-content-horizontal">
                                 <span class="info-label-horizontal">Fecha Cierre</span>
-                                <span class="info-value-horizontal">${fechaCierre}</span>
+                                <span class="info-value-horizontal text-${colorVigencia}" style="color: ${colorVigencia === 'danger' ? '#dc3545' : colorVigencia === 'warning' ? '#ffc107' : '#28a745'} !important; font-weight: ${colorVigencia === 'danger' ? 'bold' : 'normal'};">
+                                    ${fechaCierre}${esVigente && textoVigencia ? ` (${textoVigencia})` : ''}
+                                </span>
                             </div>
                         </div>
                         <div class="oferta-info-item-horizontal">
-                            <i class="fas fa-calendar-plus text-success"></i>
                             <div class="info-content-horizontal">
                                 <span class="info-label-horizontal">Publicada</span>
                                 <span class="info-value-horizontal">${fechaAlta}</span>
@@ -13394,14 +13458,30 @@ function abrirModalPostulacion(idOferta) {
     // Guardar ID de oferta en variable global
     window.ofertaActual = idOferta;
     
-    // Resetear formulario
+    // DESACTIVAR INMEDIATAMENTE la validación del formulario
     const form = document.getElementById('form-postulacion');
     if (form) {
         form.reset();
-        // Limpiar clases de validación
-        form.querySelectorAll('.is-valid, .is-invalid').forEach(el => {
-            el.classList.remove('is-valid', 'is-invalid');
+        
+        // DESACTIVAR validación HTML5
+        form.noValidate = true;
+        form.setAttribute('novalidate', 'true');
+        
+        // DESACTIVAR validación en TODOS los campos
+        const campos = form.querySelectorAll('input, select, textarea');
+        campos.forEach(campo => {
+            campo.removeAttribute('required');
+            campo.removeAttribute('pattern');
+            campo.removeAttribute('minlength');
+            campo.removeAttribute('maxlength');
+            if (campo.setCustomValidity) {
+                campo.setCustomValidity('');
+            }
+            campo.classList.remove('is-valid', 'is-invalid');
         });
+        
+        // Eliminar todos los feedbacks existentes
+        form.querySelectorAll('.invalid-feedback').forEach(fb => fb.remove());
     }
     
     // Obtener instancia del modal
@@ -13429,6 +13509,60 @@ async function inicializarModalPostulacion(idOferta) {
     console.log('🔄 Inicializando modal de postulación...');
     
     try {
+        // 0. Limpiar formulario y eliminar todos los mensajes de error
+        const form = document.getElementById('form-postulacion');
+        if (form) {
+            form.reset();
+            
+            // DESACTIVAR COMPLETAMENTE la validación nativa del navegador
+            form.setAttribute('novalidate', 'novalidate');
+            form.noValidate = true;
+            form.classList.remove('was-validated');
+            
+            // Eliminar todas las clases de validación
+            const campos = form.querySelectorAll('input, select, textarea');
+            campos.forEach(campo => {
+                // Remover clases de Bootstrap
+                campo.classList.remove('is-invalid', 'is-valid');
+                delete campo.dataset.touched;
+                
+                // DESACTIVAR validación HTML5 en cada campo
+                campo.removeAttribute('required');
+                campo.removeAttribute('pattern');
+                campo.removeAttribute('minlength');
+                campo.removeAttribute('maxlength');
+                campo.removeAttribute('min');
+                campo.removeAttribute('max');
+                campo.removeAttribute('aria-invalid');
+                campo.removeAttribute('aria-describedby');
+                
+                // Desactivar mensajes personalizados del navegador
+                if (campo.setCustomValidity) {
+                    campo.setCustomValidity('');
+                }
+                
+                // Prevenir que el navegador valide el campo
+                campo.willValidate = false;
+            });
+            
+            // Eliminar TODOS los divs de invalid-feedback del DOM
+            const feedbacks = form.querySelectorAll('.invalid-feedback');
+            feedbacks.forEach(fb => fb.remove());
+            
+            // Prevenir submit nativo del formulario
+            form.onsubmit = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            };
+            
+            // Prevenir evento invalid del navegador
+            form.addEventListener('invalid', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, true);
+        }
+        
         // 1. Cargar departamentos
         await cargarDepartamentosPostulacion();
         
@@ -14150,41 +14284,91 @@ function obtenerUbicacionActual() {
 
 /**
  * Configurar validación en tiempo real del formulario
+ * SOLO para remover errores cuando el usuario corrige, NUNCA para mostrarlos
  */
 function configurarValidacionEnTiempoReal() {
     const form = document.getElementById('form-postulacion');
     const campos = form.querySelectorAll('input:not([readonly]), select');
     
     campos.forEach(campo => {
-        // Validar al perder foco
-        campo.addEventListener('blur', function() {
-            validarCampo(this);
-        });
-        
-        // Validar al escribir (solo para inputs)
+        // SOLO agregar listener de input para QUITAR errores una vez que se han mostrado
         if (campo.tagName === 'INPUT' && !campo.readOnly) {
             campo.addEventListener('input', function() {
+                // Solo actuar si el campo tiene error visible
                 if (this.classList.contains('is-invalid')) {
-                    validarCampo(this);
+                    const feedback = this.nextElementSibling;
+                    if (feedback && feedback.classList.contains('show-error')) {
+                        // Verificar si ahora es válido
+                        const esValido = validarCampoSilencioso(this);
+                        
+                        if (esValido) {
+                            this.classList.remove('is-invalid');
+                            this.classList.add('is-valid');
+                            feedback.remove(); // Eliminar el feedback del DOM
+                        }
+                    }
                 }
             });
         }
         
-        // Validar al cambiar (para selects)
+        // SOLO agregar listener de change para QUITAR errores en selects
         if (campo.tagName === 'SELECT') {
             campo.addEventListener('change', function() {
-                validarCampo(this);
+                // Solo actuar si el campo tiene error visible
+                if (this.classList.contains('is-invalid')) {
+                    const feedback = this.nextElementSibling;
+                    if (feedback && feedback.classList.contains('show-error')) {
+                        if (this.value !== '') {
+                            this.classList.remove('is-invalid');
+                            this.classList.add('is-valid');
+                            feedback.remove(); // Eliminar el feedback del DOM
+                        }
+                    }
+                }
             });
         }
     });
 }
 
 /**
+ * Validar campo sin mostrar errores (solo retorna true/false)
+ */
+function validarCampoSilencioso(campo) {
+    const valor = campo.value.trim();
+    const nombre = campo.name;
+    
+    switch(nombre) {
+        case 'dni':
+            return /^[0-9]{7,8}$/.test(valor);
+        case 'apellido':
+        case 'nombre':
+            return valor.length >= 2 && /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(valor);
+        case 'calle':
+            return valor.length >= 3;
+        case 'numeracion':
+            return /^[0-9]+$/.test(valor) && parseInt(valor) > 0;
+        case 'codigoPostal':
+            return /^[0-9]{4}$/.test(valor);
+        case 'departamento':
+        case 'distrito':
+            return valor !== '';
+        case 'latitud':
+        case 'longitud':
+            return valor !== '' && !isNaN(parseFloat(valor));
+        case 'telefono':
+            return /^[0-9]{7,12}$/.test(valor);
+        default:
+            return campo.checkValidity();
+    }
+}
+
+/**
  * Validar un campo individual
  * @param {HTMLElement} campo - Campo a validar
+ * @param {boolean} mostrarError - Si debe mostrar el error (true para submit, false para blur)
  * @returns {boolean} - True si es válido
  */
-function validarCampo(campo) {
+function validarCampo(campo, mostrarError = true) {
     const valor = campo.value.trim();
     const nombre = campo.name;
     let esValido = true;
@@ -14201,6 +14385,11 @@ function validarCampo(campo) {
         case 'nombre':
             esValido = valor.length >= 2 && /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(valor);
             mensajeError = `${nombre.charAt(0).toUpperCase() + nombre.slice(1)} debe tener al menos 2 letras`;
+            break;
+        
+        case 'nombreEstablecimiento':
+            esValido = valor.length >= 3;
+            mensajeError = 'El nombre debe tener al menos 3 caracteres';
             break;
             
         case 'calle':
@@ -14254,21 +14443,25 @@ function validarCampo(campo) {
         campo.classList.add('is-valid');
         const feedback = campo.nextElementSibling;
         if (feedback && feedback.classList.contains('invalid-feedback')) {
-            feedback.style.display = 'none';
+            feedback.classList.remove('show-error');
+            feedback.textContent = '';
         }
     } else {
-        campo.classList.remove('is-valid');
-        campo.classList.add('is-invalid');
-        
-        // Mostrar mensaje de error
-        let feedback = campo.nextElementSibling;
-        if (!feedback || !feedback.classList.contains('invalid-feedback')) {
-            feedback = document.createElement('div');
-            feedback.className = 'invalid-feedback';
-            campo.parentNode.insertBefore(feedback, campo.nextSibling);
+        // Solo mostrar error si mostrarError es true (al enviar formulario)
+        if (mostrarError) {
+            campo.classList.remove('is-valid');
+            campo.classList.add('is-invalid');
+            
+            // Mostrar mensaje de error con clase show-error
+            let feedback = campo.nextElementSibling;
+            if (!feedback || !feedback.classList.contains('invalid-feedback')) {
+                feedback = document.createElement('div');
+                feedback.className = 'invalid-feedback';
+                campo.parentNode.insertBefore(feedback, campo.nextSibling);
+            }
+            feedback.textContent = mensajeError;
+            feedback.classList.add('show-error');
         }
-        feedback.textContent = mensajeError;
-        feedback.style.display = 'block';
     }
     
     return esValido;
@@ -14286,7 +14479,8 @@ function validarFormularioCompleto() {
     let primerCampoInvalido = null;
     
     campos.forEach(campo => {
-        const esValido = validarCampo(campo);
+        // Forzar mostrar errores al validar el formulario completo
+        const esValido = validarCampo(campo, true);
         if (!esValido) {
             formularioValido = false;
             if (!primerCampoInvalido) {

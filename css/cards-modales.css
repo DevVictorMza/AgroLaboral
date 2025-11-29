@@ -113,6 +113,7 @@
     font-size: 1rem !important;
     margin: 0 !important;
     color: var(--success-color) !important;
+    text-transform: uppercase !important;
 }
 
 /* === CARD BODY === */
@@ -122,12 +123,15 @@
     background: var(--card-bg-primary) !important;
 }
 
+/* Forzar mayúsculas en info-item de establecimientos */
 .dashboard-card .establecimiento-card .info-item,
 .establecimientos-container .establecimiento-card .info-item {
     display: flex !important;
     align-items: center !important;
     margin-bottom: 0.75rem !important;
     padding: 0.5rem 0 !important;
+    text-transform: uppercase !important;
+}
     border-radius: 6px !important;
     transition: background-color var(--transition-fast) !important;
 }

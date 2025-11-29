@@ -87,15 +87,19 @@
 
 /* Badge de estado */
 .oferta-estado-badge {
-    padding: 0.35rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 15px;
+    font-size: 0.7rem;
     font-weight: 600;
     white-space: nowrap;
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.3rem;
     transition: all 0.2s ease;
+}
+
+.oferta-estado-badge i {
+    font-size: 0.65rem;
 }
 
 .oferta-estado-badge.vigente {
@@ -114,14 +118,18 @@
 .oferta-especie-tag {
     background: linear-gradient(135deg, #17a2b8 0%, #20c997 100%);
     color: white;
-    padding: 0.3rem 0.65rem;
-    border-radius: 15px;
-    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.65rem;
     font-weight: 500;
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.25rem;
     box-shadow: 0 2px 4px rgba(23, 162, 184, 0.2);
+}
+
+.oferta-especie-tag i {
+    font-size: 0.6rem;
 }
 
 /* Sección Principal (Centro-Izquierda) */

@@ -5,6 +5,54 @@
  */
 
 /* ===================================
+   INPUTS Y SELECTS - FONDO #181101
+   =================================== */
+#wizardFincaModal .form-control,
+#wizardFincaModal .form-select,
+#wizardFincaModal input[type="text"],
+#wizardFincaModal input[type="number"],
+#wizardFincaModal input[type="email"],
+#wizardFincaModal input[type="tel"],
+#wizardFincaModal select,
+#wizardFincaModal textarea,
+#wizardFincaModal .bg-secondary,
+#wizardFincaModal .bg-dark,
+#finca-form .form-control,
+#finca-form .form-select,
+#finca-form input,
+#finca-form select {
+    background: #181101 !important;
+    background-color: #181101 !important;
+    color: #FFFFFF !important;
+    border-color: #444 !important;
+}
+
+#wizardFincaModal .form-control:focus,
+#wizardFincaModal .form-select:focus,
+#wizardFincaModal input:focus,
+#wizardFincaModal select:focus,
+#finca-form .form-control:focus,
+#finca-form .form-select:focus {
+    background: #181101 !important;
+    background-color: #181101 !important;
+    border-color: #666 !important;
+    box-shadow: 0 0 0 0.2rem rgba(24, 17, 1, 0.5) !important;
+    color: #FFFFFF !important;
+}
+
+#wizardFincaModal .form-control::placeholder,
+#wizardFincaModal input::placeholder,
+#finca-form .form-control::placeholder {
+    color: #999 !important;
+}
+
+#wizardFincaModal .form-select option,
+#finca-form .form-select option {
+    background: #181101 !important;
+    color: #FFFFFF !important;
+}
+
+/* ===================================
    MODAL WIZARD - TAMAÑO Y ESTRUCTURA
    =================================== */
 
@@ -25,10 +73,10 @@
 
 /* Contenido del modal */
 #wizardFincaModal .modal-content {
-    background: #428F61 !important;
-    border: 2px solid rgba(66, 143, 97, 0.8) !important;
-    box-shadow: 0 8px 32px rgba(66, 143, 97, 0.4) !important;
-    background: var(--card-bg-primary);
+    background: #000000 !important;
+    border: 2px solid rgba(0, 66, 37, 0.8) !important;
+    box-shadow: 0 8px 32px rgba(0, 66, 37, 0.4) !important;
+    background: #000000 !important;
     border: 1px solid var(--card-border);
     border-radius: 12px;
     overflow: hidden;
@@ -49,7 +97,7 @@
 
 /* Body del modal */
 #wizardFincaModal .modal-body {
-    padding: 2rem 1.5rem;
+    padding: 2.5rem 3rem;
     max-height: calc(100vh - 200px);
     overflow-y: auto;
     overflow-x: hidden;
@@ -58,10 +106,21 @@
 
 /* Contenedor del wizard con ancho limitado */
 #wizard-content {
-    max-width: 100%;
+    max-width: 95%;
     margin: 0 auto;
     width: 100%;
     color: #ffffff;
+    padding: 0 1rem;
+}
+
+/* Formulario con espaciado interno */
+#wizardFincaModal #finca-form {
+    padding: 0 1.5rem;
+}
+
+#wizardFincaModal .row {
+    margin-left: 0;
+    margin-right: 0;
 }
 
 /* Asegurar que todos los elementos internos respeten el ancho */
@@ -98,6 +157,24 @@
 #wizard-content h6,
 #wizard-content .text-muted {
     color: #ffffff !important;
+}
+
+/* ===================================
+   TARJETAS DE CONFIRMACIÓN - PASO 2
+   =================================== */
+#wizardFincaModal .confirmation-card,
+#wizard-content .confirmation-card,
+.confirmation-card {
+    background: #181101 !important;
+    background-color: #181101 !important;
+    border: 1px solid #444444 !important;
+    border-radius: 8px !important;
+}
+
+#wizardFincaModal .confirmation-card:hover,
+#wizard-content .confirmation-card:hover {
+    background: #181101 !important;
+    background-color: #181101 !important;
 }
 
 /* ===================================
@@ -331,6 +408,128 @@
     padding: 0.75rem;
     font-size: 0.9rem;
 }
+
+/* ============================================= */
+/* BOTONES DEL MAPA - FONDO #181101             */
+/* ============================================= */
+#wizardFincaModal .map-controls .btn,
+#wizardFincaModal .map-controls .btn-group .btn,
+#wizardFincaModal .btn-search-location,
+#wizardFincaModal #buscarUbicacionBtn,
+#wizardFincaModal #mapSatellite,
+#wizardFincaModal #mapClassic,
+.map-controls .btn-outline-success,
+.map-controls .btn-success {
+    background: #181101 !important;
+    background-color: #181101 !important;
+    color: #FFFFFF !important;
+    border-color: #28a745 !important;
+}
+
+#wizardFincaModal .map-controls .btn:hover,
+#wizardFincaModal .btn-search-location:hover,
+.map-controls .btn-outline-success:hover,
+.map-controls .btn-success:hover {
+    background: #2E2517 !important;
+    background-color: #2E2517 !important;
+    color: #FFFFFF !important;
+    border-color: #34ce57 !important;
+}
+
+/* Botón activo/seleccionado - borde verde más brillante */
+#wizardFincaModal .map-controls .btn.active,
+#wizardFincaModal .map-controls .btn-success:not(.btn-outline-success),
+#wizardFincaModal #mapClassic.btn-success,
+#wizardFincaModal #mapSatellite.btn-success {
+    background: #181101 !important;
+    background-color: #181101 !important;
+    border-color: #28a745 !important;
+    box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.4) !important;
+}
+
+/* Botón no seleccionado */
+#wizardFincaModal .map-controls .btn-outline-success {
+    background: #181101 !important;
+    background-color: #181101 !important;
+    border-color: #555 !important;
+}
+
+#wizardFincaModal .map-controls .btn-outline-success:hover {
+    border-color: #28a745 !important;
+}
+
+/* ============================================= */
+/* POPUP DEL MAPA - FONDO NEGRO, TEXTO BLANCO   */
+/* MÁXIMA ESPECIFICIDAD                          */
+/* ============================================= */
+.popup-wizard-finca-custom.leaflet-popup .leaflet-popup-content-wrapper,
+.leaflet-popup.popup-wizard-finca-custom .leaflet-popup-content-wrapper,
+#wizardFincaModal .leaflet-popup .leaflet-popup-content-wrapper,
+#wizardFincaModal .leaflet-popup-content-wrapper,
+#mapFinca .leaflet-popup-content-wrapper,
+.modal #mapFinca .leaflet-popup-content-wrapper {
+    background: #000000 !important;
+    background-color: #000000 !important;
+    color: #FFFFFF !important;
+    border-radius: 10px !important;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6) !important;
+    border: 1px solid #333 !important;
+}
+
+.popup-wizard-finca-custom.leaflet-popup .leaflet-popup-content,
+.leaflet-popup.popup-wizard-finca-custom .leaflet-popup-content,
+#wizardFincaModal .leaflet-popup .leaflet-popup-content,
+#wizardFincaModal .leaflet-popup-content,
+#mapFinca .leaflet-popup-content,
+.modal #mapFinca .leaflet-popup-content {
+    color: #FFFFFF !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.popup-wizard-finca-custom .leaflet-popup-content *,
+#wizardFincaModal .leaflet-popup-content *,
+#mapFinca .leaflet-popup-content * {
+    color: #FFFFFF !important;
+}
+
+.popup-wizard-finca-custom.leaflet-popup .leaflet-popup-tip,
+.leaflet-popup.popup-wizard-finca-custom .leaflet-popup-tip,
+#wizardFincaModal .leaflet-popup .leaflet-popup-tip,
+#wizardFincaModal .leaflet-popup-tip,
+#mapFinca .leaflet-popup-tip,
+.modal #mapFinca .leaflet-popup-tip {
+    background: #000000 !important;
+    border: none !important;
+}
+
+.popup-wizard-finca-custom .leaflet-popup-close-button,
+#wizardFincaModal .leaflet-popup-close-button,
+#mapFinca .leaflet-popup-close-button {
+    color: #FFFFFF !important;
+    font-size: 20px !important;
+}
+
+.popup-wizard-finca-custom .leaflet-popup-close-button:hover,
+#wizardFincaModal .leaflet-popup-close-button:hover,
+#mapFinca .leaflet-popup-close-button:hover {
+    color: #28a745 !important;
+}
+
+/* Contenido interno del popup */
+.popup-ubicacion-wizard {
+    background: #000000 !important;
+    color: #FFFFFF !important;
+    padding: 10px !important;
+}
+
+.popup-ubicacion-wizard h6,
+.popup-ubicacion-wizard p,
+.popup-ubicacion-wizard small,
+.popup-ubicacion-wizard * {
+    color: #FFFFFF !important;
+}
+/* ============================================= */
 
 /* Controles de zoom de Leaflet - Signos blancos */
 #mapa-finca .leaflet-control-zoom a,
@@ -585,11 +784,13 @@
 /* Botón selector de especies */
 .especies-collapse-btn {
     transition: all 0.3s ease;
-    background: #000000 !important;
+    background: #181101 !important;
+    background-color: #181101 !important;
 }
 
 .especies-collapse-btn:hover {
-    background: #000000 !important;
+    background: #181101 !important;
+    background-color: #181101 !important;
     border-color: #888 !important;
 }
 
@@ -609,6 +810,8 @@
 /* Container del collapse */
 .especies-collapse-container {
     animation: fadeIn 0.3s ease-in-out;
+    background-color: #181101 !important;
+    background: #181101 !important;
 }
 
 @keyframes fadeIn {
