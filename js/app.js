@@ -3419,10 +3419,9 @@ async function darBajaEstablecimiento(idEstablecimiento) {
         // Mostrar mensaje de éxito
         showMessage('Establecimiento dado de baja correctamente', 'success');
         
-        // Recargar la lista de establecimientos
-        setTimeout(() => {
-            window.location.reload();
-        }, 1500);
+        // Recargar y renderizar la lista de establecimientos sin redirigir
+        const establecimientosActualizados = await cargarEstablecimientos();
+        renderizarEstablecimientos(establecimientosActualizados);
         
     } catch (error) {
         console.error('❌ Error al dar de baja establecimiento:', error);
