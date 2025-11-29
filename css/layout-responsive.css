@@ -40,6 +40,7 @@ main#ofertas-disponibles.container-fluid.py-5 {
     padding-left: 2.5vw !important;
     padding-right: 2.5vw !important;
     margin: 0 !important;
+    background: #E8C39E !important;
 }
 
 main#ofertas-disponibles.container-fluid.py-5 > .row.justify-content-center.mb-4 {

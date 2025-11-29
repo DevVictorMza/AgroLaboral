@@ -30,7 +30,7 @@
 /* ===== VARIABLES ESPECIALIZADAS ===== */
 :root {
     /* Ofertas Theme */
-    --ofertas-bg-primary: linear-gradient(135deg, #DCC4A0 0%, #D1B896 50%, #B8A085 100%);
+    --ofertas-bg-primary: linear-gradient(135deg, #E8C39E 0%, #D1B896 50%, #B8A085 100%);
     --ofertas-bg-secondary: #D1B896;
     --ofertas-card-bg: rgba(220, 196, 160, 0.9);
     --ofertas-border: #444444;
@@ -99,7 +99,7 @@
 
 /* ===== SECCIÓN PRINCIPAL ===== */
 #ofertas-disponibles {
-    background: #4B382A !important;
+    background: #E8C39E !important;
     color: var(--ofertas-text-primary) !important;
     position: relative;
     overflow: hidden;

@@ -731,7 +731,7 @@ input#calle::placeholder {
 
 /* Asegurar que todos los containers tengan el tema oscuro */
 .py-5, .container {
-    background: transparent !important;
+    background: #E8C39E !important;
 }
 .btn-outline-primary:hover, .btn-success:hover, .btn-outline-secondary:hover {
     box-shadow: 0 2px 8px rgba(60,60,100,0.10);
@@ -1207,8 +1207,8 @@ html {
 }
 
 body {
-    background: #4B382A !important;
-    background-color: #4B382A !important;
+    background: #E8C39E !important;
+    background-color: #E8C39E !important;
     color: #2C2416 !important;
     min-height: 100vh;
     position: relative;
@@ -1219,8 +1219,8 @@ body {
 }
 
 #page-wrapper {
-    background: #4B382A !important;
-    background-color: #4B382A !important;
+    background: #E8C39E !important;
+    background-color: #E8C39E !important;
 }
 
 /* Pseudo-elemento eliminado para fondo limpio */
@@ -1850,7 +1850,7 @@ body::before {
 
 /* Main content con tema oscuro */
 main {
-    background: transparent;
+    background: #E8C39E !important;
 }
 
 main h2 {
