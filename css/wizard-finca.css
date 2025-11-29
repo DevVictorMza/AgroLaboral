@@ -269,8 +269,8 @@
    =================================== */
 
 .especies-seleccionadas {
-    background: rgba(39, 174, 96, 0.05);
-    border: 1px solid rgba(39, 174, 96, 0.2);
+    background: #2A2A2A;
+    border: 1px solid #444444;
     border-radius: 8px;
     padding: 1rem;
     min-height: 80px;

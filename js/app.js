@@ -1454,7 +1454,7 @@ function generarDashboard(perfil) {
 
             <!-- Stats cards -->
             <div class="row mb-4 g-3 stats-cards-container">
-                <div class="col-md-3 col-sm-6">
+                <div class="col-md-4 col-sm-6">
                     <div class="stats-card-moderna stats-fincas">
                         <div class="stats-icono">
                             <i class="fas fa-warehouse"></i>
@@ -1469,7 +1469,7 @@ function generarDashboard(perfil) {
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3 col-sm-6">
+                <div class="col-md-4 col-sm-6">
                     <div class="stats-card-moderna stats-ofertas">
                         <div class="stats-icono">
                             <i class="fas fa-briefcase"></i>
@@ -1484,22 +1484,7 @@ function generarDashboard(perfil) {
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="stats-card-moderna stats-trabajadores">
-                        <div class="stats-icono">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="stats-contenido">
-                            <div class="stats-numero" data-contador="trabajadores">0</div>
-                            <div class="stats-label">Trabajadores</div>
-                            <div class="stats-trend">
-                                <i class="fas fa-user-check"></i>
-                                <span>Contratados</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6">
+                <div class="col-md-4 col-sm-6">
                     <div class="stats-card-moderna stats-solicitudes">
                         <div class="stats-icono">
                             <i class="fas fa-file-alt"></i>
@@ -11287,6 +11272,18 @@ function renderizarOfertas(ofertas) {
     // Actualizar badge del header
     actualizarBadgeOfertas(ofertasFiltradas.length, ofertasFiltradas.length);
     
+    // Contar ofertas vigentes (activas)
+    const ofertasVigentes = ofertasFiltradas.filter(oferta => {
+        const fechaCierreDate = parsearFechaSegura(oferta.fechaCierre);
+        return oferta.vigente && fechaCierreDate && fechaCierreDate > new Date();
+    }).length;
+    
+    // Actualizar contador en stats card
+    const statsOfertasNumero = document.querySelector('[data-contador="ofertas"]');
+    if (statsOfertasNumero) {
+        statsOfertasNumero.textContent = ofertasVigentes;
+    }
+    
     let html = `
         <div class="row" id="ofertas-grid">
     `;
@@ -11375,9 +11372,6 @@ function renderizarOfertas(ofertas) {
                                   style="display: none;">
                                 0
                             </span>
-                        </button>
-                        <button class="btn-oferta btn-oferta-editar" onclick="editarOferta(${oferta.idOfertaEmpleo})" title="Editar oferta">
-                            <span>Editar</span>
                         </button>
                         <button class="btn-oferta btn-oferta-eliminar" onclick="eliminarOferta(${oferta.idOfertaEmpleo})" title="Eliminar oferta">
                             <span>Eliminar</span>

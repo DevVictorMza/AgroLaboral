@@ -329,6 +329,7 @@
     border-color: #444444 !important;
     box-shadow: none !important;
     color: #FFFFFF !important;
+    outline: none !important;
 }
 
 /* Estilos específicos para inputs del modal de postulación */
@@ -337,6 +338,49 @@
     border-color: #444444 !important;
     box-shadow: none !important;
     color: #FFFFFF !important;
+}
+
+/* Quitar efecto verde en modal de editar establecimiento */
+#editarEstablecimientoModal .form-control,
+#editarEstablecimientoModal .form-select,
+#editarEstablecimientoModal input.form-control,
+#editarEstablecimientoModal textarea.form-control {
+    background-color: #2A2A2A !important;
+    border-color: #444444 !important;
+    color: #FFFFFF !important;
+    transition: none !important;
+}
+
+#editarEstablecimientoModal .form-control:hover,
+#editarEstablecimientoModal .form-select:hover,
+#editarEstablecimientoModal input.form-control:hover,
+#editarEstablecimientoModal textarea.form-control:hover {
+    background-color: #2A2A2A !important;
+    border-color: #444444 !important;
+    color: #FFFFFF !important;
+    box-shadow: none !important;
+}
+
+#editarEstablecimientoModal .form-control:focus,
+#editarEstablecimientoModal .form-select:focus,
+#editarEstablecimientoModal input.form-control:focus,
+#editarEstablecimientoModal textarea.form-control:focus {
+    background-color: #2A2A2A !important;
+    border-color: #444444 !important;
+    box-shadow: none !important;
+    color: #FFFFFF !important;
+    outline: none !important;
+}
+
+#editarEstablecimientoModal .form-control:focus-visible,
+#editarEstablecimientoModal .form-select:focus-visible,
+#editarEstablecimientoModal input.form-control:focus-visible,
+#editarEstablecimientoModal textarea.form-control:focus-visible {
+    background-color: #2A2A2A !important;
+    border-color: #444444 !important;
+    box-shadow: none !important;
+    color: #FFFFFF !important;
+    outline: none !important;
 }
 
 #modalPostulacion .form-control:hover {
