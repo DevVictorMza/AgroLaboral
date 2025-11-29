@@ -5245,6 +5245,17 @@ async function confirmarRegistroMejorado() {
             console.log('🌐 URL COMPLETA DE PETICIÓN:', url);
             console.log('📤 DATOS A ENVIAR:', JSON.stringify(datosEnvio, null, 2));
             console.log('🔑 TOKEN ANTES DE PETICIÓN:', localStorage.getItem('jwt_token') ? 'Token presente' : 'No hay token');
+            console.log('🔍 DATOS EXACTOS QUE SE ENVIARÁN:', datosEnvio);
+            console.log('🔍 VALIDACIÓN DE CAMPOS:', {
+                nombreEstablecimiento: datosEnvio.nombreEstablecimiento?.length || 0,
+                calle: datosEnvio.calle?.length || 0,
+                numeracion: datosEnvio.numeracion?.length || 0,
+                codigoPostal: datosEnvio.codigoPostal?.length || 0,
+                latitud: datosEnvio.latitud,
+                longitud: datosEnvio.longitud,
+                idDistrito: datosEnvio.idDistrito,
+                idsEspecies: datosEnvio.idsEspecies
+            });
 
             // Realizar petición autenticada al backend
             const response = await fetchWithAuth(url, {
