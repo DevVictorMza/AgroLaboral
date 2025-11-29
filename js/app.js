@@ -3785,15 +3785,15 @@ function actualizarMarcadorEstablecimiento(lat, lng, datos) {
     
     // Crear popup con información
     const popupContent = `
-        <div style="min-width: 200px;">
-            <h6 style="color: #2ECC71; margin-bottom: 8px; font-weight: bold;">
+        <div style="min-width: 200px; text-transform: uppercase;">
+            <h6 style="color: #2ECC71; margin-bottom: 8px; font-weight: bold; text-transform: uppercase;">
                 <i class="fas fa-warehouse"></i> ${datos.nombre || 'Establecimiento'}
             </h6>
-            <div style="font-size: 0.85rem; line-height: 1.6;">
-                <div><i class="fas fa-map-marker-alt" style="color: #3498db; width: 16px;"></i> ${datos.calle || 'N/A'} ${datos.numeracion || ''}</div>
-                <div><i class="fas fa-envelope" style="color: #e67e22; width: 16px;"></i> CP: ${datos.codigoPostal || 'N/A'}</div>
-                <div><i class="fas fa-map" style="color: #9b59b6; width: 16px;"></i> ${datos.distrito || 'N/A'}</div>
-                <div style="margin-top: 8px; color: #95a5a6; font-size: 0.75rem;">
+            <div style="font-size: 0.85rem; line-height: 1.6; text-transform: uppercase;">
+                <div style="text-transform: uppercase;"><i class="fas fa-map-marker-alt" style="color: #3498db; width: 16px;"></i> ${datos.calle || 'N/A'} ${datos.numeracion || ''}</div>
+                <div style="text-transform: uppercase;"><i class="fas fa-envelope" style="color: #e67e22; width: 16px;"></i> CP: ${datos.codigoPostal || 'N/A'}</div>
+                <div style="text-transform: uppercase;"><i class="fas fa-map" style="color: #9b59b6; width: 16px;"></i> ${datos.distrito || 'N/A'}</div>
+                <div style="margin-top: 8px; color: #95a5a6; font-size: 0.75rem; text-transform: uppercase;">
                     <i class="fas fa-crosshairs"></i> ${lat.toFixed(6)}, ${lng.toFixed(6)}
                 </div>
             </div>
