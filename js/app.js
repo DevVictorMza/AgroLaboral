@@ -526,6 +526,13 @@ async function abrirDashboardUsuario() {
 
 async function cargarPerfilEmpresa() {
     try {
+        // Verificar si hay token antes de intentar cargar el perfil
+        const token = obtenerToken();
+        if (!token) {
+            console.log('ℹ️ No hay sesión activa - omitiendo carga de perfil');
+            return null;
+        }
+        
         console.log('🔄 Cargando perfil de empresa...');
         
         const url = buildURL(BACKEND_CONFIG.ENDPOINTS.PROFILE);
@@ -7359,7 +7366,7 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function() {
 	const btnConfirmarRegistro = document.getElementById('btn-confirmar-registro');
 	if (btnConfirmarRegistro) {
-		btnConfirmarRegistro.addEventListener('click', function(e) {
+		btnConfirmarRegistro.addEventListener('click', async function(e) {
 			e.preventDefault();
 			
 			// Recopilar todos los datos del wizard
@@ -7369,32 +7376,56 @@ document.addEventListener('DOMContentLoaded', function() {
 				// Deshabilitar botón y mostrar estado de carga
 				const removeLoading = addLoadingState(btnConfirmarRegistro, 'Registrando...');
 				
-				// Enviar datos al backend
-				enviarRegistroAlBackend(datosRegistro)
-					.then(response => {
-						// Registro exitoso
-						removeLoading();
-						mostrarMensajeExito();
+				try {
+					// Enviar datos al backend
+					await enviarRegistroAlBackend(datosRegistro);
+					
+					// Registro exitoso - Ahora hacer login automático
+					console.log('✅ Registro exitoso, iniciando sesión automática...');
+					
+					// Intentar login automático con las credenciales usadas en el registro
+					const cuit = document.getElementById('cuit')?.value?.trim();
+					const password = document.getElementById('password')?.value;
+					
+					if (cuit && password) {
+						const resultadoLogin = await autenticarUsuario(cuit, password);
 						
-						setTimeout(function() {
-							// Cerrar modal de registro
-							const modalRegistro = document.getElementById('modalRegistroEmpleador');
-							if (modalRegistro) {
-								const modalInstance = bootstrap.Modal.getInstance(modalRegistro);
-								if (modalInstance) modalInstance.hide();
-							}
+						if (resultadoLogin.exito) {
+							// Almacenar la sesión
+							almacenarSesion(resultadoLogin.datos.token, resultadoLogin.datos.usuario);
+							actualizarInterfazLogin(true);
 							
-							// Cargar perfil y abrir dashboard
+							removeLoading();
+							mostrarMensajeExito();
+							
 							setTimeout(function() {
-								cargarPerfilEmpresa();
-							}, 500);
-						}, 1500);
-					})
-					.catch(error => {
-						// Error en el registro
+								// Cerrar modal de registro
+								const modalRegistro = document.getElementById('modalRegistroEmpleador');
+								if (modalRegistro) {
+									const modalInstance = bootstrap.Modal.getInstance(modalRegistro);
+									if (modalInstance) modalInstance.hide();
+								}
+								
+								// Ahora sí cargar el perfil (ya tenemos token)
+								setTimeout(function() {
+									cargarPerfilEmpresa();
+								}, 500);
+							}, 1500);
+						} else {
+							// Login automático falló, pero el registro fue exitoso
+							removeLoading();
+							mostrarMensajeExitoSinDashboard();
+						}
+					} else {
+						// No hay credenciales para login automático
 						removeLoading();
-						mostrarMensajeError(error.message);
-					});
+						mostrarMensajeExitoSinDashboard();
+					}
+				} catch (error) {
+					// Error en el registro
+					removeLoading();
+					mostrarMensajeError(error.message);
+				}
 			}
 		});
 	}
@@ -7489,6 +7520,30 @@ function mostrarMensajeExito() {
 			Será redirigido al dashboard en unos segundos...
 		`;
 		paso5.appendChild(mensajeExito);
+	}
+}
+
+// Función para mostrar mensaje de éxito sin dashboard (cuando el login automático falla)
+function mostrarMensajeExitoSinDashboard() {
+	const paso5 = document.getElementById('form-registro-empleador-paso5');
+	if (paso5) {
+		const mensajeExito = document.createElement('div');
+		mensajeExito.className = 'alert alert-success mt-3';
+		mensajeExito.innerHTML = `
+			<i class="fas fa-check-circle me-2"></i>
+			<strong>¡Registro exitoso!</strong> Su empresa ha sido registrada correctamente.
+			<br><small>Por favor, inicie sesión para acceder a su panel de control.</small>
+		`;
+		paso5.appendChild(mensajeExito);
+		
+		// Cerrar modal después de un momento
+		setTimeout(function() {
+			const modalRegistro = document.getElementById('modalRegistroEmpleador');
+			if (modalRegistro) {
+				const modalInstance = bootstrap.Modal.getInstance(modalRegistro);
+				if (modalInstance) modalInstance.hide();
+			}
+		}, 3000);
 	}
 }
 
