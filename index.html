@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; script-src 'self' https: 'unsafe-inline' 'unsafe-eval'; style-src 'self' https: 'unsafe-inline'; font-src 'self' https: data:; img-src 'self' https: data: blob:; connect-src 'self' https: http://localhost:8080 http://localhost:5501 http://localhost:3001 ws://localhost:*;">
-  <title>Agro Laboral - Mendoza</title>
+  <title>Agro Lab's - Mendoza</title>
     <!-- Page Wrapper CSS - DEBE IR PRIMERO -->
     <link rel="stylesheet" href="css/page-wrapper.css?v=agro-claro-unificado">
     <!-- Bootstrap CSS -->
@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="css/dashboard-extra.css?v=no-green-hover">
     <link rel="stylesheet" href="css/botones-gigantes.css?v=1">
     <link rel="stylesheet" href="css/map-ofertas.css?v=1">
-    <link rel="stylesheet" href="css/map-establecimientos.css?v=1">
+    <link rel="stylesheet" href="css/map-establecimientos.css?v=badge-blanco">
     <link rel="stylesheet" href="css/marcador-destacado.css">
     <link rel="stylesheet" href="css/map-markers.css?v=1">
     <link rel="stylesheet" href="css/ofertas-section.css?v=filtros-vino-5F021C">
@@ -49,6 +49,14 @@
     
     <!-- Estilos mínimos inline para optimización -->
     <style>
+        /* Forzar X blanca en btn-close-white */
+        .btn-close.btn-close-white {
+            filter: invert(1) grayscale(100%) brightness(200%) !important;
+            opacity: 1 !important;
+            background-color: transparent !important;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") !important;
+        }
+        
         /* Offcanvas dashboard styles */
         .establecimientos-container .establecimiento-card .dropdown-item.text-danger:hover {
             background: rgba(231, 76, 60, 0.15) !important;
@@ -1057,8 +1065,8 @@
         <!-- Contenido del banner -->
         <div class="text-center banner-text-content">
             <!-- Ícono de uva eliminado -->
-            <h1 class="display-4 fw-bold title-gradient animated-title">Bienvenidos a Agro Laboral</h1>
-            <p class="lead subtitle-enhanced">La plataforma para conectar Al Empresario y Al trabajador.</p>
+            <h1 class="display-4 fw-bold title-gradient animated-title">Bienvenidos a Agro Lab's</h1>
+            <p class="lead subtitle-enhanced">El puente digital entre empleadores y trabajadores del agro.</p>
         </div>
     </div>
     

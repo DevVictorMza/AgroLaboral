@@ -1,89 +1,256 @@
 /* Estilos para popups de establecimientos en el mapa */
 .establecimiento-popup-container .leaflet-popup-content-wrapper {
-    background: white !important;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
     color: #333 !important;
-    border-radius: 8px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-    min-width: 320px !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    min-width: 340px !important;
+    max-width: 420px !important;
+    border: none !important;
+    overflow: hidden;
+}
+
+.establecimiento-popup-container .leaflet-popup-content {
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .establecimiento-popup {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.4;
-    max-height: 400px;
+    max-height: 450px;
     overflow-y: auto;
 }
 
-.establecimiento-popup h6 {
-    margin: 0 0 10px 0;
-    color: #2c3e50 !important;
-    font-size: 1.1rem;
-    border-bottom: 2px solid #27ae60;
-    padding-bottom: 5px;
+/* Header del popup con diseño moderno */
+.popup-establecimiento-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    background: linear-gradient(135deg, #5F021C 0%, #8B0329 100%);
+    color: #ffffff !important;
 }
 
-.establecimiento-popup p {
-    margin: 5px 0;
-    color: #555 !important;
+.popup-establecimiento-header,
+.popup-establecimiento-header *,
+.popup-establecimiento-header h6,
+.popup-establecimiento-header .popup-title-wrapper h6 {
+    color: #ffffff !important;
+}
+
+.popup-icon-wrapper {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.popup-icon-wrapper i {
+    font-size: 1.5rem;
+    color: #ffffff !important;
+}
+
+.popup-title-wrapper {
+    flex: 1;
+}
+
+.popup-title-wrapper h6 {
+    margin: 0 0 6px 0;
+    color: #ffffff !important;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+/* Forzar color blanco con máxima especificidad */
+.leaflet-popup .popup-establecimiento-header h6,
+.leaflet-popup-content .popup-establecimiento-header h6,
+.establecimiento-popup-container .popup-title-wrapper h6,
+.leaflet-popup .popup-title-wrapper h6,
+#main-map .popup-title-wrapper h6,
+.establecimiento-popup .popup-establecimiento-header h6 {
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important;
+}
+
+.popup-especie-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.25);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+.popup-especie-badge i {
+    font-size: 0.7rem;
+    color: #ffffff !important;
+}
+
+/* Información de ubicación */
+.popup-ubicacion-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.popup-ubicacion-info > i {
+    color: #e74c3c;
     font-size: 0.9rem;
+    margin-bottom: 4px;
 }
 
-.establecimiento-popup .text-muted {
-    color: #888 !important;
-    font-style: italic;
-    font-size: 0.8rem;
-    margin-top: 10px;
-    border-top: 1px solid #eee;
-    padding-top: 5px;
+.popup-ubicacion-info .direccion-texto {
+    color: #2c3e50;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.popup-ubicacion-info .coordenadas-texto {
+    color: #95a5a6;
+    font-size: 0.7rem;
+    font-family: monospace;
+}
+
+/* Sección de ofertas */
+.popup-ofertas-section {
+    padding: 12px 16px;
+}
+
+.popup-ofertas-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #27ae60;
+}
+
+.popup-ofertas-header i {
+    color: #27ae60;
+    font-size: 1rem;
+}
+
+.popup-ofertas-header span {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #2c3e50;
 }
 
 /* Contenedor de ofertas */
 .ofertas-container {
-    max-height: 200px;
+    max-height: 180px;
     overflow-y: auto;
-    margin: 10px 0;
-    border: 1px solid #e8e8e8;
-    border-radius: 5px;
-    padding: 5px;
-    background-color: #fafafa;
+    padding: 4px;
+    background-color: transparent;
+    border: none;
+    margin: 0;
 }
 
-.ofertas-container .mb-2 {
-    margin-bottom: 8px !important;
-    border-left: 3px solid #27ae60 !important;
+/* Item de oferta individual */
+.oferta-item-popup {
+    background: white;
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    border-left: 4px solid #27ae60;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     transition: all 0.2s ease;
-    background-color: white !important;
 }
 
-.ofertas-container .mb-2:hover {
-    border-left-color: #2ecc71 !important;
-    background-color: #f8f9fa !important;
+.oferta-item-popup:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.15);
+    border-left-color: #2ecc71;
 }
 
-.ofertas-container .fas {
-    color: #27ae60 !important;
-    margin-right: 5px;
+.oferta-item-popup:last-child {
+    margin-bottom: 0;
 }
 
-.ofertas-container strong {
-    color: #2c3e50 !important;
-    font-size: 0.9rem;
+.oferta-item-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
 }
 
-.ofertas-container small {
-    color: #666 !important;
+.oferta-item-header i {
+    color: #5F021C;
+    font-size: 0.85rem;
+}
+
+.oferta-item-header strong {
+    color: #2c3e50;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.oferta-item-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.oferta-item-details span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: #666;
+    background: #f8f9fa;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.oferta-item-details span i {
+    color: #27ae60;
+    font-size: 0.7rem;
+}
+
+/* Footer del popup */
+.popup-footer {
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-top: 1px solid #dee2e6;
+}
+
+.ofertas-count {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     font-size: 0.8rem;
+    color: #27ae60;
+    font-weight: 600;
 }
 
+.ofertas-count i {
+    font-size: 0.85rem;
+}
+
+/* Ocultar punta del popup */
 .establecimiento-popup-container .leaflet-popup-tip {
     display: none !important;
-    background: white !important;
 }
 
 /* Estilos adicionales para el mapa principal */
 #main-map .leaflet-popup-content {
-    margin: 8px 12px;
-    min-width: 300px;
+    margin: 0;
+    min-width: 320px;
 }
 
 /* Scrollbar personalizada para Firefox */

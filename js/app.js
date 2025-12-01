@@ -6892,23 +6892,57 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 							}
 						}
 						
-						return `<div class="mb-2 p-2 bg-light rounded">
-							<strong>${oferta.puesto}</strong><br>
-							<small><i class="fas fa-seedling"></i> ${oferta.especie || 'No especificado'}</small><br>
-							<small><i class="fas fa-users"></i> ${oferta.vacantes} vacante(s)</small><br>
-							<small><i class="fas fa-calendar"></i> Cierre: ${fechaCierreFormateada}</small>
+						return `<div class="oferta-item-popup">
+							<div class="oferta-item-header">
+								<i class="fas fa-briefcase"></i>
+								<strong>${oferta.puesto}</strong>
+							</div>
+							<div class="oferta-item-details">
+								<span><i class="fas fa-seedling"></i> ${oferta.especie || 'No especificado'}</span>
+								<span><i class="fas fa-users"></i> ${oferta.vacantes} vacante(s)</span>
+								<span><i class="fas fa-calendar-alt"></i> ${fechaCierreFormateada}</span>
+							</div>
 						</div>`;
 					}).join('');
 					
+					// Obtener dirección aproximada usando geocodificación inversa (async)
+					const coordenadasTexto = `${establecimiento.latitud.toFixed(4)}, ${establecimiento.longitud.toFixed(4)}`;
+					
 					const popupContent = `
 						<div class="establecimiento-popup">
-							<h6><strong>${establecimiento.nombre.toUpperCase()}</strong></h6>
-							<p><strong>Especie principal:</strong> ${establecimiento.especie_principal}</p>
-							<p><strong>Ofertas laborales activas:</strong></p>
-							<div class="ofertas-container">
-								${ofertasHtml}
+							<div class="popup-establecimiento-header">
+								<div class="popup-icon-wrapper">
+									<i class="fas fa-warehouse"></i>
+								</div>
+								<div class="popup-title-wrapper">
+									<h6>${establecimiento.nombre.toUpperCase()}</h6>
+									<span class="popup-especie-badge">
+										<i class="fas fa-leaf"></i> ${establecimiento.especie_principal}
+									</span>
+								</div>
 							</div>
-							<small class="text-muted">Total: ${establecimiento.ofertas.length} oferta(s) disponible(s)</small>
+							
+							<div class="popup-ubicacion-info" id="ubicacion-${key}">
+								<i class="fas fa-map-marker-alt"></i>
+								<span class="direccion-texto">Cargando ubicación...</span>
+								<small class="coordenadas-texto">${coordenadasTexto}</small>
+							</div>
+							
+							<div class="popup-ofertas-section">
+								<div class="popup-ofertas-header">
+									<i class="fas fa-clipboard-list"></i>
+									<span>Ofertas laborales activas (${establecimiento.ofertas.length})</span>
+								</div>
+								<div class="ofertas-container">
+									${ofertasHtml}
+								</div>
+							</div>
+							
+							<div class="popup-footer">
+								<span class="ofertas-count">
+									<i class="fas fa-check-circle"></i> ${establecimiento.ofertas.length} oferta(s) disponible(s)
+								</span>
+							</div>
 						</div>
 					`;
 					
@@ -6916,9 +6950,38 @@ window.depurarAutocompletado = async function(dni = '35876866') {
 					const marcador = L.marker([establecimiento.latitud, establecimiento.longitud])
 						.addTo(mapa)
 						.bindPopup(popupContent, {
-							maxWidth: 350,
+							maxWidth: 400,
+							minWidth: 320,
 							className: 'establecimiento-popup-container'
 						});
+					
+					// Cargar dirección al abrir el popup
+					marcador.on('popupopen', async function() {
+						const ubicacionDiv = document.getElementById(`ubicacion-${key}`);
+						if (ubicacionDiv) {
+							try {
+								const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${establecimiento.latitud}&lon=${establecimiento.longitud}&zoom=18&addressdetails=1`);
+								const data = await response.json();
+								const direccionSpan = ubicacionDiv.querySelector('.direccion-texto');
+								if (direccionSpan && data.address) {
+									const road = data.address.road || data.address.pedestrian || '';
+									const houseNumber = data.address.house_number || '';
+									const suburb = data.address.suburb || data.address.neighbourhood || '';
+									const city = data.address.city || data.address.town || data.address.village || '';
+									
+									let direccion = '';
+									if (road) direccion += road;
+									if (houseNumber) direccion += ` ${houseNumber}`;
+									if (suburb) direccion += direccion ? `, ${suburb}` : suburb;
+									if (city) direccion += direccion ? `, ${city}` : city;
+									
+									direccionSpan.textContent = direccion || 'Mendoza, Argentina';
+								}
+							} catch (e) {
+								console.log('No se pudo obtener la dirección:', e);
+							}
+						}
+					});
 					
 					// Almacenar información del establecimiento en el marcador
 					marcador._establecimientoData = establecimiento;
