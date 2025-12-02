@@ -1473,12 +1473,51 @@
             margin-right: 20vw !important;
         }
         
+        /* Tablet */
         @media (max-width: 768px) {
             #wizardFincaModal .modal-dialog {
                 width: 95vw !important;
                 max-width: 95vw !important;
                 margin-left: 2.5vw !important;
                 margin-right: 2.5vw !important;
+            }
+        }
+        
+        /* Móvil - FULLSCREEN 100% */
+        @media (max-width: 576px) {
+            #wizardFincaModal {
+                padding: 0 !important;
+            }
+            
+            #wizardFincaModal .modal-dialog,
+            #wizardFincaModal .modal-dialog.modal-lg,
+            #wizardFincaModal .modal-dialog.modal-dialog-centered {
+                width: 100vw !important;
+                max-width: 100vw !important;
+                min-width: 100vw !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                height: 100vh !important;
+                min-height: 100vh !important;
+            }
+            
+            #wizardFincaModal .modal-content {
+                width: 100vw !important;
+                max-width: 100vw !important;
+                height: 100vh !important;
+                min-height: 100vh !important;
+                border-radius: 0 !important;
+                border: none !important;
+                margin: 0 !important;
+            }
+            
+            #wizardFincaModal .modal-header {
+                border-radius: 0 !important;
+            }
+            
+            #wizardFincaModal .modal-body {
+                padding: 1rem !important;
+                overflow-y: auto !important;
             }
         }
     </style>

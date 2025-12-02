@@ -386,70 +386,58 @@ async function abrirDashboardUsuario() {
             focus: true
         });
         
-        // Forzar estilos de fullscreen antes de mostrar
-        dashboardOffcanvas.style.position = 'fixed';
-        dashboardOffcanvas.style.top = '0';
-        dashboardOffcanvas.style.left = '0';
-        dashboardOffcanvas.style.width = '100vw';
-        dashboardOffcanvas.style.height = '100vh';
-        dashboardOffcanvas.style.margin = '0';
-        dashboardOffcanvas.style.padding = '0';
-        dashboardOffcanvas.style.zIndex = '1060';
+        // Agregar clase para estilos responsive fullscreen
+        dashboardOffcanvas.classList.add('modal-fullscreen-mobile');
+        
+        // Forzar estilos de fullscreen antes de mostrar con cssText
+        dashboardOffcanvas.style.cssText = 'position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100vw !important; height: 100vh !important; max-width: 100vw !important; margin: 0 !important; padding: 0 !important; z-index: 1060 !important;';
         
         const modalDialog = dashboardOffcanvas.querySelector('.modal-dialog');
         if (modalDialog) {
-            modalDialog.style.position = 'fixed';
-            modalDialog.style.top = '0';
-            modalDialog.style.left = '0';
-            modalDialog.style.width = '100vw';
-            modalDialog.style.height = '100vh';
-            modalDialog.style.margin = '0';
-            modalDialog.style.padding = '0';
-            modalDialog.style.maxWidth = '100vw';
-            modalDialog.style.maxHeight = '100vh';
+            modalDialog.style.cssText = 'position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100vw !important; height: 100vh !important; max-width: 100vw !important; max-height: 100vh !important; margin: 0 !important; padding: 0 !important; transform: none !important;';
         }
         
         const modalContent = dashboardOffcanvas.querySelector('.modal-content');
         if (modalContent) {
-            modalContent.style.width = '100vw';
-            modalContent.style.height = '100vh';
-            modalContent.style.border = 'none';
-            modalContent.style.borderRadius = '0';
+            modalContent.style.cssText = 'position: absolute !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100% !important; height: 100% !important; max-width: 100% !important; border: none !important; border-radius: 0 !important; margin: 0 !important; padding: 0 !important;';
         }
         
         bsModal.show();
         
         // Asegurar fullscreen después de que se muestre
         dashboardOffcanvas.addEventListener('shown.bs.modal', function() {
-            // Forzar estilos después de que el modal se haya mostrado
-            this.style.position = 'fixed';
-            this.style.top = '0';
-            this.style.left = '0';
-            this.style.width = '100vw';
-            this.style.height = '100vh';
-            this.style.margin = '0';
-            this.style.padding = '0';
+            // Forzar estilos después de que el modal se haya mostrado con cssText
+            this.style.cssText = 'position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100vw !important; height: 100vh !important; max-width: 100vw !important; margin: 0 !important; padding: 0 !important; z-index: 1060 !important;';
             
             const dialog = this.querySelector('.modal-dialog');
             if (dialog) {
-                dialog.style.position = 'fixed';
-                dialog.style.top = '0';
-                dialog.style.left = '0';
-                dialog.style.width = '100vw';
-                dialog.style.height = '100vh';
-                dialog.style.margin = '0';
-                dialog.style.padding = '0';
-                dialog.style.maxWidth = '100vw';
-                dialog.style.maxHeight = '100vh';
-                dialog.style.transform = 'none';
+                dialog.style.cssText = 'position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100vw !important; height: 100vh !important; max-width: 100vw !important; max-height: 100vh !important; margin: 0 !important; padding: 0 !important; transform: none !important;';
             }
             
             const content = this.querySelector('.modal-content');
             if (content) {
-                content.style.width = '100vw';
-                content.style.height = '100vh';
-                content.style.border = 'none';
-                content.style.borderRadius = '0';
+                content.style.cssText = 'position: absolute !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100% !important; height: 100% !important; max-width: 100% !important; border: none !important; border-radius: 0 !important; margin: 0 !important; padding: 0 !important;';
+            }
+            
+            // Forzar modal-body y dashboard-content
+            const modalBody = this.querySelector('.modal-body');
+            if (modalBody) {
+                modalBody.style.cssText = 'width: 100% !important; padding: 0 !important; margin: 0 !important; overflow-y: auto !important; overflow-x: hidden !important;';
+            }
+            
+            const dashboardContent = this.querySelector('#dashboard-content');
+            if (dashboardContent) {
+                dashboardContent.style.cssText = 'width: 100% !important; max-width: 100% !important; padding: 0.5rem !important; margin: 0 !important;';
+            }
+            
+            const dashboardContainer = this.querySelector('.dashboard-container');
+            if (dashboardContainer) {
+                dashboardContainer.style.cssText = 'width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important;';
+            }
+            
+            const containerFluid = this.querySelector('.container-fluid');
+            if (containerFluid) {
+                containerFluid.style.cssText = 'width: 100% !important; max-width: 100% !important; padding-left: 0.25rem !important; padding-right: 0.25rem !important; margin: 0 !important;';
             }
             
             // Eliminar backdrop si existe
@@ -4837,11 +4825,14 @@ async function verDetalleEstablecimiento(idEstablecimiento) {
             return;
         }
 
-        // Crear modal con detalles
+        // Crear modal con detalles - usar fullscreen en móvil
+        const isMobile = window.innerWidth <= 576;
+        const modalDialogClass = isMobile ? 'modal-dialog modal-fullscreen' : 'modal-dialog modal-lg modal-dialog-centered';
+        
         const modalHtml = `
             <div class="modal fade" id="detalleEstablecimientoModal" tabindex="-1">
-                <div class="modal-dialog modal-lg modal-dialog-centered">
-                    <div class="modal-content modal-ubicacion-detalle">
+                <div class="${modalDialogClass}">
+                    <div class="modal-content modal-ubicacion-detalle bg-dark text-white">
                         <div class="modal-header modal-ubicacion-header">
                             <div class="header-ubicacion-info">
                                 <div class="header-ubicacion-icon">
@@ -4971,12 +4962,53 @@ async function verDetalleEstablecimiento(idEstablecimiento) {
         // Agregar modal al DOM
         document.body.insertAdjacentHTML('beforeend', modalHtml);
 
+        // Obtener referencia al modal
+        const modalElement = document.getElementById('detalleEstablecimientoModal');
+        
+        // FORZAR FULLSCREEN EN MÓVIL (375px y similar)
+        if (window.innerWidth <= 576) {
+            const modalDialog = modalElement.querySelector('.modal-dialog');
+            const modalContent = modalElement.querySelector('.modal-content');
+            const modalHeader = modalElement.querySelector('.modal-header');
+            const modalBody = modalElement.querySelector('.modal-body');
+            const modalFooter = modalElement.querySelector('.modal-footer');
+            
+            // Estilos para modal dialog
+            if (modalDialog) {
+                modalDialog.className = 'modal-dialog';
+                modalDialog.style.cssText = 'width: 100vw !important; max-width: 100vw !important; min-width: 100vw !important; margin: 0 !important; padding: 0 !important; height: 100vh !important; min-height: 100vh !important;';
+            }
+            
+            // Estilos para modal content
+            if (modalContent) {
+                modalContent.style.cssText = 'width: 100vw !important; max-width: 100vw !important; min-width: 100vw !important; height: 100vh !important; min-height: 100vh !important; border-radius: 0 !important; border: none !important; margin: 0 !important;';
+            }
+            
+            // Estilos para modal header
+            if (modalHeader) {
+                modalHeader.style.cssText = 'border-radius: 0 !important; width: 100% !important;';
+            }
+            
+            // Estilos para modal body
+            if (modalBody) {
+                modalBody.style.cssText = 'width: 100% !important; padding: 1rem !important; overflow-y: auto !important;';
+            }
+            
+            // Estilos para modal footer
+            if (modalFooter) {
+                modalFooter.style.cssText = 'border-radius: 0 !important; width: 100% !important;';
+            }
+            
+            // Estilos para el modal base
+            modalElement.style.cssText = 'padding: 0 !important;';
+        }
+
         // Mostrar modal
-        const modal = new bootstrap.Modal(document.getElementById('detalleEstablecimientoModal'));
+        const modal = new bootstrap.Modal(modalElement);
         modal.show();
 
         // Limpiar modal después de cerrar
-        document.getElementById('detalleEstablecimientoModal').addEventListener('hidden.bs.modal', function() {
+        modalElement.addEventListener('hidden.bs.modal', function() {
             this.remove();
         });
 
@@ -15690,8 +15722,7 @@ function verUbicacionPostulante(lat, lng, nombre) {
         // Control de capas
         const capasBase = {
             "🗺️ Mapa": capaOSM,
-            "🛰️ Satélite": capaSatelital,
-            "🌍 Híbrido": capaHibrida
+            "🛰️ Satélite": capaSatelital
         };
         
         L.control.layers(capasBase, null, { position: 'topright' }).addTo(mapaUbicacionPostulante);

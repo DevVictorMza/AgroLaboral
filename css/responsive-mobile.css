@@ -15,6 +15,264 @@
 }
 
 /* ===========================================
+   MODAL FULLSCREEN MOBILE - CLASE GLOBAL
+   Aplicada via JavaScript para 100% ancho
+   =========================================== */
+.modal-fullscreen-mobile,
+.modal-fullscreen-mobile.modal,
+.modal-fullscreen-mobile.modal.show,
+.modal-fullscreen-mobile.modal.fade.show {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    z-index: 1060 !important;
+}
+
+.modal-fullscreen-mobile .modal-dialog,
+.modal-fullscreen-mobile > .modal-dialog {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+}
+
+.modal-fullscreen-mobile .modal-content {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+}
+
+.modal-fullscreen-mobile .modal-header {
+    width: 100% !important;
+    padding: 0.625rem 0.75rem !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+}
+
+.modal-fullscreen-mobile .modal-body {
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+.modal-fullscreen-mobile #dashboard-content,
+.modal-fullscreen-mobile .dashboard-container,
+.modal-fullscreen-mobile .container-fluid {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0.25rem !important;
+    margin: 0 !important;
+}
+
+.modal-fullscreen-mobile .row {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.modal-fullscreen-mobile [class*="col-"] {
+    padding-left: 0.25rem !important;
+    padding-right: 0.25rem !important;
+}
+
+.modal-fullscreen-mobile .dashboard-card,
+.modal-fullscreen-mobile .dashboard-card.p-4 {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 0 0.5rem 0 !important;
+    padding: 0.75rem !important;
+}
+
+/* ===========================================
+   DASHBOARD OFFCANVAS - FULLSCREEN RESPONSIVE
+   Prioridad máxima para ocupar 100% del ancho
+   =========================================== */
+@media (max-width: 576px) {
+    /* ========================================
+       DASHBOARD MODAL - 100% ANCHO PANTALLA
+       Cada capa con estilos específicos
+       ======================================== */
+    
+    /* CAPA 1: Modal base */
+    #dashboardOffcanvas.modal,
+    #dashboardOffcanvas.modal.show {
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        z-index: 1055 !important;
+    }
+    
+    /* CAPA 2: Modal dialog */
+    #dashboardOffcanvas > .modal-dialog,
+    #dashboardOffcanvas.modal .modal-dialog {
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        transform: none !important;
+    }
+    
+    /* CAPA 3: Modal content */
+    #dashboardOffcanvas .modal-dialog > .modal-content,
+    #dashboardOffcanvas .modal-content {
+        position: absolute !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        border-radius: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    /* CAPA 4: Modal header */
+    #dashboardOffcanvas .modal-header,
+    #dashboardOffcanvas .modal-content > .modal-header {
+        position: relative !important;
+        width: 100% !important;
+        min-height: 56px !important;
+        padding: 0.625rem 0.75rem !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        flex-shrink: 0 !important;
+        box-sizing: border-box !important;
+    }
+    
+    #dashboardOffcanvas .modal-header .modal-title {
+        font-size: 1rem !important;
+    }
+    
+    #dashboardOffcanvas .modal-header .btn-close {
+        margin: 0 !important;
+        padding: 0.5rem !important;
+    }
+    
+    /* CAPA 5: Modal body */
+    #dashboardOffcanvas .modal-body,
+    #dashboardOffcanvas .modal-content > .modal-body {
+        position: relative !important;
+        width: 100% !important;
+        flex: 1 1 auto !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* CAPA 6: Dashboard content */
+    #dashboardOffcanvas #dashboard-content,
+    #dashboardOffcanvas .modal-body > #dashboard-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0.5rem !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* CAPA 7: Dashboard container */
+    #dashboardOffcanvas .dashboard-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* CAPA 8: Container fluid */
+    #dashboardOffcanvas .container-fluid,
+    #dashboardOffcanvas .dashboard-container > .container-fluid {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-left: 0.25rem !important;
+        padding-right: 0.25rem !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* CAPA 9: Rows */
+    #dashboardOffcanvas .row,
+    #dashboardOffcanvas .container-fluid > .row {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* CAPA 10: Columns */
+    #dashboardOffcanvas [class*="col-"],
+    #dashboardOffcanvas .col-12,
+    #dashboardOffcanvas .col-md-6,
+    #dashboardOffcanvas .col-lg-4 {
+        padding-left: 0.25rem !important;
+        padding-right: 0.25rem !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* CAPA 11: Dashboard cards */
+    #dashboardOffcanvas .dashboard-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 0 0.5rem 0 !important;
+        padding: 0.75rem !important;
+        border-radius: 12px !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* Sobrescribir .p-4 de Bootstrap */
+    #dashboardOffcanvas .dashboard-card.p-4,
+    #dashboardOffcanvas .p-4 {
+        padding: 0.75rem !important;
+    }
+    
+    /* Ofertas content */
+    #dashboardOffcanvas #ofertas-content,
+    #dashboardOffcanvas .ofertas-content {
+        width: 100% !important;
+        padding: 0 !important;
+    }
+}
+
+/* ===========================================
    BREAKPOINT PRINCIPAL: MAX 480px
    Samsung Galaxy S20 Ultra y similares
    =========================================== */
@@ -1170,21 +1428,25 @@
 }
 
 /* --- CONTENEDOR DERECHO: BADGE + BOTÓN --- */
-/* Stack vertical para agrupar badge especie y botón postularse */
+/* Stack para agrupar badge especie y botón postularse */
 .oferta-right-stack {
     position: absolute !important;
     top: 0.75rem !important;
     right: 0.75rem !important;
     z-index: 10 !important;
     display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-end !important;
+    flex-direction: row !important;
+    align-items: center !important;
     gap: 0.5rem !important;
 }
 
 /* Badge especie dentro del stack */
 .oferta-right-stack .oferta-especie {
     margin: 0 !important;
+    padding: 0.35rem 0.7rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 14px !important;
+    white-space: nowrap !important;
 }
 
 /* Botón postularse - mismo tamaño que badge especie */
@@ -1193,14 +1455,14 @@
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    padding: 0.4rem 0.9rem !important;
-    font-size: 0.85rem !important;
+    padding: 0.35rem 0.7rem !important;
+    font-size: 0.75rem !important;
     font-weight: 600 !important;
-    border-radius: 20px !important;
+    border-radius: 14px !important;
     background: linear-gradient(135deg, #0056b3 0%, #007bff 100%) !important;
     color: #ffffff !important;
     border: 1px solid rgba(0, 123, 255, 0.6) !important;
-    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3) !important;
+    box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3) !important;
     white-space: nowrap !important;
     margin: 0 !important;
 }
@@ -1210,27 +1472,12 @@
     background: linear-gradient(135deg, #004494 0%, #0056b3 100%) !important;
     color: #ffffff !important;
     transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.5) !important;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.5) !important;
 }
 
 /* Ocultar sección de acciones antigua */
 .oferta-actions-section {
     display: none !important;
-}
-
-@media (max-width: 576px) {
-    .oferta-right-stack {
-        top: 0.5rem !important;
-        right: 0.5rem !important;
-        gap: 0.4rem !important;
-    }
-    
-    .oferta-right-stack .oferta-especie,
-    .oferta-right-stack .btn-postularse {
-        padding: 0.35rem 0.75rem !important;
-        font-size: 0.8rem !important;
-        border-radius: 18px !important;
-    }
 }
 
 /* ============================================
@@ -1291,39 +1538,8 @@
     .oferta-publica-card-horizontal .oferta-card-content {
         display: block !important;
         padding: 1rem !important;
-        padding-top: 3.5rem !important; /* Espacio para los badges superiores */
+        padding-top: 2.75rem !important; /* Espacio para badges en fila */
         position: relative !important;
-        min-height: auto !important;
-    }
-}
-
-/* --- STACK DERECHO (BADGE + BOTÓN) --- */
-@media (max-width: 576px) {
-    .oferta-right-stack {
-        position: absolute !important;
-        top: 0.75rem !important;
-        right: 0.75rem !important;
-        z-index: 10 !important;
-        display: flex !important;
-        flex-direction: row !important;
-        align-items: center !important;
-        gap: 0.5rem !important;
-    }
-    
-    .oferta-right-stack .oferta-especie {
-        padding: 0.35rem 0.7rem !important;
-        font-size: 0.7rem !important;
-        border-radius: 12px !important;
-        margin: 0 !important;
-        white-space: nowrap !important;
-    }
-    
-    .oferta-right-stack .btn-postularse {
-        padding: 0.35rem 0.7rem !important;
-        font-size: 0.7rem !important;
-        border-radius: 12px !important;
-        margin: 0 !important;
-        white-space: nowrap !important;
     }
 }
 
@@ -1453,9 +1669,14 @@
 
 /* --- HEADER DE SECCIÓN OFERTAS --- */
 @media (max-width: 576px) {
-    /* Contenedor dashboard-card para ofertas */
+    /* Contenedor dashboard-card para ofertas con margin 1% */
     .dashboard-card.p-4:has(.ofertas-header) {
         padding: 0.75rem !important;
+        margin-left: 1% !important;
+        margin-right: 1% !important;
+        width: 98% !important;
+        max-width: 98% !important;
+        box-sizing: border-box !important;
     }
     
     /* Header principal de ofertas */
@@ -1463,27 +1684,28 @@
         display: flex !important;
         flex-direction: column !important;
         align-items: stretch !important;
-        padding: 0.875rem !important;
-        margin-bottom: 0.75rem !important;
+        padding: 0.75rem !important;
+        margin-bottom: 0.5rem !important;
         gap: 0.75rem !important;
         border-radius: 12px !important;
+        width: 100% !important;
     }
     
     /* Info del header (icono + texto) */
     .ofertas-header .header-info {
         display: flex !important;
         align-items: center !important;
-        gap: 0.75rem !important;
+        gap: 0.625rem !important;
         width: 100% !important;
     }
     
     /* Icono del header */
     .ofertas-header .header-info > i {
-        font-size: 1.25rem !important;
-        width: 40px !important;
-        height: 40px !important;
-        min-width: 40px !important;
-        border-radius: 10px !important;
+        font-size: 1.125rem !important;
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+        border-radius: 8px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -1493,63 +1715,116 @@
     .ofertas-header .header-text {
         display: flex !important;
         flex-direction: column !important;
-        gap: 0.2rem !important;
+        gap: 0.125rem !important;
         flex: 1 !important;
     }
     
     /* Título h5 */
     .ofertas-header .header-text h5 {
-        font-size: 1rem !important;
+        font-size: 0.95rem !important;
         margin: 0 !important;
-        line-height: 1.3 !important;
+        line-height: 1.25 !important;
     }
     
     /* Badge contador */
     .ofertas-header .header-text .contador-badge {
-        font-size: 0.75rem !important;
-        padding: 0.2rem 0.5rem !important;
-        border-radius: 10px !important;
+        font-size: 0.7rem !important;
+        padding: 0.15rem 0.4rem !important;
+        border-radius: 8px !important;
         display: inline-block !important;
         width: fit-content !important;
     }
     
-    /* Controles de filtro */
+    /* Controles de filtro - contenedor */
     .ofertas-filter-controls {
         width: 100% !important;
+        display: block !important;
     }
     
-    /* Grupo de botones */
+    /* =============================================
+       GRUPO DE BOTONES - APILADOS VERTICALMENTE
+       ============================================= */
+    .ofertas-header .ofertas-filter-controls .btn-group-ofertas,
+    .ofertas-filter-controls .btn-group-ofertas,
     .btn-group-ofertas {
         display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
         width: 100% !important;
         gap: 0.5rem !important;
-        padding: 0.35rem !important;
-        border-radius: 10px !important;
+        padding: 0.5rem !important;
+        border-radius: 12px !important;
+        background: rgba(0, 0, 0, 0.25) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
     }
     
-    /* Botones de filtro */
+    /* =============================================
+       BOTONES DE FILTRO - ESTILO PROLIJO
+       ============================================= */
+    .ofertas-header .btn-filter,
+    .ofertas-filter-controls .btn-filter,
+    .btn-group-ofertas .btn-filter,
     .btn-filter {
-        flex: 1 !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 0.4rem !important;
-        padding: 0.6rem 0.5rem !important;
-        font-size: 0.8rem !important;
+        gap: 0.5rem !important;
+        width: 100% !important;
+        padding: 0.65rem 1rem !important;
+        font-size: 0.85rem !important;
+        font-weight: 600 !important;
         border-radius: 8px !important;
         white-space: nowrap !important;
+        box-sizing: border-box !important;
+        border: 2px solid transparent !important;
+        transition: all 0.2s ease !important;
     }
     
+    /* Icono del botón */
     .btn-filter i {
-        font-size: 0.85rem !important;
+        font-size: 0.9rem !important;
+        flex-shrink: 0 !important;
+        width: 18px !important;
+        text-align: center !important;
     }
     
+    /* Texto del botón visible */
+    .ofertas-header .btn-filter span,
+    .ofertas-filter-controls .btn-filter span,
+    .btn-group-ofertas .btn-filter span,
     .btn-filter span {
         display: inline !important;
-        font-size: 0.8rem !important;
+        font-size: 0.85rem !important;
+        font-weight: 600 !important;
     }
     
-    /* Estado activo */
+    /* Botón "Todas" - estilo base */
+    .btn-filter.btn-filter-todas {
+        background: rgba(255, 255, 255, 0.08) !important;
+        color: rgba(255, 255, 255, 0.85) !important;
+    }
+    
+    .btn-filter.btn-filter-todas:hover,
+    .btn-filter.btn-filter-todas.active {
+        background: rgba(255, 255, 255, 0.15) !important;
+        color: #ffffff !important;
+        border-color: rgba(255, 255, 255, 0.25) !important;
+    }
+    
+    /* Botón "Vigentes" - estilo verde */
+    .btn-filter.btn-filter-vigentes {
+        background: rgba(39, 174, 96, 0.15) !important;
+        color: #2ecc71 !important;
+    }
+    
+    .btn-filter.btn-filter-vigentes:hover,
+    .btn-filter.btn-filter-vigentes.active {
+        background: rgba(39, 174, 96, 0.25) !important;
+        color: #2ecc71 !important;
+        border-color: rgba(39, 174, 96, 0.4) !important;
+    }
+    
+    /* Estado activo - sin transform */
     .btn-filter.active {
         transform: none !important;
     }
@@ -1629,3 +1904,529 @@
         border-radius: 8px !important;
     }
 }
+
+/* =====================================================
+   BOTONES DE ACCIONES DEL ESTABLECIMIENTO - RESPONSIVE
+   ===================================================== */
+@media (max-width: 576px) {
+    /* Contenedor de acciones - layout vertical */
+    .establecimiento-acciones {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.5rem !important;
+        width: 100% !important;
+        margin: 1% !important;
+        padding: 0 !important;
+    }
+    
+    /* Botones - ancho completo y uniformes */
+    .establecimiento-acciones .btn {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 0.5rem !important;
+        width: 100% !important;
+        padding: 0.7rem 1rem !important;
+        font-size: 0.85rem !important;
+        font-weight: 600 !important;
+        border-radius: 10px !important;
+        white-space: nowrap !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+    }
+    
+    /* Iconos de los botones */
+    .establecimiento-acciones .btn i {
+        font-size: 0.9rem !important;
+        flex-shrink: 0 !important;
+    }
+    
+    /* Botón Ver Detalles (azul/outline) */
+    .establecimiento-acciones .btn-outline-light,
+    .establecimiento-acciones .btn-outline-primary,
+    .establecimiento-acciones .btn[onclick*="Detalles"] {
+        background: rgba(59, 130, 246, 0.15) !important;
+        border: 2px solid rgba(59, 130, 246, 0.5) !important;
+        color: #60a5fa !important;
+    }
+    
+    .establecimiento-acciones .btn-outline-light:hover,
+    .establecimiento-acciones .btn-outline-primary:hover {
+        background: rgba(59, 130, 246, 0.25) !important;
+        border-color: rgba(59, 130, 246, 0.7) !important;
+    }
+    
+    /* Botón Ver Ofertas (verde) */
+    .establecimiento-acciones .btn-success,
+    .establecimiento-acciones .btn[onclick*="Ofertas"] {
+        background: rgba(34, 197, 94, 0.2) !important;
+        border: 2px solid rgba(34, 197, 94, 0.5) !important;
+        color: #4ade80 !important;
+    }
+    
+    .establecimiento-acciones .btn-success:hover {
+        background: rgba(34, 197, 94, 0.3) !important;
+        border-color: rgba(34, 197, 94, 0.7) !important;
+    }
+}
+
+/* =====================================================
+   MODAL DETALLES DEL ESTABLECIMIENTO - FULLSCREEN
+   ===================================================== */
+@media (max-width: 576px) {
+    /* Modal backdrop sin padding */
+    body.modal-open {
+        padding-right: 0 !important;
+    }
+    
+    /* Modal base - sin padding */
+    div#detalleEstablecimientoModal.modal.fade,
+    div#detalleEstablecimientoModal.modal,
+    #detalleEstablecimientoModal {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    /* Modal dialog - FORZAR ancho y alto completo con especificidad máxima */
+    div#detalleEstablecimientoModal div.modal-dialog.modal-fullscreen,
+    div#detalleEstablecimientoModal div.modal-dialog.modal-lg,
+    div#detalleEstablecimientoModal div.modal-dialog.modal-dialog-centered,
+    div#detalleEstablecimientoModal .modal-dialog,
+    #detalleEstablecimientoModal .modal-dialog {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        min-width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        min-height: 100vh !important;
+        height: 100vh !important;
+        transform: none !important;
+        left: 0 !important;
+        right: 0 !important;
+        top: 0 !important;
+        bottom: 0 !important;
+    }
+    
+    /* Modal content - FORZAR sin bordes ni márgenes y SIN FONDO VERDE */
+    div#detalleEstablecimientoModal div.modal-content.modal-ubicacion-detalle.bg-dark.text-white,
+    div#detalleEstablecimientoModal div.modal-content.modal-ubicacion-detalle,
+    div#detalleEstablecimientoModal .modal-content.modal-ubicacion-detalle,
+    div#detalleEstablecimientoModal .modal-content,
+    #detalleEstablecimientoModal .modal-content {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        min-width: 100vw !important;
+        min-height: 100vh !important;
+        height: 100vh !important;
+        border-radius: 0 !important;
+        border: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        background: #1e2a38 !important;
+        background-color: #1e2a38 !important;
+    }
+    
+    /* Modal header */
+    #detalleEstablecimientoModal .modal-header,
+    #detalleEstablecimientoModal .modal-header.modal-ubicacion-header {
+        padding: 1rem !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 0 !important;
+        width: 100vw !important;
+    }
+    
+    #detalleEstablecimientoModal .modal-title {
+        font-size: 1.1rem !important;
+        font-weight: 700 !important;
+    }
+    
+    /* Modal body - scroll si es necesario */
+    #detalleEstablecimientoModal .modal-body,
+    #detalleEstablecimientoModal .modal-body.modal-ubicacion-body {
+        padding: 0.75rem !important;
+        overflow-y: auto !important;
+        flex: 1 !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* Secciones dentro del modal body */
+    #detalleEstablecimientoModal .modal-body .container,
+    #detalleEstablecimientoModal .modal-body .container-fluid,
+    #detalleEstablecimientoModal .modal-body .row {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+    
+    #detalleEstablecimientoModal .modal-body .col,
+    #detalleEstablecimientoModal .modal-body [class*="col-"] {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+    
+    /* Modal footer */
+    #detalleEstablecimientoModal .modal-footer {
+        padding: 0.75rem 1rem !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+        gap: 0.5rem !important;
+        border-radius: 0 !important;
+        width: 100vw !important;
+    }
+    
+    #detalleEstablecimientoModal .modal-footer .btn {
+        flex: 1 !important;
+        padding: 0.6rem 1rem !important;
+        font-size: 0.85rem !important;
+    }
+}
+
+/* =====================================================
+   MODAL WIZARD FINCA - FULLSCREEN
+   ===================================================== */
+@media (max-width: 576px) {
+    /* Modal base - sin padding ni fondo visible */
+    div#wizardFincaModal.modal.fade,
+    div#wizardFincaModal.modal,
+    #wizardFincaModal {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+    }
+    
+    /* Backdrop del modal - sin fondo verde */
+    #wizardFincaModal ~ .modal-backdrop,
+    .modal-backdrop.show {
+        background-color: rgba(0, 0, 0, 0.8) !important;
+    }
+    
+    /* Modal dialog - FORZAR ancho y alto completo */
+    div#wizardFincaModal div.modal-dialog.modal-lg.modal-dialog-centered,
+    div#wizardFincaModal div.modal-dialog.modal-lg,
+    div#wizardFincaModal div.modal-dialog,
+    #wizardFincaModal .modal-dialog {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        min-width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        min-height: 100vh !important;
+        height: 100vh !important;
+        transform: none !important;
+        left: 0 !important;
+        right: 0 !important;
+        top: 0 !important;
+        bottom: 0 !important;
+    }
+    
+    /* Modal content - sin bordes redondeados y SIN FONDO VERDE */
+    div#wizardFincaModal div.modal-content.border-secondary,
+    div#wizardFincaModal .modal-content,
+    #wizardFincaModal .modal-content {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        min-width: 100vw !important;
+        min-height: 100vh !important;
+        height: 100vh !important;
+        border-radius: 0 !important;
+        border: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+        background: #1a1a1a !important;
+        background-color: #1a1a1a !important;
+    }
+    
+    /* =============================================
+       HEADER DEL MODAL - REDISEÑO PROFESIONAL
+       ============================================= */
+    #wizardFincaModal .modal-header {
+        padding: 0.75rem 1rem !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-radius: 0 !important;
+        width: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        min-height: 56px !important;
+        max-height: 56px !important;
+    }
+    
+    #wizardFincaModal .modal-title {
+        font-size: 0.95rem !important;
+        font-weight: 600 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        margin: 0 !important;
+        flex: 1 !important;
+    }
+    
+    #wizardFincaModal .modal-title i {
+        font-size: 1rem !important;
+        color: #4ade80 !important;
+    }
+    
+    #wizardFincaModal .btn-close {
+        padding: 0.5rem !important;
+        margin: 0 !important;
+        width: 32px !important;
+        height: 32px !important;
+        opacity: 0.8 !important;
+    }
+    
+    /* =============================================
+       MODAL BODY - OPTIMIZADO Y OCUPA TODO EL ESPACIO
+       ============================================= */
+    #wizardFincaModal .modal-body,
+    #wizardFincaModal #wizard-content {
+        padding: 0.75rem !important;
+        overflow-y: auto !important;
+        flex: 1 1 auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 100% !important;
+        min-height: 0 !important;
+    }
+    
+    /* Asegurar que el wizard content ocupe todo el espacio disponible */
+    #wizardFincaModal .wizard-step-content {
+        min-height: calc(100vh - 200px) !important;
+    }
+    
+    /* =============================================
+       BARRA DE PROGRESO - COMPACTA Y PROFESIONAL
+       ============================================= */
+    #wizardFincaModal .wizard-progress {
+        padding: 0.75rem 0.5rem !important;
+        margin-bottom: 0.75rem !important;
+        gap: 0.5rem !important;
+    }
+    
+    #wizardFincaModal .wizard-step {
+        flex: 1 !important;
+        min-width: 0 !important;
+    }
+    
+    #wizardFincaModal .wizard-step-circle {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 0.85rem !important;
+        font-weight: 600 !important;
+        border-width: 2px !important;
+        margin-bottom: 0.35rem !important;
+    }
+    
+    #wizardFincaModal .wizard-step-label {
+        font-size: 0.7rem !important;
+        font-weight: 500 !important;
+        line-height: 1.2 !important;
+        margin-top: 0.25rem !important;
+    }
+    
+    #wizardFincaModal .wizard-step-line {
+        height: 2px !important;
+        top: 16px !important;
+    }
+    
+    /* =============================================
+       FORMULARIO - CAMPOS OPTIMIZADOS
+       ============================================= */
+    #wizardFincaModal .form-label,
+    #wizardFincaModal label {
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        margin-bottom: 0.35rem !important;
+        color: rgba(255, 255, 255, 0.9) !important;
+    }
+    
+    #wizardFincaModal .form-control,
+    #wizardFincaModal .form-select,
+    #wizardFincaModal input,
+    #wizardFincaModal select,
+    #wizardFincaModal textarea {
+        font-size: 0.85rem !important;
+        padding: 0.6rem 0.75rem !important;
+        border-radius: 8px !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        background: rgba(0, 0, 0, 0.3) !important;
+        color: #ffffff !important;
+    }
+    
+    #wizardFincaModal .form-control:focus,
+    #wizardFincaModal .form-select:focus,
+    #wizardFincaModal input:focus,
+    #wizardFincaModal select:focus,
+    #wizardFincaModal textarea:focus {
+        border-color: #4ade80 !important;
+        box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.2) !important;
+        background: rgba(0, 0, 0, 0.4) !important;
+    }
+    
+    /* =============================================
+       SPACING Y LAYOUT
+       ============================================= */
+    #wizardFincaModal #wizard-content .row {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    #wizardFincaModal #wizard-content .col,
+    #wizardFincaModal #wizard-content [class*="col-"] {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    #wizardFincaModal .mb-3,
+    #wizardFincaModal .mb-4 {
+        margin-bottom: 0.75rem !important;
+    }
+    
+    /* =============================================
+       BOTONES DE NAVEGACIÓN
+       ============================================= */
+    #wizardFincaModal .wizard-buttons,
+    #wizardFincaModal .btn-group,
+    #wizardFincaModal .d-flex.justify-content-between {
+        padding: 0.75rem 0.5rem !important;
+        gap: 0.5rem !important;
+        margin-top: 0.75rem !important;
+    }
+    
+    #wizardFincaModal .wizard-buttons .btn,
+    #wizardFincaModal button.btn {
+        padding: 0.6rem 1rem !important;
+        font-size: 0.85rem !important;
+        font-weight: 600 !important;
+        border-radius: 8px !important;
+        min-height: 40px !important;
+    }
+    
+    #wizardFincaModal .btn-primary {
+        background: #4ade80 !important;
+        border-color: #4ade80 !important;
+        color: #000000 !important;
+    }
+    
+    #wizardFincaModal .btn-secondary {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border-color: rgba(255, 255, 255, 0.2) !important;
+        color: #ffffff !important;
+    }
+    
+    /* =============================================
+       ESPECIES COLLAPSE - COMPACTO
+       ============================================= */
+    #wizardFincaModal .especies-collapse-container {
+        margin-bottom: 0.75rem !important;
+    }
+    
+    #wizardFincaModal .especies-collapse-btn {
+        padding: 0.6rem 0.75rem !important;
+        font-size: 0.85rem !important;
+        border-radius: 8px !important;
+    }
+    
+    #wizardFincaModal .especie-card {
+        padding: 0.6rem !important;
+        margin-bottom: 0.5rem !important;
+        border-radius: 8px !important;
+        font-size: 0.8rem !important;
+    }
+    
+    #wizardFincaModal .especie-card i {
+        font-size: 1rem !important;
+    }
+}
+
+/* =====================================================
+   TODOS LOS MODALES - FULLSCREEN EN RESPONSIVE
+   ===================================================== */
+@media (max-width: 576px) {
+    /* Aplicar a todos los modales que no tienen estilos específicos */
+    .modal:not(#wizardFincaModal):not(#detalleEstablecimientoModal):not(#dashboardOffcanvas) {
+        padding: 0 !important;
+    }
+    
+    .modal:not(#wizardFincaModal):not(#detalleEstablecimientoModal):not(#dashboardOffcanvas) .modal-dialog {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        min-width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        min-height: 100vh !important;
+        height: 100vh !important;
+    }
+    
+    .modal:not(#wizardFincaModal):not(#detalleEstablecimientoModal):not(#dashboardOffcanvas) .modal-content {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        min-width: 100vw !important;
+        min-height: 100vh !important;
+        height: 100vh !important;
+        border-radius: 0 !important;
+        border: none !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+        background: #1a1a1a !important;
+    }
+    
+    .modal:not(#wizardFincaModal):not(#detalleEstablecimientoModal):not(#dashboardOffcanvas) .modal-header {
+        padding: 0.75rem 1rem !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-radius: 0 !important;
+        min-height: 56px !important;
+        flex-shrink: 0 !important;
+    }
+    
+    .modal:not(#wizardFincaModal):not(#detalleEstablecimientoModal):not(#dashboardOffcanvas) .modal-title {
+        font-size: 0.95rem !important;
+        font-weight: 600 !important;
+    }
+    
+    .modal:not(#wizardFincaModal):not(#detalleEstablecimientoModal):not(#dashboardOffcanvas) .modal-body {
+        padding: 1rem !important;
+        overflow-y: auto !important;
+        flex: 1 1 auto !important;
+    }
+    
+    .modal:not(#wizardFincaModal):not(#detalleEstablecimientoModal):not(#dashboardOffcanvas) .modal-footer {
+        padding: 0.75rem 1rem !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-radius: 0 !important;
+        flex-shrink: 0 !important;
+    }
+    
+    /* Formularios dentro de los modales */
+    .modal .form-label {
+        font-size: 0.85rem !important;
+        margin-bottom: 0.35rem !important;
+    }
+    
+    .modal .form-control,
+    .modal .form-select {
+        font-size: 0.85rem !important;
+        padding: 0.6rem 0.75rem !important;
+        border-radius: 8px !important;
+    }
+    
+    .modal .btn {
+        padding: 0.6rem 1rem !important;
+        font-size: 0.85rem !important;
+        border-radius: 8px !important;
+    }
+}
+
