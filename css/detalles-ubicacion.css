@@ -840,3 +840,170 @@
         font-size: 0.85rem;
     }
 }
+
+/* =========================================
+   MODAL UBICACIÓN DEL POSTULANTE
+   ========================================= */
+
+.modal-ubicacion-postulante {
+    background: linear-gradient(145deg, #1a2e23 0%, #243d32 100%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+.modal-ubicacion-postulante .modal-ubicacion-header {
+    background: linear-gradient(135deg, #27AE60 0%, #2ECC71 50%, #1E8449 100%);
+    border-bottom: 2px solid rgba(39, 174, 96, 0.4);
+    border-radius: 16px 16px 0 0;
+    padding: 1.25rem 1.5rem;
+}
+
+.modal-ubicacion-postulante .modal-ubicacion-header .modal-title {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.25rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Header info del postulante - Sección verde */
+.postulante-info-header {
+    background: linear-gradient(135deg, #1E8449 0%, #27AE60 50%, #2ECC71 100%);
+    padding: 1rem 1.5rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.postulante-avatar {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.postulante-avatar i {
+    font-size: 1.5rem;
+    color: #ffffff;
+}
+
+.postulante-datos h6 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.postulante-datos small {
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+/* Contenedor del mapa */
+.mapa-postulante-container {
+    width: 100%;
+    height: 400px;
+    background: #1a2e23;
+    position: relative;
+}
+
+.mapa-postulante-container .leaflet-container {
+    height: 100%;
+    width: 100%;
+    border-radius: 0;
+}
+
+/* Footer del modal */
+.modal-ubicacion-postulante .modal-ubicacion-footer {
+    background: linear-gradient(135deg, #1a2e23 0%, #243d32 100%);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem 1.5rem;
+}
+
+/* Popup del marcador */
+.popup-postulante {
+    text-align: center;
+    min-width: 200px;
+    background: #1a2e23 !important;
+    padding: 0.5rem;
+    border-radius: 8px;
+}
+
+.popup-postulante h6 {
+    color: #ffffff !important;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.popup-postulante p {
+    color: #ffffff !important;
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.popup-postulante .coords-info {
+    background: rgba(39, 174, 96, 0.3);
+    padding: 0.5rem;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: #ffffff !important;
+}
+
+/* Estilos del popup de Leaflet */
+.leaflet-popup-content-wrapper {
+    background: #1a2e23 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+.leaflet-popup-content {
+    color: #ffffff !important;
+    margin: 10px 12px !important;
+}
+
+.leaflet-popup-tip {
+    background: #1a2e23 !important;
+}
+
+.leaflet-popup-close-button {
+    color: #ffffff !important;
+}
+
+/* Marcador personalizado */
+.marcador-postulante {
+    background: linear-gradient(135deg, #27AE60, #2ECC71);
+    border-radius: 50%;
+    border: 3px solid #ffffff;
+    box-shadow: 0 4px 15px rgba(39, 174, 96, 0.5);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .mapa-postulante-container {
+        height: 300px;
+    }
+    
+    .postulante-info-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    .postulante-avatar {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .postulante-avatar i {
+        font-size: 1.25rem;
+    }
+    
+    .postulante-datos h6 {
+        font-size: 1rem;
+    }
+}

@@ -1743,6 +1743,49 @@ function generarDashboard(perfil) {
                 </div>
             </div>
         </div>
+
+        <!-- Modal de Ubicación del Postulante -->
+        <div class="modal fade" id="modalUbicacionPostulante" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content modal-ubicacion-postulante">
+                    <div class="modal-header modal-ubicacion-header">
+                        <h5 class="modal-title text-white">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            Ubicación del Postulante
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    
+                    <div class="modal-body p-0">
+                        <!-- Info del postulante -->
+                        <div class="postulante-info-header" id="postulante-info-header">
+                            <div class="d-flex align-items-center">
+                                <div class="postulante-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="postulante-datos">
+                                    <h6 class="mb-0 text-white" id="postulante-nombre">Nombre del Postulante</h6>
+                                    <small class="text-white-50" id="postulante-coords">Coordenadas</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Contenedor del mapa -->
+                        <div id="mapa-ubicacion-postulante" class="mapa-postulante-container"></div>
+                    </div>
+                    
+                    <div class="modal-footer modal-ubicacion-footer">
+                        <small class="text-muted me-auto">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Ubicación registrada por el trabajador al postularse
+                        </small>
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     `;
     
     // Inicializar la carga de establecimientos después de generar el dashboard
@@ -15450,7 +15493,7 @@ async function abrirModalPostulaciones(idOferta) {
     // Actualizar título del modal
     const tituloElement = document.getElementById('modal-oferta-titulo');
     if (tituloElement) {
-        tituloElement.textContent = oferta?.nombrePuesto || `Oferta #${idOferta}`;
+        tituloElement.textContent = oferta?.nombrePuesto || 'Oferta';
     }
     
     // Mostrar modal
@@ -15582,13 +15625,186 @@ function renderizarPostulaciones(postulaciones) {
 /**
  * Ver ubicación del postulante en el mapa
  */
+let mapaUbicacionPostulante = null;
+
 function verUbicacionPostulante(lat, lng, nombre) {
     console.log(`📍 Ver ubicación de ${nombre}: [${lat}, ${lng}]`);
     
-    // Crear un mini modal o alert con el mapa
-    showMessage(`Ubicación de ${nombre}: Lat ${lat.toFixed(5)}, Lng ${lng.toFixed(5)}`, 'info');
+    // Validar coordenadas
+    if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
+        showMessage('El postulante no tiene ubicación registrada', 'warning');
+        return;
+    }
     
-    // TODO: Implementar modal con mapa Leaflet si se requiere
+    // Actualizar información del header
+    const nombreElement = document.getElementById('postulante-nombre');
+    const coordsElement = document.getElementById('postulante-coords');
+    
+    if (nombreElement) nombreElement.textContent = nombre;
+    if (coordsElement) coordsElement.textContent = `Lat: ${parseFloat(lat).toFixed(5)}, Lng: ${parseFloat(lng).toFixed(5)}`;
+    
+    // Abrir el modal
+    const modalElement = document.getElementById('modalUbicacionPostulante');
+    if (!modalElement) {
+        console.error('❌ Modal de ubicación no encontrado');
+        showMessage('Error al abrir el modal de ubicación', 'error');
+        return;
+    }
+    
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+    
+    // Esperar a que el modal esté visible para inicializar el mapa
+    modalElement.addEventListener('shown.bs.modal', function inicializarMapa() {
+        // Remover listener para evitar múltiples inicializaciones
+        modalElement.removeEventListener('shown.bs.modal', inicializarMapa);
+        
+        const contenedorMapa = document.getElementById('mapa-ubicacion-postulante');
+        if (!contenedorMapa) {
+            console.error('❌ Contenedor del mapa no encontrado');
+            return;
+        }
+        
+        // Destruir mapa anterior si existe
+        if (mapaUbicacionPostulante) {
+            mapaUbicacionPostulante.remove();
+            mapaUbicacionPostulante = null;
+        }
+        
+        // Crear nuevo mapa
+        mapaUbicacionPostulante = L.map('mapa-ubicacion-postulante', {
+            center: [lat, lng],
+            zoom: 15,
+            zoomControl: true
+        });
+        
+        // Capa base: OpenStreetMap (clara y detallada)
+        const capaOSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 19
+        });
+        
+        // Capa satelital de ESRI
+        const capaSatelital = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri',
+            maxZoom: 19
+        });
+        
+        // Capa híbrida (satelital + etiquetas)
+        const capaHibrida = L.layerGroup([
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                maxZoom: 19
+            }),
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+                maxZoom: 19
+            })
+        ]);
+        
+        // Agregar capa OSM por defecto (más clara)
+        capaOSM.addTo(mapaUbicacionPostulante);
+        
+        // Control de capas
+        const capasBase = {
+            "🗺️ Mapa": capaOSM,
+            "🛰️ Satélite": capaSatelital,
+            "🌍 Híbrido": capaHibrida
+        };
+        
+        L.control.layers(capasBase, null, { position: 'topright' }).addTo(mapaUbicacionPostulante);
+        
+        // Crear icono personalizado
+        const iconoPostulante = L.divIcon({
+            className: 'marcador-postulante-custom',
+            html: `
+                <div style="
+                    background: linear-gradient(135deg, #27AE60, #2ECC71);
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    border: 3px solid #ffffff;
+                    box-shadow: 0 4px 15px rgba(39, 174, 96, 0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                ">
+                    <i class="fas fa-user" style="color: white; font-size: 18px;"></i>
+                </div>
+            `,
+            iconSize: [40, 40],
+            iconAnchor: [20, 20],
+            popupAnchor: [0, -20]
+        });
+        
+        // Crear marcador
+        const marcador = L.marker([lat, lng], { icon: iconoPostulante }).addTo(mapaUbicacionPostulante);
+        
+        // Obtener dirección por geocodificación inversa
+        obtenerDireccionPostulante(lat, lng).then(direccion => {
+            const popupContent = `
+                <div class="popup-postulante">
+                    <h6><i class="fas fa-user me-2"></i>${nombre}</h6>
+                    <p><i class="fas fa-map-marker-alt me-1 text-success"></i>${direccion}</p>
+                    <div class="coords-info">
+                        📍 ${parseFloat(lat).toFixed(5)}, ${parseFloat(lng).toFixed(5)}
+                    </div>
+                </div>
+            `;
+            marcador.bindPopup(popupContent).openPopup();
+        });
+        
+        // Forzar redimensionamiento del mapa
+        setTimeout(() => {
+            mapaUbicacionPostulante.invalidateSize();
+        }, 100);
+    }, { once: true });
+    
+    // Limpiar mapa al cerrar modal
+    modalElement.addEventListener('hidden.bs.modal', function limpiarMapa() {
+        modalElement.removeEventListener('hidden.bs.modal', limpiarMapa);
+        if (mapaUbicacionPostulante) {
+            mapaUbicacionPostulante.remove();
+            mapaUbicacionPostulante = null;
+        }
+    }, { once: true });
+}
+
+/**
+ * Obtener dirección a partir de coordenadas (geocodificación inversa)
+ */
+async function obtenerDireccionPostulante(lat, lng) {
+    try {
+        const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
+            {
+                headers: {
+                    'Accept-Language': 'es',
+                    'User-Agent': 'AgroLaboral/1.0'
+                }
+            }
+        );
+        
+        if (!response.ok) throw new Error('Error en geocodificación');
+        
+        const data = await response.json();
+        
+        if (data && data.address) {
+            const addr = data.address;
+            const partes = [];
+            
+            if (addr.road) partes.push(addr.road);
+            if (addr.house_number) partes.push(addr.house_number);
+            if (addr.suburb || addr.neighbourhood) partes.push(addr.suburb || addr.neighbourhood);
+            if (addr.city || addr.town || addr.village) partes.push(addr.city || addr.town || addr.village);
+            if (addr.state) partes.push(addr.state);
+            
+            return partes.length > 0 ? partes.join(', ') : 'Ubicación aproximada';
+        }
+        
+        return 'Ubicación registrada';
+    } catch (error) {
+        console.warn('⚠️ Error obteniendo dirección:', error);
+        return 'Ubicación registrada';
+    }
 }
 
 /**
