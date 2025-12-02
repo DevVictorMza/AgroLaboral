@@ -13128,19 +13128,15 @@ function renderizarOfertasPublicas(ofertas) {
             <div class="col-12 mb-3">
                 <div class="card shadow-sm border-0 oferta-publica-card oferta-publica-card-horizontal" data-oferta-id="${oferta.idOfertaEmpleo}" data-lat="${oferta.latitud}" data-lng="${oferta.longitud}">
                     <div class="oferta-card-content">
-                        <!-- Sección Icono/Estado -->
-                        <div class="oferta-icon-section">
-                            <div class="oferta-icon-wrapper ${headerColor}">
-                                <i class="fas fa-briefcase"></i>
-                            </div>
-                            <div class="oferta-badge-container">
-                                ${oferta.distancia !== undefined && oferta.distancia !== null ? `
-                                    <div class="oferta-distancia-badge-horizontal">
-                                        <i class="fas fa-location-arrow"></i>
-                                        <span>${formatearDistancia(oferta.distancia)}</span>
-                                    </div>
-                                ` : ''}
-                            </div>
+                        <!-- Contenedor derecho: Badge especie + Botón Postularse -->
+                        <div class="oferta-right-stack">
+                            <span class="oferta-especie">
+                                <i class="fas fa-seedling me-1"></i>
+                                ${oferta.nombreEspecie || 'Especie no especificada'}
+                            </span>
+                            <button class="btn btn-primary btn-postularse" onclick="contactarEmpresa('${oferta.idOfertaEmpleo}')">
+                                Postularse
+                            </button>
                         </div>
                         
                         <!-- Sección Información Principal -->
@@ -13149,10 +13145,6 @@ function renderizarOfertasPublicas(ofertas) {
                                 <h5 class="oferta-titulo">
                                     ${oferta.nombrePuestoTrabajo || 'Puesto no especificado'}
                                 </h5>
-                                <span class="oferta-especie">
-                                    <i class="fas fa-seedling me-1"></i>
-                                    ${oferta.nombreEspecie || 'Especie no especificada'}
-                                </span>
                             </div>
                             
                             <div class="oferta-empresa-horizontal">
@@ -13192,14 +13184,6 @@ function renderizarOfertasPublicas(ofertas) {
                                     </button>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <!-- Sección Acciones -->
-                        <div class="oferta-actions-section">
-                            <button class="btn btn-primary btn-postularse" onclick="contactarEmpresa('${oferta.idOfertaEmpleo}')">
-                                <i class="fas fa-paper-plane me-2"></i>
-                                Postularse
-                            </button>
                         </div>
                     </div>
                 </div>

@@ -1,0 +1,1631 @@
+/* =========================================
+   RESPONSIVE MÓVIL - AGROLABORAL
+   Optimizado para Samsung Galaxy S20 Ultra (412x915)
+   y dispositivos móviles similares
+   ========================================= */
+
+/* ===========================================
+   VARIABLES MÓVILES
+   =========================================== */
+:root {
+    --mobile-padding: 1rem;
+    --mobile-font-base: 14px;
+    --mobile-touch-target: 44px;
+    --mobile-spacing: 0.75rem;
+}
+
+/* ===========================================
+   BREAKPOINT PRINCIPAL: MAX 480px
+   Samsung Galaxy S20 Ultra y similares
+   =========================================== */
+@media (max-width: 480px) {
+    
+    /* --- RESET Y BASE --- */
+    html {
+        font-size: 14px;
+    }
+    
+    body {
+        overflow-x: hidden !important;
+    }
+    
+    #page-wrapper {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100vw !important;
+        overflow-x: hidden !important;
+    }
+    
+    /* --- NAVBAR MÓVIL --- */
+    .navbar {
+        padding: 0.5rem 0.75rem !important;
+        height: auto !important;
+        min-height: 56px;
+    }
+    
+    .navbar-brand {
+        font-size: 1.1rem !important;
+        max-width: 150px;
+    }
+    
+    .navbar-brand img {
+        height: 32px !important;
+        width: auto;
+    }
+    
+    .navbar-toggler {
+        padding: 0.4rem 0.6rem !important;
+        border: 1px solid rgba(255,255,255,0.3) !important;
+    }
+    
+    .navbar-nav {
+        padding: 0.5rem 0;
+        gap: 0.25rem;
+    }
+    
+    .navbar-nav .nav-link {
+        padding: 0.75rem 1rem !important;
+        font-size: 0.95rem !important;
+        border-radius: 8px;
+    }
+    
+    .navbar .btn {
+        width: 100%;
+        margin: 0.25rem 0;
+        padding: 0.6rem 1rem !important;
+        font-size: 0.9rem !important;
+    }
+    
+    /* --- BANNER PRINCIPAL --- */
+    .banner-container {
+        min-height: 100vh !important;
+        height: auto !important;
+        padding: 60px 0.75rem 2rem !important;
+        margin-top: 0 !important;
+    }
+    
+    .banner-text-content {
+        padding: 1.5rem 1rem !important;
+        max-width: 100% !important;
+        margin: 0 0.5rem !important;
+        border-radius: 16px !important;
+    }
+    
+    .banner-text-content h1,
+    .title-gradient {
+        font-size: 1.75rem !important;
+        line-height: 1.2 !important;
+        margin-bottom: 0.75rem !important;
+        letter-spacing: 0.5px !important;
+    }
+    
+    .banner-text-content p,
+    .subtitle-banner {
+        font-size: 0.95rem !important;
+        line-height: 1.5 !important;
+        margin-bottom: 1.25rem !important;
+    }
+    
+    .banner-text-content .btn,
+    .btn-banner {
+        width: 100% !important;
+        padding: 0.875rem 1.5rem !important;
+        font-size: 1rem !important;
+        margin: 0.375rem 0 !important;
+    }
+    
+    /* --- SECCIONES GENERALES --- */
+    section {
+        padding: 2rem 0.75rem !important;
+    }
+    
+    section h2 {
+        font-size: 1.5rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    section p {
+        font-size: 0.95rem !important;
+    }
+    
+    .container {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+    
+    /* --- CARDS DE SERVICIOS --- */
+    .servicios-grid,
+    .services-grid,
+    .row.g-4 {
+        gap: 1rem !important;
+    }
+    
+    .servicio-card,
+    .service-card {
+        padding: 1.25rem !important;
+        margin-bottom: 0.75rem !important;
+        border-radius: 12px !important;
+    }
+    
+    .servicio-card .icon-container,
+    .service-icon {
+        width: 50px !important;
+        height: 50px !important;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    .servicio-card .icon-container i,
+    .service-icon i {
+        font-size: 1.5rem !important;
+    }
+    
+    .servicio-card h4,
+    .service-card h4 {
+        font-size: 1.1rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .servicio-card p,
+    .service-card p {
+        font-size: 0.875rem !important;
+        line-height: 1.4 !important;
+    }
+    
+    /* --- CARRUSEL DE SERVICIOS --- */
+    .servicios-carousel-container {
+        padding: 0 0.5rem !important;
+    }
+    
+    .servicio-carousel-item {
+        min-width: 280px !important;
+        padding: 1rem !important;
+    }
+    
+    .carousel-nav-btn {
+        width: 36px !important;
+        height: 36px !important;
+    }
+    
+    /* --- MAPA PRINCIPAL --- */
+    #mapa-principal,
+    .mapa-container,
+    .map-wrapper {
+        height: 350px !important;
+        min-height: 300px !important;
+        border-radius: 12px !important;
+        margin: 0 0.5rem !important;
+    }
+    
+    /* Controles del mapa más grandes para touch */
+    .leaflet-control-zoom a {
+        width: 36px !important;
+        height: 36px !important;
+        line-height: 36px !important;
+        font-size: 18px !important;
+    }
+    
+    .leaflet-control-layers {
+        max-width: 180px;
+    }
+    
+    /* Popups del mapa */
+    .leaflet-popup-content-wrapper {
+        max-width: 280px !important;
+        border-radius: 12px !important;
+    }
+    
+    .leaflet-popup-content {
+        margin: 10px !important;
+        font-size: 0.875rem !important;
+    }
+    
+    /* --- MODALES --- */
+    .modal-dialog {
+        margin: 0.5rem !important;
+        max-width: calc(100vw - 1rem) !important;
+    }
+    
+    .modal-dialog-centered {
+        min-height: calc(100vh - 1rem) !important;
+    }
+    
+    .modal-content {
+        border-radius: 16px !important;
+        max-height: 90vh !important;
+        overflow: hidden;
+    }
+    
+    .modal-header {
+        padding: 1rem !important;
+        border-radius: 16px 16px 0 0 !important;
+    }
+    
+    .modal-header .modal-title {
+        font-size: 1.1rem !important;
+    }
+    
+    .modal-header .btn-close {
+        width: 32px !important;
+        height: 32px !important;
+        padding: 0 !important;
+    }
+    
+    .modal-body {
+        padding: 1rem !important;
+        max-height: 60vh !important;
+        overflow-y: auto !important;
+    }
+    
+    .modal-footer {
+        padding: 0.75rem 1rem !important;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .modal-footer .btn {
+        flex: 1 1 auto;
+        min-width: 120px;
+        padding: 0.625rem 1rem !important;
+    }
+    
+    /* Modal XL en móvil */
+    .modal-xl {
+        max-width: calc(100vw - 1rem) !important;
+    }
+    
+    /* --- FORMULARIOS --- */
+    .form-control,
+    .form-select {
+        padding: 0.75rem 1rem !important;
+        font-size: 16px !important; /* Previene zoom en iOS */
+        border-radius: 10px !important;
+        min-height: var(--mobile-touch-target);
+    }
+    
+    .form-label {
+        font-size: 0.9rem !important;
+        margin-bottom: 0.375rem !important;
+    }
+    
+    .form-group,
+    .mb-3 {
+        margin-bottom: 1rem !important;
+    }
+    
+    textarea.form-control {
+        min-height: 100px !important;
+    }
+    
+    /* --- BOTONES --- */
+    .btn {
+        padding: 0.75rem 1.25rem !important;
+        font-size: 0.95rem !important;
+        border-radius: 10px !important;
+        min-height: var(--mobile-touch-target);
+    }
+    
+    .btn-sm {
+        padding: 0.5rem 0.875rem !important;
+        font-size: 0.85rem !important;
+        min-height: 36px !important;
+    }
+    
+    .btn-lg {
+        padding: 0.875rem 1.5rem !important;
+        font-size: 1.05rem !important;
+    }
+    
+    /* Botones gigantes adaptados */
+    .btn-gigante,
+    .menu-btn-circle {
+        width: 100% !important;
+        max-width: none !important;
+        height: auto !important;
+        min-height: 80px !important;
+        padding: 1rem !important;
+        border-radius: 16px !important;
+        flex-direction: row !important;
+        justify-content: flex-start !important;
+        gap: 1rem !important;
+    }
+    
+    .btn-gigante i,
+    .menu-btn-circle i {
+        font-size: 1.75rem !important;
+        width: 50px !important;
+        text-align: center;
+    }
+    
+    .btn-gigante span,
+    .menu-btn-circle span {
+        font-size: 1rem !important;
+    }
+    
+    /* --- TABLAS RESPONSIVE --- */
+    .table-responsive {
+        font-size: 0.85rem !important;
+    }
+    
+    .table th,
+    .table td {
+        padding: 0.5rem 0.375rem !important;
+        vertical-align: middle !important;
+    }
+    
+    .table th {
+        font-size: 0.8rem !important;
+        white-space: nowrap;
+    }
+    
+    /* Ocultar columnas menos importantes en móvil */
+    .table .hide-mobile {
+        display: none !important;
+    }
+    
+    /* --- DASHBOARD --- */
+    .dashboard-container {
+        padding: 0.75rem !important;
+    }
+    
+    .dashboard-header {
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+        text-align: center !important;
+    }
+    
+    .dashboard-title {
+        font-size: 1.25rem !important;
+    }
+    
+    /* Stats cards en móvil */
+    .stats-grid,
+    .stats-container {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 0.75rem !important;
+    }
+    
+    .stat-card {
+        padding: 1rem !important;
+        border-radius: 12px !important;
+    }
+    
+    .stat-card .stat-number {
+        font-size: 1.5rem !important;
+    }
+    
+    .stat-card .stat-label {
+        font-size: 0.75rem !important;
+    }
+    
+    /* --- CARDS DE OFERTAS --- */
+    .ofertas-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+    
+    .oferta-card {
+        padding: 1rem !important;
+        border-radius: 12px !important;
+    }
+    
+    .oferta-card .oferta-title {
+        font-size: 1.05rem !important;
+    }
+    
+    .oferta-card .oferta-meta {
+        font-size: 0.85rem !important;
+    }
+    
+    /* --- LISTA DE ESTABLECIMIENTOS --- */
+    .establecimiento-item {
+        padding: 0.875rem !important;
+        border-radius: 10px !important;
+    }
+    
+    .establecimiento-item h5 {
+        font-size: 1rem !important;
+    }
+    
+    .establecimiento-item .badge {
+        font-size: 0.7rem !important;
+        padding: 0.25rem 0.5rem !important;
+    }
+    
+    /* --- WIZARD DE REGISTRO --- */
+    .wizard-container {
+        padding: 1rem !important;
+    }
+    
+    .wizard-steps {
+        gap: 0.25rem !important;
+    }
+    
+    .wizard-step {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 0.75rem !important;
+    }
+    
+    .wizard-step-title {
+        display: none !important;
+    }
+    
+    .wizard-content {
+        padding: 1rem !important;
+    }
+    
+    /* --- POSTULACIONES --- */
+    .postulaciones-header {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+    }
+    
+    .postulante-row {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+        padding: 0.75rem !important;
+    }
+    
+    .postulante-info {
+        flex-direction: column !important;
+        text-align: center !important;
+    }
+    
+    .postulante-actions {
+        width: 100% !important;
+        display: flex !important;
+        gap: 0.5rem !important;
+    }
+    
+    .postulante-actions .btn {
+        flex: 1 !important;
+    }
+    
+    /* --- UBICACIÓN POSTULANTE (MODAL MAPA) --- */
+    .mapa-postulante-container {
+        height: 280px !important;
+    }
+    
+    .postulante-info-header {
+        padding: 0.75rem 1rem !important;
+    }
+    
+    .postulante-avatar {
+        width: 40px !important;
+        height: 40px !important;
+    }
+    
+    .postulante-datos h6 {
+        font-size: 0.95rem !important;
+    }
+    
+    /* --- ALERTAS Y NOTIFICACIONES --- */
+    .alert {
+        padding: 0.875rem 1rem !important;
+        font-size: 0.9rem !important;
+        border-radius: 10px !important;
+    }
+    
+    .toast {
+        max-width: calc(100vw - 2rem) !important;
+    }
+    
+    /* --- BADGES --- */
+    .badge {
+        font-size: 0.7rem !important;
+        padding: 0.3rem 0.6rem !important;
+    }
+    
+    /* --- FOOTER --- */
+    footer {
+        padding: 1.5rem 1rem !important;
+        text-align: center !important;
+    }
+    
+    footer .row {
+        flex-direction: column !important;
+        gap: 1.5rem !important;
+    }
+    
+    footer h5 {
+        font-size: 1rem !important;
+    }
+    
+    footer p,
+    footer a {
+        font-size: 0.875rem !important;
+    }
+    
+    /* --- UTILIDADES MÓVILES --- */
+    .d-mobile-none {
+        display: none !important;
+    }
+    
+    .d-mobile-block {
+        display: block !important;
+    }
+    
+    .d-mobile-flex {
+        display: flex !important;
+    }
+    
+    .text-mobile-center {
+        text-align: center !important;
+    }
+    
+    .w-mobile-100 {
+        width: 100% !important;
+    }
+    
+    /* Espaciado móvil */
+    .p-mobile-1 { padding: 0.5rem !important; }
+    .p-mobile-2 { padding: 1rem !important; }
+    .m-mobile-1 { margin: 0.5rem !important; }
+    .m-mobile-2 { margin: 1rem !important; }
+    .gap-mobile-1 { gap: 0.5rem !important; }
+    .gap-mobile-2 { gap: 1rem !important; }
+}
+
+/* ===========================================
+   BREAKPOINT SECUNDARIO: MAX 360px
+   Dispositivos más pequeños
+   =========================================== */
+@media (max-width: 360px) {
+    
+    html {
+        font-size: 13px;
+    }
+    
+    .banner-text-content h1,
+    .title-gradient {
+        font-size: 1.5rem !important;
+    }
+    
+    .banner-text-content p,
+    .subtitle-banner {
+        font-size: 0.875rem !important;
+    }
+    
+    .modal-dialog {
+        margin: 0.25rem !important;
+    }
+    
+    .stats-grid,
+    .stats-container {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .btn-gigante,
+    .menu-btn-circle {
+        min-height: 70px !important;
+    }
+}
+
+/* ===========================================
+   ORIENTACIÓN LANDSCAPE EN MÓVIL
+   =========================================== */
+@media (max-width: 915px) and (orientation: landscape) {
+    
+    .banner-container {
+        min-height: auto !important;
+        padding: 70px 1rem 1.5rem !important;
+    }
+    
+    .banner-text-content h1 {
+        font-size: 1.5rem !important;
+    }
+    
+    .modal-content {
+        max-height: 85vh !important;
+    }
+    
+    .modal-body {
+        max-height: 50vh !important;
+    }
+    
+    #mapa-principal,
+    .mapa-container {
+        height: 250px !important;
+    }
+    
+    .mapa-postulante-container {
+        height: 200px !important;
+    }
+}
+
+/* ===========================================
+   MEJORAS DE ACCESIBILIDAD TÁCTIL
+   =========================================== */
+@media (pointer: coarse) {
+    /* Aumentar áreas táctiles */
+    .btn,
+    .nav-link,
+    .form-control,
+    .form-select,
+    .dropdown-item {
+        min-height: 44px;
+    }
+    
+    /* Espaciado entre elementos clicables */
+    .btn + .btn,
+    .nav-link + .nav-link {
+        margin-left: 0.5rem;
+    }
+    
+    /* Links más fáciles de tocar */
+    a {
+        padding: 0.25rem;
+    }
+    
+    /* Checkboxes y radios más grandes */
+    input[type="checkbox"],
+    input[type="radio"] {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+/* ===========================================
+   PREVENIR ZOOM EN iOS AL FOCUS INPUT
+   =========================================== */
+@media screen and (max-width: 480px) {
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="tel"],
+    input[type="number"],
+    input[type="search"],
+    textarea,
+    select {
+        font-size: 16px !important;
+    }
+}
+
+/* ===========================================
+   SMOOTH SCROLL PARA MÓVILES
+   =========================================== */
+@media (max-width: 768px) {
+    html {
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Ocultar scrollbar pero mantener funcionalidad */
+    ::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+    }
+}
+
+/* ===========================================
+   CORRECCIONES DE TARJETAS Y MODALES
+   Formas prolijas para responsive
+   =========================================== */
+
+/* --- MODALES: BORDES Y ESQUINAS UNIFORMES --- */
+@media (max-width: 576px) {
+    
+    /* Modal dialog centrado con márgenes uniformes */
+    .modal-dialog {
+        margin: 0.75rem !important;
+        max-width: calc(100vw - 1.5rem) !important;
+    }
+    
+    .modal-dialog-centered {
+        min-height: calc(100% - 1.5rem) !important;
+    }
+    
+    /* Modal content con bordes redondeados uniformes */
+    .modal-content {
+        border-radius: 16px !important;
+        overflow: hidden !important;
+        border-width: 1px !important;
+    }
+    
+    .modal-header {
+        border-radius: 16px 16px 0 0 !important;
+        padding: 1rem 1.25rem !important;
+    }
+    
+    .modal-body {
+        padding: 1.25rem !important;
+    }
+    
+    .modal-footer {
+        border-radius: 0 0 16px 16px !important;
+        padding: 1rem 1.25rem !important;
+        gap: 0.5rem;
+    }
+    
+    /* Modal XL y LG adaptados */
+    .modal-lg,
+    .modal-xl {
+        max-width: calc(100vw - 1.5rem) !important;
+    }
+    
+    /* Modal fullscreen sin bordes */
+    .modal-fullscreen .modal-content {
+        border-radius: 0 !important;
+    }
+    
+    .modal-fullscreen .modal-header {
+        border-radius: 0 !important;
+    }
+}
+
+/* --- TARJETAS DE SERVICIOS CARRUSEL --- */
+@media (max-width: 576px) {
+    
+    .servicio-card-agro {
+        border-radius: 14px !important;
+        padding: 1.25rem !important;
+        margin: 0.5rem !important;
+        min-height: auto !important;
+    }
+    
+    .servicio-slide {
+        padding: 0 0.5rem !important;
+    }
+    
+    .carousel-track-container {
+        padding: 0.5rem 0 !important;
+    }
+    
+    .servicio-header-card {
+        border-radius: 14px !important;
+        padding: 1.5rem 1rem !important;
+        margin: 0 0.75rem !important;
+    }
+    
+    .servicio-header-card h2 {
+        font-size: 1.5rem !important;
+    }
+    
+    .servicio-header-card p {
+        font-size: 0.9rem !important;
+    }
+}
+
+/* --- TARJETAS DE OFERTAS LABORALES --- */
+@media (max-width: 576px) {
+    
+    #ofertas-publicas-container {
+        padding: 0 0.5rem !important;
+    }
+    
+    #ofertas-publicas-container .col-12,
+    #ofertas-publicas-container .col-md-6,
+    #ofertas-publicas-container .col-lg-4 {
+        padding: 0.375rem !important;
+    }
+    
+    /* Cards de ofertas con bordes uniformes */
+    .oferta-card,
+    .card-oferta,
+    .oferta-publica-card {
+        border-radius: 14px !important;
+        overflow: hidden !important;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    .oferta-card .card-header,
+    .card-oferta .card-header {
+        border-radius: 14px 14px 0 0 !important;
+        padding: 0.875rem 1rem !important;
+    }
+    
+    .oferta-card .card-body,
+    .card-oferta .card-body {
+        padding: 1rem !important;
+    }
+    
+    .oferta-card .card-footer,
+    .card-oferta .card-footer {
+        border-radius: 0 0 14px 14px !important;
+        padding: 0.75rem 1rem !important;
+    }
+}
+
+/* --- FILTROS DE OFERTAS --- */
+@media (max-width: 576px) {
+    
+    .filtros-container,
+    .filtros-ofertas-container {
+        border-radius: 14px !important;
+        padding: 1rem !important;
+        margin: 0 0.5rem 1rem 0.5rem !important;
+    }
+    
+    .filtros-container .form-select,
+    .filtros-container .form-control {
+        border-radius: 10px !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .filtros-container .btn {
+        border-radius: 10px !important;
+        width: 100% !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    /* Botones de ordenamiento en columna */
+    .filtros-container .d-flex.gap-2 {
+        flex-direction: column !important;
+    }
+}
+
+/* --- WIZARD DE REGISTRO --- */
+@media (max-width: 576px) {
+    
+    #modalRegistroEmpleador .modal-content,
+    #modalLogin .modal-content {
+        border-radius: 16px !important;
+    }
+    
+    .wizard-progress {
+        padding: 0 0.5rem !important;
+    }
+    
+    .wizard-progress-bar {
+        border-radius: 8px !important;
+        height: 6px !important;
+    }
+    
+    .wizard-step-label {
+        font-size: 0.75rem !important;
+    }
+    
+    .wizard-step-label span:first-child {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 0.8rem !important;
+    }
+}
+
+/* --- CARDS DEL DASHBOARD --- */
+@media (max-width: 576px) {
+    
+    /* Stats cards */
+    .stat-card,
+    .dashboard-stat-card {
+        border-radius: 12px !important;
+        padding: 1rem !important;
+    }
+    
+    /* Cards de establecimientos */
+    .establecimiento-card,
+    .finca-card {
+        border-radius: 12px !important;
+        margin-bottom: 0.75rem !important;
+        overflow: hidden !important;
+    }
+    
+    .establecimiento-card .card-header,
+    .finca-card .card-header {
+        border-radius: 12px 12px 0 0 !important;
+    }
+    
+    /* Lista de establecimientos */
+    .establecimiento-item,
+    .lista-establecimiento-item {
+        border-radius: 10px !important;
+        padding: 0.875rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+}
+
+/* --- MODAL EDITAR ESTABLECIMIENTO --- */
+@media (max-width: 576px) {
+    
+    #editarEstablecimientoModal .modal-content {
+        border-radius: 16px !important;
+    }
+    
+    #editarEstablecimientoModal .modal-header {
+        border-radius: 16px 16px 0 0 !important;
+    }
+    
+    #editarEstablecimientoModal .modal-footer {
+        border-radius: 0 0 16px 16px !important;
+    }
+    
+    /* Mapa dentro del modal */
+    .map-preview-editar,
+    #mapEditarEstablecimiento {
+        border-radius: 10px !important;
+        height: 200px !important;
+    }
+    
+    /* Dropdown de especies */
+    .especies-dropdown {
+        border-radius: 10px !important;
+        max-height: 200px !important;
+    }
+}
+
+/* --- MODAL OFERTA DE TRABAJO --- */
+@media (max-width: 576px) {
+    
+    #modalOfertaTrabajo .modal-content {
+        border-radius: 16px !important;
+    }
+    
+    #modalOfertaTrabajo .modal-header {
+        border-radius: 16px 16px 0 0 !important;
+    }
+    
+    #modalOfertaTrabajo .modal-footer {
+        border-radius: 0 0 16px 16px !important;
+        flex-direction: column !important;
+    }
+    
+    #modalOfertaTrabajo .modal-footer .btn {
+        width: 100% !important;
+    }
+}
+
+/* --- MODAL POSTULACIONES --- */
+@media (max-width: 576px) {
+    
+    #modalPostulaciones .modal-content {
+        border-radius: 16px !important;
+    }
+    
+    /* Tabla de postulaciones */
+    #modalPostulaciones .table-responsive {
+        border-radius: 10px !important;
+    }
+    
+    #modalPostulaciones .table {
+        font-size: 0.8rem !important;
+    }
+    
+    #modalPostulaciones .table th,
+    #modalPostulaciones .table td {
+        padding: 0.5rem 0.375rem !important;
+        white-space: nowrap;
+    }
+    
+    /* Ocultar columnas menos importantes */
+    #modalPostulaciones .table th:nth-child(5),
+    #modalPostulaciones .table td:nth-child(5) {
+        display: none !important;
+    }
+}
+
+/* --- MODAL UBICACIÓN POSTULANTE --- */
+@media (max-width: 576px) {
+    
+    #modalUbicacionPostulante .modal-content {
+        border-radius: 16px !important;
+    }
+    
+    .mapa-postulante-container {
+        border-radius: 0 !important;
+        height: 280px !important;
+    }
+    
+    .postulante-info-header {
+        border-radius: 0 !important;
+    }
+}
+
+/* --- ALERTAS Y BADGES --- */
+@media (max-width: 576px) {
+    
+    .alert {
+        border-radius: 12px !important;
+        padding: 0.875rem 1rem !important;
+    }
+    
+    .badge {
+        border-radius: 6px !important;
+    }
+    
+    .badge-pill {
+        border-radius: 50rem !important;
+    }
+}
+
+/* --- BOTONES UNIFORMES --- */
+@media (max-width: 576px) {
+    
+    .btn {
+        border-radius: 10px !important;
+    }
+    
+    .btn-sm {
+        border-radius: 8px !important;
+    }
+    
+    .btn-lg {
+        border-radius: 12px !important;
+    }
+    
+    .btn-group .btn:first-child {
+        border-radius: 10px 0 0 10px !important;
+    }
+    
+    .btn-group .btn:last-child {
+        border-radius: 0 10px 10px 0 !important;
+    }
+}
+
+/* --- INPUTS Y SELECTS --- */
+@media (max-width: 576px) {
+    
+    .form-control,
+    .form-select {
+        border-radius: 10px !important;
+    }
+    
+    .input-group .form-control:first-child {
+        border-radius: 10px 0 0 10px !important;
+    }
+    
+    .input-group .form-control:last-child,
+    .input-group .btn:last-child {
+        border-radius: 0 10px 10px 0 !important;
+    }
+}
+
+/* --- CONTENEDOR PRINCIPAL DE OFERTAS --- */
+@media (max-width: 576px) {
+    
+    /* Remover el style inline width: 95% */
+    .row[style*="width: 95%"] {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 0.5rem !important;
+    }
+}
+
+/* --- POPUPS DE MAPA LEAFLET --- */
+@media (max-width: 576px) {
+    
+    .leaflet-popup-content-wrapper {
+        border-radius: 12px !important;
+        max-width: 280px !important;
+    }
+    
+    .leaflet-popup-content {
+        margin: 8px 10px !important;
+    }
+    
+    /* Popup de establecimiento */
+    .popup-establecimiento {
+        border-radius: 10px !important;
+    }
+    
+    .popup-establecimiento-header {
+        border-radius: 10px 10px 0 0 !important;
+    }
+}
+
+/* --- SPINNER Y LOADING --- */
+@media (max-width: 576px) {
+    
+    .ofertas-loading-container {
+        padding: 2rem 1rem !important;
+    }
+    
+    .ofertas-loading-container p {
+        font-size: 0.95rem !important;
+    }
+}
+
+/* --- TARJETAS DE OFERTAS SIN ICONO GRANDE --- */
+/* Ocultar sección de icono en todas las vistas */
+.oferta-icon-section {
+    display: none !important;
+}
+
+/* Nuevo contenedor de badge de distancia */
+.oferta-badge-container-mobile {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 5;
+}
+
+.oferta-badge-container-mobile .oferta-distancia-badge-horizontal {
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Ajustar card content sin el icono */
+.oferta-card-content {
+    position: relative;
+}
+
+.oferta-info-section {
+    width: 100% !important;
+    padding-left: 0 !important;
+}
+
+@media (max-width: 576px) {
+    .oferta-badge-container-mobile {
+        top: 0.375rem;
+        right: 0.375rem;
+    }
+    
+    .oferta-badge-container-mobile .oferta-distancia-badge-horizontal {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+    }
+}
+
+/* --- CONTENEDOR DERECHO: BADGE + BOTÓN --- */
+/* Stack vertical para agrupar badge especie y botón postularse */
+.oferta-right-stack {
+    position: absolute !important;
+    top: 0.75rem !important;
+    right: 0.75rem !important;
+    z-index: 10 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 0.5rem !important;
+}
+
+/* Badge especie dentro del stack */
+.oferta-right-stack .oferta-especie {
+    margin: 0 !important;
+}
+
+/* Botón postularse - mismo tamaño que badge especie */
+.oferta-right-stack .btn-postularse {
+    width: auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.4rem 0.9rem !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    border-radius: 20px !important;
+    background: linear-gradient(135deg, #0056b3 0%, #007bff 100%) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(0, 123, 255, 0.6) !important;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3) !important;
+    white-space: nowrap !important;
+    margin: 0 !important;
+}
+
+.oferta-right-stack .btn-postularse:hover,
+.oferta-right-stack .btn-postularse:focus {
+    background: linear-gradient(135deg, #004494 0%, #0056b3 100%) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.5) !important;
+}
+
+/* Ocultar sección de acciones antigua */
+.oferta-actions-section {
+    display: none !important;
+}
+
+@media (max-width: 576px) {
+    .oferta-right-stack {
+        top: 0.5rem !important;
+        right: 0.5rem !important;
+        gap: 0.4rem !important;
+    }
+    
+    .oferta-right-stack .oferta-especie,
+    .oferta-right-stack .btn-postularse {
+        padding: 0.35rem 0.75rem !important;
+        font-size: 0.8rem !important;
+        border-radius: 18px !important;
+    }
+}
+
+/* ============================================
+   SECCIÓN OFERTAS PÚBLICAS - RESPONSIVE MÓVIL
+   Samsung Galaxy S20 Ultra (412x915)
+   ============================================ */
+
+/* --- CONTENEDOR PRINCIPAL OFERTAS --- */
+@media (max-width: 576px) {
+    .ofertas-main-container {
+        width: 100% !important;
+        padding: 0 0.5rem !important;
+        margin: 0 !important;
+    }
+    
+    #ofertas-publicas-container {
+        padding: 0 !important;
+    }
+    
+    #ofertas-publicas-container .col-12 {
+        padding: 0.25rem 0 !important;
+    }
+}
+
+/* ============================================
+   CARDS DE OFERTAS - RESPONSIVE MÓVIL OPTIMIZADO
+   Samsung Galaxy S20 Ultra (412x915)
+   ============================================ */
+
+/* --- CONTENEDOR DE OFERTAS --- */
+@media (max-width: 576px) {
+    #ofertas-content,
+    .ofertas-content {
+        padding: 0.25rem !important;
+    }
+    
+    #ofertas-content .row,
+    .ofertas-content .row {
+        margin: 0 -0.25rem !important;
+    }
+    
+    #ofertas-content .col-12,
+    .ofertas-content .col-12 {
+        padding: 0.25rem !important;
+    }
+}
+
+/* --- CARD DE OFERTA PÚBLICA --- */
+@media (max-width: 576px) {
+    .oferta-publica-card,
+    .oferta-publica-card-horizontal {
+        border-radius: 12px !important;
+        margin: 0 0 0.5rem 0 !important;
+        overflow: hidden !important;
+        width: 100% !important;
+    }
+    
+    .oferta-publica-card-horizontal .oferta-card-content {
+        display: block !important;
+        padding: 1rem !important;
+        padding-top: 3.5rem !important; /* Espacio para los badges superiores */
+        position: relative !important;
+        min-height: auto !important;
+    }
+}
+
+/* --- STACK DERECHO (BADGE + BOTÓN) --- */
+@media (max-width: 576px) {
+    .oferta-right-stack {
+        position: absolute !important;
+        top: 0.75rem !important;
+        right: 0.75rem !important;
+        z-index: 10 !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+    }
+    
+    .oferta-right-stack .oferta-especie {
+        padding: 0.35rem 0.7rem !important;
+        font-size: 0.7rem !important;
+        border-radius: 12px !important;
+        margin: 0 !important;
+        white-space: nowrap !important;
+    }
+    
+    .oferta-right-stack .btn-postularse {
+        padding: 0.35rem 0.7rem !important;
+        font-size: 0.7rem !important;
+        border-radius: 12px !important;
+        margin: 0 !important;
+        white-space: nowrap !important;
+    }
+}
+
+/* --- SECCIÓN INFO PRINCIPAL --- */
+@media (max-width: 576px) {
+    .oferta-info-section {
+        width: 100% !important;
+        padding: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.625rem !important;
+    }
+    
+    .oferta-header-horizontal {
+        display: block !important;
+    }
+    
+    .oferta-titulo {
+        font-size: 1rem !important;
+        font-weight: 700 !important;
+        line-height: 1.3 !important;
+        margin: 0 !important;
+        color: #ffffff !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+    }
+}
+
+/* --- EMPRESA Y ESTABLECIMIENTO --- */
+@media (max-width: 576px) {
+    .oferta-empresa-horizontal {
+        padding-bottom: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    .oferta-empresa-horizontal h6 {
+        font-size: 0.85rem !important;
+        margin-bottom: 0.25rem !important;
+        font-weight: 600 !important;
+    }
+    
+    .oferta-empresa-horizontal h6 i {
+        font-size: 0.75rem !important;
+        margin-right: 0.35rem !important;
+    }
+    
+    .oferta-empresa-horizontal p {
+        font-size: 0.75rem !important;
+        margin: 0 !important;
+        opacity: 0.85 !important;
+    }
+    
+    .oferta-empresa-horizontal p i {
+        font-size: 0.7rem !important;
+        margin-right: 0.35rem !important;
+    }
+}
+
+/* --- DETALLES (VACANTES, FECHA, VER MAPA) --- */
+@media (max-width: 576px) {
+    .oferta-detalles-horizontal {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 0.5rem !important;
+        margin-top: 0.25rem !important;
+    }
+    
+    .oferta-detalle-item {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.2rem !important;
+        padding: 0.5rem 0.625rem !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+        border-radius: 10px !important;
+        border: none !important;
+        flex: 1 1 45% !important;
+        min-width: 0 !important;
+    }
+    
+    .oferta-detalle-item:last-child {
+        flex: 1 1 100% !important;
+        flex-direction: row !important;
+        justify-content: center !important;
+        align-items: center !important;
+        background: transparent !important;
+        padding: 0.375rem 0 0 0 !important;
+    }
+    
+    .oferta-detalle-item small {
+        font-size: 0.7rem !important;
+        opacity: 0.75 !important;
+        white-space: nowrap !important;
+    }
+    
+    .oferta-detalle-item small i {
+        font-size: 0.65rem !important;
+        margin-right: 0.25rem !important;
+    }
+    
+    .oferta-detalle-item .fw-bold {
+        font-size: 0.8rem !important;
+    }
+    
+    .oferta-detalle-item .fw-bold small {
+        font-size: 0.65rem !important;
+        opacity: 0.8 !important;
+    }
+    
+    /* Botón Ver en mapa */
+    .oferta-detalle-item .btn-link {
+        font-size: 0.8rem !important;
+        padding: 0.35rem 0.75rem !important;
+        text-decoration: none !important;
+        background: rgba(52, 152, 219, 0.15) !important;
+        border-radius: 10px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.25rem !important;
+    }
+    
+    .oferta-detalle-item .btn-link i {
+        font-size: 0.75rem !important;
+    }
+}
+
+/* --- HEADER DE SECCIÓN OFERTAS --- */
+@media (max-width: 576px) {
+    /* Contenedor dashboard-card para ofertas */
+    .dashboard-card.p-4:has(.ofertas-header) {
+        padding: 0.75rem !important;
+    }
+    
+    /* Header principal de ofertas */
+    .ofertas-header {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        padding: 0.875rem !important;
+        margin-bottom: 0.75rem !important;
+        gap: 0.75rem !important;
+        border-radius: 12px !important;
+    }
+    
+    /* Info del header (icono + texto) */
+    .ofertas-header .header-info {
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.75rem !important;
+        width: 100% !important;
+    }
+    
+    /* Icono del header */
+    .ofertas-header .header-info > i {
+        font-size: 1.25rem !important;
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        border-radius: 10px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    /* Contenedor de texto */
+    .ofertas-header .header-text {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.2rem !important;
+        flex: 1 !important;
+    }
+    
+    /* Título h5 */
+    .ofertas-header .header-text h5 {
+        font-size: 1rem !important;
+        margin: 0 !important;
+        line-height: 1.3 !important;
+    }
+    
+    /* Badge contador */
+    .ofertas-header .header-text .contador-badge {
+        font-size: 0.75rem !important;
+        padding: 0.2rem 0.5rem !important;
+        border-radius: 10px !important;
+        display: inline-block !important;
+        width: fit-content !important;
+    }
+    
+    /* Controles de filtro */
+    .ofertas-filter-controls {
+        width: 100% !important;
+    }
+    
+    /* Grupo de botones */
+    .btn-group-ofertas {
+        display: flex !important;
+        width: 100% !important;
+        gap: 0.5rem !important;
+        padding: 0.35rem !important;
+        border-radius: 10px !important;
+    }
+    
+    /* Botones de filtro */
+    .btn-filter {
+        flex: 1 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 0.4rem !important;
+        padding: 0.6rem 0.5rem !important;
+        font-size: 0.8rem !important;
+        border-radius: 8px !important;
+        white-space: nowrap !important;
+    }
+    
+    .btn-filter i {
+        font-size: 0.85rem !important;
+    }
+    
+    .btn-filter span {
+        display: inline !important;
+        font-size: 0.8rem !important;
+    }
+    
+    /* Estado activo */
+    .btn-filter.active {
+        transform: none !important;
+    }
+}
+
+/* --- FILTROS DE OFERTAS --- */
+@media (max-width: 576px) {
+    .row.g-3.align-items-end {
+        padding: 0.75rem !important;
+        margin: 0.5rem 0 !important;
+    }
+    
+    .row.g-3.align-items-end .col-md-3,
+    .row.g-3.align-items-end .col-md-2,
+    .row.g-3.align-items-end [class*="col-"] {
+        padding: 0.25rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .row.g-3.align-items-end .form-label {
+        font-size: 0.8rem !important;
+        margin-bottom: 0.25rem !important;
+    }
+    
+    .row.g-3.align-items-end .form-select,
+    .row.g-3.align-items-end .form-control {
+        font-size: 0.85rem !important;
+        padding: 0.6rem 0.75rem !important;
+        border-radius: 10px !important;
+    }
+    
+    .row.g-3.align-items-end .btn {
+        width: 100% !important;
+        padding: 0.6rem 1rem !important;
+        font-size: 0.85rem !important;
+        border-radius: 10px !important;
+    }
+}
+
+/* --- ESTADO VACÍO Y CARGA --- */
+@media (max-width: 576px) {
+    .ofertas-empty-state,
+    .ofertas-loading {
+        padding: 2rem 1rem !important;
+        text-align: center !important;
+    }
+    
+    .ofertas-empty-state i {
+        font-size: 2.5rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    .ofertas-empty-state h5 {
+        font-size: 1rem !important;
+    }
+    
+    .ofertas-empty-state p {
+        font-size: 0.85rem !important;
+    }
+}
+
+/* --- PAGINACIÓN OFERTAS --- */
+@media (max-width: 576px) {
+    .pagination-ofertas,
+    .ofertas-pagination {
+        display: flex !important;
+        justify-content: center !important;
+        gap: 0.25rem !important;
+        padding: 1rem 0.5rem !important;
+        flex-wrap: wrap !important;
+    }
+    
+    .pagination-ofertas .page-link,
+    .ofertas-pagination .page-link {
+        padding: 0.4rem 0.7rem !important;
+        font-size: 0.8rem !important;
+        border-radius: 8px !important;
+    }
+}

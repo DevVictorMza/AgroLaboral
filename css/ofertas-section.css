@@ -3,6 +3,19 @@
    Tema oscuro profesional para la sección de ofertas
    =================================================== */
 
+/* Contenedor principal de ofertas */
+.ofertas-main-container {
+    width: 95%;
+    margin: 0 auto;
+}
+
+@media (max-width: 576px) {
+    .ofertas-main-container {
+        width: 100%;
+        padding: 0 0.5rem;
+    }
+}
+
 /* Tema vino para contenedor de filtros seleccionado - SOLO ELEMENTOS INTERNOS */
 .row.g-3.align-items-end {
     background: transparent !important;
